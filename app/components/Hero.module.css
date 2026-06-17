@@ -1,0 +1,168 @@
+.hero {
+  padding: clamp(72px, 12vh, 128px) 0 clamp(56px, 9vh, 96px);
+  border-bottom: 1px solid var(--border);
+}
+
+.eyebrow {
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+  margin-bottom: 18px;
+}
+
+.title {
+  font-size: clamp(2.1rem, 5.4vw, 3.3rem);
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  max-width: 20ch;
+  text-wrap: balance;
+}
+
+.intro {
+  margin-top: 24px;
+  max-width: 64ch;
+  font-size: 1.14rem;
+  color: var(--muted-strong);
+}
+
+.tags {
+  margin-top: 26px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  list-style: none;
+}
+
+.tag {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--muted-strong);
+  padding: 6px 13px;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+}
+
+.actions {
+  margin-top: 34px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.ctaPrimary,
+.ctaSecondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  padding: 0 26px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 1rem;
+  border: 1px solid transparent;
+  transition:
+    transform 0.18s var(--ease),
+    background-color 0.18s var(--ease),
+    border-color 0.18s var(--ease),
+    box-shadow 0.18s var(--ease);
+}
+
+.ctaPrimary {
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.ctaSecondary {
+  border-color: var(--border-strong);
+  color: var(--foreground);
+  background: color-mix(in srgb, var(--surface) 60%, transparent);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ctaPrimary:hover {
+    background: var(--accent-strong);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 30px -12px var(--glow-1);
+  }
+  .ctaSecondary:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+  }
+}
+
+/* Agentic-only "problem -> tested artifact" storyline */
+.storyline {
+  margin-top: 44px;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  counter-reset: story;
+}
+
+.storyStep {
+  position: relative;
+  padding: 18px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 64%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.storyStep::after {
+  content: "→";
+  position: absolute;
+  right: -11px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.storyStep:last-child::after {
+  content: none;
+}
+
+.storyIndex {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent-contrast);
+  background: var(--accent);
+}
+
+.storyLabel {
+  font-weight: 700;
+  font-size: 0.98rem;
+}
+
+.storyText {
+  font-size: 0.88rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+@media (max-width: 760px) {
+  .storyline {
+    grid-template-columns: 1fr 1fr;
+  }
+  .storyStep::after {
+    content: none;
+  }
+}
+
+@media (max-width: 440px) {
+  .storyline {
+    grid-template-columns: 1fr;
+  }
+}

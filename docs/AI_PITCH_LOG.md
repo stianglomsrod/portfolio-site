@@ -280,7 +280,8 @@ Additional standing rules:
    - Two unused-but-harmless leftovers (`journey` data, old timeline CSS classes) add minor clutter.
 
 10. **Recommended next slice**
-   - **Slice 4 — Cleanup + entry framing:** remove the dead `journey` array and unused timeline CSS,
-     and add a short agentic-only intro/transition tying Hero → Fit Scan → Journey into one narrative.
-     Keep it additive and Professional-mode-safe. Optionally add a "tilbake til scan" affordance after
-     a chip jump.
+
+- **Slice 4 — Cleanup + entry framing:** remove the dead `journey` array and unused timeline CSS,
+  and add a short agentic-only intro/transition tying Hero → Fit Scan → Journey into one narrative.
+  Keep it additive and Professional-mode-safe. Optionally add a "tilbake til scan" affordance after
+  a chip jump.

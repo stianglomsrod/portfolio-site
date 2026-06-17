@@ -372,18 +372,14 @@ export default function FitConstellation({
         const isActive = n.data.id === active;
         const isHover = n.data.id === hovered;
         const focus = isActive || isHover;
-        const pulse =
-          reduced || !focus ? 0 : Math.sin(t * 3) * 0.08 + 0.08;
+        const pulse = reduced || !focus ? 0 : Math.sin(t * 3) * 0.08 + 0.08;
         const targetScale = (focus ? 1.5 : 1) + pulse;
         n.mesh.scale.lerp(
           tmp.set(targetScale, targetScale, targetScale),
           reduced ? 1 : 0.15,
         );
         const gScale = n.glowScale * (focus ? 1.5 : 1);
-        n.glow.scale.lerp(
-          tmp.set(gScale, gScale, gScale),
-          reduced ? 1 : 0.15,
-        );
+        n.glow.scale.lerp(tmp.set(gScale, gScale, gScale), reduced ? 1 : 0.15);
         // Dim non-focused nodes when something is active/hovered.
         const anyFocus = active || hovered;
         const lit = focus || !anyFocus;
@@ -435,5 +431,11 @@ export default function FitConstellation({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return <div ref={mountRef} aria-hidden="true" style={{ width: "100%", height: "100%" }} />;
+  return (
+    <div
+      ref={mountRef}
+      aria-hidden="true"
+      style={{ width: "100%", height: "100%" }}
+    />
+  );
 }

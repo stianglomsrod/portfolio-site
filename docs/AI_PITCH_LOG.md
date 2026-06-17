@@ -310,7 +310,7 @@ Additional standing rules:
 
 2. **Why it changed**
    - The previous Skamløs mode was an alternative content layout, not an experience. This makes the
-     application itself *demonstrate* AI-native prototyping, interaction design and modern frontend —
+     application itself _demonstrate_ AI-native prototyping, interaction design and modern frontend —
      exactly the VG X brief — instead of only describing it.
 
 3. **Concept chosen**
@@ -328,7 +328,7 @@ Additional standing rules:
    - Mouse/touch: drag to orbit; hover a star to highlight + show its floating label; click to scan
      (click again to deselect). Idle auto-rotation until the pointer enters.
    - Keyboard / AT: the constellation is `aria-hidden` decorative; the real control is the semantic
-     "Skann-mål" list of `<button aria-pressed>` elements. Focus/hover/select there drive *and* mirror
+     "Skann-mål" list of `<button aria-pressed>` elements. Focus/hover/select there drive _and_ mirror
      the 3D highlight, and the readout is an `aria-live="polite"` region. Full functionality with no
      pointer and no WebGL.
 
@@ -366,15 +366,17 @@ Additional standing rules:
      slice focused on the experimental hero.
 
 10. **Risks / concerns**
-   - three.js adds ~150KB gzip to the agentic-only async chunk; acceptable and lazy, but worth watching.
-   - The constellation is decorative-only for AT (by design); all meaning lives in the parallel HTML —
-     verify the readout stays in sync if the data model changes.
-   - React Strict Mode double-mounts effects in dev; the scene relies on its dispose cleanup to avoid
-     double canvases (handled, but a place to watch if extended).
-   - Mobile GPUs: DPR capped at 2 and geometry is light (9 spheres + 320 points), should stay smooth.
+
+- three.js adds ~150KB gzip to the agentic-only async chunk; acceptable and lazy, but worth watching.
+- The constellation is decorative-only for AT (by design); all meaning lives in the parallel HTML —
+  verify the readout stays in sync if the data model changes.
+- React Strict Mode double-mounts effects in dev; the scene relies on its dispose cleanup to avoid
+  double canvases (handled, but a place to watch if extended).
+- Mobile GPUs: DPR capped at 2 and geometry is light (9 spheres + 320 points), should stay smooth.
 
 11. **Recommended next slice**
-   - **Slice 6 — Scan choreography + onboarding:** add an optional guided "scan sweep" that auto-walks
-     the path on first view (reduced-motion-safe, skippable), a focus ring/keyboard arrow-cycling on the
-     canvas itself, and a "fortsett til bevisene" CTA linking the constellation to the Fit Scan section.
-     Then do the deferred Slice 4 cleanup (remove dead `journey` data + unused CSS).
+
+- **Slice 6 — Scan choreography + onboarding:** add an optional guided "scan sweep" that auto-walks
+  the path on first view (reduced-motion-safe, skippable), a focus ring/keyboard arrow-cycling on the
+  canvas itself, and a "fortsett til bevisene" CTA linking the constellation to the Fit Scan section.
+  Then do the deferred Slice 4 cleanup (remove dead `journey` data + unused CSS).

@@ -23,7 +23,10 @@ export type PitchNode = {
  * Lay the milestones out as a gentle spiral that climbs and winds inward,
  * converging on the VG X star at the centre. Deterministic = stable render.
  */
-function spiralPosition(index: number, count: number): [number, number, number] {
+function spiralPosition(
+  index: number,
+  count: number,
+): [number, number, number] {
   const t = count <= 1 ? 0 : index / (count - 1);
   const angle = t * Math.PI * 1.7 + Math.PI * 0.15;
   const radius = 6.4 - t * 2.1;

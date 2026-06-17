@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  useCallback,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from "react";
+import { useCallback, useRef, useState, useSyncExternalStore } from "react";
 import dynamic from "next/dynamic";
 import { caseRefLabels } from "../data/portfolio";
 import { pitchNodes } from "./skamlos/pitchNodes";
@@ -49,7 +44,7 @@ export default function SkamlosPitchScene() {
 
   const active = pitchNodes.find((n) => n.id === activeId) ?? null;
   const labelNode = label
-    ? pitchNodes.find((n) => n.id === label.id) ?? null
+    ? (pitchNodes.find((n) => n.id === label.id) ?? null)
     : null;
 
   return (
@@ -106,8 +101,8 @@ export default function SkamlosPitchScene() {
                     ))}
                   </div>
                   <p className={styles.fallbackNote}>
-                    3D-visning er ikke tilgjengelig her — men hele pitchen virker
-                    via listen under.
+                    3D-visning er ikke tilgjengelig her — men hele pitchen
+                    virker via listen under.
                   </p>
                 </div>
               )}
@@ -126,8 +121,8 @@ export default function SkamlosPitchScene() {
 
             <p className={styles.hint}>
               <span className={styles.hintKey}>Dra</span> for å rotere ·{" "}
-              <span className={styles.hintKey}>klikk</span> et punkt for å skanne
-              · eller bruk knappene under.
+              <span className={styles.hintKey}>klikk</span> et punkt for å
+              skanne · eller bruk knappene under.
             </p>
           </div>
         </Reveal>
@@ -139,7 +134,10 @@ export default function SkamlosPitchScene() {
             <h3 className={styles.consoleTitle} id="scan-targets-heading">
               Skann-mål
             </h3>
-            <ul className={styles.targetList} aria-labelledby="scan-targets-heading">
+            <ul
+              className={styles.targetList}
+              aria-labelledby="scan-targets-heading"
+            >
               {pitchNodes.map((n) => (
                 <li key={n.id}>
                   <button
@@ -198,8 +196,8 @@ export default function SkamlosPitchScene() {
                 </>
               ) : (
                 <p className={styles.readoutEmpty}>
-                  Velg et punkt i konstellasjonen — eller et skann-mål — for å se
-                  hvordan steget kobler seg til VG X.
+                  Velg et punkt i konstellasjonen — eller et skann-mål — for å
+                  se hvordan steget kobler seg til VG X.
                 </p>
               )}
             </div>

@@ -285,3 +285,96 @@ Additional standing rules:
   and add a short agentic-only intro/transition tying Hero → Fit Scan → Journey into one narrative.
   Keep it additive and Professional-mode-safe. Optionally add a "tilbake til scan" affordance after
   a chip jump.
+
+---
+
+## 2026-06-18 — Slice 5: Interactive 3D fit-constellation (experimental hero)
+
+1. **What changed**
+   - Added a substantial interactive **3D scene** as the first thing in Skamløs AI-pitch mode: the
+     **"VG X fit-konstellasjon"**. Stian's 8 learning-journey milestones become glowing stars wired as
+     a spiral that converges on a central **VG X** star. Hovering/clicking a star "scans" it and reveals
+     its unlock, evidence, VG X relevance, case deep-link and metaphor in an accessible readout.
+   - New files:
+     - `app/components/skamlos/pitchNodes.ts` — derives constellation nodes from `fitScan.milestones`
+       (source of truth) + a synthetic VG X target node; computes deterministic 3D spiral positions.
+     - `app/components/skamlos/FitConstellation.tsx` — vanilla three.js scene (client-only): WebGL
+       renderer, glow sprites, background star field, path + convergence lines, raycast hover/select,
+       drag-to-orbit, idle auto-rotate, screen-projected label, full dispose-on-unmount cleanup.
+     - `app/components/SkamlosPitchScene.tsx` — section wrapper: lazy-loads the 3D scene via
+       `next/dynamic({ ssr: false })`, owns selection state, renders the accessible "Skann-mål" button
+       list + "Skann-resultat" readout, the floating label, and the no-WebGL fallback.
+     - `app/components/SkamlosPitchScene.module.css` — mission-control styling.
+   - Wired into `Portfolio.tsx`: `{mode === "agentic" && <SkamlosPitchScene />}` placed right after the
+     Hero (top of Skamløs mode). Existing Fit Scan + Journey remain as supporting sections below.
+
+2. **Why it changed**
+   - The previous Skamløs mode was an alternative content layout, not an experience. This makes the
+     application itself *demonstrate* AI-native prototyping, interaction design and modern frontend —
+     exactly the VG X brief — instead of only describing it.
+
+3. **Concept chosen**
+   - "Skill constellation / fit-scan" hybrid (Concept C + B). It maps Stian's progression (C → CS50x →
+     Figma/needfinding → fullstack precursor → Klar → agentic workflow → **VG X**) into one spatial,
+     explorable proof-of-fit, and reuses the existing typed data so there are zero new claims.
+
+4. **Dependencies added**
+   - `three@^0.180.0` (+ `@types/three`). Chosen over `@react-three/fiber` to avoid React-19/reconciler
+     coupling under Next 16 + Turbopack — a single, well-maintained dep, hand-managed render loop and
+     disposal (engineering taste over framework weight). Loaded **only** client-side in agentic mode via
+     dynamic import, so it never touches SSR or the Professional-mode bundle.
+
+5. **How interaction works**
+   - Mouse/touch: drag to orbit; hover a star to highlight + show its floating label; click to scan
+     (click again to deselect). Idle auto-rotation until the pointer enters.
+   - Keyboard / AT: the constellation is `aria-hidden` decorative; the real control is the semantic
+     "Skann-mål" list of `<button aria-pressed>` elements. Focus/hover/select there drive *and* mirror
+     the 3D highlight, and the readout is an `aria-live="polite"` region. Full functionality with no
+     pointer and no WebGL.
+
+6. **Fallback / reduced-motion**
+   - No WebGL (or renderer init failure): `FitConstellation` calls `onUnavailable()`; the scene swaps to
+     a static CSS star fallback while the button list + readout keep the pitch fully usable.
+   - `prefers-reduced-motion`: tracked via `useSyncExternalStore` (no setState-in-effect); disables idle
+     spin, node pulsing, star drift and eases-to-instant. Interaction (drag/select) still works.
+   - SSR-safe: `ssr: false` dynamic import means no three.js on the server and no hydration trap; the
+     accessible markup renders identically.
+
+7. **Files changed**
+   - `app/components/skamlos/pitchNodes.ts` (new)
+   - `app/components/skamlos/FitConstellation.tsx` (new)
+   - `app/components/SkamlosPitchScene.tsx` (new)
+   - `app/components/SkamlosPitchScene.module.css` (new)
+   - `app/components/Portfolio.tsx` (import + one agentic-gated render line)
+   - `package.json` / `package-lock.json` (three + @types/three)
+   - `docs/AI_PITCH_LOG.md` (this entry)
+
+8. **Validation run**
+   - `npm run lint` → ✅ passed (exit 0).
+   - `npm run build` → ✅ passed (compiled, TypeScript ok, `/` prerendered static — three.js excluded
+     from the prerender/SSR path via dynamic import).
+
+9. **Intentionally NOT changed**
+   - Professional mode untouched: the scene is gated behind `mode === "agentic"` and three.js is only
+     fetched when it mounts, so Professional performance/bundle is unaffected.
+   - Existing Fit Scan + Journey kept (now framed as supporting sections below the scene), per the rule
+     not to delete prior work.
+   - No new claims/metrics — all node copy comes from existing `fitScan.milestones`.
+   - Internal mode key `"agentic"` unchanged. No backend/API/auth/analytics. No external assets (glow
+     texture is generated on a canvas at runtime).
+   - The Slice 4 cleanup (dead `journey` array / old timeline CSS) was deliberately deferred to keep this
+     slice focused on the experimental hero.
+
+10. **Risks / concerns**
+   - three.js adds ~150KB gzip to the agentic-only async chunk; acceptable and lazy, but worth watching.
+   - The constellation is decorative-only for AT (by design); all meaning lives in the parallel HTML —
+     verify the readout stays in sync if the data model changes.
+   - React Strict Mode double-mounts effects in dev; the scene relies on its dispose cleanup to avoid
+     double canvases (handled, but a place to watch if extended).
+   - Mobile GPUs: DPR capped at 2 and geometry is light (9 spheres + 320 points), should stay smooth.
+
+11. **Recommended next slice**
+   - **Slice 6 — Scan choreography + onboarding:** add an optional guided "scan sweep" that auto-walks
+     the path on first view (reduced-motion-safe, skippable), a focus ring/keyboard arrow-cycling on the
+     canvas itself, and a "fortsett til bevisene" CTA linking the constellation to the Fit Scan section.
+     Then do the deferred Slice 4 cleanup (remove dead `journey` data + unused CSS).

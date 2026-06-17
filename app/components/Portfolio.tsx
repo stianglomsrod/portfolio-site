@@ -4,6 +4,7 @@ import { useSyncExternalStore } from "react";
 import type { Mode } from "../data/portfolio";
 import ModeToggle from "./ModeToggle";
 import Hero from "./Hero";
+import SkamlosPitchScene from "./SkamlosPitchScene";
 import FeaturedKlar from "./FeaturedKlar";
 import SupportingCases from "./SupportingCases";
 import FitScan from "./FitScan";
@@ -69,6 +70,7 @@ export default function Portfolio() {
 
       <main id="top" className={styles.main}>
         <Hero mode={mode} />
+        {mode === "agentic" && <SkamlosPitchScene />}
         <FeaturedKlar mode={mode} />
         <SupportingCases mode={mode} />
         {mode === "agentic" && <FitScan />}

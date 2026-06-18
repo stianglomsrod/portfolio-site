@@ -3,6 +3,17 @@ import CaseLink from "./CaseLink";
 import ScreenshotPlaceholder from "./ScreenshotPlaceholder";
 import styles from "./CaseCard.module.css";
 
+function getCaseLinkLabel(caseId: string): string {
+  const labels: Record<string, string> = {
+    forloper: "Åpne PD-app",
+    "ask-away": "Åpne ASK Away i Figma",
+    fagtekst: "Åpne Warp Read i Figma",
+    acad: "Åpne ACAD i Figma",
+    wordhunt: "Se Wordhunt-video",
+  };
+  return labels[caseId] ?? "Lenke";
+}
+
 export default function CaseCard({
   data,
   mode,
@@ -60,7 +71,12 @@ export default function CaseCard({
         )}
 
         <div className={styles.actions}>
-          <CaseLink href={data.link} label="Lenke" />
+          <CaseLink href={data.link} label={getCaseLinkLabel(data.id)} />
+          {data.id === "forloper" && (
+            <span className={styles.accessNote}>
+              Ta kontakt for brukertilgang: stianglomsrod@gmail.com
+            </span>
+          )}
         </div>
       </div>
 
@@ -68,7 +84,7 @@ export default function CaseCard({
       {!isSecondary && data.screenshots && data.screenshots.length > 0 && (
         <div className={styles.gallery}>
           {data.screenshots.map((label) => (
-            <ScreenshotPlaceholder key={label} label={label} />
+            <ScreenshotPlaceholder key={label} caseId={data.id} label={label} />
           ))}
         </div>
       )}

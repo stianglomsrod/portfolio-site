@@ -66,17 +66,16 @@ export default function FeaturedKlar({ mode }: { mode: Mode }) {
             </div>
 
             <div className={styles.actions}>
-              <CaseLink href={k.link} label="Åpne live-prototype" />
-              {/* TODO: Legg til lærer- og elev-demobruker når de er klare. */}
+              <CaseLink href={k.link} label="Åpne Klar" />
               <span className={styles.demoNote}>
-                Demo-tilganger (lærer/elev) legges til senere.
+                Demo-/brukertilgang gis ved forespørsel: stianglomsrod@gmail.com
               </span>
             </div>
 
             {k.screenshots && k.screenshots.length > 0 && (
               <div className={styles.gallery}>
                 {k.screenshots.map((label) => (
-                  <ScreenshotPlaceholder key={label} label={label} />
+                  <ScreenshotPlaceholder key={label} caseId={k.id} label={label} />
                 ))}
               </div>
             )}

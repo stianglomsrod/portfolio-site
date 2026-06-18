@@ -1,3 +1,5 @@
+"use client";
+
 import type { Mode } from "../data/portfolio";
 import { hero, profileTags, storyline } from "../data/portfolio";
 import Reveal from "./Reveal";
@@ -35,12 +37,36 @@ export default function Hero({ mode }: { mode: Mode }) {
 
         <Reveal delay={200}>
           <div className={styles.actions}>
-            <a className={styles.ctaPrimary} href={hero.primaryCta.href}>
-              {hero.primaryCta.label}
-            </a>
-            <a className={styles.ctaSecondary} href={hero.secondaryCta.href}>
-              {hero.secondaryCta.label}
-            </a>
+            {agentic ? (
+              <>
+                <a className={styles.ctaPrimary} href="#pitch-scene">
+                  Start reisen
+                </a>
+                <a
+                  className={styles.ctaSecondary}
+                  href="#pitch-scene"
+                  onClick={() =>
+                    window.dispatchEvent(
+                      new CustomEvent("skamlos:openjournal"),
+                    )
+                  }
+                >
+                  Åpne journal
+                </a>
+              </>
+            ) : (
+              <>
+                <a className={styles.ctaPrimary} href={hero.primaryCta.href}>
+                  {hero.primaryCta.label}
+                </a>
+                <a
+                  className={styles.ctaSecondary}
+                  href={hero.secondaryCta.href}
+                >
+                  {hero.secondaryCta.label}
+                </a>
+              </>
+            )}
           </div>
         </Reveal>
 

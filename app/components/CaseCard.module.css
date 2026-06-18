@@ -104,6 +104,15 @@
 
 .actions {
   margin-top: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  align-items: center;
+}
+
+.accessNote {
+  font-size: 0.86rem;
+  color: var(--muted);
 }
 
 .link {
@@ -156,10 +165,28 @@
   padding: 8px;
 }
 
+.screenshotFigure {
+  margin: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface-2) 90%, transparent);
+}
+
+.screenshotImage {
+  width: 100%;
+  height: auto;
+  display: block;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
+
 .screenshotLabel {
   font-size: 0.85rem;
   color: var(--muted);
   font-weight: 500;
+  display: block;
+  padding: 8px 10px;
 }
 
 /* ---------- Tier variants ---------- */

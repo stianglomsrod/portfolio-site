@@ -519,3 +519,344 @@ Additional standing rules:
   `@types/three` (and the deferred Slice 4 dead `journey` data + unused CSS). Optionally add arrow-key
   travel between adjacent places, a first-visit onboarding hint, and place artwork/illustration slots
   (image/video placeholders) inside the dock for real screenshots of each project.
+
+---
+
+## 2026-06-18 — Slice 7: Playable top-down world ("Stians verden" as a real game)
+
+1. **What changed**
+   - Turned the Skamløs map widget into an actual **playable top-down game**. You now control a
+     **Stian/cursor avatar** with **WASD/arrow** movement (rAF game loop), idle + walking animation,
+     facing/direction, and a shadow. Walk between **8 gym landmarks** that represent Stian's real
+     learning journey; a **proximity popover** appears when the avatar is near; **Space** (or **E**, or
+     clicking) triggers that gym's contextual **training action**, which marks it visited, fires a
+     particle burst + unlock toast, and opens a rich **side dock**.
+   - Implemented the gym design doc 1:1: **Systemkilden** (C), **Verktøybenken** (CS50x/Wordhunt),
+     **Skisselaboratoriet** (Figma: ASK Away + ACAD + AI-fagtekst), **Meddesignrommet** (participatory
+     facet of forløper), **Maskinrommet** (Vue+Django fullstack facet of forløper), **Klar-drivhuset**
+     (Klar — its own greenhouse landmark, kept distinct from agentic work), **Agentlabben** (agentic
+     workflow / QA), and **VG X-portalen** (next mission). Each has a distinct CSS landmark with a
+     distant-readable emblem (no copyrighted logo assets — stylised text + brand-coloured shapes).
+   - Added **narrative energy bars** (Prototypekraft / Brukerinnsikt / Forståelseskraft / Agentisk
+     kontroll) that fill from the visited gyms' energy contributions (per the doc's mapping) — no fake
+     percentage "scores". Plus a progress meter (`X / 8 steder trent`).
+   - Contextual action labels exactly per the doc: Kjør løkka, Generer verktøyet, Test prototypen, Samle
+     innsikten, Koble systemet, La ukebrevet spire, Kjør QA-sjekk, Åpne neste oppdrag.
+   - Visible states: **available/unlocked** (colourful landmark, glowing name), **nearby** (hop + popover
+     "Space …"), **visited** (check badge + calmer glow + journal mark), **next-quest** (VG X portal,
+     dashed/violet, framed positively).
+   - **World juice**: swaying grass tufts, animated energy trail, nearby-hop, training particle bursts,
+     unlock toast, portal shimmer, a bobbing start hint, and avatar **upgrades** (terminal glow after
+     Systemkilden, prototype border, Klar leaf, Agentlab antenna).
+   - **Journal (J / M)** rewritten as an ordered, recruiter-scannable overview (every gym + state +
+     unlocked-skill line + jump-to), plus a **VG X-match** panel (the four needs with honest fit badges)
+     and a "neste anbefalte stopp" pointer. Works fully without playing.
+   - **Touch D-pad** appears on coarse pointers; gyms/journal are also tappable buttons.
+   - **Cleanup:** removed the now-orphaned Three.js constellation (`SkamlosPitchScene.tsx` +
+     `.module.css`, `FitConstellation.tsx`, `pitchNodes.ts`) and **uninstalled `three` + `@types/three`**.
+     Replaced `worldNodes.ts` with the new typed `worldGyms.ts`.
+
+2. **Why it changed**
+   - The previous version was still "a dashboard/card/map widget inside a normal webpage". The
+     `EPIC_PLAYABLE_SKAMLOS_WORLD` + `SKAMLOS_WORLD_GYMS` docs ask for a genuinely playable, explorable
+     learning world — movement, places, proximity, unlocks, juice — that *demonstrates* VG X's own
+     values (AI-native prototyping, user-centred experiences over pixels) instead of describing them.
+
+3. **R&D performed**
+   - Read both new design docs in full (`EPIC_PLAYABLE_SKAMLOS_WORLD.md`, `SKAMLOS_WORLD_GYMS.md`), the
+     existing epic, `utlysning.md`, `AGENTS.md`, `package.json`, and the current Skamløs components.
+   - Evaluated game tech: **Phaser**, **PixiJS**, **custom Canvas 2D**, **existing Three.js**, and
+     **DOM + CSS + rAF** against game-feel, speed, maintainability, accessibility, Next 16/Turbopack
+     compatibility, performance, fallback and "does it demonstrate the application concept".
+
+4. **Concept and technology chosen**
+   - **Custom DOM + CSS top-down game with a `requestAnimationFrame` movement loop — zero new deps.**
+     The avatar is a real DOM element moved by direct ref writes each frame (no per-frame React
+     re-render); gyms are real `<button>`s; popover/dock/journal are React/DOM. Rejected Phaser/PixiJS:
+     both are heavy WebGL/canvas layers, invisible to assistive tech (would force a parallel DOM info
+     layer anyway), and add SSR/Turbopack integration risk — the docs explicitly say "don't choose tech
+     because it sounds impressive." Shipping a polished playable world with **zero dependencies** is
+     itself the engineering-taste signal VG X wants, and it satisfies every accessibility/fallback rule.
+
+5. **What was implemented** — see point 1. New typed data model `worldGyms.ts` derives factual content
+   from `fitScan` (milestones/needs/case labels) and adds only playful place names, action labels, energy
+   mapping and 2D positions. No invented metrics/achievements.
+
+6. **How movement & interaction work**
+   - A single setup effect runs the rAF loop: reads a held-keys `Set` (WASD + arrows mapped to logical
+     directions), integrates velocity by `dt`, clamps to world bounds, writes `left/top` % straight to
+     the avatar node, derives facing from the dominant axis, and computes the nearest gym within the
+     proximity radius. Discrete changes (facing, moving, nearby) update React state only on change.
+   - **Space/E/Enter** train the nearby gym; **Esc** closes the dock; **J/M** toggle the journal; clicking
+     a gym or journal entry walks the avatar there (auto-target steering in the same loop) and opens it.
+     Movement keys `preventDefault` only while the stage (`role="application"`, `tabIndex=0`) is focused.
+
+7. **How gym states work**
+   - All 8 gyms are real achievements → **unlocked** (colourful). Visiting adds to a `Set` → **visited**
+     (check badge, calmer glow, journal "Besøkt"). Being within radius → **nearby** (hop + popover). The
+     VG X portal is the only **next-quest** (dashed violet, positive framing). States are mirrored in the
+     map, the popover, the legend and the journal badges.
+
+8. **How panels / journal work**
+   - **Dock** (non-blocking `<aside>`): place name, title, one-liner, "Hva dette var", "Hva jeg lærte",
+     "VG X"-relevance, energy chips, case deep-links (`#<caseRef>`), portal needs summary, "Neste steg",
+     and a contextual **action button**. Focus moves to the dock heading on open (`tabIndex=-1`, no trap)
+     and returns to the trigger on close.
+   - **Journal**: ordered list of all gyms (state badge + unlocked-skill + jump-to) and a VG X-match panel
+     — usable entirely without playing, for time-pressed recruiters.
+
+9. **Files changed**
+   - `app/components/skamlos/worldGyms.ts` (new typed data model)
+   - `app/components/SkamlosWorld.tsx` (rewritten into the playable game)
+   - `app/components/SkamlosWorld.module.css` (rewritten: world, landmarks, avatar, juice, dock, journal)
+   - Removed: `app/components/skamlos/worldNodes.ts`, `app/components/SkamlosPitchScene.tsx`,
+     `app/components/SkamlosPitchScene.module.css`, `app/components/skamlos/FitConstellation.tsx`,
+     `app/components/skamlos/pitchNodes.ts`
+   - `package.json` / `package-lock.json` (uninstalled `three`, `@types/three`)
+   - `docs/AI_PITCH_LOG.md` (this entry)
+   - `Portfolio.tsx` unchanged this slice (already renders `<SkamlosWorld />` agentic-gated after Hero).
+
+10. **Dependencies added** — **none** (net **removed** two: `three`, `@types/three`). Project deps are
+    back to next/react/react-dom only.
+
+11. **Fallback / reduced-motion / accessibility**
+    - No WebGL/canvas → no advanced-rendering failure mode. If the game layer ever failed, the journal +
+      dock (real DOM) still carry every fact and link, and gyms remain clickable buttons.
+    - `prefers-reduced-motion` (external store + CSS query): disables walk bob, grass sway, trail flow,
+      nearby-hop, particles, toast/portal animation; movement still works (and is slightly faster to
+      compensate for no animation). 
+    - Keyboard: stage is `role="application"` with a descriptive label; gyms/journal/controls are real
+      buttons with visible `:focus-visible`; dock focus is moved/returned politely (no trap); Esc closes;
+      `role="progressbar"` with aria values; decorative layers are `aria-hidden`.
+    - Touch: on-screen D-pad on coarse pointers + tap-to-select gyms. Responsive: dock/journal/HUD stack
+      under the world < 900px; landmarks scale down < 520px. No audio. No external/required assets.
+
+12. **Validation results**
+    - `npm run lint` → ✅ passed (exit 0).
+    - `npm run build` → ✅ passed (compiled ~8.5s, TypeScript ok, `/` prerendered **static**) before and
+      after removing `three`.
+
+13. **Manual QA guide**
+    - **Professional** mode: no world, no journal, unchanged and sendable. **Mode persistence**: toggle,
+      reload — saved mode restored.
+    - **Skamløs**: world appears under the Hero. Click the stage, then **WASD/arrows** move the avatar
+      (idle vs walk animation, facing flips). Walk near a gym → **popover** appears; walk away → it
+      disappears. **Space** trains it → particle burst, toast, check badge, dock opens, energy bars +
+      progress advance. Click a distant gym/journal entry → avatar walks there + opens. Visit all 8 →
+      "Alle steder trent" + portal shimmer. Open **VG X-portalen** → positive "neste arena" framing + the
+      four needs + CTA-style action. **J/M** toggle journal; click an entry to jump. **Esc** closes (focus
+      returns). Case deep-links (e.g. "Se Klar") scroll to the case. Mobile/touch → **D-pad** + tappable
+      gyms; dock stacks below. OS **reduced-motion** → animations calm, play still works. **No console
+      errors** expected.
+
+14. **Risks / tradeoffs**
+    - Per-frame DOM writes are cheap (one element, `left/top`), but movement is %-based on an
+      `aspect-ratio` stage, so proximity distance is mildly anisotropic — fine at these sizes; revisit if
+      the world grows.
+    - Landmark positions are hand-placed in `worldGyms.ts`; reordering/adding gyms needs position tweaks.
+    - Landmarks are CSS approximations of brand languages (no logo images) — intentional, to avoid asset/
+      licensing issues and keep "no required external assets".
+    - The dock has placeholder-free copy but **no real media yet** (screenshots/video) — slots are a
+      natural next addition. Footer contact links are still placeholders (pre-existing).
+
+15. **Recommended next slice**
+    - **Slice 8 — Media + polish:** add image/video slots in the dock for real project screenshots
+      (Klar, Wordhunt, Figma prototypes), an optional Ctrl+C easter egg in Systemkilden/Agentlabben
+      ("Process stopped. Curiosity continues."), a subtle camera/parallax on larger worlds, and a
+      first-visit guided arrow toward Systemkilden. Then revisit whether Fit Scan / JourneyTimeline below
+      the world are now partly duplicated and can be trimmed.
+
+---
+
+## 2026-06-18 — Slice 8: Game-first app shell (the game IS the Skamløs interface)
+
+1. **What changed**
+   - **Product/IA shift:** Skamløs AI-pitch is no longer "game + long webpage". It is now **game-first**:
+     in Skamløs mode the page renders only the **Hero** (orientation) + the **playable world**, and a
+     one-line fallback link back to Professional mode. The duplicate long sections (FeaturedKlar,
+     SupportingCases, Fit Scan, Quest Log/JourneyTimeline, AgenticWorkflow, footer) are **gated out of
+     Skamløs mode**; their content is reframed inside the world's gym panels + journal.
+   - **Bigger world shell:** the stage is now a viewport-dominant surface (`clamp(440px, 78vh, 760px)`,
+     ~66vh on tablets) instead of a small aspect-boxed card. The world is the main thing on screen.
+   - **Journal is now an in-game overlay** (`role="dialog"`, slide-in panel + backdrop) with **four
+     tabs**: **Reise** (the journey as jump-to gym list), **Bevis** (the real cases behind the gyms —
+     Klar + side projects, with the live Klar link), **VG X-match** (the four VG X needs with honest fit
+     badges + "hvorfor Stian"), and **Kontakt** (footer contact links + closing line). It opens over the
+     world without scrolling the page or pushing content down. `J`/`M`, the HUD button, and the Hero
+     "Åpne journal" CTA all open it; `Esc` / backdrop / × close it and return focus to the world.
+   - **Focus/input fixed:** removed the effect that auto-moved focus into the dock on every interaction
+     (the cause of "game dies after Space"). Now the avatar keeps focus; `close()` returns focus to the
+     stage. The stage keydown handler only drives the game when **the stage itself is focused**
+     (`e.target === stage`), so tabbing into the dock/journal pauses game input (accessible) but normal
+     play never loses focus. Dock & journal have their own `Esc` handlers since focus may sit inside them.
+   - **Reduced in-world clutter:** gym name labels are now hidden at distance and only appear when the
+     avatar is **near**, on **hover/focus**, or for **visited/next-quest** gyms. The world reads through
+     landmarks, colour, glow, states and the proximity popover; text lives in the panel/journal.
+   - **Compact-first dock → details on demand:** the side panel is now an overlay drawer that slides in
+     from the right inside the world. It shows the essentials first (title, one-liner, "Låser opp", a
+     one-line VG X relevance, primary action) with a **"Les mer"** expander for the full
+     what/learned/energy/evidence/next-step. Case links now **open the journal Bevis tab** (anchors to the
+     removed long sections would otherwise dangle in Skamløs mode). The VG X portal panel surfaces an
+     **"Åpne kontakt"** CTA.
+   - **Hero (agentic) CTAs** changed to game actions: **"Start reisen"** (into the world) and **"Åpne
+     journal"** (dispatches a decoupled `skamlos:openjournal` event the world listens for). Professional
+     Hero CTAs are unchanged.
+
+2. **Why it changed**
+   - The brief: *"Skamløs AI-pitch should not be game + webpage. It should be the game as the interface."*
+     The previous slice made a real game but left it sitting atop a long duplicate portfolio, `J` jumped
+     into document flow, and Space could drop game focus. This slice makes the world the actual
+     information architecture and fixes the input/focus and clutter problems.
+
+3. **Files changed**
+   - `app/components/SkamlosWorld.tsx` — rewritten: game-first shell, overlay dock, tabbed journal modal,
+     focus fixes, `skamlos:openjournal` listener, compact/expandable panel, Bevis/Kontakt content.
+   - `app/components/SkamlosWorld.module.css` — scene head, viewport-tall stage, label-on-proximity,
+     overlay dock (slide-in + mobile bottom sheet), journal modal + tabs, Bevis/Kontakt/fallback styles,
+     updated reduced-motion + responsive rules.
+   - `app/components/Portfolio.tsx` — Skamløs mode now renders only Hero + SkamlosWorld; removed
+     `FitScan` / `JourneyTimeline` imports.
+   - `app/components/Hero.tsx` — `"use client"`; agentic CTAs become "Start reisen" / "Åpne journal".
+   - `docs/AI_PITCH_LOG.md` — this entry.
+
+4. **Validation run**
+   - `npm run lint` → ✅ passed (after fixing a `react-hooks/refs` error: replaced a handler-factory
+     called during render with two concrete `useCallback` Esc handlers).
+   - `npm run build` → ✅ passed; `/` prerendered **static**; TypeScript clean.
+
+5. **Intentionally NOT changed**
+   - **Professional mode** is untouched: same Hero CTAs, FeaturedKlar, SupportingCases, AgenticWorkflow,
+     footer, and all `#klar` / `#forloper` / `#workflow` anchors still exist there.
+   - The gym roster, real journey, copy, energy mapping and Klar-as-its-own-landmark rule are unchanged.
+   - Internal mode key stays `"agentic"`; mode persistence (localStorage) untouched.
+   - No invented facts/metrics; all panel/journal text comes from existing data.
+
+6. **Remaining placeholders**
+   - Contact links (`footer.links`) and the footer humour line are still placeholders (pre-existing).
+   - No real media yet — the dock/Bevis have no screenshots/video (only the live Klar URL renders).
+   - `FitScan.tsx` / `JourneyTimeline.tsx` (+ their CSS) are now **orphaned** on disk; their content was
+     reframed into the journal's VG X-match / Reise tabs. Kept for reference / Professional reuse.
+
+7. **Risks / concerns**
+   - The dock lives inside the `overflow:hidden` stage; a gym very close to the right edge can sit behind
+     the open dock (acceptable — the dock is the focus then).
+   - Stage is now free-aspect (height-driven); proximity is computed in world units so distance is
+     mildly anisotropic. At desktop sizes the box aspect (~1.57) is near the world's 1.5625, so distortion
+     is minimal; revisit if the world grows.
+   - Game input is gated to `e.target === stage`; this is deliberate (tab-into-panel pauses play) but
+     means a user who tabs to a gym button and presses WASD won't move until they refocus the stage.
+
+8. **Recommended next slice**
+   - **Slice 9 — Media + delete orphans:** add screenshot/video slots to the dock & Bevis tab (Klar,
+     Wordhunt, Figma), then **delete the orphaned `FitScan` / `JourneyTimeline` files** (content now lives
+     in the journal) to remove the duplicate source of truth. Optional: Ctrl+C easter egg in
+     Systemkilden/Agentlabben, a first-visit guided arrow toward Systemkilden, and a sound-off toggle.
+
+---
+
+## 2026-06-18 — Slice 8b: Focused gameplay cleanup (popover safety + no panel train-buttons + Avkobling framing)
+
+1. **What changed**
+  - Added a reusable popover placement helper in the world component:
+    `getPopoverPlacement(gym)` now clamps popover anchor X within safe bounds and flips vertically when
+    nodes are near the top edge. The popover now uses CSS vars (`--pop-x`, `--pop-y`) plus `data-v`
+    (`top`/`bottom`) so all gyms, including the VG X portal in the top-right, stay readable in-shell.
+  - Updated popover CSS to support edge-safe placement: directional transform for top/bottom placement,
+    directional pointer arrow, and a neutral fade/scale-in animation that no longer assumes one fixed
+    direction.
+  - Removed in-panel **training action buttons** from gyms. Visiting/interacting (`Space`, click) remains
+    the single unlock action; panel now shows the action label as compact flavor copy (`Utforskning`) and
+    keeps only utility actions ("Les mer" + portal contact button for VG X).
+  - Rewrote `fitScan.needs.avkobling` wording to avoid "Koble av fra hverdagsstress" as a personal skill.
+    It is now framed as a **VG X product need** around calmer access, reduced friction and lower cognitive
+    load, with honest evidence strength still marked `fit: "voksende"`.
+
+2. **Why it changed**
+  - This pass targets concrete UX friction in the current game-first slice: corner-cramped popovers,
+    unnecessary panel button tasks that interrupt exploration flow, and awkward Avkobling phrasing that
+    sounded like a personal skill instead of a product-experience need.
+
+3. **Files changed**
+  - `app/components/SkamlosWorld.tsx`
+  - `app/components/SkamlosWorld.module.css`
+  - `app/data/portfolio.ts`
+  - `docs/AI_PITCH_LOG.md`
+
+4. **Validation run**
+  - `npm run lint` → ✅ passed.
+  - `npm run build` → ✅ passed; `/` prerendered static.
+
+5. **Intentionally NOT changed**
+  - Professional mode composition and behavior unchanged.
+  - No new major features or architecture changes; game-first shell from Slice 8 remains intact.
+  - Gym order, milestones, and real-case mapping unchanged.
+
+6. **Remaining placeholders**
+  - Contact links and humor line placeholders remain unchanged.
+  - No new media assets were added in this pass.
+
+7. **Risks / concerns**
+  - Popover uses heuristic edge thresholds (safe and predictable, but not collision-measured against
+    dynamic panel widths). If scene density increases, consider precise pixel-based collision checks.
+  - Action labels still appear as flavor text in panel/popover; copy should stay short to avoid clutter.
+
+8. **Recommended next slice**
+  - **Slice 9 (continue):** add manual placement QA snapshots (all gyms, desktop + mobile), then remove
+    fully orphaned components (`FitScan`, `JourneyTimeline`) once verified no references remain.
+
+---
+
+## 2026-06-18 — Slice 9a: Real case assets + real links integration
+
+1. **What changed**
+  - Integrated real external URLs for supporting cases in `portfolio.ts`:
+    - Forløperprosjektet → PD app frontend
+    - ASK Away → Figma prototype
+    - AI og fagtekstforståelse (Warp Read) → Figma prototype
+    - ACAD Collaborate → Figma prototype
+    - Wordhunt → YouTube video
+  - Replaced screenshot placeholders with real images where files were provided.
+    A screenshot mapping now resolves by case id + screenshot label and renders actual images from
+    `public/images/cases/...`, with fallback placeholder only when an image is missing.
+  - Added explicit access notes with email for Klar and Forløper links:
+    - "Demo-/brukertilgang gis ved forespørsel: stianglomsrod@gmail.com"
+    - "Ta kontakt for brukertilgang: stianglomsrod@gmail.com"
+  - Updated case link labels to readable, specific CTAs (e.g. "Åpne ASK Away i Figma",
+    "Se Wordhunt-video").
+
+2. **Why it changed**
+  - To replace visible placeholder content with real, recruiter-usable evidence and links, while keeping
+    both Professional and Skamløs modes stable and truthful.
+
+3. **Files changed**
+  - `app/data/portfolio.ts`
+  - `app/components/ScreenshotPlaceholder.tsx`
+  - `app/components/CaseCard.tsx`
+  - `app/components/CaseCard.module.css`
+  - `app/components/FeaturedKlar.tsx`
+  - `docs/AI_PITCH_LOG.md`
+  - Added/moved image assets under:
+    - `public/images/cases/klar/`
+    - `public/images/cases/supporting/`
+
+4. **Validation run**
+  - `npm run lint` → ✅ passed.
+  - `npm run build` → ✅ passed; `/` prerendered static.
+
+5. **Intentionally NOT changed**
+  - No IA or layout redesign.
+  - No changes to game mechanics or Professional/Skamløs mode gating.
+  - No invented claims or credentials.
+
+6. **Remaining placeholders**
+  - No screenshot file was provided for ACAD or Wordhunt, so those remain without real gallery images
+    (fallback behavior remains safe).
+  - Footer contact links/humor placeholders remain as previously (outside this scope).
+
+7. **Risks / concerns**
+  - If screenshot label text in data changes later, mapping keys must be updated to keep image resolution.
+  - External prototype/video URLs can change over time; periodic link checks recommended.
+
+8. **Recommended next slice**
+  - Add optional screenshot assets for ACAD and Wordhunt, then migrate screenshot mapping from label-based
+    keys to explicit structured image metadata in `portfolio.ts` for stronger long-term maintainability.

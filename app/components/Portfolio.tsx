@@ -7,8 +7,6 @@ import Hero from "./Hero";
 import SkamlosWorld from "./SkamlosWorld";
 import FeaturedKlar from "./FeaturedKlar";
 import SupportingCases from "./SupportingCases";
-import FitScan from "./FitScan";
-import JourneyTimeline from "./JourneyTimeline";
 import AgenticWorkflow from "./AgenticWorkflow";
 import SiteFooter from "./SiteFooter";
 import { hero } from "../data/portfolio";
@@ -70,13 +68,19 @@ export default function Portfolio() {
 
       <main id="top" className={styles.main}>
         <Hero mode={mode} />
-        {mode === "agentic" && <SkamlosWorld />}
-        <FeaturedKlar mode={mode} />
-        <SupportingCases mode={mode} />
-        {mode === "agentic" && <FitScan />}
-        {mode === "agentic" && <JourneyTimeline />}
-        <AgenticWorkflow mode={mode} />
-        <SiteFooter mode={mode} />
+        {mode === "agentic" ? (
+          // Skamløs AI-pitch is a game-first experience: the playable world is
+          // the interface for the whole journey, cases, VG X-match and contact.
+          // No duplicate long portfolio sections are rendered below it.
+          <SkamlosWorld />
+        ) : (
+          <>
+            <FeaturedKlar mode={mode} />
+            <SupportingCases mode={mode} />
+            <AgenticWorkflow mode={mode} />
+            <SiteFooter mode={mode} />
+          </>
+        )}
       </main>
     </div>
   );

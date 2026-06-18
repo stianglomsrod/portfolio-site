@@ -128,7 +128,7 @@ export const supportingCases: PortfolioCase[] = [
     type: "Deltakende design-prosjekt / fungerende prototype",
     role: "Utvikler og meddesigner",
     tech: "Python, Django, SQLite, Vue.js",
-    link: "[YouTube demo / repo]",
+    link: "https://pd-app-frontend.vercel.app/",
     pitch: "Fullstack-prototype bygget sammen med elever som meddesignere.",
     description: [
       "Dette prosjektet var forløperen til Klar. Målet var å utvikle et digitalt hjelpemiddel som kunne støtte elever i å holde oversikt over og prioritere skolearbeid. Prosjektet ble gjennomført med medstudenter og ungdomsskoleelever som meddesignere.",
@@ -147,7 +147,7 @@ export const supportingCases: PortfolioCase[] = [
     title: "AI og fagtekstforståelse",
     type: "Figma-prototype / konseptuell AI-utforsking",
     role: "Meddesigner",
-    link: "[Figma-lenke]",
+    link: "https://www.figma.com/proto/CH7TbwA8ImoHzZ6FvBj8Bf/Arbeidskrav-3?node-id=27-44&starting-point-node-id=27%3A44&t=dm0tzpdCkHy75Ldm-1",
     pitch: "Nye grensesnitt der AI gjør fagtekst mer forståelig og interaktiv.",
     description: [
       "En Figma-prototype som utforsket hvordan generativ AI kunne hjelpe studenter med å forstå fagtekst gjennom ulike nivåer, endret kompleksitet, hypertekst og quizer.",
@@ -165,7 +165,7 @@ export const supportingCases: PortfolioCase[] = [
     title: "ASK Away",
     type: "Figma-prototype / tilgjengelighetscase",
     role: "Initiativtaker og prototypeutvikler",
-    link: "[Figma-lenke]",
+    link: "https://www.figma.com/proto/u7vwxKdeBTXxGwCBgJZPk8/Skolestudio-med-ASK?node-id=103-1056&starting-point-node-id=75%3A2&t=xMWyRa5weOfYpB11-1",
     pitch:
       "Inkluderende design som tetter gapet mellom verktøy og faktiske brukerforutsetninger.",
     description: [
@@ -184,7 +184,7 @@ export const supportingCases: PortfolioCase[] = [
     title: "ACAD Collaborate",
     type: "Figma-prototype / metodeoversettelse",
     role: "Meddesigner",
-    link: "[Figma-lenke]",
+    link: "https://www.figma.com/proto/lC2Z78lDDnAYEQbNPKuFjz/Arbeidskrav-ACAD?node-id=95-542&starting-point-node-id=95%3A542&t=fgAQS2I2P7tIjetm-1",
     pitch: "Teori gjort om til produktflyt for læreres samarbeid.",
     description: [
       "ACAD Collaborate utforsket hvordan Activity-Centred Analysis and Design kunne digitaliseres som en mobil samarbeidsapp for lærere.",
@@ -202,7 +202,7 @@ export const supportingCases: PortfolioCase[] = [
     title: "Wordhunt / CS50x final project",
     type: "Tidlig selvstendig kodeprosjekt",
     tech: "HTML, CSS, JavaScript",
-    link: "[GitHub / video-demo]",
+    link: "https://www.youtube.com/watch?v=tI5fU1aAAvI",
     pitch: "Et lite, ekte verktøy — der teknologi-nysgjerrigheten startet.",
     description: [
       "En enkel webapp der læreren skriver inn ord, og applikasjonen genererer en 10x10 ordjakt med ordene plassert i et rutenett av tilfeldige bokstaver. Med print-CSS blir resultatet formatert som et utskriftsvennlig arbeidsark.",
@@ -480,16 +480,17 @@ export const fitScan: FitScan = {
     {
       id: "avkobling",
       label: "Avkobling",
-      vgxMeaning: "Koble av fra hverdagsstress, plikter og forventninger.",
+      vgxMeaning:
+        "Gi brukeren en roligere inngang til komplekst innhold uten å overvelde.",
       whyStian:
-        "Klar reduserer kognitiv belastning og bruker opt-in motivasjon uten stigma — avkobling gjennom mindre stress.",
+        "Mest relevant som produktbehov: i Klar har jeg jobbet med lavere kognitiv belastning og mindre friksjon, men med svakere direkte nyhetsbevis enn for Oversikt/Forståelse/Relevans.",
       evidence: [
         "Klar: opt-in motivasjonssystem (level-up, blomsterhage) og støtte uten stigma.",
-        "Designprinsipp: flytte belastning fra brukeren til verktøyet.",
+        "Designprinsipp: flytte kognitiv belastning fra brukeren til verktøyet.",
       ],
       caseRefs: ["klar"],
       pitchAngle:
-        "Vis hvordan rolig, opt-in interaksjon kan gi en mindre stressende nyhetsopplevelse.",
+        "Vis hvordan roligere, opt-in interaksjon kan senke friksjon og gjøre nyheter lettere å nærme seg.",
       // Honest: this is the need with the least direct news-product evidence.
       fit: "voksende",
     },

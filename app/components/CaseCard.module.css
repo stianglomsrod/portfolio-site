@@ -201,10 +201,18 @@
 
 .screenshotImage {
   width: 100%;
-  height: auto;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  /* UI screenshots read best from their top edge (nav, headers, primary action). */
+  object-position: top center;
+}
+
+.screenshotThumb {
   display: block;
   aspect-ratio: 16 / 10;
-  object-fit: cover;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--surface-2) 90%, transparent);
 }
 
 .screenshotLabel {

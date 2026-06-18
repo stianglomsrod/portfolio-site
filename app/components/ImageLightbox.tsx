@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import type { CaseScreenshot } from "./caseScreenshotData";
 import styles from "./ImageLightbox.module.css";
 
@@ -26,10 +27,15 @@ export default function ImageLightbox({
   const [index, setIndex] = useState(() =>
     clampIndex(initialIndex, images.length),
   );
+  const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
   const dialogRef = useRef<HTMLDivElement | null>(null);
 
   const hasMany = images.length > 1;
   const current = images[index] ?? null;
+
+  // Derived from the currently loaded src so the new image fades in on every
+  // navigation without a setState-in-effect.
+  const loaded = current != null && loadedSrc === current.src;
 
   const prev = useCallback(() => {
     setIndex((i) => {
@@ -54,7 +60,9 @@ export default function ImageLightbox({
   }, []);
 
   useEffect(() => {
-    dialogRef.current?.focus();
+    // preventScroll stops the browser from scrolling the page to bring the
+    // focused dialog into view (the modal is already centered via position: fixed).
+    dialogRef.current?.focus({ preventScroll: true });
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -83,8 +91,13 @@ export default function ImageLightbox({
   }, [current]);
 
   if (!current) return null;
+  // The lightbox must escape any ancestor with a transform / will-change
+  // (e.g. the Reveal wrapper), otherwise position: fixed anchors to that
+  // element instead of the viewport. Portalling to <body> guarantees the
+  // overlay covers the real viewport and centers correctly.
+  if (typeof document === "undefined") return null;
 
-  return (
+  return createPortal(
     <div className={styles.overlay} role="presentation">
       <button
         type="button"
@@ -100,8 +113,9 @@ export default function ImageLightbox({
         aria-modal="true"
         aria-label={`Bildefremviser: ${title}`}
         tabIndex={-1}
+        onClick={onClose}
       >
-        <header className={styles.topbar}>
+        <header className={styles.topbar} onClick={(e) => e.stopPropagation()}>
           <p className={styles.title}>{title}</p>
           <p className={styles.count} aria-live="polite">
             {index + 1} / {images.length}
@@ -121,7 +135,10 @@ export default function ImageLightbox({
             <button
               type="button"
               className={`${styles.nav} ${styles.prev}`}
-              onClick={prev}
+              onClick={(e) => {
+                e.stopPropagation();
+                prev();
+              }}
               aria-label="Forrige bilde"
             >
               <span aria-hidden="true">‹</span>
@@ -129,14 +146,24 @@ export default function ImageLightbox({
           )}
 
           <figure className={styles.figure}>
-            <Image
-              src={current.src}
-              alt={current.alt}
-              width={1800}
-              height={1200}
-              className={styles.image}
-              priority
-            />
+            <div
+              className={styles.frame}
+              data-loaded={loaded}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Image
+                key={current.src}
+                src={current.src}
+                alt={current.alt}
+                width={current.width}
+                height={current.height}
+                className={styles.image}
+                sizes="(max-width: 720px) 92vw, min(1200px, 88vw)"
+                priority
+                onLoad={() => setLoadedSrc(current.src)}
+              />
+              <span className={styles.spinner} aria-hidden="true" />
+            </div>
             <figcaption className={styles.caption}>
               {current.caption}
             </figcaption>
@@ -146,7 +173,10 @@ export default function ImageLightbox({
             <button
               type="button"
               className={`${styles.nav} ${styles.next}`}
-              onClick={next}
+              onClick={(e) => {
+                e.stopPropagation();
+                next();
+              }}
               aria-label="Neste bilde"
             >
               <span aria-hidden="true">›</span>
@@ -154,6 +184,7 @@ export default function ImageLightbox({
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

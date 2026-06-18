@@ -73,13 +73,17 @@ export default function CaseScreenshotGallery({
               aria-label={`Apne stor visning: ${entry.label}`}
             >
               <figure className={styles.screenshotFigure}>
-                <Image
-                  className={styles.screenshotImage}
-                  src={entry.shot.src}
-                  alt={entry.shot.alt}
-                  width={960}
-                  height={600}
-                />
+                <span className={styles.screenshotThumb}>
+                  <Image
+                    className={styles.screenshotImage}
+                    src={entry.shot.src}
+                    alt={entry.shot.alt}
+                    width={entry.shot.width}
+                    height={entry.shot.height}
+                    sizes="(max-width: 600px) 45vw, 280px"
+                    style={{ objectPosition: entry.shot.focus ?? "center top" }}
+                  />
+                </span>
                 <figcaption className={styles.screenshotLabel}>
                   {entry.label}
                 </figcaption>

@@ -713,7 +713,9 @@ export default function SkamlosWorld() {
                     }}
                   >
                     <Landmark gym={g} />
-                    <span className={styles.gymName}>{g.worldName}</span>
+                    {g.kind !== "portal" && (
+                      <span className={styles.gymName}>{g.worldName}</span>
+                    )}
                     {state === "visited" && (
                       <span className={styles.gymCheck} aria-hidden="true" />
                     )}

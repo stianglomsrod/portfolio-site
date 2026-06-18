@@ -45,16 +45,16 @@ export const hero = {
   professional: {
     eyebrow: "Stian Glomsrød",
     tagline:
-      "Brukerinvolvert design, AI-native prototyping og praktisk teknologisk problemløsning",
+      "Jeg designer med brukere og bygger fungerende prototyper — med AI som en styrt del av arbeidet",
     intro:
-      "Jeg arbeider i skjæringspunktet mellom brukerinnsikt, digital læringsdesign, AI-assistert prototyping og fungerende produktutvikling. Bakgrunnen min som lærer gjør at jeg ofte starter i konkrete problemer: Hva prøver brukeren faktisk å få til, hvor oppstår friksjonen, og hvordan kan teknologi gjøre situasjonen mer håndterbar?",
+      "Jeg er lærer med master i digital læringsdesign, og jobber nå med UX, AI-assistert prototyping og produktutvikling. Lærerbakgrunnen gjør at jeg ofte starter i konkrete problemer: Hva prøver brukeren faktisk å få til, hvor oppstår friksjonen, og hvordan kan teknologi gjøre situasjonen mer håndterbar?",
   },
   agentic: {
     eyebrow: "UX Designer-kandidat · tenker på VG X",
     tagline:
       "Jeg gjør uklare behov om til testbare produkter — med brukere og AI-agenter",
     intro:
-      "Lærerbakgrunn, master i digital læringsdesign og en sterk hånd på agentiske AI-workflows. Jeg starter i ekte problemer, involverer brukere, og gjør ideer testbare raskt. Bytt gjerne mellom modusene øverst — samme person, to tonefall.",
+      "Lærerbakgrunn, master i digital læringsdesign og mye praktisk erfaring med agentiske AI-workflows. Jeg starter i ekte problemer, involverer brukere, og gjør ideer testbare raskt. Bytt gjerne mellom modusene øverst — samme person, to tonefall.",
   },
   // Primary call-to-action targets. Update href values as links become ready.
   primaryCta: { label: "Se hovedcaset Klar", href: "#klar" },
@@ -229,7 +229,7 @@ export const sectionCopy = {
     professional: { label: "Arbeidsform", title: "Min agentiske arbeidsform" },
     agentic: {
       label: "Superkraft",
-      title: "Slik bygger jeg robuste AI-workflows",
+      title: "Slik bygger jeg AI-workflows jeg kan stole på",
     },
   },
   journey: {
@@ -303,7 +303,7 @@ export const journey = [
 export type WorkflowStep = { phase: string; text: string };
 
 export const agenticWorkflow = {
-  text: "Min sterkeste AI-kompetanse ligger ikke bare i å bruke verktøyene, men i å utvikle robuste agentiske workflows: å gi modeller riktig kontekst, teste output kritisk, finne feilmoduser og bygge kontrollpunkter som gjør at brukerbehov og produktmål fortsatt styrer prosessen.",
+  text: "Det jeg er best på med AI er ikke å bruke verktøyene, men å bygge arbeidsflyter rundt dem: å gi modeller riktig kontekst, teste output kritisk, finne feilmoduser og lage kontrollpunkter som gjør at brukerbehov og produktmål fortsatt styrer prosessen.",
   steps: [
     {
       phase: "Definere",
@@ -503,7 +503,7 @@ export const fitScan: FitScan = {
       vgxInterpretation:
         "Bruke AI for å jobbe smartere i flest mulig steg av designjobben.",
       evidence: [
-        "Robuste agentiske workflows som metode: kontekst, kontrollpunkter, kritisk testing.",
+        "Agentiske workflows som metode: kontekst, kontrollpunkter, kritisk testing.",
         "Klar: AI som bevisst produktbeslutning (Smart Import), ikke pynt.",
         "Denne nettsiden er selv bygget med en AI-native prototypingprosess.",
       ],
@@ -752,7 +752,7 @@ export const fitScan: FitScan = {
       title: "Agentisk workflow / QA-tankesett",
       shortLabel: "Superkraft",
       unlocked:
-        "Robuste AI-workflows: kontekst, kontrollpunkter, edge cases, QA, ekstern LLM-kritikk og feilmoduser.",
+        "Pålitelige AI-workflows: kontekst, kontrollpunkter, edge cases, QA, ekstern LLM-kritikk og feilmoduser.",
       evidence: "Arbeidsformen beskrevet i agentic workflow-seksjonen.",
       vgxRelevance:
         "Kan hjelpe et team å finne ut hvordan AI-agenter faktisk bør brukes — produktivt og kritisk.",
@@ -781,12 +781,12 @@ export const fitLevelLabels: Record<FitLevel, string> = {
 // Contact / footer links. Replace placeholder values when ready.
 export const footer = {
   links: [
-    { label: "E-post", href: "[email placeholder]" },
+    { label: "E-post", href: "mailto:stianglomsrod@gmail.com" },
     { label: "LinkedIn", href: "[LinkedIn placeholder]" },
     { label: "GitHub", href: "[GitHub placeholder]" },
     { label: "CV", href: "[CV placeholder]" },
   ],
-  // Reserved spot for a future light, AI-related closing line (agentic mode only).
-  // Keep it tasteful — no joke written yet.
-  humorPlaceholder: "Plass reservert til en liten, lett AI-spøk på tampen.",
+  // Light, self-aware closing line shown in agentic mode only. Stays honest:
+  // the site is AI-built, but Stian steered it.
+  closingLine: "Ja, denne siden er bygget med AI-agenter. Nei, de fikk ikke styre alene.",
 };

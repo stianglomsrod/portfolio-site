@@ -1130,7 +1130,7 @@ export default function SkamlosWorld() {
                         ))}
                       </ul>
                       <p className={styles.kontaktNote}>
-                        {footer.humorPlaceholder}
+                        {footer.closingLine}
                       </p>
                     </>
                   )}

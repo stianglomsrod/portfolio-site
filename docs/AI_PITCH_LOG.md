@@ -936,3 +936,63 @@ Additional standing rules:
 
 - Add ACAD/Wordhunt screenshots and migrate screenshots in `portfolio.ts` from label-only arrays to typed
   objects (`caption`, `src`, `alt`) for stricter compile-time safety.
+
+---
+
+## 2026-06-18 — Slice 10: Copy humanization + footer contact fixes
+
+1. **What changed**
+   - Removed AI-marker copy across both modes (shared content layer):
+     - Professional H1: three-part noun-phrase list → a human, specific sentence.
+     - Professional intro: dropped "i skjæringspunktet mellom …" consultant opener;
+       leads with teacher + master context.
+     - Agentic intro: "en sterk hånd på" → "mye praktisk erfaring med".
+     - `agenticWorkflow.text`: removed "ikke bare X, men Y" + vague "robuste".
+     - Workflow heading + two fit-scan evidence strings: dropped vague "robust(e)".
+   - Contact footer: `[email placeholder]` → working `mailto:stianglomsrod@gmail.com`
+     (address already public in case demo-access notes; not invented/secret).
+   - Replaced the agentic-only visible placeholder string
+     (`footer.humorPlaceholder`, was `aria-hidden`) with a real, accessible
+     closing line; renamed the field to `footer.closingLine` and updated both
+     usages (SiteFooter + SkamlosWorld journal Kontakt tab).
+
+2. **Why it changed**
+   - Make the copy read as Stian, not generic AI output, per `STIAN_VOICE_PROFILE.md`.
+   - Give a job-application site a working contact path and remove an
+     unfinished-looking placeholder.
+
+3. **Files changed**
+   - `app/data/portfolio.ts` (hero copy, workflow copy, fit-scan strings, footer
+     links + `closingLine`)
+   - `app/components/SiteFooter.tsx` (field rename + a11y: removed `aria-hidden`)
+   - `app/components/SkamlosWorld.tsx` (field rename in Kontakt tab)
+   - `docs/reports/UX_UI_COPY_REVIEW.md` (new report)
+   - `docs/AI_PITCH_LOG.md` (this entry)
+
+4. **Validation run**
+   - `npm run lint` → ✅ pass (exit 0, no warnings).
+   - `npm run build` → ✅ pass (`/` prerendered static).
+   - Browser QA on `localhost:3007`: professional hero copy ✅, footer mailto ✅,
+     mode switch ✅, agentic hero copy ✅, world renders ✅, journal Kontakt shows
+     working email + new closing line ✅.
+   - AI-marker grep re-scan → clean.
+
+5. **Intentionally NOT changed**
+   - No IA, layout, gameplay, or mode-gating changes. Internal `"agentic"` key
+     untouched.
+   - Game/gym copy in `worldGyms.ts` left as-is (already factual and on-voice).
+   - LinkedIn/GitHub/CV links kept as honest "kommer" placeholders (not invented).
+
+6. **Remaining placeholders**
+   - LinkedIn / GitHub / CV footer links still `[bracketed]`.
+   - Klar teacher/student demo credentials still by-request.
+
+7. **Risks / concerns**
+   - Closing line is light/self-aware; if a stricter professional tone is wanted,
+     it is agentic-mode-only and easy to soften.
+   - Mobile/narrow viewport and live in-world keystroke gameplay not verified in
+     the automation harness (element-stability gate); see report §11/§14.
+
+8. **Recommended next slice**
+   - Fill LinkedIn/GitHub/CV URLs, then do a real mobile-viewport QA pass
+     (hero, nav, case cards, lightbox, world playability on a phone width).

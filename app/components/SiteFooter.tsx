@@ -19,12 +19,9 @@ export default function SiteFooter({ mode }: { mode: Mode }) {
             ))}
           </ul>
 
-          {/* TODO: Skriv en lett humoristisk, AI-relatert avsluttende setning her
-              senere — bare hvis den passer tonen. Ingen vits skrevet ennå. */}
+          {/* Light, self-aware closing line — agentic mode only. */}
           {mode === "agentic" && (
-            <p className={styles.humorSlot} aria-hidden="true">
-              {footer.humorPlaceholder}
-            </p>
+            <p className={styles.humorSlot}>{footer.closingLine}</p>
           )}
 
           <p className={styles.note}>

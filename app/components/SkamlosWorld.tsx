@@ -871,12 +871,14 @@ export default function SkamlosWorld() {
                     <p className={styles.dockShort}>{selected.short}</p>
 
                     {/* Compact essentials first */}
-                    <p className={styles.dockKey}>
-                      <span className={styles.dockTag} data-unlock="true">
-                        Låser opp
-                      </span>
-                      {selected.unlockName}
-                    </p>
+                    {selected.kind !== "portal" && (
+                      <p className={styles.dockKey}>
+                        <span className={styles.dockTag} data-unlock="true">
+                          Låser opp
+                        </span>
+                        {selected.unlockName}
+                      </p>
+                    )}
                     <p className={styles.dockKey}>
                       <span className={styles.dockTag} data-vgx="true">
                         VG X
@@ -915,7 +917,9 @@ export default function SkamlosWorld() {
                       <div className={styles.dockDetails}>
                         <p className={styles.dockBlock}>
                           <span className={styles.dockTag}>
-                            Hva dette kan bli
+                            {selected.kind === "portal"
+                              ? "Hva dette kan bli"
+                              : "Hva dette er"}
                           </span>
                           {selected.whatItWas}
                         </p>

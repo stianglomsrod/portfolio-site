@@ -246,13 +246,13 @@ export const gyms: Gym[] = [
     emblem: "VG X",
     worldName: "VG X",
     title: "VG X",
-    short: "Neste arena — ikke en trofé.",
+    short: "Neste arena …?",
     trainingTheme: "Neste oppdrag",
     actionLabel: "Åpne neste oppdrag",
     unlockName: "Neste arena",
     energies: {},
     whatItWas:
-      "Jobbsøknaden og neste arena: et tverrfaglig team som lager AI-native prototyper og fremtidens nyhetsopplevelser.",
+      "Jobbe i et tverrfaglig team som lager AI-native prototyper og fremtidens nyhetsopplevelser.",
     learned:
       "Å bruke hele reisen sammen — system, prototyping, brukersentrering, deltakende design, kjørende produkter, AI som produktbeslutning og agentisk arbeidsledelse.",
     vgxRelevance:

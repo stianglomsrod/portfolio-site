@@ -169,7 +169,9 @@ export default function SkamlosWorld() {
   const selected = selectedId
     ? (gyms.find((g) => g.id === selectedId) ?? null)
     : null;
-  const nearby = nearbyId ? (gyms.find((g) => g.id === nearbyId) ?? null) : null;
+  const nearby = nearbyId
+    ? (gyms.find((g) => g.id === nearbyId) ?? null)
+    : null;
   const popoverPlacement = nearby ? getPopoverPlacement(nearby) : null;
 
   // Accumulated energies from visited gyms.
@@ -1039,7 +1041,8 @@ export default function SkamlosWorld() {
                   {journalTab === "bevis" && (
                     <>
                       <p className={styles.journalIntro}>
-                        De faktiske prosjektene bak stedene i verden — kortversjon.
+                        De faktiske prosjektene bak stedene i verden —
+                        kortversjon.
                       </p>
                       <ul className={styles.bevisList}>
                         {bevisCases.map((c) => (

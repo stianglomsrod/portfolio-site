@@ -46,9 +46,7 @@ export default function Hero({ mode }: { mode: Mode }) {
                   className={styles.ctaSecondary}
                   href="#pitch-scene"
                   onClick={() =>
-                    window.dispatchEvent(
-                      new CustomEvent("skamlos:openjournal"),
-                    )
+                    window.dispatchEvent(new CustomEvent("skamlos:openjournal"))
                   }
                 >
                   Åpne journal

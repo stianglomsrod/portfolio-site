@@ -222,8 +222,7 @@ export const gyms: Gym[] = [
       "Å ramme inn oppgaven, fange feilmoduser, beskytte produktintensjon og gjøre vage ideer om til fungerende artefakter.",
     vgxRelevance:
       "Trolig den mest direkte AI-native matchen: jeg kan bidra ikke bare ved å bruke AI-verktøy, men ved å forme pålitelige arbeidsflyter rundt AI-assistert design og prototyping.",
-    nextStep:
-      "Hele reisen peker nå mot én arena der alt dette brukes sammen.",
+    nextStep: "Hele reisen peker nå mot én arena der alt dette brukes sammen.",
     caseRefs: [],
     kind: "gym",
     pos: { x: 862, y: 360 },
@@ -245,8 +244,7 @@ export const gyms: Gym[] = [
       "Å bruke hele reisen sammen — system, prototyping, brukersentrering, deltakende design, kjørende produkter, AI som produktbeslutning og agentisk arbeidsledelse.",
     vgxRelevance:
       "Det er her alle de tidligere ferdighetene peker. Ikke fordi reisen er ferdig, men fordi dette er nettopp miljøet der den bør fortsette.",
-    nextStep:
-      "Herfra: profesjonell portefølje, Klar-demo, kontakt og CV.",
+    nextStep: "Herfra: profesjonell portefølje, Klar-demo, kontakt og CV.",
     caseRefs: [],
     kind: "portal",
     pos: { x: 912, y: 122 },

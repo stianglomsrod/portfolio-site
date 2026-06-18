@@ -5,7 +5,10 @@ import styles from "./CaseCard.module.css";
  * Renders a screenshot when an asset mapping exists.
  * Falls back to a tasteful placeholder if an image is still missing.
  */
-const screenshotMap: Record<string, Record<string, { src: string; alt: string }>> = {
+const screenshotMap: Record<
+  string,
+  Record<string, { src: string; alt: string }>
+> = {
   klar: {
     "Smart Import": {
       src: "/images/cases/klar/smart-import.png",

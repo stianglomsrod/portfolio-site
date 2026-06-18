@@ -583,8 +583,16 @@
   overflow: hidden;
   outline: none;
   background:
-    radial-gradient(60% 50% at 86% 14%, color-mix(in srgb, var(--accent-2) 16%, transparent), transparent 60%),
-    radial-gradient(70% 60% at 12% 88%, color-mix(in srgb, #2c6f4b 28%, transparent), transparent 62%),
+    radial-gradient(
+      60% 50% at 86% 14%,
+      color-mix(in srgb, var(--accent-2) 16%, transparent),
+      transparent 60%
+    ),
+    radial-gradient(
+      70% 60% at 12% 88%,
+      color-mix(in srgb, #2c6f4b 28%, transparent),
+      transparent 62%
+    ),
     linear-gradient(180deg, #0f161a 0%, #0c1114 100%);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.04),
@@ -605,8 +613,15 @@
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(color-mix(in srgb, var(--accent) 7%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in srgb, var(--accent) 7%, transparent) 1px, transparent 1px);
+    linear-gradient(
+      color-mix(in srgb, var(--accent) 7%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--accent) 7%, transparent) 1px,
+      transparent 1px
+    );
   background-size: 40px 40px;
   mask-image: radial-gradient(90% 90% at 50% 50%, #000 35%, transparent 100%);
   opacity: 0.55;
@@ -655,7 +670,9 @@
   stroke-width: 3;
   stroke-linecap: round;
   stroke-dasharray: 4 9;
-  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--accent) 40%, transparent));
+  filter: drop-shadow(
+    0 0 4px color-mix(in srgb, var(--accent) 40%, transparent)
+  );
   animation: trailFlow 1.4s linear infinite;
 }
 
@@ -914,7 +931,11 @@
   box-shadow: inset 0 0 0 3px #f4f1e8;
 }
 [data-landmark="verktoybenken"] .lmGlow {
-  background: radial-gradient(circle, rgba(230, 196, 106, 0.55), transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(230, 196, 106, 0.55),
+    transparent 70%
+  );
 }
 [data-landmark="verktoybenken"] .lmEmblem {
   color: #ffd96a;
@@ -986,7 +1007,11 @@
   background: #f4f1e8;
 }
 [data-landmark="meddesign"] .lmGlow {
-  background: radial-gradient(circle, rgba(111, 227, 176, 0.45), transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(111, 227, 176, 0.45),
+    transparent 70%
+  );
 }
 [data-landmark="meddesign"] .lmEmblem {
   color: #9fe9c8;
@@ -1023,7 +1048,11 @@
   border: 1px solid #156a48;
 }
 [data-landmark="maskinrommet"] .lmGlow {
-  background: radial-gradient(circle, rgba(65, 184, 131, 0.45), transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(65, 184, 131, 0.45),
+    transparent 70%
+  );
 }
 [data-landmark="maskinrommet"] .lmEmblem {
   color: #79e0b4;
@@ -1038,7 +1067,11 @@
 [data-landmark="klar"] .lmBase {
   inset: 22px 6px 8px;
   border-radius: 6px 6px 8px 8px;
-  background: linear-gradient(180deg, rgba(173, 232, 198, 0.85), rgba(120, 200, 160, 0.6));
+  background: linear-gradient(
+    180deg,
+    rgba(173, 232, 198, 0.85),
+    rgba(120, 200, 160, 0.6)
+  );
   border: 1.5px solid #7fd6a6;
 }
 [data-landmark="klar"] .lmDetailA {
@@ -1065,7 +1098,11 @@
 }
 [data-landmark="klar"] .lmGlow {
   inset: -16px;
-  background: radial-gradient(circle, rgba(143, 224, 176, 0.7), transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(143, 224, 176, 0.7),
+    transparent 70%
+  );
 }
 [data-landmark="klar"] .lmEmblem {
   color: #b6f0cf;
@@ -1112,7 +1149,11 @@
   box-shadow: 0 0 8px #b58cff;
 }
 [data-landmark="agentlab"] .lmGlow {
-  background: radial-gradient(circle, rgba(181, 140, 255, 0.6), transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(181, 140, 255, 0.6),
+    transparent 70%
+  );
 }
 [data-landmark="agentlab"] .lmEmblem {
   color: #d0bbff;

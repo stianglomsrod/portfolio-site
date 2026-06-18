@@ -559,7 +559,7 @@ Additional standing rules:
 2. **Why it changed**
    - The previous version was still "a dashboard/card/map widget inside a normal webpage". The
      `EPIC_PLAYABLE_SKAMLOS_WORLD` + `SKAMLOS_WORLD_GYMS` docs ask for a genuinely playable, explorable
-     learning world — movement, places, proximity, unlocks, juice — that *demonstrates* VG X's own
+     learning world — movement, places, proximity, unlocks, juice — that _demonstrates_ VG X's own
      values (AI-native prototyping, user-centred experiences over pixels) instead of describing them.
 
 3. **R&D performed**
@@ -624,7 +624,7 @@ Additional standing rules:
       dock (real DOM) still carry every fact and link, and gyms remain clickable buttons.
     - `prefers-reduced-motion` (external store + CSS query): disables walk bob, grass sway, trail flow,
       nearby-hop, particles, toast/portal animation; movement still works (and is slightly faster to
-      compensate for no animation). 
+      compensate for no animation).
     - Keyboard: stage is `role="application"` with a descriptive label; gyms/journal/controls are real
       buttons with visible `:focus-visible`; dock focus is moved/returned politely (no trap); Esc closes;
       `role="progressbar"` with aria values; decorative layers are `aria-hidden`.
@@ -703,7 +703,7 @@ Additional standing rules:
      Hero CTAs are unchanged.
 
 2. **Why it changed**
-   - The brief: *"Skamløs AI-pitch should not be game + webpage. It should be the game as the interface."*
+   - The brief: _"Skamløs AI-pitch should not be game + webpage. It should be the game as the interface."_
      The previous slice made a real game but left it sitting atop a long duplicate portfolio, `J` jumped
      into document flow, and Space could drop game focus. This slice makes the world the actual
      information architecture and fixes the input/focus and clutter problems.
@@ -757,106 +757,122 @@ Additional standing rules:
 ## 2026-06-18 — Slice 8b: Focused gameplay cleanup (popover safety + no panel train-buttons + Avkobling framing)
 
 1. **What changed**
-  - Added a reusable popover placement helper in the world component:
-    `getPopoverPlacement(gym)` now clamps popover anchor X within safe bounds and flips vertically when
-    nodes are near the top edge. The popover now uses CSS vars (`--pop-x`, `--pop-y`) plus `data-v`
-    (`top`/`bottom`) so all gyms, including the VG X portal in the top-right, stay readable in-shell.
-  - Updated popover CSS to support edge-safe placement: directional transform for top/bottom placement,
-    directional pointer arrow, and a neutral fade/scale-in animation that no longer assumes one fixed
-    direction.
-  - Removed in-panel **training action buttons** from gyms. Visiting/interacting (`Space`, click) remains
-    the single unlock action; panel now shows the action label as compact flavor copy (`Utforskning`) and
-    keeps only utility actions ("Les mer" + portal contact button for VG X).
-  - Rewrote `fitScan.needs.avkobling` wording to avoid "Koble av fra hverdagsstress" as a personal skill.
-    It is now framed as a **VG X product need** around calmer access, reduced friction and lower cognitive
-    load, with honest evidence strength still marked `fit: "voksende"`.
+
+- Added a reusable popover placement helper in the world component:
+  `getPopoverPlacement(gym)` now clamps popover anchor X within safe bounds and flips vertically when
+  nodes are near the top edge. The popover now uses CSS vars (`--pop-x`, `--pop-y`) plus `data-v`
+  (`top`/`bottom`) so all gyms, including the VG X portal in the top-right, stay readable in-shell.
+- Updated popover CSS to support edge-safe placement: directional transform for top/bottom placement,
+  directional pointer arrow, and a neutral fade/scale-in animation that no longer assumes one fixed
+  direction.
+- Removed in-panel **training action buttons** from gyms. Visiting/interacting (`Space`, click) remains
+  the single unlock action; panel now shows the action label as compact flavor copy (`Utforskning`) and
+  keeps only utility actions ("Les mer" + portal contact button for VG X).
+- Rewrote `fitScan.needs.avkobling` wording to avoid "Koble av fra hverdagsstress" as a personal skill.
+  It is now framed as a **VG X product need** around calmer access, reduced friction and lower cognitive
+  load, with honest evidence strength still marked `fit: "voksende"`.
 
 2. **Why it changed**
-  - This pass targets concrete UX friction in the current game-first slice: corner-cramped popovers,
-    unnecessary panel button tasks that interrupt exploration flow, and awkward Avkobling phrasing that
-    sounded like a personal skill instead of a product-experience need.
+
+- This pass targets concrete UX friction in the current game-first slice: corner-cramped popovers,
+  unnecessary panel button tasks that interrupt exploration flow, and awkward Avkobling phrasing that
+  sounded like a personal skill instead of a product-experience need.
 
 3. **Files changed**
-  - `app/components/SkamlosWorld.tsx`
-  - `app/components/SkamlosWorld.module.css`
-  - `app/data/portfolio.ts`
-  - `docs/AI_PITCH_LOG.md`
+
+- `app/components/SkamlosWorld.tsx`
+- `app/components/SkamlosWorld.module.css`
+- `app/data/portfolio.ts`
+- `docs/AI_PITCH_LOG.md`
 
 4. **Validation run**
-  - `npm run lint` → ✅ passed.
-  - `npm run build` → ✅ passed; `/` prerendered static.
+
+- `npm run lint` → ✅ passed.
+- `npm run build` → ✅ passed; `/` prerendered static.
 
 5. **Intentionally NOT changed**
-  - Professional mode composition and behavior unchanged.
-  - No new major features or architecture changes; game-first shell from Slice 8 remains intact.
-  - Gym order, milestones, and real-case mapping unchanged.
+
+- Professional mode composition and behavior unchanged.
+- No new major features or architecture changes; game-first shell from Slice 8 remains intact.
+- Gym order, milestones, and real-case mapping unchanged.
 
 6. **Remaining placeholders**
-  - Contact links and humor line placeholders remain unchanged.
-  - No new media assets were added in this pass.
+
+- Contact links and humor line placeholders remain unchanged.
+- No new media assets were added in this pass.
 
 7. **Risks / concerns**
-  - Popover uses heuristic edge thresholds (safe and predictable, but not collision-measured against
-    dynamic panel widths). If scene density increases, consider precise pixel-based collision checks.
-  - Action labels still appear as flavor text in panel/popover; copy should stay short to avoid clutter.
+
+- Popover uses heuristic edge thresholds (safe and predictable, but not collision-measured against
+  dynamic panel widths). If scene density increases, consider precise pixel-based collision checks.
+- Action labels still appear as flavor text in panel/popover; copy should stay short to avoid clutter.
 
 8. **Recommended next slice**
-  - **Slice 9 (continue):** add manual placement QA snapshots (all gyms, desktop + mobile), then remove
-    fully orphaned components (`FitScan`, `JourneyTimeline`) once verified no references remain.
+
+- **Slice 9 (continue):** add manual placement QA snapshots (all gyms, desktop + mobile), then remove
+  fully orphaned components (`FitScan`, `JourneyTimeline`) once verified no references remain.
 
 ---
 
 ## 2026-06-18 — Slice 9a: Real case assets + real links integration
 
 1. **What changed**
-  - Integrated real external URLs for supporting cases in `portfolio.ts`:
-    - Forløperprosjektet → PD app frontend
-    - ASK Away → Figma prototype
-    - AI og fagtekstforståelse (Warp Read) → Figma prototype
-    - ACAD Collaborate → Figma prototype
-    - Wordhunt → YouTube video
-  - Replaced screenshot placeholders with real images where files were provided.
-    A screenshot mapping now resolves by case id + screenshot label and renders actual images from
-    `public/images/cases/...`, with fallback placeholder only when an image is missing.
-  - Added explicit access notes with email for Klar and Forløper links:
-    - "Demo-/brukertilgang gis ved forespørsel: stianglomsrod@gmail.com"
-    - "Ta kontakt for brukertilgang: stianglomsrod@gmail.com"
-  - Updated case link labels to readable, specific CTAs (e.g. "Åpne ASK Away i Figma",
-    "Se Wordhunt-video").
+
+- Integrated real external URLs for supporting cases in `portfolio.ts`:
+  - Forløperprosjektet → PD app frontend
+  - ASK Away → Figma prototype
+  - AI og fagtekstforståelse (Warp Read) → Figma prototype
+  - ACAD Collaborate → Figma prototype
+  - Wordhunt → YouTube video
+- Replaced screenshot placeholders with real images where files were provided.
+  A screenshot mapping now resolves by case id + screenshot label and renders actual images from
+  `public/images/cases/...`, with fallback placeholder only when an image is missing.
+- Added explicit access notes with email for Klar and Forløper links:
+  - "Demo-/brukertilgang gis ved forespørsel: stianglomsrod@gmail.com"
+  - "Ta kontakt for brukertilgang: stianglomsrod@gmail.com"
+- Updated case link labels to readable, specific CTAs (e.g. "Åpne ASK Away i Figma",
+  "Se Wordhunt-video").
 
 2. **Why it changed**
-  - To replace visible placeholder content with real, recruiter-usable evidence and links, while keeping
-    both Professional and Skamløs modes stable and truthful.
+
+- To replace visible placeholder content with real, recruiter-usable evidence and links, while keeping
+  both Professional and Skamløs modes stable and truthful.
 
 3. **Files changed**
-  - `app/data/portfolio.ts`
-  - `app/components/ScreenshotPlaceholder.tsx`
-  - `app/components/CaseCard.tsx`
-  - `app/components/CaseCard.module.css`
-  - `app/components/FeaturedKlar.tsx`
-  - `docs/AI_PITCH_LOG.md`
-  - Added/moved image assets under:
-    - `public/images/cases/klar/`
-    - `public/images/cases/supporting/`
+
+- `app/data/portfolio.ts`
+- `app/components/ScreenshotPlaceholder.tsx`
+- `app/components/CaseCard.tsx`
+- `app/components/CaseCard.module.css`
+- `app/components/FeaturedKlar.tsx`
+- `docs/AI_PITCH_LOG.md`
+- Added/moved image assets under:
+  - `public/images/cases/klar/`
+  - `public/images/cases/supporting/`
 
 4. **Validation run**
-  - `npm run lint` → ✅ passed.
-  - `npm run build` → ✅ passed; `/` prerendered static.
+
+- `npm run lint` → ✅ passed.
+- `npm run build` → ✅ passed; `/` prerendered static.
 
 5. **Intentionally NOT changed**
-  - No IA or layout redesign.
-  - No changes to game mechanics or Professional/Skamløs mode gating.
-  - No invented claims or credentials.
+
+- No IA or layout redesign.
+- No changes to game mechanics or Professional/Skamløs mode gating.
+- No invented claims or credentials.
 
 6. **Remaining placeholders**
-  - No screenshot file was provided for ACAD or Wordhunt, so those remain without real gallery images
-    (fallback behavior remains safe).
-  - Footer contact links/humor placeholders remain as previously (outside this scope).
+
+- No screenshot file was provided for ACAD or Wordhunt, so those remain without real gallery images
+  (fallback behavior remains safe).
+- Footer contact links/humor placeholders remain as previously (outside this scope).
 
 7. **Risks / concerns**
-  - If screenshot label text in data changes later, mapping keys must be updated to keep image resolution.
-  - External prototype/video URLs can change over time; periodic link checks recommended.
+
+- If screenshot label text in data changes later, mapping keys must be updated to keep image resolution.
+- External prototype/video URLs can change over time; periodic link checks recommended.
 
 8. **Recommended next slice**
-  - Add optional screenshot assets for ACAD and Wordhunt, then migrate screenshot mapping from label-based
-    keys to explicit structured image metadata in `portfolio.ts` for stronger long-term maintainability.
+
+- Add optional screenshot assets for ACAD and Wordhunt, then migrate screenshot mapping from label-based
+  keys to explicit structured image metadata in `portfolio.ts` for stronger long-term maintainability.

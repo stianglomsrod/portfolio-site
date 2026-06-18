@@ -75,7 +75,11 @@ export default function FeaturedKlar({ mode }: { mode: Mode }) {
             {k.screenshots && k.screenshots.length > 0 && (
               <div className={styles.gallery}>
                 {k.screenshots.map((label) => (
-                  <ScreenshotPlaceholder key={label} caseId={k.id} label={label} />
+                  <ScreenshotPlaceholder
+                    key={label}
+                    caseId={k.id}
+                    label={label}
+                  />
                 ))}
               </div>
             )}

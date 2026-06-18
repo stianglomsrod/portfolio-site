@@ -55,6 +55,24 @@ function setStoredMode(next: Mode) {
 export default function Portfolio() {
   const mode = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
+  // On a user toggle, bring the relevant content into view: in Skamløs mode the
+  // playable stage (the game IS the pitch), in Normal mode the top of the page.
+  function handleModeChange(next: Mode) {
+    setStoredMode(next);
+    if (next === "agentic") {
+      // Wait for the world to mount, then center the stage in the viewport.
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => {
+          document
+            .getElementById("world-stage")
+            ?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }),
+      );
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }
+
   return (
     <div className={styles.root} data-mode={mode}>
       <header className={styles.topbar}>
@@ -62,19 +80,20 @@ export default function Portfolio() {
           <a href="#top" className={styles.brand}>
             {hero.name}
           </a>
-          <ModeToggle mode={mode} onChange={setStoredMode} />
+          <ModeToggle mode={mode} onChange={handleModeChange} />
         </div>
       </header>
 
       <main id="top" className={styles.main}>
-        <Hero mode={mode} />
         {mode === "agentic" ? (
-          // Skamløs AI-pitch is a game-first experience: the playable world is
-          // the interface for the whole journey, cases, VG X-match and contact.
-          // No duplicate long portfolio sections are rendered below it.
+          // Skamløs AI-pitch is a game-first experience: the game IS the pitch.
+          // No text-heavy hero preamble — the playable world is the entry point
+          // and the interface for the whole journey, cases, VG X-match and
+          // contact. The essential framing lives in the world's compact header.
           <SkamlosWorld />
         ) : (
           <>
+            <Hero mode={mode} />
             <FeaturedKlar mode={mode} />
             <SupportingCases mode={mode} />
             <AgenticWorkflow mode={mode} />

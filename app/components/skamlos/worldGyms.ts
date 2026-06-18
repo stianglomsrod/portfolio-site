@@ -52,6 +52,12 @@ export type Gym = {
   /** Name of the skill unlocked here. */
   unlockName: string;
   energies: Partial<Record<Energy, number>>;
+  /**
+   * A small collectible "charm" the avatar picks up when this gym is trained.
+   * Rendered as a badge orbiting the avatar — a tangible, semantically fitting
+   * token of the skill learned here (decorative; no copyrighted assets).
+   */
+  charm?: { icon: string; label: string };
   /** Panel copy: what this place represents / what was built. */
   whatItWas: string;
   /** Panel copy: what Stian learned. */
@@ -79,6 +85,7 @@ export const gyms: Gym[] = [
     actionLabel: "Kjør løkka",
     unlockName: "Systemblikk",
     energies: { prototypekraft: 1 },
+    charm: { icon: "⌨️", label: "Systemblikk" },
     whatItWas:
       "Tidlig programmeringsglede i C — for-løkker, pekere, malloc og følelsen av å forstå hvordan et system oppfører seg på lavt nivå.",
     learned:
@@ -102,6 +109,7 @@ export const gyms: Gym[] = [
     actionLabel: "Generer verktøyet",
     unlockName: "Praksisproblem → artefakt",
     energies: { prototypekraft: 1, brukerinnsikt: 1 },
+    charm: { icon: "🔧", label: "Første verktøy" },
     whatItWas:
       "CS50x og Wordhunt — et lite HTML/CSS/JavaScript-verktøy som genererer utskriftsvennlige ordjakt-oppgaver for lærere.",
     learned: "Å gjøre et reelt praksisproblem om til et brukbart verktøy.",
@@ -124,6 +132,7 @@ export const gyms: Gym[] = [
     actionLabel: "Test prototypen",
     unlockName: "Prototypeblikk",
     energies: { prototypekraft: 1, forstaelseskraft: 1 },
+    charm: { icon: "✏️", label: "Prototypeblikk" },
     whatItWas:
       "Tidlige designprototyper i Figma: ASK Away (symbolstøtte og tilgjengelighet), ACAD Collaborate (metode → produktflyt) og AI for fagtekstforståelse (forklaring på ulike nivåer, hypertekst, quiz).",
     learned:
@@ -147,6 +156,7 @@ export const gyms: Gym[] = [
     actionLabel: "Samle innsikten",
     unlockName: "Design med, ikke bare for",
     energies: { brukerinnsikt: 2 },
+    charm: { icon: "💬", label: "Brukerinnsikt" },
     whatItWas:
       "Deltakende design med elever som meddesignere, i forløperprosjektet før masteren.",
     learned:
@@ -170,6 +180,7 @@ export const gyms: Gym[] = [
     actionLabel: "Koble systemet",
     unlockName: "Prototype som faktisk kjører",
     energies: { prototypekraft: 2 },
+    charm: { icon: "⚙️", label: "Kjørende system" },
     whatItWas:
       "Forløper-prototypen bygget fullstack med Python, Django, SQLite og Vue.js.",
     learned:
@@ -193,6 +204,7 @@ export const gyms: Gym[] = [
     actionLabel: "La ukebrevet spire",
     unlockName: "AI som produktbeslutning",
     energies: { brukerinnsikt: 1, forstaelseskraft: 2, agentisk: 1 },
+    charm: { icon: "🌱", label: "Klar" },
     whatItWas:
       "Masterprosjektet Klar: en fungerende PWA-prototype for elever med eksekutive vansker, med lærer-/elevgrensesnitt og AI-støttet Smart Import.",
     learned:
@@ -216,6 +228,7 @@ export const gyms: Gym[] = [
     actionLabel: "Kjør QA-sjekk",
     unlockName: "Agentisk arbeidsledelse",
     energies: { agentisk: 3, prototypekraft: 1 },
+    charm: { icon: "🤖", label: "Agentisk kontroll" },
     whatItWas:
       "Dagens arbeidsform: strukturerte prompts, epics, logger, persistente regler, kontekststyring, QA, edge cases og ekstern LLM-kritikk.",
     learned:
@@ -231,7 +244,7 @@ export const gyms: Gym[] = [
     id: "vgx",
     landmark: "vgx",
     emblem: "VG X",
-    worldName: "VG X-portalen",
+    worldName: "VG X",
     title: "VG X",
     short: "Neste arena — ikke en trofé.",
     trainingTheme: "Neste oppdrag",
@@ -244,7 +257,7 @@ export const gyms: Gym[] = [
       "Å bruke hele reisen sammen — system, prototyping, brukersentrering, deltakende design, kjørende produkter, AI som produktbeslutning og agentisk arbeidsledelse.",
     vgxRelevance:
       "Det er her alle de tidligere ferdighetene peker. Ikke fordi reisen er ferdig, men fordi dette er nettopp miljøet der den bør fortsette.",
-    nextStep: "Herfra: profesjonell portefølje, Klar-demo, kontakt og CV.",
+    nextStep: "Herfra: Normal-porteføljen, Klar-demo og kontakt.",
     caseRefs: [],
     kind: "portal",
     pos: { x: 912, y: 122 },

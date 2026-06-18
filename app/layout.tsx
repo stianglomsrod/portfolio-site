@@ -12,10 +12,50 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Absolute base URL for OG/canonical metadata. Set NEXT_PUBLIC_SITE_URL to the
+// final domain in Vercel; otherwise fall back to the Vercel-provided production
+// URL, and finally to localhost for local dev.
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : "http://localhost:3000");
+
+const title = "Stian Glomsrød — Portefølje";
+const description =
+  "Brukerinvolvert design, AI-native prototyping og praktisk teknologisk problemløsning.";
+
 export const metadata: Metadata = {
-  title: "Stian Glomsrød — Portefølje",
-  description:
-    "Brukerinvolvert design, AI-native prototyping og praktisk teknologisk problemløsning.",
+  metadataBase: new URL(siteUrl),
+  title,
+  description,
+  applicationName: title,
+  authors: [{ name: "Stian Glomsrød" }],
+  creator: "Stian Glomsrød",
+  keywords: [
+    "UX",
+    "AI-native",
+    "prototyping",
+    "brukerinvolvert design",
+    "digital læringsdesign",
+    "VG X",
+    "portefølje",
+  ],
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    locale: "nb_NO",
+    url: "/",
+    siteName: title,
+    title,
+    description,
+  },
+  twitter: {
+    card: "summary",
+    title,
+    description,
+  },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({

@@ -52,6 +52,10 @@ const SPEED = 330; // units / second
 const PROXIMITY = 132; // interaction radius
 const ARRIVE = 8; // auto-walk arrival threshold
 const PAD = 46; // world edge padding
+// Velocity smoothing: how fast the avatar accelerates toward / decelerates
+// from its target velocity. Higher = snappier, lower = more momentum/glide.
+const ACCEL = 13; // per second — ramp up to target speed
+const DECEL = 9; // per second — glide to a stop (lighter = more drift)
 
 type Dir = "up" | "down" | "left" | "right";
 type Vec = { x: number; y: number };
@@ -154,6 +158,7 @@ export default function SkamlosWorld() {
   const journalCloseRef = useRef<HTMLButtonElement | null>(null);
   const journalContentRef = useRef<HTMLDivElement | null>(null);
   const posRef = useRef<Vec>({ x: 140, y: 588 });
+  const velRef = useRef<Vec>({ x: 0, y: 0 });
   const keysRef = useRef<Set<Dir>>(new Set());
   const autoTargetRef = useRef<Vec | null>(null);
   const nearbyRef = useRef<string | null>(null);
@@ -199,7 +204,7 @@ export default function SkamlosWorld() {
   const nextStop = useMemo(
     () =>
       gyms.find((g) => g.kind === "gym" && !visited.has(g.id))?.worldName ??
-      "VG X-portalen",
+      "VG X",
     [visited],
   );
 
@@ -366,6 +371,8 @@ export default function SkamlosWorld() {
         const d = Math.hypot(tx, ty);
         if (d <= ARRIVE) {
           autoTargetRef.current = null;
+          velRef.current.x = 0;
+          velRef.current.y = 0;
         } else {
           dx = tx / d;
           dy = ty / d;
@@ -374,23 +381,47 @@ export default function SkamlosWorld() {
 
       if (dx !== 0 || dy !== 0) {
         const len = Math.hypot(dx, dy) || 1;
-        p.x += (dx / len) * SPEED * dt;
-        p.y += (dy / len) * SPEED * dt;
+        dx /= len;
+        dy /= len;
+      }
+
+      // Momentum: ease the live velocity toward the desired velocity so the
+      // avatar ramps up on start and glides on release (no instant snapping).
+      const v = velRef.current;
+      const targetVX = dx * SPEED;
+      const targetVY = dy * SPEED;
+      const ramp = dx !== 0 || dy !== 0 ? ACCEL : DECEL;
+      const k = 1 - Math.exp(-ramp * dt); // frame-rate independent lerp
+      v.x += (targetVX - v.x) * k;
+      v.y += (targetVY - v.y) * k;
+      if (Math.abs(v.x) < 0.5) v.x = 0;
+      if (Math.abs(v.y) < 0.5) v.y = 0;
+
+      const speed = Math.hypot(v.x, v.y);
+      if (speed > 0.5) {
+        p.x += v.x * dt;
+        p.y += v.y * dt;
         p.x = Math.max(PAD, Math.min(WORLD_W - PAD, p.x));
         p.y = Math.max(PAD, Math.min(WORLD_H - PAD, p.y));
         applyAvatar();
 
-        // facing from dominant axis
+        // facing from dominant axis of travel
         let dir: Dir = facingRef.current;
-        if (Math.abs(dx) >= Math.abs(dy)) dir = dx < 0 ? "left" : "right";
-        else dir = dy < 0 ? "up" : "down";
+        if (Math.abs(v.x) >= Math.abs(v.y)) dir = v.x < 0 ? "left" : "right";
+        else dir = v.y < 0 ? "up" : "down";
         if (dir !== facingRef.current) {
           facingRef.current = dir;
           setFacing(dir);
         }
-        if (!movingRef.current) {
+        // "moving" reflects active input/drive, not residual glide, so the
+        // walk animation stops promptly while the position still eases out.
+        const driving = dx !== 0 || dy !== 0;
+        if (driving && !movingRef.current) {
           movingRef.current = true;
           setMoving(true);
+        } else if (!driving && movingRef.current) {
+          movingRef.current = false;
+          setMoving(false);
         }
       } else if (movingRef.current) {
         movingRef.current = false;
@@ -475,6 +506,13 @@ export default function SkamlosWorld() {
     keysRef.current.delete(dir);
   }, []);
 
+  // First-load activation: the overlay invites the player in, then hands focus
+  // to the stage so keyboard play works immediately (no awkward focus trap).
+  const activate = useCallback(() => {
+    setStarted(true);
+    stageRef.current?.focus({ preventScroll: true });
+  }, []);
+
   // Esc inside an overlay (focus may be in the dock / modal, not the stage).
   const onDockKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -498,8 +536,18 @@ export default function SkamlosWorld() {
   // Avatar upgrade flags (visual only, from visited set).
   const upTerminal = visited.has("c-foundations");
   const upPrototype = visited.has("maskinrommet") || visited.has("skisselab");
-  const upLeaf = visited.has("klar");
-  const upAgent = visited.has("agentic-workflow");
+
+  // Collectible charms picked up from each trained gym, in journey order so each
+  // keeps a stable orbit slot around the avatar as more are collected.
+  const collectedCharms = useMemo(
+    () =>
+      gyms
+        .map((g, i) => ({ gym: g, slot: i }))
+        .filter(
+          ({ gym }) => gym.kind === "gym" && gym.charm && visited.has(gym.id),
+        ),
+    [visited],
+  );
 
   return (
     <section
@@ -512,16 +560,14 @@ export default function SkamlosWorld() {
         <div className={styles.sceneHead}>
           <p className={styles.sceneLabel}>
             <span className={styles.live} aria-hidden="true" />
-            Spillbar prototype · gå inn i verden
+            Skamløs AI-pitch · spill pitchen
           </p>
           <h2 id="world-heading" className={styles.sceneTitle}>
             Stians verden
           </h2>
           <p className={styles.sceneLede}>
-            Ikke en CV — en liten verden du kan gå rundt i. Styr Stian-avataren
-            mellom treningsstedene fra den ekte læringsreisen, tren hvert sted,
-            og se stien peke mot VG X-portalen. Vil du bare skanne? Trykk{" "}
-            <kbd>J</kbd> for journalen.
+            Spill deg gjennom den ekte læringsreisen mot VG X — eller
+            trykk <kbd>J</kbd> for journalen.
           </p>
         </div>
 
@@ -543,7 +589,7 @@ export default function SkamlosWorld() {
             </div>
             <p className={styles.progressLabel}>
               {allExplored
-                ? "Alle steder trent — VG X-portalen lyser opp."
+                ? "Alle steder trent — VG X lyser opp."
                 : `${visitedCount} / ${gymCount} steder trent`}
             </p>
           </div>
@@ -592,7 +638,7 @@ export default function SkamlosWorld() {
 
         {/* World shell — the dominant, game-first surface */}
         <div className={styles.worldGrid}>
-          <div className={styles.stageWrap}>
+          <div className={styles.stageWrap} id="world-stage">
             <div
               ref={stageRef}
               className={styles.stage}
@@ -694,15 +740,29 @@ export default function SkamlosWorld() {
                 data-moving={moving ? "true" : "false"}
                 data-up-terminal={upTerminal ? "true" : "false"}
                 data-up-prototype={upPrototype ? "true" : "false"}
-                data-up-leaf={upLeaf ? "true" : "false"}
-                data-up-agent={upAgent ? "true" : "false"}
                 aria-hidden="true"
               >
                 <span className={styles.avatarShadow} />
                 <span className={styles.avatarBody}>
                   <span className={styles.avatarFace} />
-                  <span className={styles.avatarPointer} />
+                  <span className={styles.avatarPointer} aria-hidden="true" />
                 </span>
+                {collectedCharms.length > 0 && (
+                  <span className={styles.charmOrbit} aria-hidden="true">
+                    {collectedCharms.map(({ gym: g, slot }) => (
+                      <span
+                        key={g.id}
+                        className={styles.charm}
+                        style={{
+                          ["--a" as string]: `${slot * (360 / gymCount)}deg`,
+                        }}
+                        title={g.charm!.label}
+                      >
+                        {g.charm!.icon}
+                      </span>
+                    ))}
+                  </span>
+                )}
               </div>
 
               {/* proximity popover */}
@@ -732,12 +792,29 @@ export default function SkamlosWorld() {
                 </div>
               )}
 
-              {/* start hint */}
+              {/* activation overlay — the game is the pitch; first click (or
+                  Enter/Space on this button) starts play and focuses the stage */}
               {!started && (
-                <div className={styles.startHint} aria-hidden="true">
-                  <span className={styles.startKeys}>WASD / piltaster</span>
-                  <span>Gå inn i verden</span>
-                </div>
+                <button
+                  type="button"
+                  className={styles.activate}
+                  onClick={activate}
+                  aria-label="Hjelp Stian mot målet. Klikk for å spille."
+                >
+                  <span className={styles.activateCard}>
+                    <span className={styles.activatePlay} aria-hidden="true" />
+                    <span className={styles.activateTitle}>
+                      Hjelp Stian mot målet.
+                    </span>
+                    <span className={styles.activateCta}>
+                      Klikk her for å spille
+                    </span>
+                    <span className={styles.activateKeys} aria-hidden="true">
+                      <kbd>WASD</kbd> <kbd>piler</kbd> gå · <kbd>Space</kbd> tren
+                      · <kbd>J</kbd> journal
+                    </span>
+                  </span>
+                </button>
               )}
 
               {/* touch D-pad (shown on coarse pointers via CSS) */}
@@ -837,7 +914,7 @@ export default function SkamlosWorld() {
                     {dockExpanded && (
                       <div className={styles.dockDetails}>
                         <p className={styles.dockBlock}>
-                          <span className={styles.dockTag}>Hva dette var</span>
+                          <span className={styles.dockTag}>Hva dette kan bli</span>
                           {selected.whatItWas}
                         </p>
                         <p className={styles.dockBlock}>
@@ -897,13 +974,6 @@ export default function SkamlosWorld() {
                             ))}
                           </ul>
                         )}
-
-                        <p className={styles.dockNext}>
-                          <span className={styles.dockTag} data-next="true">
-                            Neste steg
-                          </span>
-                          {selected.nextStep}
-                        </p>
                       </div>
                     )}
                   </div>
@@ -1129,9 +1199,7 @@ export default function SkamlosWorld() {
                           </li>
                         ))}
                       </ul>
-                      <p className={styles.kontaktNote}>
-                        {footer.closingLine}
-                      </p>
+                      <p className={styles.kontaktNote}>{footer.closingLine}</p>
                     </>
                   )}
                 </div>
@@ -1142,7 +1210,7 @@ export default function SkamlosWorld() {
 
         <p className={styles.fallback}>
           Foretrekker du en vanlig, scrollbar portefølje? Bytt til{" "}
-          <strong>Profesjonell</strong> modus øverst på siden — samme person, to
+          <strong>Normal</strong> modus øverst på siden — samme person, to
           tonefall.
         </p>
       </div>

@@ -36,7 +36,7 @@ export type PortfolioCase = {
 };
 
 export const modeLabels: Record<Mode, { label: string; hint: string }> = {
-  professional: { label: "Profesjonell", hint: "Rolig og søknadsklar" },
+  professional: { label: "Normal pitch", hint: "Rolig og søknadsklar" },
   agentic: { label: "Skamløs AI-pitch", hint: "AI-native, ærlig og energisk" },
 };
 
@@ -778,15 +778,18 @@ export const fitLevelLabels: Record<FitLevel, string> = {
   voksende: "Voksende",
 };
 
-// Contact / footer links. Replace placeholder values when ready.
+// Contact / footer links.
 export const footer = {
   links: [
     { label: "E-post", href: "mailto:stianglomsrod@gmail.com" },
-    { label: "LinkedIn", href: "[LinkedIn placeholder]" },
-    { label: "GitHub", href: "[GitHub placeholder]" },
-    { label: "CV", href: "[CV placeholder]" },
+    {
+      label: "LinkedIn",
+      href: "https://www.linkedin.com/in/stian-glomsr%C3%B8d-156968265/",
+    },
+    { label: "GitHub", href: "https://github.com/stianglomsrod" },
   ],
   // Light, self-aware closing line shown in agentic mode only. Stays honest:
   // the site is AI-built, but Stian steered it.
-  closingLine: "Ja, denne siden er bygget med AI-agenter. Nei, de fikk ikke styre alene.",
+  closingLine:
+    "Ja, denne siden er bygget med AI-agenter. Nei, de fikk ikke styre alene.",
 };

@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Stian Glomsrød — Portefølje
 
-## Getting Started
+A two-mode portfolio site built as Stian Glomsrød's application for the **UX Designer** role at
+**VG X** (Schibsted). It is itself an AI-native prototype that argues its own thesis.
 
-First, run the development server:
+- **Normal pitch** (default): a calm, scannable, application-ready portfolio —
+  Hero → featured case (Klar) → supporting cases → agentic workflow → contact.
+- **Skamløs AI-pitch**: a game-first, playable world ("Stians verden") where the real learning
+  journey is the pitch. All evidence is also available as text via the journal (`J`), so it stays
+  fully usable without playing.
+
+The mode toggle persists to `localStorage` (`portfolio-mode`) and drives a `data-mode` attribute.
+
+## Tech stack
+
+- **Next.js 16** (App Router, Turbopack) + **React 19**
+- **TypeScript** (strict)
+- **CSS Modules** + a small global theme in [`app/globals.css`](app/globals.css)
+- No runtime UI dependencies beyond React/Next.
+
+## Getting started
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Script          | Purpose                               |
+| --------------- | ------------------------------------- |
+| `npm run dev`   | Start the dev server (Turbopack)      |
+| `npm run build` | Production build                      |
+| `npm run start` | Serve the production build            |
+| `npm run lint`  | ESLint (core-web-vitals + TypeScript) |
 
-## Learn More
+## Project structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+app/
+  layout.tsx          Root layout + SEO/OpenGraph metadata
+  page.tsx            Renders <Portfolio/>
+  globals.css         Theme tokens, reduced-motion handling
+  components/         UI (Portfolio, SkamlosWorld, cases, footer, …)
+  data/portfolio.ts   Single source of truth for copy + the VG X fit-scan
+docs/                 Epic, AI pitch log, reports
+public/images/        Case screenshots + avatar
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Content & integrity rules
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Copy lives in [`app/data/portfolio.ts`](app/data/portfolio.ts) and
+  [`app/components/skamlos/worldGyms.ts`](app/components/skamlos/worldGyms.ts) — no invented
+  metrics, awards, or seniority.
+- Contact links live in `footer.links` in [`app/data/portfolio.ts`](app/data/portfolio.ts). Any
+  link written as `[bracketed text]` is treated as a placeholder and renders as a non-clickable
+  chip (see [`app/components/CaseLink.tsx`](app/components/CaseLink.tsx)).
+
+## Configuration
+
+Optional environment variable:
+
+| Variable               | Purpose                                                                                                                                                                  |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SITE_URL` | Absolute site URL for canonical/OpenGraph tags (e.g. `https://…`). On Vercel it falls back automatically to the production URL, and to `http://localhost:3000` locally. |
 
 ## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This is a standard Next.js app and deploys on Vercel with zero extra configuration:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Push the repo to GitHub.
+2. At [vercel.com/new](https://vercel.com/new), import the repository — Next.js is auto-detected.
+3. (Optional) Add the `NEXT_PUBLIC_SITE_URL` environment variable for correct canonical/OpenGraph
+   URLs.
+4. Click **Deploy**.
+
+Local production check before deploying:
+
+```bash
+npm run lint && npm run build
+```

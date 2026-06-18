@@ -876,3 +876,63 @@ Additional standing rules:
 
 - Add optional screenshot assets for ACAD and Wordhunt, then migrate screenshot mapping from label-based
   keys to explicit structured image metadata in `portfolio.ts` for stronger long-term maintainability.
+
+---
+
+## 2026-06-18 — Slice 9b: Clickable screenshot galleries with reusable lightbox carousel
+
+1. **What changed**
+
+- Implemented a reusable, accessible image lightbox/carousel (`ImageLightbox`) for case screenshots.
+- Implemented a reusable gallery wrapper (`CaseScreenshotGallery`) that makes available screenshots
+  clickable thumbnails and opens the lightbox at the clicked image.
+- Wired both featured Klar gallery and supporting primary case galleries to the shared wrapper; no IA
+  changes, only interaction upgrade.
+- Added shared screenshot data helpers (`caseScreenshotData.ts`) so image source/alt metadata is not
+  duplicated across components.
+- Updated screenshot card CSS for semantic clickable thumbnail buttons with visible focus states.
+
+2. **Why it changed**
+
+- Screenshots were visible but too small to inspect. Recruiters need larger, inspectable evidence without
+  leaving the page.
+
+3. **Files changed**
+
+- `app/components/ImageLightbox.tsx` (new)
+- `app/components/ImageLightbox.module.css` (new)
+- `app/components/CaseScreenshotGallery.tsx` (new)
+- `app/components/caseScreenshotData.ts` (new)
+- `app/components/FeaturedKlar.tsx`
+- `app/components/CaseCard.tsx`
+- `app/components/CaseCard.module.css`
+- `app/components/ScreenshotPlaceholder.tsx` (refactored to shared data helper)
+- `docs/AI_PITCH_LOG.md`
+
+4. **Validation run**
+
+- `npm run lint` → ✅ passed.
+- `npm run build` → ✅ passed; `/` prerendered static.
+
+5. **Intentionally NOT changed**
+
+- No redesign of page layout or IA.
+- No changes to mode gating (Professional vs Skamløs).
+- No changes to gameplay logic in Skamløs world.
+
+6. **Remaining placeholders**
+
+- ACAD and Wordhunt still have no screenshot assets provided; they retain tasteful placeholders and do not
+  open a broken lightbox.
+
+7. **Risks / concerns**
+
+- Lightbox entry index is derived by caption match in the current screenshot labels. If labels are edited,
+  mapping should be updated accordingly.
+- Body scroll lock uses `document.body.style.overflow`; if future overlays do the same simultaneously,
+  a shared scroll-lock utility may be cleaner.
+
+8. **Recommended next slice**
+
+- Add ACAD/Wordhunt screenshots and migrate screenshots in `portfolio.ts` from label-only arrays to typed
+  objects (`caption`, `src`, `alt`) for stricter compile-time safety.

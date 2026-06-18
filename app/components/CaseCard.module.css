@@ -165,12 +165,38 @@
   padding: 8px;
 }
 
+.screenshotButton {
+  appearance: none;
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  cursor: zoom-in;
+  border-radius: 10px;
+}
+
+.screenshotButton:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent) 70%, transparent);
+  outline-offset: 2px;
+}
+
 .screenshotFigure {
   margin: 0;
   border-radius: 10px;
   overflow: hidden;
   border: 1px solid var(--border);
   background: color-mix(in srgb, var(--surface-2) 90%, transparent);
+  transition:
+    border-color 0.2s var(--ease),
+    transform 0.2s var(--ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .screenshotButton:hover .screenshotFigure {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
 }
 
 .screenshotImage {

@@ -1,6 +1,6 @@
 import type { Mode, PortfolioCase } from "../data/portfolio";
+import CaseScreenshotGallery from "./CaseScreenshotGallery";
 import CaseLink from "./CaseLink";
-import ScreenshotPlaceholder from "./ScreenshotPlaceholder";
 import styles from "./CaseCard.module.css";
 
 function getCaseLinkLabel(caseId: string): string {
@@ -82,11 +82,11 @@ export default function CaseCard({
 
       {/* Only primary cases carry the screenshot gallery, to keep hierarchy */}
       {!isSecondary && data.screenshots && data.screenshots.length > 0 && (
-        <div className={styles.gallery}>
-          {data.screenshots.map((label) => (
-            <ScreenshotPlaceholder key={label} caseId={data.id} label={label} />
-          ))}
-        </div>
+        <CaseScreenshotGallery
+          caseId={data.id}
+          labels={data.screenshots}
+          className={styles.gallery}
+        />
       )}
     </article>
   );

@@ -1,7 +1,7 @@
 import type { Mode } from "../data/portfolio";
 import { featuredCase, sectionCopy } from "../data/portfolio";
+import CaseScreenshotGallery from "./CaseScreenshotGallery";
 import CaseLink from "./CaseLink";
-import ScreenshotPlaceholder from "./ScreenshotPlaceholder";
 import Reveal from "./Reveal";
 import shared from "./Shared.module.css";
 import styles from "./FeaturedKlar.module.css";
@@ -73,15 +73,11 @@ export default function FeaturedKlar({ mode }: { mode: Mode }) {
             </div>
 
             {k.screenshots && k.screenshots.length > 0 && (
-              <div className={styles.gallery}>
-                {k.screenshots.map((label) => (
-                  <ScreenshotPlaceholder
-                    key={label}
-                    caseId={k.id}
-                    label={label}
-                  />
-                ))}
-              </div>
+              <CaseScreenshotGallery
+                caseId={k.id}
+                labels={k.screenshots}
+                className={styles.gallery}
+              />
             )}
           </article>
         </Reveal>

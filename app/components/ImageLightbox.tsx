@@ -137,7 +137,9 @@ export default function ImageLightbox({
               className={styles.image}
               priority
             />
-            <figcaption className={styles.caption}>{current.caption}</figcaption>
+            <figcaption className={styles.caption}>
+              {current.caption}
+            </figcaption>
           </figure>
 
           {hasMany && (

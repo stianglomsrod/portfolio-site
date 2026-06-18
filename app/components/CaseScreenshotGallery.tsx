@@ -3,7 +3,10 @@
 import Image from "next/image";
 import { useMemo, useRef, useState } from "react";
 import ImageLightbox from "./ImageLightbox";
-import { getCaseScreenshot, getCaseScreenshotItems } from "./caseScreenshotData";
+import {
+  getCaseScreenshot,
+  getCaseScreenshotItems,
+} from "./caseScreenshotData";
 import styles from "./CaseCard.module.css";
 
 export default function CaseScreenshotGallery({
@@ -19,7 +22,11 @@ export default function CaseScreenshotGallery({
   const triggerRef = useRef<HTMLButtonElement | null>(null);
 
   const entries = useMemo(
-    () => labels.map((label) => ({ label, shot: getCaseScreenshot(caseId, label) })),
+    () =>
+      labels.map((label) => ({
+        label,
+        shot: getCaseScreenshot(caseId, label),
+      })),
     [caseId, labels],
   );
 
@@ -62,9 +69,7 @@ export default function CaseScreenshotGallery({
               key={entry.label}
               type="button"
               className={styles.screenshotButton}
-              onClick={(e) =>
-                openFromLabel(entry.label, e.currentTarget)
-              }
+              onClick={(e) => openFromLabel(entry.label, e.currentTarget)}
               aria-label={`Apne stor visning: ${entry.label}`}
             >
               <figure className={styles.screenshotFigure}>

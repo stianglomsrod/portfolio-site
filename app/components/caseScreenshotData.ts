@@ -4,7 +4,10 @@ export type CaseScreenshot = {
   caption: string;
 };
 
-const screenshotMap: Record<string, Record<string, { src: string; alt: string }>> = {
+const screenshotMap: Record<
+  string,
+  Record<string, { src: string; alt: string }>
+> = {
   klar: {
     "Smart Import": {
       src: "/images/cases/klar/smart-import.png",

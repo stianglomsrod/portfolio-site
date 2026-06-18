@@ -1195,8 +1195,7 @@ export default function SkamlosWorld() {
                   {journalTab === "kontakt" && (
                     <>
                       <p className={styles.journalIntro}>
-                        Vil du ta praten videre? Her er veiene inn — og en demo
-                        som faktisk kjører.
+                        Vil du ta praten videre? Her er veiene inn.
                       </p>
                       <ul className={styles.kontaktLinks}>
                         {footer.links.map((item) => (

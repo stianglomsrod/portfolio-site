@@ -13,9 +13,6 @@ export default function Hero({ mode }: { mode: Mode }) {
   return (
     <header className={styles.hero}>
       <div className={shared.container}>
-        <Reveal>
-          <p className={styles.eyebrow}>{copy.eyebrow}</p>
-        </Reveal>
         <Reveal delay={60}>
           <h1 className={styles.title}>{copy.tagline}</h1>
         </Reveal>

@@ -566,8 +566,8 @@ export default function SkamlosWorld() {
             Stians verden
           </h2>
           <p className={styles.sceneLede}>
-            Spill deg gjennom den ekte læringsreisen mot VG X — eller
-            trykk <kbd>J</kbd> for journalen.
+            Spill deg gjennom den ekte læringsreisen mot VG X — eller trykk{" "}
+            <kbd>J</kbd> for journalen.
           </p>
         </div>
 
@@ -810,8 +810,8 @@ export default function SkamlosWorld() {
                       Klikk her for å spille
                     </span>
                     <span className={styles.activateKeys} aria-hidden="true">
-                      <kbd>WASD</kbd> <kbd>piler</kbd> gå · <kbd>Space</kbd> tren
-                      · <kbd>J</kbd> journal
+                      <kbd>WASD</kbd> <kbd>piler</kbd> gå · <kbd>Space</kbd>{" "}
+                      tren · <kbd>J</kbd> journal
                     </span>
                   </span>
                 </button>
@@ -914,7 +914,9 @@ export default function SkamlosWorld() {
                     {dockExpanded && (
                       <div className={styles.dockDetails}>
                         <p className={styles.dockBlock}>
-                          <span className={styles.dockTag}>Hva dette kan bli</span>
+                          <span className={styles.dockTag}>
+                            Hva dette kan bli
+                          </span>
                           {selected.whatItWas}
                         </p>
                         <p className={styles.dockBlock}>

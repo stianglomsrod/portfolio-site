@@ -380,3 +380,142 @@ Additional standing rules:
   the path on first view (reduced-motion-safe, skippable), a focus ring/keyboard arrow-cycling on the
   canvas itself, and a "fortsett til bevisene" CTA linking the constellation to the Fit Scan section.
   Then do the deferred Slice 4 cleanup (remove dead `journey` data + unused CSS).
+
+---
+
+## 2026-06-18 — Slice 6: "Stians verden" explorable hub (replaces the constellation as hero)
+
+1. **What changed**
+   - Replaced the 3D fit-constellation as the Skamløs hero with a fully **explorable 2D world** —
+     **"Stians verden"**: a navigable learning-journey map you travel through. A glowing **avatar**
+     (the "agent" diamond) travels along a winding trail between **9 places** (8 real milestones + the
+     **VG X-portalen**). Each place is a focusable `<button>` that, when visited, moves the avatar there,
+     marks it visited, and opens a rich **side dock** (non-blocking `<aside>`, not a modal).
+   - Skill/unlock states are visible on the map and in the journal: **unlocked** (colourful, pulsing,
+     visitable beacon), **visited** (calm green + check badge), **next-quest** (the VG X portal — dashed,
+     shimmering violet, framed positively as the next arena, never as a deficiency).
+   - Added a **HUD** with an exploration progress bar (`X / 8 områder utforsket`, `role="progressbar"`)
+     plus **"Åpne journal"** and **"Nullstill"** controls.
+   - Added a collapsible **Reisejournal** (map/overview) for fast recruiter scanning: every place grouped
+     by thematic area with state badges and click-to-jump, plus a **VG X-match** panel surfacing the four
+     VG X user needs (Oversikt / Forståelse / Relevans / Avkobling) with honest fit badges.
+   - New files:
+     - `app/components/skamlos/worldNodes.ts` — derives world nodes from `fitScan.milestones` (source of
+       truth), adds presentational flavour only (place name, thematic area, icon key, 2D map position),
+       plus the synthetic VG X portal and the reused `fitScan.needs` summary.
+     - `app/components/SkamlosWorld.tsx` — the client hub: avatar travel, visited/selection state,
+       journal, dock, inline stroke-icon set, reduced-motion external store.
+     - `app/components/SkamlosWorld.module.css` — world/map/journal/dock styling + reduced-motion +
+       responsive (dock stacks under the map < 880px).
+   - `Portfolio.tsx` now renders `{mode === "agentic" && <SkamlosWorld />}` in the slot previously held by
+     `<SkamlosPitchScene />` (same position: right after the Hero). Fit Scan + Journey remain below.
+
+2. **Why it changed**
+   - User feedback: the constellation was "still too much like an alternative content view with a 3D
+     visualization on top." The brief asked to push Skamløs into a genuinely **navigable, playful,
+     memorable** experience — a controllable presence, explorable nodes with unlock states, rich info
+     panels, and a recruiter-friendly overview. A robust, accessible DOM/SVG world demonstrates VG X's
+     own values (experiences over pixels, AI-native prototyping, user-centred, accessible) better than a
+     fragile 3D toy — and it ships **zero new dependencies**.
+
+3. **R&D performed**
+   - Re-read the job ad (`utlysning.md`): VG X = news as **experiences** for digital natives; four needs
+     (Oversikt / Forståelse / Relevans / Avkobling); AI-native, "kort vei fra tanke til test", user-centred.
+   - Re-read current architecture: `Portfolio.tsx`, `SkamlosPitchScene.tsx`, `FitConstellation.tsx`,
+     `pitchNodes.ts`, `fitScan.milestones`, `Shared.module.css`, `globals.css` (CSS variables/tokens).
+   - Reviewed the React-19 `react-hooks/set-state-in-effect` constraint and Next 16 dynamic/SSR notes
+     already documented in earlier slices (informed the external-store + handler-driven state design).
+
+4. **Technology options considered**
+   - **A. Extend three.js into a walkable 3D world** — max wow, reuses the dep, but heavy, fragile on
+     mobile GPUs, hard to make keyboard/AT-robust, long build, collision/camera complexity.
+   - **B. DOM + SVG 2D world map with an avatar (chosen)** — places are real `<button>`s (keyboard/AT
+     native), avatar + trail are CSS/SVG, info in a real `<aside>` dock. Lightweight, robust, responsive,
+     trivially reduced-motion-safe, no WebGL failure mode, **no new deps**.
+   - **C. HTML Canvas 2D game world** — smooth animation/generative visuals, but canvas content is
+     invisible to AT (needs a parallel DOM anyway) and is more code to maintain.
+   - **D. Scroll-driven spatial DOM scenes** — cinematic, but weaker on "controllable presence" and
+     scroll-jacking hurts accessibility.
+
+5. **Technology choice and justification**
+   - Chose **B**. It directly embodies the VG X message (accessible, user-centred experiences), is the
+     engineering-taste choice (lightweight, maintainable, isolated, removable), keeps lint/build green
+     with no dependency churn, and still delivers a memorable, playful, interactive hub.
+
+6. **How the world / navigation works**
+   - 9 places positioned by percentage on a responsive stage; an SVG `non-scaling-stroke` trail connects
+     them in journey order. Clicking a place (or a journal entry) travels the avatar there (CSS `left/top`
+     transition), marks it visited, and opens the dock. Keyboard: places are buttons in journey order, so
+     Tab order = the learning path; Enter selects; Escape closes the dock and returns focus to the place.
+
+7. **How unlock / visited / next-quest states work**
+   - All 8 milestones are **unlocked** (real, documented achievements) and render as colourful pulsing
+     beacons. Visiting one adds it to a `Set` → **visited** styling (green + check badge, calmer pulse).
+     The VG X portal is the only **next-quest** node — dashed/shimmering and framed positively. State is
+     mirrored identically in the journal badges and the map legend.
+
+8. **How info panels / journal work**
+   - **Dock** (non-blocking `<aside aria-label>`): place name + icon, title, short tag, "Hva dette var"
+     (evidence), "Låste opp" (skill), "VG X"-relevance, case deep-link (`#<caseRef>`), and metaphor. The
+     portal variant shows its positive blurb + the four VG X needs. Focus moves to the dock heading on
+     open (`tabIndex=-1`, not a trap) and returns to the triggering place on close.
+   - **Journal** (collapsible `aria-expanded`/`hidden`): places grouped by thematic area with state badges
+     - click-to-jump, and a VG X-match panel of the four needs with honest fit badges — built for
+       time-pressed recruiters.
+
+9. **Files changed**
+   - `app/components/skamlos/worldNodes.ts` (new)
+   - `app/components/SkamlosWorld.tsx` (new)
+   - `app/components/SkamlosWorld.module.css` (new)
+   - `app/components/Portfolio.tsx` (swap import + one agentic-gated render line)
+   - `docs/AI_PITCH_LOG.md` (this entry)
+
+10. **Dependencies added**
+
+- **None.** The whole experience is DOM + SVG + CSS. (`three` is now unused by the render path — see
+  risks; flagged for removal next slice.)
+
+11. **Fallback / reduced-motion / accessibility**
+
+- No WebGL dependency at all → no advanced-rendering failure mode; SVG/DOM is universally supported.
+- `prefers-reduced-motion`: tracked via `useSyncExternalStore` (no setState-in-effect) **and** a CSS
+  media query — disables avatar travel transition, trail flow, node beacons, quest shimmer and the live
+  dot. All interaction stays fully functional.
+- Keyboard: every place + journal entry + control is a real button; visible `:focus-visible`; Tab order
+  follows the journey; Escape closes the dock; focus is moved/returned politely (no focus trap, no
+  hidden-content traps). `role="progressbar"` with aria values; decorative avatar/trail are `aria-hidden`.
+- Responsive/mobile: dock stacks under the map < 880px; node/label sizes shrink; HUD stacks < 520px.
+
+12. **Validation results**
+
+- `npm run lint` → ✅ passed (exit 0).
+- `npm run build` → ✅ passed (compiled in ~6.4s, TypeScript ok, `/` prerendered **static**).
+
+13. **Manual QA guide**
+
+- Toggle to **Skamløs AI-pitch**: the world appears right under the Hero. Click places → avatar travels,
+  dock fills, progress bar advances, check badges appear. Visit all 8 → progress label flips to "Alle
+  områder utforsket". Open the VG X portal → positive "neste oppdrag" framing + the four needs.
+- Open **journal** → grouped overview + VG X-match; click an entry jumps to that place. **Nullstill**
+  clears visited/selection. Tab through the map; Enter to open; Escape to close (focus returns).
+  Verify case deep-links (e.g. "Se Klar") scroll to the matching case. Toggle OS reduced-motion → motion
+  calms, interaction intact. Resize to mobile → dock stacks under the map. Confirm **Professional** mode
+  is unchanged (no world, no journal).
+
+14. **Risks / tradeoffs**
+
+- `three` + `@types/three` are now **unused** by the render path (constellation files remain on disk but
+  are no longer imported). They no longer ship in any bundle, but the dep is dead weight — recommend
+  removing it (and the orphaned `SkamlosPitchScene.tsx` / `FitConstellation.tsx` / `pitchNodes.ts`) in a
+  cleanup slice. Left in place this slice to keep the change focused and reversible.
+- Less raw "3D wow" than the constellation — deliberate tradeoff for robustness, accessibility and a
+  stronger product narrative.
+- Node label collisions are avoided by hand-placed positions; if milestones are added/reordered the map
+  positions in `worldNodes.ts` (`FLAVOR`) must be updated.
+
+15. **Recommended next slice**
+
+- **Slice 7 — Cleanup + polish:** delete the now-orphaned constellation files and remove `three` /
+  `@types/three` (and the deferred Slice 4 dead `journey` data + unused CSS). Optionally add arrow-key
+  travel between adjacent places, a first-visit onboarding hint, and place artwork/illustration slots
+  (image/video placeholders) inside the dock for real screenshots of each project.

@@ -69,13 +69,22 @@ portfolio-site/
 │       └── portfolio.ts
 ├── docs/
 │   ├── AI_PITCH_LOG.md
+│   ├── context/
+│   │   ├── 2026-06-19-agent-context-pack.zip
+│   │   └── 2026-06-19-agent-context-pack/
+│   │       ├── 01_BRIEF_MAAL_OG_RAMMER.md
+│   │       ├── 02_SKILLS_OG_BEVIS.md
+│   │       ├── 03_AGENTISK_UX_OG_FELTNOTAT.md
+│   │       └── 04_STARTPROMPT_NY_AGENT.md
 │   ├── dnb/
 │   │   ├── DNB_AGENT_HANDOFF_PROTOCOL.md
+│   │   ├── DNB_AGENT_ONBOARDING_INDEX.md
 │   │   ├── DNB_CONTENT_OUTLINE.md
 │   │   ├── DNB_COST_CONTROL.md
 │   │   ├── DNB_IMPLEMENTATION_LOG.md
 │   │   ├── DNB_POSITIONING.md
 │   │   ├── DNB_QA_CHECKLIST.md
+│   │   ├── DNB_SECTION_COPY_V1.md
 │   │   └── DNB_WORKFLOW_DNA.md
 │   ├── epics/
 │   │   └── EPIC_SKAMLOS_AI_PITCH.md

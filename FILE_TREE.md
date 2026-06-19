@@ -3,6 +3,7 @@
 > Purpose: Compact project file tree for onboarding ChatGPT, Codex, Copilot, and future agents. Update this file whenever files are created, deleted, moved, renamed, or structurally reorganized.
 
 ## Maintenance rule
+
 Any future agent that creates, deletes, moves, renames, or meaningfully reorganizes files must update this file in the same session and report the changed paths in the final summary.
 
 ## Full repo tree

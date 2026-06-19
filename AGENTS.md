@@ -67,6 +67,8 @@ The report must be self-contained so it can be pasted into ChatGPT and Codex for
 ## Report delivery rule
 At the end of every session:
 1. Save the full report as `docs/reports/YYYY-MM-DD-<slug>-report.md` and update `FILE_TREE.md`.
-2. Present the complete report a **second time** inside a fenced ` ```markdown ` code block at the very end of the response. This gives the user a single copy button to grab the full handoff text for ChatGPT — no navigation or file opening required.
+2. Deliver the report **once**, as the detailed report itself inside a single fenced ` ```markdown ` code block. Do **not** present a prose version first and then a duplicate markdown block — the markdown block IS the report. Keep the same elaborated, narrative, detail-rich style inside the block. Detail is key.
 3. The first section of the report must be **## 0. User prompt** containing the verbatim user request that triggered the session.
 4. Inside the copyable block, do **not** use fenced code blocks (no triple backticks). Use plain indented text for directory trees and command output so the outer fence is never broken.
+5. The recipient is an LLM (tech lead) that already knows this workflow. Include a short workflow refresher only inside the prompt itself when it materially helps that specific handoff — not otherwise. Always state the goal.
+6. Assume both the agent and the recipient LLM can read context from screenshots and arbitrary documents (PDF, md, code, images).

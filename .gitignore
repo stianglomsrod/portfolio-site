@@ -44,3 +44,16 @@ next-env.d.ts
 *.md
 !README.md
 
+
+# DNB workflow / agent documentation
+# Keep most markdown ignored if desired, but explicitly track the DNB agent workflow docs.
+!AGENTS.md
+!FILE_TREE.md
+!README_COPY_INSTRUCTIONS.md
+!.github/
+!.github/copilot-instructions.md
+!docs/
+!docs/dnb/
+!docs/dnb/*.md
+!docs/reports/
+!docs/reports/2026-06-19-bootstrap-cleanup-report.md

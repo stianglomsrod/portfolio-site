@@ -48,7 +48,7 @@ Output: a one-paragraph decision note appended to `DNB_IMPLEMENTATION_LOG.md`. N
 
 - **Goal**: the documented agentic workflow as a labelled sequence (context → requirements → human review → correction → QA → documentation → handoff → safety gates).
 - **Copy**: `DNB_SECTION_COPY_V1.md` §2, with softened reuse wording ("designet for å kunne deles og læres av andre").
-- **DNB hook**: connect to the posting's *enabler / force-multiplier* and *guardrails* themes — honestly, at Stian's scale.
+- **DNB hook**: connect to the posting's _enabler / force-multiplier_ and _guardrails_ themes — honestly, at Stian's scale.
 - **Likely files**: new section component + CSS module; reuse `Reveal`.
 - **Acceptance criteria**: scannable, not a wall of prose; no overclaim beyond claim map; mobile-friendly.
 - **Validation**: lint, build, visual check.

@@ -18,6 +18,7 @@ Mid-session user prompt (verbatim): "This is the utlysning. Store it, read it an
 ## 2. Files and sources read
 
 Raw sources (read for evidence, then isolated as local-only):
+
 - docs/dnb/sources/Eksamensmanus_ord_for_ord.md — self-authored oral-exam manuscript; gave method, Smart Import, safety, and limitations reasoning. Uses placeholder name "Vetle" — real candidate is Stian.
 - docs/dnb/sources/QA_bank_samtale.md — self-authored Q&A defence bank; gave source-by-source academic grounding, tech-stack rationale, anti-overclaim language.
 - docs/dnb/sources/thesis.pdf — master's thesis (primary); confirmed Klar architecture and method. Read via extraction, not committed.
@@ -37,6 +38,7 @@ Existing docs read to align updates: DNB_CLAIM_SOURCE_MAP.md, DNB_SECTION_COPY_V
 ## 4. Files created, modified, moved, deleted
 
 Created (tracked):
+
 - docs/dnb/DNB_SOURCE_EVIDENCE_NOTES.md — safe distilled primary evidence with source-strength tiers.
 - docs/dnb/DNB_INSIGHT_SYNTHESIS.md — strategy: what got stronger, role-fit, risks, workflow-as-evidence.
 - docs/dnb/DNB_PORTFOLIO_STRATEGY.md — page structure, evidence hierarchy, visual direction, reuse, priorities.
@@ -44,7 +46,8 @@ Created (tracked):
 - docs/dnb/DNB_JOB_POSTING.md — exact posting stored verbatim plus role-fit reading.
 
 Modified (tracked):
-- .gitignore — ignore docs/dnb/sources/ and *.pdf.
+
+- .gitignore — ignore docs/dnb/sources/ and \*.pdf.
 - docs/dnb/DNB_CLAIM_SOURCE_MAP.md — Partial→Strong upgrades, posting resolved, verdict safe to implement.
 - docs/dnb/DNB_AGENT_ONBOARDING_INDEX.md — new reading order, posting note, sources note.
 - docs/dnb/DNB_QA_CHECKLIST.md — source-grounded + workflow/posting-fit checks.

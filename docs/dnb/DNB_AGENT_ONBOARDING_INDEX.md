@@ -29,7 +29,7 @@ Build the DNB-targeted portfolio variant as an AI-first engineering narrative wh
 
 ## Reading order for new agents
 
-Strategic and source layer (read to understand *what to argue* and *why it is safe*):
+Strategic and source layer (read to understand _what to argue_ and _why it is safe_):
 
 1. `AGENTS.md`
 2. `.github/copilot-instructions.md`

@@ -89,18 +89,18 @@ This section is interpretation for agents — see `DNB_INSIGHT_SYNTHESIS.md` for
 
 **Strong, honest matches:**
 
-- *"Solid engineer excited about AI-native development, not an AI specialist"* → exactly the AI-first builder positioning. The role explicitly welcomes new graduates and says distributed-systems depth is "a plus for everyone else," which keeps our no-senior-distributed-systems guardrail valid.
-- *"Enabler at heart… measure impact by what the people around you can do… you share what you learn"* → the documented, governed agentic workflow, handoff docs, QA checklists and reusable artefacts are direct evidence of an enablement mindset.
-- *"Builder's mindset… you'd rather prototype an answer than win the argument"* → Klar and rapid AI-assisted prototyping.
-- *"Guardrails that let agents act safely… observability… sensible cost and rate limits, designed in before agents are turned loose"* → Smart Import's human-in-the-loop preview gate (small-scale, honest) + the workflow's claim-source gating, QA, and cost-control discipline. Frame at Stian's real scale, not enterprise.
-- *"Open-source ways of working: transparency and contributing beyond your own team… reuse rather than rebuild"* → working in the open, public repo docs, reusable handoff/standards artefacts.
-- *"Fluent in one or more of Python, TypeScript, or Go"* → TypeScript (React/Next.js) is a direct match; honest openness to picking up the others.
-- *"Iterative delivery, true ownership of outcomes"* → small reviewable chunks, implementation logs, iterative delivery.
+- _"Solid engineer excited about AI-native development, not an AI specialist"_ → exactly the AI-first builder positioning. The role explicitly welcomes new graduates and says distributed-systems depth is "a plus for everyone else," which keeps our no-senior-distributed-systems guardrail valid.
+- _"Enabler at heart… measure impact by what the people around you can do… you share what you learn"_ → the documented, governed agentic workflow, handoff docs, QA checklists and reusable artefacts are direct evidence of an enablement mindset.
+- _"Builder's mindset… you'd rather prototype an answer than win the argument"_ → Klar and rapid AI-assisted prototyping.
+- _"Guardrails that let agents act safely… observability… sensible cost and rate limits, designed in before agents are turned loose"_ → Smart Import's human-in-the-loop preview gate (small-scale, honest) + the workflow's claim-source gating, QA, and cost-control discipline. Frame at Stian's real scale, not enterprise.
+- _"Open-source ways of working: transparency and contributing beyond your own team… reuse rather than rebuild"_ → working in the open, public repo docs, reusable handoff/standards artefacts.
+- _"Fluent in one or more of Python, TypeScript, or Go"_ → TypeScript (React/Next.js) is a direct match; honest openness to picking up the others.
+- _"Iterative delivery, true ownership of outcomes"_ → small reviewable chunks, implementation logs, iterative delivery.
 
 **Plus items where Stian is genuinely strong (claim honestly):**
 
 - Daily fluent use of AI developer tools (GitHub Copilot / coding agents) — real, daily practice.
-- Context management discipline — the documented workflow *is* structured context management.
+- Context management discipline — the documented workflow _is_ structured context management.
 
 **Plus items to frame as growth direction (do NOT overclaim):**
 

@@ -16,7 +16,7 @@ The stored posting sharpens the emphasis. The role is about **enablement and AI-
 
 Page consequences:
 
-- Lead with the **documented, governed workflow** as an *enablement* exhibit, not just a personal-productivity story.
+- Lead with the **documented, governed workflow** as an _enablement_ exhibit, not just a personal-productivity story.
 - Frame Klar's Smart Import preview gate as a small, honest example of **agent guardrails / human-in-the-loop**.
 - Use **transparency / build-in-the-open / reusable artefacts** language where natural.
 - Name **TypeScript** as the language match; keep distributed systems / platform / MCP as growth direction.
@@ -43,9 +43,9 @@ Eight sections, mapping to the approved outline but re-prioritised so evidence l
 1. **Hero** — one clear sentence on what Stian is (AI-first builder / software engineering candidate with system understanding) + what the page is. Three proof bullets. Primary CTA jumps to the workflow or Klar section.
 2. **How I build with AI** (the differentiator) — the documented agentic workflow: context → requirements → human review → correction → QA → documentation → handoff → safety gates. State plainly that the repo itself is the evidence.
 3. **Klar as evidence** — the product: fullstack PWA, React/Next.js, Supabase/PostgreSQL, auth + RBAC, teacher/student roles. Lead the AI story with Smart Import (bottleneck → AI choice → human preview gate → user validation). Keep the non-enterprise-scale disclaimer.
-4. **From unclear needs to buildable systems** (method) — participatory design + design science, the probe → workshops → build → evaluation chain, landing each insight on a *technical* decision. Plain language, no citation dump.
+4. **From unclear needs to buildable systems** (method) — participatory design + design science, the probe → workshops → build → evaluation chain, landing each insight on a _technical_ decision. Plain language, no citation dump.
 5. **Learning velocity and work capacity** — evidence-based, professional framing; the cross-domain build and sustained documented output.
-6. **Honest growth direction** — lower-level engineering, robustness, observability, platform thinking as *direction*, not current expertise.
+6. **Honest growth direction** — lower-level engineering, robustness, observability, platform thinking as _direction_, not current expertise.
 7. **Proof / documentation** — a short, honest "receipts" section linking the idea that the workflow, QA, and handoff docs exist (without exposing sensitive sources). Optional, can be folded into section 2.
 8. **Contact / CTA** — clear, sober call to action for AI-first engineering roles. No DNB logo/branding.
 
@@ -56,17 +56,20 @@ Order rationale: sections 2 and 3 are the strongest exhibits and should come imm
 ## 3. Per-section recommendations
 
 ### Hero
+
 - One sentence, plain. Avoid buzzword stacking.
 - Three proof bullets max, each pointing at a real artefact (Klar, the workflow, the method).
 - Visual: restrained, technical, lots of whitespace. No stocky hero imagery.
 
 ### How I build with AI
+
 - This is the lead exhibit. Present the workflow as a labelled sequence, not prose.
 - State the honest meta-point: "this site was built with this workflow; the repo docs are the receipts."
-- Tie to DNB: tempo without control creates rework; this method gives speed *and* safety. Frame it as **enablement** — a workflow designed to be shared, reused, and run by others (matches the posting's force-multiplier theme).
+- Tie to DNB: tempo without control creates rework; this method gives speed _and_ safety. Frame it as **enablement** — a workflow designed to be shared, reused, and run by others (matches the posting's force-multiplier theme).
 - Soften the reuse claim: "designet for å kunne deles og læres av andre," not "proven reusable."
 
 ### Klar as evidence
+
 - Lead with the system, then the AI decision.
 - Smart Import story arc: real bottleneck → AI chosen deliberately → human-in-the-loop preview before publish → validated by users as the strongest adoption driver.
 - Use the existing Klar screenshots in `public/images/cases/klar/`.
@@ -74,18 +77,22 @@ Order rationale: sections 2 and 3 are the strongest exhibits and should come imm
 - Safety: general framing ("godkjent personvernprosess", "menneske-i-løkka"), specifics only if user approves.
 
 ### Method
+
 - Land every design insight on a technical or system decision (e.g. platform independence → PWA + Supabase choice). This keeps it engineering, not pure UX.
 - Name the method honestly (participatory design, design science) but avoid an academic citation wall.
 
 ### Learning velocity
+
 - Professional capacity, not personal narrative. No private/medical framing.
 - Prefer "vist rask overgang fra nytt teknisk domene til fungerende prototype" over "dokumentert overgang."
 
 ### Growth direction
+
 - "Har lyst til å bygge" / "motivert for", never "har erfaring med."
 - Reaffirm current strongest evidence is AI-first fullstack product building with disciplined workflow.
 
 ### Contact / CTA
+
 - Sober, direct. Link to Klar live and (optionally) GitHub. No DNB branding.
 
 ---
@@ -95,7 +102,7 @@ Order rationale: sections 2 and 3 are the strongest exhibits and should come imm
 - **Text-led, evidence-dense, scannable.** Short paragraphs, labelled lists, clear section headers.
 - **Visuals are supporting**: Klar screenshots, a simple workflow diagram, restrained typography. No decorative gimmicks.
 - **One signature interaction at most** (e.g. a clean expand/inspect on the workflow steps or a Klar screenshot lightbox — the repo already has `ImageLightbox`). Reliability and clarity over flash.
-- The interaction design should itself model safe-AI values: clear states, confirmation where it matters, graceful empty/error states. This is a quiet way to *demonstrate* the engineering posture.
+- The interaction design should itself model safe-AI values: clear states, confirmation where it matters, graceful empty/error states. This is a quiet way to _demonstrate_ the engineering posture.
 
 ---
 

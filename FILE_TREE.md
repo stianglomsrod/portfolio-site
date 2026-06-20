@@ -91,6 +91,7 @@ portfolio-site/
 │   │   └── EPIC_SKAMLOS_AI_PITCH.md
 │   └── reports/
 │       ├── 2026-06-19-bootstrap-cleanup-report.md
+│       ├── 2026-06-19-report-format-hardening.md
 │       └── UX_UI_COPY_REVIEW.md
 ├── public/
 │   └── images/

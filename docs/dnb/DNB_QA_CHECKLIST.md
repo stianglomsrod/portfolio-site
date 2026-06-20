@@ -37,3 +37,13 @@
 - [ ] Build/lint/dev validation performed when code changes require it.
 - [ ] `FILE_TREE.md` updated when structure changes.
 - [ ] Agent report includes full relative paths.
+
+## Agent report format
+- [ ] Final response is exactly one fenced Markdown code block.
+- [ ] No prose before or after the block.
+- [ ] No nested triple-backtick fences inside the block.
+- [ ] Section 0 contains the verbatim user prompt.
+- [ ] Sections 0–11 all present (user prompt, session context, files read, reasoning, files changed, deliverables, claim QA, validation, file tree, git status, risks, next step).
+- [ ] Report saved as `docs/reports/YYYY-MM-DD-<slug>-report.md`.
+- [ ] Commit was not made automatically unless explicitly requested.
+- [ ] No ZIP or binary artifact committed unless explicitly requested and justified.

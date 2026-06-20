@@ -1,5 +1,36 @@
 # DNB Implementation Log
 
+## 2026-06-20 — Report format hardening and protocol update
+
+### Purpose
+Harden the agent report delivery rule across all protocol docs, add required report sections list, and add commit/binary artifact policy. Create a dedicated explanation file for why the rule exists.
+
+### Branch
+`feature/dnb-section-copy`
+
+### Files changed
+- `AGENTS.md` (updated: Required final report format and Report delivery rule expanded; Commit and binary artifact policy added)
+- `docs/dnb/DNB_AGENT_HANDOFF_PROTOCOL.md` (updated: Report delivery rule point 7 added; Required report sections block added; Commit and binary artifact policy added)
+- `docs/dnb/DNB_WORKFLOW_DNA.md` (updated: Report delivery rule point 7 added; Commit and binary artifact policy added)
+- `docs/dnb/DNB_QA_CHECKLIST.md` (updated: Agent report format QA section added)
+- `docs/dnb/DNB_IMPLEMENTATION_LOG.md` (updated)
+- `docs/reports/2026-06-19-report-format-hardening.md` (created)
+- `FILE_TREE.md` (updated)
+
+### Key decisions
+- Expanded Required final report format in AGENTS.md to list all 12 sections (0-11) explicitly.
+- Added point 7 to Report delivery rule in all three files: no prose before or after the block.
+- Added Commit and binary artifact policy to all three primary protocol files.
+- Added Agent report format section to DNB_QA_CHECKLIST.md so agents can self-verify.
+- Created docs/reports/2026-06-19-report-format-hardening.md to document the rationale.
+
+### Validation
+- `git status --untracked-files=all` run at end of session.
+- No build required (documentation-only).
+
+### Next step
+Push this branch or merge to dnb-main; then proceed with content-to-implementation conversion using DNB_SECTION_COPY_V1.md.
+
 ## 2026-06-19 — Agent onboarding index and context handover pack
 
 ### Purpose

@@ -80,18 +80,26 @@ portfolio-site/
 │   ├── dnb/
 │   │   ├── DNB_AGENT_HANDOFF_PROTOCOL.md
 │   │   ├── DNB_AGENT_ONBOARDING_INDEX.md
+│   │   ├── DNB_CLAIM_SOURCE_MAP.md
 │   │   ├── DNB_CONTENT_OUTLINE.md
 │   │   ├── DNB_COST_CONTROL.md
+│   │   ├── DNB_IMPLEMENTATION_BRIEF_FOR_AUTO.md
 │   │   ├── DNB_IMPLEMENTATION_LOG.md
+│   │   ├── DNB_INSIGHT_SYNTHESIS.md
+│   │   ├── DNB_JOB_POSTING.md
 │   │   ├── DNB_POSITIONING.md
+│   │   ├── DNB_PORTFOLIO_STRATEGY.md
 │   │   ├── DNB_QA_CHECKLIST.md
 │   │   ├── DNB_SECTION_COPY_V1.md
-│   │   └── DNB_WORKFLOW_DNA.md
+│   │   ├── DNB_SOURCE_EVIDENCE_NOTES.md
+│   │   ├── DNB_WORKFLOW_DNA.md
+│   │   └── sources/        (gitignored, local-only raw sources: thesis.pdf, diploma PDF [contains PII], exam prep .md — never committed)
 │   ├── epics/
 │   │   └── EPIC_SKAMLOS_AI_PITCH.md
 │   └── reports/
 │       ├── 2026-06-19-bootstrap-cleanup-report.md
 │       ├── 2026-06-19-report-format-hardening.md
+│       ├── 2026-06-20-source-synthesis-posting-report.md
 │       └── UX_UI_COPY_REVIEW.md
 ├── public/
 │   └── images/

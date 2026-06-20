@@ -1,14 +1,102 @@
 # DNB Implementation Log
 
+## 2026-06-20 — Pre-implementation decisions confirmed (chunk 1)
+
+User/tech-lead decisions, resolving the open questions before any code:
+
+- **Routing**: the DNB variant is built as a root-level page on branch `dnb-main` and deployed as its own separate Vercel project. The VG X portfolio is preserved on `master`. The variants are kept apart by branch + deploy, not by an in-app mode toggle.
+- **Master-tema (public, non-clinical phrasing)**: "Klar er en fullstack PWA-prototype som støtter struktur, prioritering og hjelp underveis i skolehverdagen, og viser hvordan brukerbehov kan oversettes til roller, arbeidsflyt, data, auth og AI-assistert import med menneske-i-løkka-kontroll." Use this wording on-page; do not surface diagnosis/executive-function clinical framing.
+- **Safety/personvern framing**: general only. Do not lead with Sikt/GDPR names, national details, school, participants, or sensitive context. Mention consent, data minimisation, role-based access, and responsible AI at a high level.
+
+Next: run Copilot Auto on chunk 2 (DNB scaffold + Hero) from `DNB_IMPLEMENTATION_BRIEF_FOR_AUTO.md`, targeting branch `dnb-main`.
+
+## 2026-06-20 — Source synthesis + posting capture + implementation packaging (documentation/QA)
+
+### Purpose
+
+Deep insight synthesis across newly added primary sources (master thesis, diploma) and self-authored exam prep, plus capture of the exact DNB job posting, to package safe, source-grounded documentation so cheaper GitHub Copilot Auto sessions can implement the DNB variant.
+
+### Branch
+
+`feature/dnb-claim-source-map`
+
+### Files changed
+
+- `.gitignore` (updated: ignore `docs/dnb/sources/` and `*.pdf` to protect PII/participant-sensitive raw sources)
+- `docs/dnb/sources/` (created; raw sources moved here, gitignored: thesis.pdf, diploma PDF, exam prep .md)
+- `docs/dnb/DNB_SOURCE_EVIDENCE_NOTES.md` (created)
+- `docs/dnb/DNB_INSIGHT_SYNTHESIS.md` (created)
+- `docs/dnb/DNB_PORTFOLIO_STRATEGY.md` (created)
+- `docs/dnb/DNB_IMPLEMENTATION_BRIEF_FOR_AUTO.md` (created)
+- `docs/dnb/DNB_JOB_POSTING.md` (created; exact posting stored verbatim, tracked)
+- `docs/dnb/DNB_CLAIM_SOURCE_MAP.md` (updated: Partial→Strong upgrades; verdict → safe to implement)
+- `docs/dnb/DNB_AGENT_ONBOARDING_INDEX.md` (updated: reading order, posting note, sources note)
+- `docs/dnb/DNB_QA_CHECKLIST.md` (updated: source-grounded + workflow/posting-fit checks)
+- `docs/dnb/DNB_IMPLEMENTATION_LOG.md` (updated)
+- `FILE_TREE.md` (updated)
+
+### Key decisions
+
+- Privacy: the diploma PDF contains a national ID; the thesis is participant-sensitive. Moved all raw sources to `docs/dnb/sources/` and gitignored them. Distilled only safe, paraphrased evidence into tracked `DNB_SOURCE_EVIDENCE_NOTES.md`.
+- Treated thesis + diploma as primary/formal sources; exam manuscript + Q&A bank as self-authored prep (supporting, not load-bearing). Noted the manuscript's placeholder name "Vetle" — real candidate is Stian.
+- Stored the exact posting and folded its themes (enabler/force-multiplier, agent guardrails, innersource/transparency, TypeScript language match) into synthesis, strategy, claim map, onboarding, and QA. Distributed-systems depth kept as growth direction (senior/staff plus only).
+- Upgraded most Klar/method/safety/learning-velocity claims from Partial to Strong now that primary sources are captured. Kept two wording softenings ("vist rask overgang", reuse framing).
+- Verdict moved from "safe with edits" to "safe to implement" via the Copilot-Auto chunk brief.
+
+### Validation
+
+- `git status --untracked-files=all` and `git check-ignore` run; confirmed raw sources are ignored.
+- No build required (documentation/QA only). No app code changed. No commit made.
+
+### Next step
+
+Human/ChatGPT confirm the routing model and thesis-topic phrasing (brief §1), then run Copilot Auto on chunk 2 (DNB scaffold + Hero) from `DNB_IMPLEMENTATION_BRIEF_FOR_AUTO.md`.
+
+## 2026-06-20 — Claim-to-source map (documentation/QA)
+
+### Purpose
+
+Review DNB_SECTION_COPY_V1.md and map each major factual or positioning claim to available source documentation. Establish a pre-implementation quality gate.
+
+### Branch
+
+`feature/dnb-claim-source-map`
+
+### Files changed
+
+- `docs/dnb/DNB_CLAIM_SOURCE_MAP.md` (created)
+- `docs/dnb/DNB_IMPLEMENTATION_LOG.md` (updated)
+- `FILE_TREE.md` (updated)
+
+### Key decisions
+
+- Mapped all major claims in DNB_SECTION_COPY_V1.md against available tracked repo sources.
+- Identified that thesis.txt and diploma.txt are not present on this branch — they were extracted locally on a prior branch but not committed. This creates partial source support for Klar tech stack, workshop, and learning velocity claims.
+- Two claims recommended for softening: "dokumentert overgang" and "lagbar, laerbar og mulig aa standardisere".
+- Agentic workflow section (section 2 of copy) is fully evidenced by repo docs and approved for immediate implementation.
+- Pre-implementation verdict: safe with edits.
+
+### Validation
+
+- `git status --untracked-files=all` run at end of session.
+- No build required (documentation and QA only).
+
+### Next step
+
+User commits thesis.txt (or a short Klar tech stack note), applies two softening rewrites, then proceeds to DNB page skeleton with hero + agentic workflow sections only.
+
 ## 2026-06-20 — Report format hardening and protocol update
 
 ### Purpose
+
 Harden the agent report delivery rule across all protocol docs, add required report sections list, and add commit/binary artifact policy. Create a dedicated explanation file for why the rule exists.
 
 ### Branch
+
 `feature/dnb-section-copy`
 
 ### Files changed
+
 - `AGENTS.md` (updated: Required final report format and Report delivery rule expanded; Commit and binary artifact policy added)
 - `docs/dnb/DNB_AGENT_HANDOFF_PROTOCOL.md` (updated: Report delivery rule point 7 added; Required report sections block added; Commit and binary artifact policy added)
 - `docs/dnb/DNB_WORKFLOW_DNA.md` (updated: Report delivery rule point 7 added; Commit and binary artifact policy added)
@@ -18,6 +106,7 @@ Harden the agent report delivery rule across all protocol docs, add required rep
 - `FILE_TREE.md` (updated)
 
 ### Key decisions
+
 - Expanded Required final report format in AGENTS.md to list all 12 sections (0-11) explicitly.
 - Added point 7 to Report delivery rule in all three files: no prose before or after the block.
 - Added Commit and binary artifact policy to all three primary protocol files.
@@ -25,10 +114,12 @@ Harden the agent report delivery rule across all protocol docs, add required rep
 - Created docs/reports/2026-06-19-report-format-hardening.md to document the rationale.
 
 ### Validation
+
 - `git status --untracked-files=all` run at end of session.
 - No build required (documentation-only).
 
 ### Next step
+
 Push this branch or merge to dnb-main; then proceed with content-to-implementation conversion using DNB_SECTION_COPY_V1.md.
 
 ## 2026-06-19 — Agent onboarding index and context handover pack

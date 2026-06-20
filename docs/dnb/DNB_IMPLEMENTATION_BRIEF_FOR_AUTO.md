@@ -21,15 +21,15 @@ Read first: `DNB_AGENT_ONBOARDING_INDEX.md`, `DNB_JOB_POSTING.md`, `DNB_INSIGHT_
 
 ---
 
-## 1. Pre-implementation decision (human/ChatGPT, before any code)
+## 1. Pre-implementation decision (RESOLVED 2026-06-20)
 
-Before chunk 2, the user/tech lead must confirm:
+Confirmed by user/tech lead (logged in `DNB_IMPLEMENTATION_LOG.md`):
 
-- **Routing model**: how the DNB variant is served (separate route, separate branch/deploy, or a mode toggle). Inspect `app/page.tsx`, `app/layout.tsx`, and `ModeToggle.tsx` before deciding. Do NOT assume.
-- **Thesis topic phrasing**: public wording for the master project (recommend a brief, non-clinical phrasing decided by the user).
-- **Safety specifics**: whether to name Sikt/GDPR on-page (recommend: general framing only).
+- **Routing**: DNB variant = root-level page on branch `dnb-main`, deployed as its own separate Vercel project. VG X stays on `master`. No in-app mode toggle for the split. Build chunk 2 on `dnb-main`, not on the docs branch.
+- **Master-tema phrasing (use on-page, non-clinical)**: "Klar er en fullstack PWA-prototype som støtter struktur, prioritering og hjelp underveis i skolehverdagen, og viser hvordan brukerbehov kan oversettes til roller, arbeidsflyt, data, auth og AI-assistert import med menneske-i-løkka-kontroll."
+- **Safety/personvern**: general framing only — consent, data minimisation, role-based access, responsible AI at a high level. No Sikt/GDPR names, no school/participants/national or sensitive detail.
 
-Output: a one-paragraph decision note appended to `DNB_IMPLEMENTATION_LOG.md`. No code in this step.
+With these resolved, chunk 2 can proceed.
 
 ---
 

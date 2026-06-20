@@ -111,8 +111,14 @@ The distinctiveness is the combination: builder + method + governance + honesty.
 - Daily AI-tool fluency (Copilot / coding agents) and context-management discipline are genuine strengths — claim them plainly.
 - Lean into _enabler / open-in-the-open / reuse_ language; this is where Stian is differentiated and honest.
 
-## 9. Open questions for the user (do not invent answers)
+## 9. Resolved decisions (2026-06-20) and remaining option
 
-- Whether to name Sikt/GDPR explicitly on the page, or keep safety framing general (recommended: general on-page, specifics in backing docs).
-- Whether to surface the master's thesis title/topic publicly (executive-function assistive tool) or keep it abstracted to "an assistive learning tool" — recommend a brief, non-clinical phrasing decided by the user.
+Confirmed by user/tech lead (see `DNB_IMPLEMENTATION_LOG.md`):
+
+- **Routing**: DNB variant = root-level page on branch `dnb-main`, separate Vercel project; VG X stays on `master`. RESOLVED.
+- **Master-tema (public phrasing)**: use the agreed non-clinical sentence — "Klar er en fullstack PWA-prototype som støtter struktur, prioritering og hjelp underveis i skolehverdagen, og viser hvordan brukerbehov kan oversettes til roller, arbeidsflyt, data, auth og AI-assistert import med menneske-i-løkka-kontroll." RESOLVED.
+- **Safety/personvern**: general framing only (consent, data minimisation, role-based access, responsible AI); no Sikt/GDPR/school/participant detail. RESOLVED.
+
+Still optional (user's call at build time):
+
 - Whether to add a small, honest "areas I'm actively going deeper on" note (distributed systems, GitHub Actions automation, MCP/agent frameworks) to pre-empt the senior/staff "plus" expectations without overclaiming.

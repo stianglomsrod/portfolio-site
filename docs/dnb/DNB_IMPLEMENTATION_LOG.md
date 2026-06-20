@@ -1,5 +1,15 @@
 # DNB Implementation Log
 
+## 2026-06-20 — Pre-implementation decisions confirmed (chunk 1)
+
+User/tech-lead decisions, resolving the open questions before any code:
+
+- **Routing**: the DNB variant is built as a root-level page on branch `dnb-main` and deployed as its own separate Vercel project. The VG X portfolio is preserved on `master`. The variants are kept apart by branch + deploy, not by an in-app mode toggle.
+- **Master-tema (public, non-clinical phrasing)**: "Klar er en fullstack PWA-prototype som støtter struktur, prioritering og hjelp underveis i skolehverdagen, og viser hvordan brukerbehov kan oversettes til roller, arbeidsflyt, data, auth og AI-assistert import med menneske-i-løkka-kontroll." Use this wording on-page; do not surface diagnosis/executive-function clinical framing.
+- **Safety/personvern framing**: general only. Do not lead with Sikt/GDPR names, national details, school, participants, or sensitive context. Mention consent, data minimisation, role-based access, and responsible AI at a high level.
+
+Next: run Copilot Auto on chunk 2 (DNB scaffold + Hero) from `DNB_IMPLEMENTATION_BRIEF_FOR_AUTO.md`, targeting branch `dnb-main`.
+
 ## 2026-06-20 — Source synthesis + posting capture + implementation packaging (documentation/QA)
 
 ### Purpose

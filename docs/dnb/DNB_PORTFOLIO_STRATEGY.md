@@ -127,7 +127,7 @@ Prefer existing components and patterns (per implementation rules). Likely reusa
 - `app/components/SiteFooter.tsx` — footer/contact.
 - Existing CSS-module conventions and `globals.css` tokens.
 
-A `ModeToggle` already exists; confirm how the DNB variant is routed/served before adding new toggles. Do not assume — inspect first.
+A `ModeToggle` already exists, but the DNB variant is **not** a mode toggle: it is a root-level page on branch `dnb-main`, deployed as its own separate Vercel project, while VG X stays on `master` (decided 2026-06-20, see `DNB_IMPLEMENTATION_LOG.md`). Build the DNB root page on `dnb-main`; do not wire the split through `ModeToggle`.
 
 ---
 

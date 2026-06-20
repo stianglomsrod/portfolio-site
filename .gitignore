@@ -56,4 +56,4 @@ next-env.d.ts
 !docs/dnb/
 !docs/dnb/*.md
 !docs/reports/
-!docs/reports/2026-06-19-bootstrap-cleanup-report.md
+!docs/reports/*.md

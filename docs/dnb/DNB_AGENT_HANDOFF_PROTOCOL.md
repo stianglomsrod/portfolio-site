@@ -54,6 +54,26 @@ At the end of every session:
 4. Inside the copyable block, do **not** use fenced code blocks (no triple backticks). Use plain indented text for directory trees and command output so the outer fence is never broken.
 5. The recipient is an LLM (tech lead) that already knows this workflow. Include a short workflow refresher only inside the prompt itself when it materially helps that specific handoff — not otherwise. Always state the goal.
 6. Assume both the agent and the recipient LLM can read context from screenshots and arbitrary documents (PDF, md, code, images).
+7. There must be no explanatory prose before the block and no explanatory prose after the block. The fenced block is the entire final response.
+
+## Required report sections
+  0. User prompt — verbatim or as close as possible
+  1. Session context — branch, task type (docs/code/UI/QA/arch), VG X protected
+  2. Files and sources read — full relative paths + why each mattered
+  3. Reasoning against project rules — positioning, claim boundaries, cost-control, agent roles
+  4. Files created, modified, moved, deleted — full relative paths + exact purpose
+  5. What was delivered — substance not just filenames
+  6. Claim and risk QA — unsupported DNB claims, seniority overclaims, UX/prompt-user framing, student testing, private/medical, official branding
+  7. Validation performed — commands, git status, why build/lint skipped if skipped
+  8. File tree / path updates — FILE_TREE.md updated yes/no, paths
+  9. Git / commit status — committed, hash, ahead/behind remote, push needed
+  10. Risks, uncertainties, and follow-up
+  11. Recommended next step
+
+## Commit and binary artifact policy
+- Agents must not commit automatically unless the user explicitly requested a commit, or unless committing is part of the task acceptance criteria.
+- Agents must not add ZIP archives or binary context packs to the repo unless explicitly requested. Prefer tracked Markdown source documents.
+- If a ZIP or binary artifact is committed, the report must justify why it belongs in the repo.
 
 ## Path rules
 - Always use full repo-relative paths.

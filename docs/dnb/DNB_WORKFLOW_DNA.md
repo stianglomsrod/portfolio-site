@@ -66,3 +66,9 @@ At the end of every session:
 4. Inside the copyable block, do **not** use fenced code blocks (no triple backticks). Use plain indented text for directory trees and command output so the outer fence is never broken.
 5. The recipient is an LLM (tech lead) that already knows this workflow. Include a short workflow refresher only inside the prompt itself when it materially helps that specific handoff — not otherwise. Always state the goal.
 6. Assume both the agent and the recipient LLM can read context from screenshots and arbitrary documents (PDF, md, code, images).
+7. There must be no explanatory prose before the block and no explanatory prose after the block. The fenced block is the entire final response.
+
+## Commit and binary artifact policy
+- Agents must not commit automatically unless the user explicitly requested a commit, or unless committing is part of the task acceptance criteria.
+- Agents must not add ZIP archives or binary context packs to the repo unless explicitly requested. Prefer tracked Markdown source documents.
+- If a ZIP or binary artifact is committed, the report must justify why it belongs in the repo.

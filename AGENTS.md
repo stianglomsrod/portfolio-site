@@ -53,16 +53,24 @@ If no tree update was needed, say exactly:
 > No FILE_TREE.md update required because no files were created, moved, deleted, or structurally reorganized.
 
 ## Required final report format
-Return one concise Markdown report with:
-1. Files read
-2. Files created/changed/deleted/moved
-3. Key decisions
-4. Validation performed
-5. Risks or uncertainties
-6. File tree / path updates
-7. Recommended next step
 
-The report must be self-contained so it can be pasted into ChatGPT and Codex for continuity.
+The final agent response must be exactly one detailed Markdown report delivered as a single fenced Markdown code block.
+
+Required sections:
+  0. User prompt — verbatim or as close as possible
+  1. Session context — branch, task type, docs-only/code/UI/QA, VG X protected
+  2. Files and sources read — full relative paths, why each mattered, what each contributed
+  3. Reasoning against project rules — DNB positioning checked, claim boundaries, cost-control, agent role discipline
+  4. Files created, modified, moved, deleted — full relative paths, exact purpose of each change
+  5. What was delivered — clear deliverable summary, substance not just filenames
+  6. Claim and risk QA — no unsupported DNB claims, no senior distributed systems, no lower-level expertise, no pure UX, no prompt-user-only, no student user-testing, no private/medical, no DNB-official branding
+  7. Validation performed — commands run, git status result, why build/lint was skipped if skipped
+  8. File tree / path updates — FILE_TREE.md updated yes/no, full paths for all added/moved/deleted files
+  9. Git / commit status — committed yes/no, commit hash, ahead/behind remote, push needed
+  10. Risks, uncertainties, and follow-up
+  11. Recommended next step
+
+The report must be self-contained so another LLM can continue the work without chat history.
 
 ## Report delivery rule
 At the end of every session:
@@ -72,3 +80,9 @@ At the end of every session:
 4. Inside the copyable block, do **not** use fenced code blocks (no triple backticks). Use plain indented text for directory trees and command output so the outer fence is never broken.
 5. The recipient is an LLM (tech lead) that already knows this workflow. Include a short workflow refresher only inside the prompt itself when it materially helps that specific handoff — not otherwise. Always state the goal.
 6. Assume both the agent and the recipient LLM can read context from screenshots and arbitrary documents (PDF, md, code, images).
+7. There must be no explanatory prose before the block and no explanatory prose after the block. The fenced block is the entire final response.
+
+## Commit and binary artifact policy
+- Agents must not commit automatically unless the user explicitly requested a commit, or unless the current task explicitly includes committing as part of the acceptance criteria.
+- Agents must not add ZIP archives or binary context packs to the repo unless explicitly requested. Prefer tracked Markdown source documents for all handoff material.
+- If a ZIP or binary artifact is committed, the report must explicitly justify why it belongs in the repo rather than remaining a local or downloadable artifact.

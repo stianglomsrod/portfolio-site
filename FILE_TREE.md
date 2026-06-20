@@ -39,6 +39,8 @@ portfolio-site/
 │   │   ├── CaseCard.tsx
 │   │   ├── CaseLink.tsx
 │   │   ├── CaseScreenshotGallery.tsx
+│   │   ├── DnbHero.module.css          (DNB variant only)
+│   │   ├── DnbHero.tsx                 (DNB variant only)
 │   │   ├── FeaturedKlar.module.css
 │   │   ├── FeaturedKlar.tsx
 │   │   ├── FitScan.module.css

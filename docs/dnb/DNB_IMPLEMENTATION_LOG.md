@@ -3,12 +3,15 @@
 ## 2026-06-20 — DNB scaffold + Hero (chunk 2, UI/code)
 
 ### Purpose
+
 First code/UI implementation chunk: replace `app/page.tsx` on branch `feature/dnb-scaffold-hero` with a DNB-specific root page rendering only the DnbHero component.
 
 ### Branch
+
 `feature/dnb-scaffold-hero`
 
 ### Files changed
+
 - `app/page.tsx` (replaced: VG X `Portfolio` import removed; DNB `DnbHero` + page-level `metadata` added)
 - `app/components/DnbHero.tsx` (created)
 - `app/components/DnbHero.module.css` (created)
@@ -16,6 +19,7 @@ First code/UI implementation chunk: replace `app/page.tsx` on branch `feature/dn
 - `FILE_TREE.md` (updated)
 
 ### Key decisions
+
 - Replaced `app/page.tsx` on this branch — cleanest structure for a separate Vercel deploy. VG X's `page.tsx` is preserved intact on `master`; this branch's `page.tsx` is DNB-specific.
 - Did not touch `app/layout.tsx` — it is minimal (just renders `children`) and works for both variants.
 - Added a page-level `metadata` export to `page.tsx` to override layout-level title/description for the DNB deploy without modifying the shared layout.
@@ -26,12 +30,14 @@ First code/UI implementation chunk: replace `app/page.tsx` on branch `feature/dn
 - No new dependencies added.
 
 ### Validation
+
 - `npm run lint` — run, see report.
 - `npm run build` — run, see report.
 - `git status --untracked-files=all` — run, see report.
 - Visual QA: human review needed (screenshots requested in report).
 
 ### Next step
+
 Chunk 3: "How I build with AI" workflow section (the lead exhibit). After human visual QA of the Hero on desktop and mobile.
 
 ## 2026-06-20 — Pre-implementation decisions confirmed (chunk 1)

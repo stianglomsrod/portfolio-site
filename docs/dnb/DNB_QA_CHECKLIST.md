@@ -16,6 +16,21 @@
 - [ ] Portfolio/prototypes are described accurately.
 - [ ] All claims are supported by CV, portfolio, project docs, or user-provided context.
 
+## Source-grounded claims (2026-06-20)
+- [ ] Every load-bearing claim traces to a primary/strong source (thesis, diploma, repo, live Klar), not to self-authored exam prep alone.
+- [ ] Klar tech facts match `DNB_SOURCE_EVIDENCE_NOTES.md` (React/Next.js, Supabase/PostgreSQL, auth+RBAC, PWA, human-in-the-loop preview).
+- [ ] No claim exceeds its rating in `DNB_CLAIM_SOURCE_MAP.md`.
+- [ ] "Vist rask overgang" used, not "dokumentert overgang".
+- [ ] No national ID, no diploma grades, no participant/school names on-page or in tracked docs.
+- [ ] Safety framing is general (no Sikt/GDPR specifics) unless user approved.
+- [ ] No student-outcome/effect claim for Klar.
+
+## Workflow-as-evidence and posting fit
+- [ ] The documented agentic workflow is presented as enablement evidence (force-multiplier), matching `DNB_JOB_POSTING.md`.
+- [ ] Smart Import preview gate is framed as a small, honest agent-guardrail example, not enterprise-scale.
+- [ ] Innersource/transparency/reuse language used where natural and honest.
+- [ ] TypeScript named as the language match; distributed systems / platform / MCP kept as growth direction.
+
 ## DNB fit
 - [ ] Focuses on AI-first engineering, tooling, enablement, runbooks, standards, and safe agent workflows.
 - [ ] Does not invent DNB facts.

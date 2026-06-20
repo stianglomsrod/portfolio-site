@@ -57,3 +57,8 @@ next-env.d.ts
 !docs/dnb/*.md
 !docs/reports/
 !docs/reports/*.md
+
+# Raw source material — never track (contains PII e.g. national ID, and
+# participant-sensitive thesis content). Keep as local-only evidence.
+docs/dnb/sources/
+*.pdf

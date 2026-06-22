@@ -39,8 +39,18 @@ portfolio-site/
 │   │   ├── CaseCard.tsx
 │   │   ├── CaseLink.tsx
 │   │   ├── CaseScreenshotGallery.tsx
+│   │   ├── DnbCapacity.module.css      (DNB variant only)
+│   │   ├── DnbCapacity.tsx             (DNB variant only)
+│   │   ├── DnbContact.module.css       (DNB variant only)
+│   │   ├── DnbContact.tsx              (DNB variant only)
 │   │   ├── DnbHero.module.css          (DNB variant only)
 │   │   ├── DnbHero.tsx                 (DNB variant only)
+│   │   ├── DnbKlar.module.css          (DNB variant only)
+│   │   ├── DnbKlar.tsx                 (DNB variant only)
+│   │   ├── DnbMethod.module.css        (DNB variant only)
+│   │   ├── DnbMethod.tsx               (DNB variant only)
+│   │   ├── DnbWorkflow.module.css      (DNB variant only)
+│   │   ├── DnbWorkflow.tsx             (DNB variant only)
 │   │   ├── FeaturedKlar.module.css
 │   │   ├── FeaturedKlar.tsx
 │   │   ├── FitScan.module.css
@@ -51,6 +61,9 @@ portfolio-site/
 │   │   ├── ImageLightbox.tsx
 │   │   ├── JourneyTimeline.module.css
 │   │   ├── JourneyTimeline.tsx
+│   │   ├── LanguageContext.tsx         (DNB variant only — NO/EN store + provider)
+│   │   ├── LanguageToggle.module.css   (DNB variant only)
+│   │   ├── LanguageToggle.tsx          (DNB variant only — NO/EN switch)
 │   │   ├── ModeToggle.module.css
 │   │   ├── ModeToggle.tsx
 │   │   ├── Portfolio.module.css
@@ -104,14 +117,20 @@ portfolio-site/
 │       ├── 2026-06-19-report-format-hardening.md
 │       ├── 2026-06-20-source-synthesis-posting-report.md
 │       ├── 2026-06-22-dnb-cross-repo-evidence-synthesis-report.md
+│       ├── 2026-06-22-dnb-deai-bilingual-redundancy-report.md
+│       ├── 2026-06-22-dnb-opus-full-page-buildout-report.md
+│       ├── 2026-06-22-dnb-programming-learning-ux-pass-report.md
+│       ├── 2026-06-22-dnb-hero-portrait-ux-refinement-report.md
 │       └── UX_UI_COPY_REVIEW.md
 ├── public/
 │   └── images/
 │       ├── avatar/
-│       │   └── stian-face.png
+│       │   ├── stian-face.png
+│       │   └── stian-portrait.webp
 │       └── cases/
 │           ├── klar/           (7 screenshots)
 │           └── supporting/     (3 screenshots)
 └── scripts/
-    └── build-avatar.mjs
+    ├── build-avatar.mjs
+    └── build-hero-portrait.mjs
 ```

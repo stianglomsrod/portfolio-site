@@ -1,5 +1,171 @@
 # DNB Implementation Log
 
+## 2026-06-22 — Hero portrait + layout/gamification/UX refinement pass (UI/code)
+
+### Purpose
+
+One disciplined refinement pass on the DNB page: add a tasteful hero portrait, fix cramped layout, correct the gamification wording (the teacher decides/enables, not the student), one more de-AI language touch, and one more UX-consistency pass (clickable cards + repo access for Klar and Lori).
+
+### Branch
+
+`feature/dnb-opus-full-page-buildout`
+
+### Files changed
+
+- `scripts/build-hero-portrait.mjs` (created: sharp script that crops `public/images/stian.jpg` to a calm head-and-shoulders bust, excluding the raised hand, → `public/images/avatar/stian-portrait.webp`)
+- `public/images/avatar/stian-portrait.webp` (created: 760×919 derived portrait used in the hero)
+- `app/components/DnbHero.tsx` (modified: two-column copy/portrait layout via `next/image`; added bilingual `portraitAlt`)
+- `app/components/DnbHero.module.css` (modified: `.layout` grid, `.copy`, `.portrait` framed container with subtle vignette, `.portraitImg`; stacks with a smaller portrait above the name at ≤860px)
+- `app/components/DnbMethod.tsx` (modified: gamification decision corrected in NO + EN — game elements are optional support the teacher evaluates and enables, off by default; removed "Eleven velger selv" / "The student chooses")
+- `app/components/DnbWorkflow.tsx` (modified: project cards restructured to a clickable card with a stretched primary link plus an optional secondary repo link; Klar and Lori now expose their public GitHub repos; added `repoAria`)
+- `app/components/DnbWorkflow.module.css` (modified: `.card` is now a relative container, `.cardLink` stretches via `::after` to keep the whole card clickable, `.cardLinks` row, `.cardRepo` chip above the stretched link, focus ring via `.card:has(.cardLink:focus-visible)`)
+- `app/components/DnbCapacity.tsx` (modified: de-AI'd the growth lede in NO + EN, dropping the "X, ikke Y" / "this is direction, not a claim" formula while keeping it honestly framed as a growth path)
+- `docs/dnb/DNB_IMPLEMENTATION_LOG.md` (updated)
+- `FILE_TREE.md` (updated: portrait asset, build script, this report)
+- `docs/reports/2026-06-22-dnb-hero-portrait-ux-refinement-report.md` (created)
+
+### Key decisions
+
+- Portrait source is the existing `public/images/stian.jpg`; a derived `stian-portrait.webp` was generated so the raised-hand / horns gesture is fully cropped out and the result is a calm bust. The asset is committed (it is referenced by the site), unlike the gitignored CS50x.pdf.
+- Klar/Lori repo access is added without clutter: one primary stretched link makes the whole card clickable, the repo is a small secondary chip layered above it (no nested interactive elements; valid HTML).
+- Gamification correctness: wording now states the teacher decides whether game elements suit a student and enables them; they remain optional and off by default.
+
+### Validation
+
+- `npm run lint` — clean.
+- `npm run build` — succeeds (Next.js 16.2.9 Turbopack; "/" prerendered static).
+- Visual QA on `localhost:3000` at 1280px and 390px, NO + EN: hero balance with the portrait (hand fully cropped), portrait stacks above the name on mobile, project cards clickable with Klar/Lori repo chips, corrected gamification wording in both languages, language toggle still works.
+
+---
+
+## 2026-06-22 — Programming-learning evidence + de-AI polish + whole-card UX (UI/code)
+
+### Purpose
+
+Third focused polish pass on the DNB page with three goals: (1) remove remaining AI-writing markers and make copy more natural/specific/human, (2) add an honest programming-learning narrative (CS50x, earlier Python/JS/Django/Vue work, teaching-related programming), and (3) make cards, links, hover states and clickable areas consistent across the page. No redesign, no new dependencies, no deployment change.
+
+### Branch
+
+`feature/dnb-opus-full-page-buildout`
+
+### Files changed
+
+- `app/components/DnbCapacity.tsx` (modified: de-AI'd velocity copy — dropped "bevis" framing and removed the velocity item that overlapped the new block; added a new "Programmering og veien hit" / "Programming and how I got here" block with honest learning lede, a 4-item learning list (CS50x stack; pd-app Python/Django + JS/Vue; teaching with micro:bit/Kitronik + small Python/JS/HTML/CSS; "Python og JavaScript sitter løsest i hendene"), verified `learnLinks` (CS50x certificate verify URL, pd-app-frontend Vue repo, pd-app-backend Django repo), and an honest closing line)
+- `app/components/DnbCapacity.module.css` (modified: added `.learn`, `.learnLinks`, `.learnLink` + hover, `.learnClose`)
+- `app/components/DnbWorkflow.tsx` (modified: de-AI'd lede / step 03 / step 08 / stripLede in NO + EN; converted each project card into a single whole-card `<a>` link, demoting the inner `cardLink` to a `<span>`)
+- `app/components/DnbWorkflow.module.css` (modified: `.card` now a full-height link with hover lift + accent border + glow shadow under `@media (hover:hover) and (pointer:fine)`, `.card:hover .cardLink` accent shift, `.card:focus-visible` ring; removed the stale `.cardLink:hover` rule)
+- `app/components/DnbKlar.tsx` (modified: disclaimer de-AI'd in NO + EN — "robust prototype i full bredde, men ikke en ferdig plattform" / "robust, full-width prototype, but not a finished platform"; kept the required "med lærere, ikke elever" factual boundary)
+- `app/components/DnbMethod.tsx` (modified: trimmed "ikke bare i en skisse av et grensesnitt" / "not just in a sketch of an interface" from the lede and "ikke en påstand" / "not a claim" from basisTail in NO + EN; kept the design-meaningful mapping contrasts)
+- `app/page.tsx` (modified: cleaned the awkward "kvalitetsporter" metadata description)
+- `docs/dnb/DNB_CLAIM_SOURCE_MAP.md` (modified: CS50x row flipped from "Still unverified" to "Verified (CS50x)" with certificate + public verify URL note)
+- `docs/dnb/DNB_IMPLEMENTATION_LOG.md` (updated)
+- `FILE_TREE.md` (updated)
+- `docs/reports/2026-06-22-dnb-programming-learning-ux-pass-report.md` (created)
+
+### Key decisions
+
+- CS50x certificate confirmed real by the user (local `CS50x.pdf` + `docs/CS50x.pdf`, both gitignored). Linked the official public verify URL rather than committing the binary.
+- New programming-learning block is framed as foundation/learning velocity, never as senior/expert competence; "Python og JavaScript sitter løsest i hendene" = most familiar, not expert.
+- Whole-card links use a real `<a>` wrapping flow content (valid HTML5) with the call-to-action demoted to a non-interactive `<span>`, so there are no nested interactive elements; global `:focus-visible` plus `.card:focus-visible` give keyboard affordance.
+- De-AI removals: "X, ikke Y" / "ikke bare X" formulas, repeated "bevis/proof" framing, "fart … kontroll" symmetry, "ikke en påstand" tag.
+- Claim boundaries preserved: pd-app = early/predecessor not production; Klar = robust prototype/full-width not finished platform; "med lærere, ikke elever" kept; no student-outcome claims; CS50x ≠ CS degree; no private/medical framing. Skamløs + VG X/master untouched.
+
+### Validation
+
+- `npm run lint` — clean.
+- `npm run build` — succeeds (Turbopack, static `/` prerendered).
+- Visual QA on `localhost:3000`: programming-learning block renders; CS50x cert link → verify URL; whole-card links resolve (Klar → klar-sigma, Companion → nikkoprogging, Lori → lori-frisor); LinkedIn present; NO↔EN toggle flips `document.lang` and all section copy including the new block and Klar disclaimer.
+
+---
+
+## 2026-06-22 — De-AI copy polish + NO/EN toggle + redundancy pass (UI/code)
+
+### Purpose
+
+Make the DNB page read less like AI-generated marketing and more like Stian: concrete, sober, technically curious, human, credible. Same pass also adds a Norwegian↔English content toggle and removes cross-section copy/design redundancies. No flashy redesign — the dark engineering-lab direction is kept.
+
+### Branch
+
+`feature/dnb-opus-full-page-buildout`
+
+### Files changed
+
+- `app/components/LanguageContext.tsx` (created: `useSyncExternalStore`-backed NO/EN store + `LanguageProvider` that syncs `document.lang`; default "no", persists to localStorage `dnb-lang`)
+- `app/components/LanguageToggle.tsx` + `.module.css` (created: fixed top-right NO/EN pill, mirrors ModeToggle styling)
+- `app/page.tsx` (modified: wraps content in `LanguageProvider`, renders `LanguageToggle`)
+- `app/components/DnbHero.tsx` (rewritten: bilingual `content.no/en`; removed "kvalitetsporter"/"agentisk utviklingspraksis"; de-formulaic title/intro)
+- `app/components/DnbWorkflow.tsx` (rewritten: bilingual; removed "ikke autopilot"/"fart og trygghet i samme bevegelse"/"merarbeid"; lead-card now "Det nærmeste jeg har et helhetlig produkt.")
+- `app/components/DnbWorkflow.module.css` (modified: subtle accent tint + stronger border on lead card `:first-child` so the three project cards aren't identical)
+- `app/components/DnbKlar.tsx` (rewritten: bilingual; removed "argumentert, ikke tilfeldig"; reduced em dashes in body; label "Hovedbevis" → "Hovedprosjekt"; kept "med lærere, ikke elever")
+- `app/components/DnbMethod.tsx` (rewritten: bilingual; removed "Det er ikke ren UX —" framing; trimmed closing redundancy)
+- `app/components/DnbCapacity.tsx` (rewritten: bilingual; removed duplicate "retning jeg jobber mot"; growth kept strictly as direction)
+- `app/components/DnbContact.tsx` (rewritten: bilingual; REMOVED the receipts strip — redundant with the workflow project strip and heavy on "Bevis/proof" framing; removed "solid bygger"/salesy CTA)
+- `app/components/DnbContact.module.css` (modified: deleted unused receipt styles; reset CTA spacing)
+- `docs/dnb/DNB_IMPLEMENTATION_LOG.md` (updated)
+- `FILE_TREE.md` (updated)
+- `docs/reports/2026-06-22-dnb-deai-bilingual-redundancy-report.md` (created)
+
+### Key decisions
+
+- AI-writing tells removed: "ikke X, men Y" / "X, ikke Y" formulas, "fart og trygghet", heavy em dashes in prose, repeated "bevis/proof/receipts" framing, "enterprise-skala", awkward hybrids ("agentisk utviklingsflyt"), generic salesy CTAs.
+- Single em dashes kept in a few section titles/headings (Klar title, "Smart Import — …") as deliberate stylistic punctuation; removed only from body prose.
+- Redundancies removed: "menneske-i-løkka" mentioned 4× → trimmed to Hero + Klar arc; Klar card note vs disclaimer overlap resolved; "i praksis" repetition trimmed; contact receipts strip (Klar+Lori) duplicated the workflow strip → removed.
+- Bilingual implemented with a global external store (no Context re-render churn, lint-clean, SSR renders "no" so hydration matches).
+- Claim boundaries preserved: no senior distributed-systems claim, no enterprise-scale maturity, no DNB branding, no student-outcome claim, growth = direction.
+
+### Validation
+
+- `npm run lint` — clean (after refactoring the localStorage read to `useSyncExternalStore` to satisfy `react-hooks/set-state-in-effect`).
+- `npm run build` — compiled successfully, TypeScript valid, `/` prerendered static.
+- Visual QA via automated browser (localhost:3000): confirmed NO↔EN toggle flips every section heading (workflow/Klar/method/capacity/contact) + hero title, sets `html lang` nb↔en and `aria-pressed`; lead workflow card renders accent-tinted vs plain siblings; contact receipts strip absent; toggle `position: fixed` top-right verified at desktop and 390px mobile.
+- VG X portfolio on `master` and the Skamløs pitch/game untouched.
+
+### Next step
+
+Product-owner read-through of tone in both languages (especially the EN copy, which is a fresh translation, not yet voice-reviewed by Stian), then decide on deployment.
+
+## 2026-06-22 — Full DNB page buildout (chunk 3, UI/code)
+
+### Purpose
+
+One larger self-directed buildout pass: expand the DNB page from hero-only into a near-complete AI-First Engineering portfolio page. Excludes the Skamløs pitch / playable-game concept by explicit instruction.
+
+### Branch
+
+`feature/dnb-opus-full-page-buildout`
+
+### Files changed
+
+- `app/page.tsx` (modified: now renders DnbHero, DnbWorkflow, DnbKlar, DnbMethod, DnbCapacity, DnbContact)
+- `app/components/DnbHero.tsx` (modified: "AI-første" → "AI-first"; copy fixes — "sikkerhetgrenser" → "sikkerhetsgrenser", "auth" → "innlogging" for terminology consistency)
+- `app/components/DnbWorkflow.tsx` + `.module.css` (created: ported and polished from `feature/dnb-ai-workflow-section` — 8-step agentic workflow, relevance note, three-card cross-repo evidence strip, boundary line)
+- `app/components/DnbKlar.tsx` + `.module.css` (created: system spec, "Smart Import — AI as a deliberate product choice" four-step arc, real Klar screenshot gallery via CaseScreenshotGallery, safety/disclaimer note)
+- `app/components/DnbMethod.tsx` + `.module.css` (created: participatory-design + design-science basis, five need → technical-decision mappings, closing relevance)
+- `app/components/DnbCapacity.tsx` + `.module.css` (created: "what I can show now" vs "what I want to build next", honest growth framing)
+- `app/components/DnbContact.tsx` + `.module.css` (created: receipts strip, CTA, footer with honest AI-agent note)
+- `docs/dnb/DNB_IMPLEMENTATION_LOG.md` (updated)
+- `FILE_TREE.md` (updated)
+
+### Key decisions
+
+- Workflow step labels and cross-repo cards reused from existing workflow-section branch rather than re-invented; polished into Norwegian and aligned with claim-safe wording.
+- Klar presented as the central fullstack AI-product evidence; Smart Import framed as a deliberate engineering/product choice with human-in-the-loop control, not an AI gimmick.
+- Method section frames Stian as engineering-minded (need → technical decision), explicitly "not pure UX".
+- Capacity section keeps distributed systems, low-level engineering, robustness/observability strictly as growth direction ("motivert for"), not current senior experience.
+- Skamløs pitch / playable game deliberately NOT implemented.
+
+### Validation
+
+- `npm run lint` — clean.
+- `npm run build` — compiled successfully, TypeScript valid, all routes prerendered static.
+- Visual QA on `npm run start` (localhost:3000) via automated browser: hero, workflow, cross-repo strip, Klar (Smart Import arc + real screenshot gallery), method, capacity, contact all verified on desktop (1280px). Mobile hero verified at 390px; deeper automated mobile capture limited by browser viewport-reset flakiness, but responsive media queries (collapse at 680px) confirmed by code inspection.
+- `.qa-shots/` screenshot artifacts deleted before completion (not committed).
+- VG X portfolio on `master` untouched; no master merge into DNB branch.
+
+### Next step
+
+Product-owner visual review on local environment (desktop + mobile), then decide on deployment as a separate Vercel project. Optional polish: add the dedicated Skamløs section later if/when desired (separate chunk).
+
 ## 2026-06-22 — Cross-repo evidence synthesis (documentation-only)
 
 ### Purpose

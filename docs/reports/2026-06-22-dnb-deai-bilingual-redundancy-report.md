@@ -30,12 +30,14 @@ Three combined requests during the session:
 # 4. Files created, modified, moved, deleted
 
 Created:
+
 - `app/components/LanguageContext.tsx` — `useSyncExternalStore`-backed NO/EN store + `LanguageProvider` syncing `document.documentElement.lang` (nb/en). Default "no", persists to localStorage `dnb-lang`. SSR + first client render return "no" so hydration matches.
 - `app/components/LanguageToggle.tsx` — fixed top-right NO/EN pill with sliding thumb, mirrors `ModeToggle` styling, `aria-pressed`/`aria-label` per button.
 - `app/components/LanguageToggle.module.css` — `.wrap` (fixed top/right), `.toggle` pill, `.thumb` slide, `.option` states, responsive rules.
 - `docs/reports/2026-06-22-dnb-deai-bilingual-redundancy-report.md` — this report.
 
 Modified:
+
 - `app/page.tsx` — wraps content in `LanguageProvider`, renders `LanguageToggle`; keeps server `metadata`.
 - `app/components/DnbHero.tsx` — bilingual `content.no/en`; de-formulaic title/intro; removed "kvalitetsporter"/"agentisk utviklingspraksis".
 - `app/components/DnbWorkflow.tsx` — bilingual; removed "ikke autopilot"/"fart og trygghet i samme bevegelse"/"merarbeid"; lead-card note now "Det nærmeste jeg har et helhetlig produkt."

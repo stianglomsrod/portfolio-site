@@ -57,9 +57,9 @@ export default function DnbKlar() {
             </h2>
             <p className={shared.sectionLede}>
               Klar er en fullstack PWA-prototype som støtter struktur,
-              prioritering og hjelp underveis i skolehverdagen. Den viser hvordan
-              brukerbehov kan oversettes til roller, arbeidsflyt, data, innlogging
-              og AI-assistert import med menneske-i-løkka-kontroll.
+              prioritering og hjelp underveis i skolehverdagen. Den viser
+              hvordan brukerbehov kan oversettes til roller, arbeidsflyt, data,
+              innlogging og AI-assistert import med menneske-i-løkka-kontroll.
             </p>
           </div>
         </Reveal>

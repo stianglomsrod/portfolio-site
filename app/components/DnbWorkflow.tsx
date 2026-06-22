@@ -116,14 +116,16 @@ export default function DnbWorkflow() {
           <p className={styles.relevance}>
             Tempo uten kontroll skaper rework. Denne arbeidsformen er ikke noe
             jeg bruker solo — den er skrevet ned slik at den kan deles, læres og
-            følges av andre. Det er enablement-tankegangen DNB AI Tech beskriver,
-            i praktisk skala.
+            følges av andre. Det er enablement-tankegangen DNB AI Tech
+            beskriver, i praktisk skala.
           </p>
         </Reveal>
 
         <Reveal delay={140}>
           <div className={styles.stripHead}>
-            <p className={shared.sectionLabel}>Tre prosjekter · samme mønster</p>
+            <p className={shared.sectionLabel}>
+              Tre prosjekter · samme mønster
+            </p>
             <p className={styles.stripLede}>
               Dette er ikke tre tilfeldige prosjekter. Samme arbeidsmåte går
               igjen i alle tre: produkt, utviklingsflyt og overlevering.

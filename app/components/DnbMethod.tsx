@@ -42,19 +42,19 @@ export default function DnbMethod() {
             </h2>
             <p className={shared.sectionLede}>
               Mye av styrken min ligger i å gå fra rotete, virkelige behov til
-              konkrete systemvalg. Det er ikke ren UX — hver innsikt lander på en
-              teknisk beslutning om data, roller, flyt eller arkitektur.
+              konkrete systemvalg. Det er ikke ren UX — hver innsikt lander på
+              en teknisk beslutning om data, roller, flyt eller arkitektur.
             </p>
           </div>
         </Reveal>
 
         <Reveal delay={60}>
           <p className={styles.basis}>
-            Metodisk hviler dette på{" "}
-            <strong>participatory design</strong> (lærere som med-designere) og{" "}
-            <strong>design science</strong> (bygg → evaluer → begrunn), gjennom
-            workshops for innsamling, prioritering og beslutning. Det er
-            dokumentert og eksaminert arbeid fra masteroppgaven, ikke en påstand.
+            Metodisk hviler dette på <strong>participatory design</strong>{" "}
+            (lærere som med-designere) og <strong>design science</strong> (bygg
+            → evaluer → begrunn), gjennom workshops for innsamling, prioritering
+            og beslutning. Det er dokumentert og eksaminert arbeid fra
+            masteroppgaven, ikke en påstand.
           </p>
         </Reveal>
 

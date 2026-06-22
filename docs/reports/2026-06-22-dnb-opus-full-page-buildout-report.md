@@ -13,6 +13,7 @@ Build out a near-complete DNB-targeted AI-First Engineering portfolio page on th
 ## 2. Files and sources read
 
 DNB strategy and onboarding docs (why: to absorb positioning, claim boundaries, content plan, and QA rules before building):
+
 - docs/dnb/DNB_AGENT_ONBOARDING_INDEX.md — reading order and onboarding map.
 - docs/dnb/DNB_POSITIONING.md — how Stian must and must not be positioned.
 - docs/dnb/DNB_PORTFOLIO_STRATEGY.md — page strategy and section intent.
@@ -27,6 +28,7 @@ DNB strategy and onboarding docs (why: to absorb positioning, claim boundaries, 
 - docs/dnb/DNB_IMPLEMENTATION_LOG.md — prior chunks (scaffold+hero, cross-repo synthesis).
 
 App and asset inspection (why: to reuse existing architecture, tokens, and real screenshots):
+
 - app/page.tsx, app/layout.tsx, app/globals.css — design tokens, dark theme, pre-paint `js` class, smooth scroll.
 - app/components/DnbHero.tsx + .module.css — existing DNB hero.
 - app/components/Reveal.tsx + Shared.module.css — scroll-reveal pattern and shared section primitives.
@@ -50,6 +52,7 @@ FILE_TREE.md — to keep the tree authoritative after adding components.
 ## 4. Files created, modified, moved, deleted
 
 Created:
+
 - app/components/DnbWorkflow.tsx
 - app/components/DnbWorkflow.module.css
 - app/components/DnbKlar.tsx
@@ -63,12 +66,14 @@ Created:
 - docs/reports/2026-06-22-dnb-opus-full-page-buildout-report.md (this report)
 
 Modified:
+
 - app/page.tsx — renders DnbHero, DnbWorkflow, DnbKlar, DnbMethod, DnbCapacity, DnbContact inside `<main>`; page metadata retained.
 - app/components/DnbHero.tsx — "AI-første" → "AI-first"; copy fixes "sikkerhetgrenser" → "sikkerhetsgrenser" and "auth" → "innlogging" (terminology consistency with the rest of the page).
 - FILE_TREE.md — added the ten new DNB component files.
 - docs/dnb/DNB_IMPLEMENTATION_LOG.md — added the 2026-06-22 full-page buildout entry.
 
 Deleted:
+
 - .qa-shots/ — temporary visual-QA screenshots, deleted before completion (never committed).
 
 Moved/renamed: none.
@@ -76,6 +81,7 @@ Moved/renamed: none.
 ## 5. What was delivered
 
 A near-complete, single-page DNB AI-First Engineering portfolio, in section order:
+
 1. Hero (existing, polished) — bold positioning statement, intro, three claim-safe bullets, two CTAs.
 2. "Slik bygger jeg med AI" (#arbeidsflyt) — eight-step agentic workflow, a relevance note tying it to DNB AI Tech enablement thinking, and a three-card cross-repo evidence strip (Klar / Companion / Lori Frisør) with an explicit scope boundary.
 3. Klar (#klar) — system spec (React/Next.js + Supabase/PostgreSQL + roles + PWA), a four-step "Smart Import as a deliberate product choice" arc with human-in-the-loop control, a gallery of real Klar screenshots, and a safety/disclaimer note.

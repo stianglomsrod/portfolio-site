@@ -52,11 +52,11 @@ export default function Reveal({
     return () => observer.disconnect();
   }, []);
 
-  const Component = Tag as React.ElementType;
+  const Component = Tag;
 
   return (
     <Component
-      ref={ref}
+      ref={ref as React.Ref<HTMLDivElement & HTMLLIElement>}
       className={`${styles.reveal} ${visible ? styles.visible : ""} ${className}`}
       style={delay ? { transitionDelay: `${delay}ms` } : undefined}
     >

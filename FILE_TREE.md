@@ -81,8 +81,47 @@ portfolio-site/
 │   │   ├── caseScreenshotData.ts
 │   │   └── skamlos/
 │   │       └── worldGyms.ts
-│   └── data/
-│       └── portfolio.ts
+│   ├── data/
+│   │   └── portfolio.ts
+│   └── skamlos-pitch/                   (DNB variant only — playable 3D first-person pitch, /skamlos-pitch)
+│       ├── page.tsx                     server component, exports metadata (robots: noindex)
+│       ├── SkamlosPitchClient.tsx       'use client' wrapper: WebGL probe + dynamic import (ssr:false)
+│       ├── skamlos-pitch.module.css     HUD / modals / panels / start / endgame / fallback styling
+│       └── game/
+│           ├── Game.tsx                 orchestrator: state, Canvas, keyboard, pointer-lock, overlay routing
+│           ├── i18n.ts                  all UI chrome strings (NO/EN) + CONTACT details
+│           ├── data/                    data-driven content (single source of truth)
+│           │   ├── skills.ts            SKILLS[] + SKILL_BY_ID
+│           │   ├── artifacts.ts         ARTIFACTS[] + ARTIFACT_BY_ID (honest claim boundaries)
+│           │   ├── quests.ts            QUESTS[] + QUEST_BY_ID (chain, gates, missions)
+│           │   ├── easterEggs.ts        EASTER_EGGS[] + EGG_BY_ID
+│           │   └── world.ts             tuning constants + DNB_GATE + GATE_CHECKS
+│           ├── state/
+│           │   ├── types.ts             shared game types
+│           │   ├── gameReducer.ts       reducer + pure selectors
+│           │   └── GameContext.tsx      useGameController() / useGame()
+│           ├── world/                   react-three-fiber 3D scene
+│           │   ├── placement.ts         derives artifact world positions (NOT layout.ts — reserved Next name)
+│           │   ├── Scene.tsx            composes world + PointerLockControls
+│           │   ├── Player.tsx           first-person controller (movement, head-bob, interaction scan)
+│           │   ├── Decor.tsx            ground grid, sparkles, perimeter pillars
+│           │   ├── Zone.tsx             quest platform/monolith + label
+│           │   ├── ArtifactPickup.tsx   floating evidence pickup
+│           │   ├── EasterEggs.tsx       flutterfly / egg / duck pickups
+│           │   ├── DnbGate.tsx          final gate (opens on signature skills)
+│           │   └── world.module.css     in-world Html label styling
+│           └── ui/                      DOM overlay (HUD + modals + panels + screens)
+│               ├── LangToggle.tsx
+│               ├── StartScreen.tsx
+│               ├── Hud.tsx
+│               ├── QuestLog.tsx
+│               ├── SkillTree.tsx
+│               ├── QuestModal.tsx       includes the decision-mission flow
+│               ├── ArtifactModal.tsx
+│               ├── EggModal.tsx
+│               ├── GateLockedModal.tsx
+│               ├── Endgame.tsx
+│               └── Fallback.tsx         accessible no-WebGL text version
 ├── docs/
 │   ├── AI_PITCH_LOG.md
 │   ├── context/
@@ -112,17 +151,22 @@ portfolio-site/
 │   │   └── sources/        (gitignored, local-only raw sources: thesis.pdf, diploma PDF [contains PII], exam prep .md — never committed)
 │   ├── epics/
 │   │   └── EPIC_SKAMLOS_AI_PITCH.md
-│   └── reports/
-│       ├── 2026-06-19-bootstrap-cleanup-report.md
-│       ├── 2026-06-19-report-format-hardening.md
-│       ├── 2026-06-20-source-synthesis-posting-report.md
-│       ├── 2026-06-22-dnb-cross-repo-evidence-synthesis-report.md
-│       ├── 2026-06-22-dnb-deai-bilingual-redundancy-report.md
-│       ├── 2026-06-22-dnb-opus-full-page-buildout-report.md
-│       ├── 2026-06-22-dnb-programming-learning-ux-pass-report.md
-│       ├── 2026-06-22-dnb-hero-portrait-ux-refinement-report.md
-│       ├── 2026-06-22-dnb-final-copy-label-fix-report.md
-│       └── UX_UI_COPY_REVIEW.md
+│   ├── reports/
+│   │   ├── 2026-06-19-bootstrap-cleanup-report.md
+│   │   ├── 2026-06-19-report-format-hardening.md
+│   │   ├── 2026-06-20-source-synthesis-posting-report.md
+│   │   ├── 2026-06-22-dnb-cross-repo-evidence-synthesis-report.md
+│   │   ├── 2026-06-22-dnb-deai-bilingual-redundancy-report.md
+│   │   ├── 2026-06-22-dnb-opus-full-page-buildout-report.md
+│   │   ├── 2026-06-22-dnb-programming-learning-ux-pass-report.md
+│   │   ├── 2026-06-22-dnb-hero-portrait-ux-refinement-report.md
+│   │   ├── 2026-06-22-dnb-final-copy-label-fix-report.md
+│   │   ├── 2026-06-22-skamlos-pitch-game-report.md
+│   │   └── UX_UI_COPY_REVIEW.md
+│   └── skamlos/                          (DNB variant only — playable pitch design docs)
+│       ├── IMPLEMENTATION_BRIEF.md
+│       ├── SKAMLOS_GAME_DNA.md
+│       └── QUEST_AND_SKILL_TREE.md
 ├── public/
 │   └── images/
 │       ├── avatar/

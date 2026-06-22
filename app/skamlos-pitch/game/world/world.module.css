@@ -1,0 +1,51 @@
+/* In-world DOM labels portaled by drei <Html>. Class names are globally hashed
+   by CSS Modules, so they still apply inside the portaled nodes. */
+
+.label {
+  user-select: none;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  white-space: nowrap;
+}
+
+.kicker {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(233, 234, 236, 0.55);
+  margin-bottom: 2px;
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 650;
+  color: #f2f5f8;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.85);
+}
+
+.status {
+  margin-top: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.statusDone {
+  color: #6ee7a8;
+}
+.statusLocked {
+  color: #ff9a8b;
+}
+.statusOpen {
+  color: #8fc2ff;
+}
+
+.gateLabel {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #cfe2ff;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.9);
+}

@@ -34,11 +34,13 @@ Goals: (1) add a tasteful portrait of Stian to the hero (existing `public` image
 ## 4. Files created, modified, moved, deleted
 
 Created:
+
 - scripts/build-hero-portrait.mjs — sharp crop script (source crop box left:1080, top:150, width:1340, height:1620; output 760px-wide WebP, slightly muted)
 - public/images/avatar/stian-portrait.webp — 760×919 derived head-and-shoulders portrait (committed; referenced by the hero)
 - docs/reports/2026-06-22-dnb-hero-portrait-ux-refinement-report.md — this report
 
 Modified:
+
 - app/components/DnbHero.tsx — `next/image` portrait + bilingual `portraitAlt`; copy/portrait two-column layout
 - app/components/DnbHero.module.css — `.layout` grid, `.copy`, framed `.portrait` with subtle vignette, `.portraitImg`; ≤860px stacks a smaller portrait above the name
 - app/components/DnbMethod.tsx — gamification decision corrected (NO + EN)
@@ -83,22 +85,22 @@ FILE_TREE.md updated: yes — added public/images/avatar/stian-portrait.webp, sc
 ## 9. Git / commit status
 
 Not committed, not pushed. Branch feature/dnb-opus-full-page-buildout, tracking origin. Working tree (this pass plus the prior uncommitted polish pass):
-  M FILE_TREE.md
-  M app/components/DnbCapacity.module.css
-  M app/components/DnbCapacity.tsx
-  M app/components/DnbHero.module.css
-  M app/components/DnbHero.tsx
-  M app/components/DnbKlar.tsx
-  M app/components/DnbMethod.tsx
-  M app/components/DnbWorkflow.module.css
-  M app/components/DnbWorkflow.tsx
-  M app/page.tsx
-  M docs/dnb/DNB_CLAIM_SOURCE_MAP.md
-  M docs/dnb/DNB_IMPLEMENTATION_LOG.md
-  ?? docs/reports/2026-06-22-dnb-hero-portrait-ux-refinement-report.md
-  ?? docs/reports/2026-06-22-dnb-programming-learning-ux-pass-report.md
-  ?? public/images/avatar/stian-portrait.webp
-  ?? scripts/build-hero-portrait.mjs
+M FILE_TREE.md
+M app/components/DnbCapacity.module.css
+M app/components/DnbCapacity.tsx
+M app/components/DnbHero.module.css
+M app/components/DnbHero.tsx
+M app/components/DnbKlar.tsx
+M app/components/DnbMethod.tsx
+M app/components/DnbWorkflow.module.css
+M app/components/DnbWorkflow.tsx
+M app/page.tsx
+M docs/dnb/DNB_CLAIM_SOURCE_MAP.md
+M docs/dnb/DNB_IMPLEMENTATION_LOG.md
+?? docs/reports/2026-06-22-dnb-hero-portrait-ux-refinement-report.md
+?? docs/reports/2026-06-22-dnb-programming-learning-ux-pass-report.md
+?? public/images/avatar/stian-portrait.webp
+?? scripts/build-hero-portrait.mjs
 
 ## 10. Risks, uncertainties, and open questions
 

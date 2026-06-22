@@ -40,6 +40,7 @@ Follow-up: "The cs50x.pdf should exist."
 ## 4. Files created, modified, moved, deleted
 
 Modified:
+
 - app/components/DnbCapacity.tsx — de-AI velocity; new "Programmering og veien hit" / "Programming and how I got here" block (lede, 4-item learn list, verified learnLinks, honest close)
 - app/components/DnbCapacity.module.css — .learn, .learnLinks, .learnLink (+hover), .learnClose
 - app/components/DnbWorkflow.tsx — de-AI lede/step03/step08/stripLede (NO+EN); project cards converted to whole-card anchor links, cardLink demoted to span
@@ -52,6 +53,7 @@ Modified:
 - FILE_TREE.md — added this report path
 
 Created:
+
 - docs/reports/2026-06-22-dnb-programming-learning-ux-pass-report.md
 
 Deleted / moved: none.

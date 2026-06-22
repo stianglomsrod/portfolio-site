@@ -321,13 +321,13 @@ The following claims have strong or partial source support and correct framing. 
 
 Most previously-blocked claims are now primary-source-backed. Remaining care items are about _wording and discretion_, not missing evidence:
 
-| Claim                                                                    | Status                                 | Recommended action                                                            |
-| ------------------------------------------------------------------------ | -------------------------------------- | ----------------------------------------------------------------------------- |
-| "Dokumentert overgang fra ukjent til fungerende prototype"               | Evidence now strong                    | Still use softened "vist rask overgang" to avoid implying a public case study |
-| Specific workshop techniques (Crazy Eights, journey mapping, empatikart) | RESOLVED (thesis-backed)               | May reference soberly; avoid an academic citation wall on-page                |
-| Sikt approval / consent / data minimisation                              | RESOLVED (thesis-backed)               | Keep general on-page; name specifics only if user approves                    |
-| Specific diploma grades                                                  | Available but private                  | Do NOT list grades or national ID; use credential-level framing only          |
-| Role-fit against exact DNB posting                                       | RESOLVED (`DNB_JOB_POSTING.md` stored) | Map precisely; keep distributed-systems/platform/MCP as growth direction      |
+| Claim                                                                    | Status                                 | Recommended action                                                                                                                                                                     |
+| ------------------------------------------------------------------------ | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| "Dokumentert overgang fra ukjent til fungerende prototype"               | Evidence now strong                    | Still use softened "vist rask overgang" to avoid implying a public case study                                                                                                          |
+| Specific workshop techniques (Crazy Eights, journey mapping, empatikart) | RESOLVED (thesis-backed)               | May reference soberly; avoid an academic citation wall on-page                                                                                                                         |
+| Sikt approval / consent / data minimisation                              | RESOLVED (thesis-backed)               | Keep general on-page; name specifics only if user approves                                                                                                                             |
+| Specific diploma grades                                                  | Available but private                  | Do NOT list grades or national ID; use credential-level framing only                                                                                                                   |
+| Role-fit against exact DNB posting                                       | RESOLVED (`DNB_JOB_POSTING.md` stored) | Map precisely; keep distributed-systems/platform/MCP as growth direction                                                                                                               |
 | CS50x / other specific course credentials                                | Verified (CS50x)                       | CS50x completion confirmed by certificate (`CS50x.pdf`, gitignored local; public verify URL cs50.harvard.edu/certificates/0e9210d1-…). Frame as foundational learning, not a CS degree |
 
 ---

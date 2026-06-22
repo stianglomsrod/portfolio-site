@@ -9,7 +9,7 @@ const content = {
   no: {
     label: "Arbeidsflyt",
     title: "Slik bygger jeg med AI",
-    lede: "AI-agenter gjør meg raskere, men de får ikke siste ord. Jeg jobber i en fast flyt der hvert steg har en eier og en grense, slik at farten ikke går på bekostning av kontrollen.",
+    lede: "AI-agenter gjør meg raskere, men de får ikke siste ord. Jeg jobber i en fast flyt der hvert steg har en eier og en tydelig grense.",
     stepsAria: "Utviklingsprosessen steg for steg",
     steps: [
       {
@@ -25,7 +25,7 @@ const content = {
       {
         num: "03",
         label: "Menneskelig gjennomgang",
-        desc: "Alt modellen foreslår behandles som utkast, ikke fasit. Jeg leser, vurderer og avgjør.",
+        desc: "Alt modellen foreslår er et utkast jeg leser, vurderer og tar stilling til før det går videre.",
       },
       {
         num: "04",
@@ -50,15 +50,16 @@ const content = {
       {
         num: "08",
         label: "Kontrollpunkter",
-        desc: "Ingen påstander uten dekning, ingen private data i feil kontekst, ingen «ferdig» uten verifisering.",
+        desc: "Påstander skal ha dekning, private data skal ligge der de hører hjemme, og ingenting er «ferdig» før det er verifisert.",
       },
     ],
     relevance:
       "Jeg har skrevet ned denne arbeidsmåten slik at andre kan plukke den opp, ikke bare jeg. Det er den samme enablement-tankegangen DNB AI Tech beskriver, i praktisk skala.",
     stripLabel: "Tre prosjekter · samme mønster",
     stripLede:
-      "Tre ulike prosjekter, men samme arbeidsmåte går igjen: et produkt, en langvarig utviklingsflyt og en overlevering til en ekte eier.",
+      "Samme arbeidsmåte går igjen i tre ganske ulike prosjekter: et produkt, en langvarig utviklingsflyt og en overlevering til en ekte eier.",
     stripAria: "Prosjekter",
+    repoAria: "– kildekode på GitHub",
     projects: [
       {
         tag: "Fullstack AI-produkt",
@@ -66,8 +67,8 @@ const content = {
         proof:
           "Next.js · React · TypeScript · Supabase/PostgreSQL · innlogging og rolletilgang · AI-assistert import med forhåndsvisning.",
         note: "Det nærmeste jeg har et helhetlig produkt.",
-        href: "https://klar-sigma.vercel.app/",
-        linkLabel: "Åpne Klar",
+        primary: { label: "Åpne Klar", href: "https://klar-sigma.vercel.app/" },
+        repo: { label: "Repo", href: "https://github.com/stianglomsrod/klar" },
       },
       {
         tag: "Dokumentert utviklingsflyt",
@@ -75,8 +76,11 @@ const content = {
         proof:
           "Flutter · Dart · Drift/SQLite · lokal-first arkitektur · PROJECT_DNA, planer, epics og tester.",
         note: "Langsiktig, dokumentert utviklingsdisiplin i praksis.",
-        href: "https://github.com/stianglomsrod/nikkoprogging",
-        linkLabel: "Se repoet",
+        primary: {
+          label: "Se repoet",
+          href: "https://github.com/stianglomsrod/nikkoprogging",
+        },
+        repo: null,
       },
       {
         tag: "Enablement og overlevering",
@@ -84,8 +88,14 @@ const content = {
         proof:
           "Astro · Keystatic (eierredigering) · Vercel · handoff-dokumentasjon · valgte å integrere Timma framfor å bygge booking på nytt.",
         note: "Pragmatisk leveranse for en ekte eier.",
-        href: "https://lori-frisor.vercel.app/",
-        linkLabel: "Åpne nettstedet",
+        primary: {
+          label: "Åpne nettstedet",
+          href: "https://lori-frisor.vercel.app/",
+        },
+        repo: {
+          label: "Repo",
+          href: "https://github.com/stianglomsrod/lori-frisor",
+        },
       },
     ],
     boundary:
@@ -94,7 +104,7 @@ const content = {
   en: {
     label: "Workflow",
     title: "How I build with AI",
-    lede: "AI agents make me faster, but they don't get the last word. I work in a fixed flow where every step has an owner and a boundary, so speed never comes at the cost of control.",
+    lede: "AI agents make me faster, but they don't get the last word. I work in a fixed flow where every step has an owner and a clear boundary.",
     stepsAria: "The development process, step by step",
     steps: [
       {
@@ -110,7 +120,7 @@ const content = {
       {
         num: "03",
         label: "Human review",
-        desc: "Everything the model suggests is treated as a draft, not fact. I read it, weigh it and decide.",
+        desc: "Everything the model suggests is a draft I read, weigh and decide on before it moves forward.",
       },
       {
         num: "04",
@@ -135,15 +145,16 @@ const content = {
       {
         num: "08",
         label: "Guardrails",
-        desc: "No claims without backing, no private data in the wrong place, nothing called “done” without verification.",
+        desc: "Claims need backing, private data stays where it belongs, and nothing is “done” until it's verified.",
       },
     ],
     relevance:
       "I've written this way of working down so others can pick it up, not just me. It's the same enablement mindset DNB AI Tech describes, at a practical scale.",
     stripLabel: "Three projects · one pattern",
     stripLede:
-      "Three different projects, but the same way of working runs through them: a product, a long-running dev workflow and a handoff to a real owner.",
+      "The same way of working runs through three quite different projects: a product, a long-running dev workflow and a handoff to a real owner.",
     stripAria: "Projects",
+    repoAria: "– source code on GitHub",
     projects: [
       {
         tag: "Full-stack AI product",
@@ -151,8 +162,8 @@ const content = {
         proof:
           "Next.js · React · TypeScript · Supabase/PostgreSQL · sign-in and role-based access · AI-assisted import with a preview gate.",
         note: "The closest thing I have to a complete product.",
-        href: "https://klar-sigma.vercel.app/",
-        linkLabel: "Open Klar",
+        primary: { label: "Open Klar", href: "https://klar-sigma.vercel.app/" },
+        repo: { label: "Repo", href: "https://github.com/stianglomsrod/klar" },
       },
       {
         tag: "Documented dev workflow",
@@ -160,8 +171,11 @@ const content = {
         proof:
           "Flutter · Dart · Drift/SQLite · local-first architecture · PROJECT_DNA, plans, epics and tests.",
         note: "Long-running, documented development discipline in practice.",
-        href: "https://github.com/stianglomsrod/nikkoprogging",
-        linkLabel: "View the repo",
+        primary: {
+          label: "View the repo",
+          href: "https://github.com/stianglomsrod/nikkoprogging",
+        },
+        repo: null,
       },
       {
         tag: "Enablement and handoff",
@@ -169,8 +183,14 @@ const content = {
         proof:
           "Astro · Keystatic (owner editing) · Vercel · handoff documentation · chose to integrate Timma instead of rebuilding booking from scratch.",
         note: "Pragmatic delivery for a real owner.",
-        href: "https://lori-frisor.vercel.app/",
-        linkLabel: "Open the site",
+        primary: {
+          label: "Open the site",
+          href: "https://lori-frisor.vercel.app/",
+        },
+        repo: {
+          label: "Repo",
+          href: "https://github.com/stianglomsrod/lori-frisor",
+        },
       },
     ],
     boundary:
@@ -225,15 +245,28 @@ export default function DnbWorkflow() {
                 <h3 className={styles.cardName}>{p.name}</h3>
                 <p className={styles.cardProof}>{p.proof}</p>
                 <p className={styles.cardNote}>{p.note}</p>
-                <a
-                  className={styles.cardLink}
-                  href={p.href}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                >
-                  {p.linkLabel}
-                  <span aria-hidden="true"> →</span>
-                </a>
+                <div className={styles.cardLinks}>
+                  <a
+                    className={styles.cardLink}
+                    href={p.primary.href}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
+                    {p.primary.label}
+                    <span aria-hidden="true"> →</span>
+                  </a>
+                  {p.repo ? (
+                    <a
+                      className={styles.cardRepo}
+                      href={p.repo.href}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      aria-label={`${p.name} ${t.repoAria}`}
+                    >
+                      {p.repo.label}
+                    </a>
+                  ) : null}
+                </div>
               </li>
             ))}
           </ul>

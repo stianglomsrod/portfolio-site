@@ -63,6 +63,44 @@
   content: "›";
 }
 
+/* ── Programming / learning trajectory ──────────────────────── */
+
+.learn {
+  margin-top: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px 24px 26px;
+}
+
+.learnLinks {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin-top: 20px;
+}
+
+.learnLink {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent);
+  transition: color 0.15s var(--ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .learnLink:hover {
+    color: var(--accent-strong);
+  }
+}
+
+.learnClose {
+  margin-top: 20px;
+  color: var(--muted-strong);
+  font-size: 0.97rem;
+  line-height: 1.6;
+}
+
 /* ── Honest closing line ────────────────────────────────────── */
 
 .honest {

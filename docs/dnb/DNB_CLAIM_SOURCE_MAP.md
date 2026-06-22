@@ -328,7 +328,7 @@ Most previously-blocked claims are now primary-source-backed. Remaining care ite
 | Sikt approval / consent / data minimisation                              | RESOLVED (thesis-backed)               | Keep general on-page; name specifics only if user approves                    |
 | Specific diploma grades                                                  | Available but private                  | Do NOT list grades or national ID; use credential-level framing only          |
 | Role-fit against exact DNB posting                                       | RESOLVED (`DNB_JOB_POSTING.md` stored) | Map precisely; keep distributed-systems/platform/MCP as growth direction      |
-| CS50x / other specific course credentials                                | Still unverified                       | Do not add until a source confirms; diploma covers the master credentials     |
+| CS50x / other specific course credentials                                | Verified (CS50x)                       | CS50x completion confirmed by certificate (`CS50x.pdf`, gitignored local; public verify URL cs50.harvard.edu/certificates/0e9210d1-…). Frame as foundational learning, not a CS degree |
 
 ---
 

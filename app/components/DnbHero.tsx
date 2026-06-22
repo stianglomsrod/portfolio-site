@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Reveal from "./Reveal";
 import { useLanguage } from "./LanguageContext";
 import shared from "./Shared.module.css";
@@ -8,6 +9,7 @@ import styles from "./DnbHero.module.css";
 const content = {
   no: {
     eyebrow: "Stian Glomsrød",
+    portraitAlt: "Portrett av Stian Glomsrød",
     title:
       "Jeg bygger AI-first programvare som gjør sammensatte behov om til noe folk faktisk kan bruke.",
     intro:
@@ -23,6 +25,7 @@ const content = {
   },
   en: {
     eyebrow: "Stian Glomsrød",
+    portraitAlt: "Portrait of Stian Glomsrød",
     title:
       "I build AI-first software that turns messy, real-world needs into something people can actually use.",
     intro:
@@ -45,42 +48,57 @@ export default function DnbHero() {
   return (
     <header className={styles.hero}>
       <div className={shared.container}>
-        <Reveal delay={40}>
-          <p className={styles.eyebrow}>{t.eyebrow}</p>
-        </Reveal>
+        <div className={styles.layout}>
+          <div className={styles.copy}>
+            <Reveal delay={40}>
+              <p className={styles.eyebrow}>{t.eyebrow}</p>
+            </Reveal>
 
-        <Reveal delay={80}>
-          <h1 className={styles.title}>{t.title}</h1>
-        </Reveal>
+            <Reveal delay={80}>
+              <h1 className={styles.title}>{t.title}</h1>
+            </Reveal>
 
-        <Reveal delay={140}>
-          <p className={styles.intro}>{t.intro}</p>
-        </Reveal>
+            <Reveal delay={140}>
+              <p className={styles.intro}>{t.intro}</p>
+            </Reveal>
 
-        <Reveal delay={200}>
-          <ul className={styles.bullets} aria-label={t.bulletsLabel}>
-            {t.bullets.map((b) => (
-              <li key={b} className={styles.bullet}>
-                {b}
-              </li>
-            ))}
-          </ul>
-        </Reveal>
+            <Reveal delay={200}>
+              <ul className={styles.bullets} aria-label={t.bulletsLabel}>
+                {t.bullets.map((b) => (
+                  <li key={b} className={styles.bullet}>
+                    {b}
+                  </li>
+                ))}
+              </ul>
+            </Reveal>
 
-        <Reveal delay={260}>
-          <div className={styles.actions}>
-            <a className={styles.ctaPrimary} href="#arbeidsflyt">
-              {t.ctaPrimary}
-            </a>
-            <a
-              className={styles.ctaSecondary}
-              href="mailto:stianglomsrod@gmail.com"
-              aria-label={t.ctaSecondary}
-            >
-              {t.ctaSecondary}
-            </a>
+            <Reveal delay={260}>
+              <div className={styles.actions}>
+                <a className={styles.ctaPrimary} href="#arbeidsflyt">
+                  {t.ctaPrimary}
+                </a>
+                <a
+                  className={styles.ctaSecondary}
+                  href="mailto:stianglomsrod@gmail.com"
+                  aria-label={t.ctaSecondary}
+                >
+                  {t.ctaSecondary}
+                </a>
+              </div>
+            </Reveal>
           </div>
-        </Reveal>
+
+          <Reveal delay={120} className={styles.portrait}>
+            <Image
+              className={styles.portraitImg}
+              src="/images/avatar/stian-portrait.webp"
+              alt={t.portraitAlt}
+              width={760}
+              height={919}
+              sizes="(max-width: 860px) 200px, 320px"
+            />
+          </Reveal>
+        </div>
       </div>
     </header>
   );

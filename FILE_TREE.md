@@ -119,14 +119,18 @@ portfolio-site/
 │       ├── 2026-06-22-dnb-cross-repo-evidence-synthesis-report.md
 │       ├── 2026-06-22-dnb-deai-bilingual-redundancy-report.md
 │       ├── 2026-06-22-dnb-opus-full-page-buildout-report.md
+│       ├── 2026-06-22-dnb-programming-learning-ux-pass-report.md
+│       ├── 2026-06-22-dnb-hero-portrait-ux-refinement-report.md
 │       └── UX_UI_COPY_REVIEW.md
 ├── public/
 │   └── images/
 │       ├── avatar/
-│       │   └── stian-face.png
+│       │   ├── stian-face.png
+│       │   └── stian-portrait.webp
 │       └── cases/
 │           ├── klar/           (7 screenshots)
 │           └── supporting/     (3 screenshots)
 └── scripts/
-    └── build-avatar.mjs
+    ├── build-avatar.mjs
+    └── build-hero-portrait.mjs
 ```

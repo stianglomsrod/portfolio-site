@@ -125,6 +125,7 @@
 /* ── Evidence card ──────────────────────────────────────────── */
 
 .card {
+  position: relative;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -132,6 +133,29 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  height: 100%;
+  transition:
+    border-color 0.18s var(--ease),
+    transform 0.18s var(--ease),
+    box-shadow 0.18s var(--ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px -16px var(--glow-1);
+  }
+
+  .card:hover .cardLink {
+    color: var(--accent-strong);
+  }
+}
+
+/* Keyboard focus on the stretched primary link rings the whole card. */
+.card:has(.cardLink:focus-visible) {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
 }
 
 /* Lead card (Klar) carries a little more weight than the other two so the
@@ -174,19 +198,47 @@
   font-style: italic;
 }
 
-.cardLink {
+.cardLinks {
   margin-top: auto;
-  padding-top: 10px;
+  padding-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* Primary action stretches across the whole card so the card is clickable. */
+.cardLink {
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--accent);
-  align-self: flex-start;
+  transition: color 0.15s var(--ease);
+}
+
+.cardLink::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius);
+}
+
+.cardLink:focus-visible {
+  outline: none;
+}
+
+/* Secondary repo link sits above the stretched primary link. */
+.cardRepo {
+  position: relative;
+  z-index: 1;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
   transition: color 0.15s var(--ease);
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .cardLink:hover {
-    color: var(--accent-strong);
+  .cardRepo:hover {
+    color: var(--foreground);
   }
 }
 

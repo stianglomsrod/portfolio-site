@@ -72,7 +72,7 @@ const content = {
     noteText:
       " løsningen er bygget med dataminimering og ansvarlig AI-bruk. Forhåndsvisningen før publisering fungerer også som en kontroll mot feiltolkning og mot at noe sensitivt flyter videre uten godkjenning.",
     disclaimer:
-      "Klar er en robust prototype og et fullstack-bevis, ikke en ferdig plattform i full skala. Evalueringen ble gjort med lærere, ikke elever, og det er en bevisst og dokumentert avgrensning.",
+      "Klar er en robust prototype i full bredde, men ikke en ferdig plattform i stor skala. Evalueringen ble gjort med lærere, ikke elever, og det er en bevisst og dokumentert avgrensning.",
   },
   en: {
     label: "Main project",
@@ -139,7 +139,7 @@ const content = {
     noteText:
       " the solution is built with data minimisation and responsible AI use. The preview before publishing also acts as a check against misreadings and against anything sensitive flowing onward without approval.",
     disclaimer:
-      "Klar is presented as a robust prototype and full-stack proof, not a finished platform at full scale. The evaluation was done with teachers, not students, and that's a deliberate, documented limitation.",
+      "Klar is a robust, full-width prototype, but not a finished platform at large scale. The evaluation was done with teachers, not students, and that's a deliberate, documented limitation.",
   },
 } as const;
 

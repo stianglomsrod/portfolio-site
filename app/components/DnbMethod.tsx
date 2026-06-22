@@ -9,13 +9,13 @@ const content = {
   no: {
     label: "Metode",
     title: "Fra uklare behov til byggbare systemer",
-    lede: "Mye av styrken min ligger i å gå fra rotete, virkelige behov til konkrete systemvalg. Hver innsikt ender i en teknisk beslutning om data, roller, flyt eller arkitektur, ikke bare i en skisse av et grensesnitt.",
+    lede: "Mye av styrken min ligger i å gå fra rotete, virkelige behov til konkrete systemvalg. Hver innsikt ender i en teknisk beslutning om data, roller, flyt eller arkitektur.",
     basisLead: "Metodisk hviler dette på ",
     basisPd: "participatory design",
     basisMid: " (lærere som med-designere) og ",
     basisDs: "design science",
     basisTail:
-      " (bygg → evaluer → begrunn), gjennom workshops for innsamling, prioritering og beslutning. Det er dokumentert og eksaminert arbeid fra masteroppgaven, ikke en påstand.",
+      " (bygg → evaluer → begrunn), gjennom workshops for innsamling, prioritering og beslutning. Det er dokumentert og eksaminert arbeid fra masteroppgaven.",
     mapAria: "Fra behov til teknisk valg",
     needTag: "Behov",
     decisionTag: "Teknisk valg",
@@ -43,7 +43,7 @@ const content = {
       {
         need: "Motivasjon uten å presse",
         decision:
-          "Spillelementer som valgfrie opt-ins, slått av som standard. Eleven velger selv.",
+          "Spillelementer er valgfri støtte som er av som standard. Læreren vurderer om de passer for eleven, og slår dem på.",
       },
     ],
     relevance:
@@ -52,13 +52,13 @@ const content = {
   en: {
     label: "Method",
     title: "From unclear needs to buildable systems",
-    lede: "A lot of my strength is in getting from messy, real-world needs to concrete system choices. Every insight ends in a technical decision about data, roles, flow or architecture, not just in a sketch of an interface.",
+    lede: "A lot of my strength is in getting from messy, real-world needs to concrete system choices. Every insight ends in a technical decision about data, roles, flow or architecture.",
     basisLead: "Methodologically this rests on ",
     basisPd: "participatory design",
     basisMid: " (teachers as co-designers) and ",
     basisDs: "design science",
     basisTail:
-      " (build → evaluate → justify), through workshops for gathering, prioritising and deciding. It's documented and examined work from my master's thesis, not a claim.",
+      " (build → evaluate → justify), through workshops for gathering, prioritising and deciding. It's documented and examined work from my master's thesis.",
     mapAria: "From need to technical decision",
     needTag: "Need",
     decisionTag: "Technical choice",
@@ -86,7 +86,7 @@ const content = {
       {
         need: "Motivation without pressure",
         decision:
-          "Game elements as optional opt-ins, off by default. The student chooses.",
+          "Game elements are optional support, off by default. The teacher decides whether they suit a student and turns them on.",
       },
     ],
     relevance:

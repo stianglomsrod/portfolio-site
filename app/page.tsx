@@ -12,7 +12,7 @@ import DnbContact from "./components/DnbContact";
 export const metadata: Metadata = {
   title: "Stian Glomsrød — AI-first engineering",
   description:
-    "Fullstack produktbygging, agentisk utviklingspraksis og tydelige kvalitetsporter. Portef\u00f8lje for DNB AI Tech.",
+    "Fullstack produktbygging med AI-agenter, disiplinert arbeidsflyt og tydelig kvalitetssikring. Portefølje for DNB AI Tech.",
 };
 
 export default function DnbPage() {

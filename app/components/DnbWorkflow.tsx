@@ -68,7 +68,10 @@ const content = {
           "Next.js · React · TypeScript · Supabase/PostgreSQL · innlogging og rolletilgang · AI-assistert import med forhåndsvisning.",
         note: "Mitt tydeligste fullstack-produkt.",
         primary: { label: "Åpne Klar", href: "https://klar-sigma.vercel.app/" },
-        repo: { label: "GitHub", href: "https://github.com/stianglomsrod/klar" },
+        repo: {
+          label: "GitHub",
+          href: "https://github.com/stianglomsrod/klar",
+        },
       },
       {
         tag: "Dokumentert utviklingsflyt",
@@ -163,7 +166,10 @@ const content = {
           "Next.js · React · TypeScript · Supabase/PostgreSQL · sign-in and role-based access · AI-assisted import with a preview gate.",
         note: "My clearest fullstack product.",
         primary: { label: "Open Klar", href: "https://klar-sigma.vercel.app/" },
-        repo: { label: "GitHub", href: "https://github.com/stianglomsrod/klar" },
+        repo: {
+          label: "GitHub",
+          href: "https://github.com/stianglomsrod/klar",
+        },
       },
       {
         tag: "Documented dev workflow",

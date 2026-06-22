@@ -1,5 +1,45 @@
 # DNB Implementation Log
 
+## 2026-06-22 — Cross-repo evidence synthesis (documentation-only)
+
+### Purpose
+
+Strengthen DNB strategy by synthesizing read-only evidence across three repositories (`klar`, `nikkoprogging/companion_app`, `lori-frisor`) and map this to safe claim boundaries and next-step implementation sequencing.
+
+### Branch
+
+`feature/dnb-cross-repo-evidence`
+
+### Files changed
+
+- `docs/dnb/DNB_CROSS_REPO_EVIDENCE.md` (created)
+- `docs/dnb/DNB_INSIGHT_SYNTHESIS.md` (updated)
+- `docs/dnb/DNB_PORTFOLIO_STRATEGY.md` (updated)
+- `docs/dnb/DNB_IMPLEMENTATION_BRIEF_FOR_AUTO.md` (updated)
+- `docs/dnb/DNB_CLAIM_SOURCE_MAP.md` (updated)
+- `docs/dnb/DNB_QA_CHECKLIST.md` (updated)
+- `docs/dnb/DNB_AGENT_ONBOARDING_INDEX.md` (updated)
+- `docs/dnb/DNB_IMPLEMENTATION_LOG.md` (updated)
+- `FILE_TREE.md` (updated)
+
+### Key decisions
+
+- Klar remains the main technical/product evidence case.
+- Companion app becomes the main long-running workflow/process evidence case.
+- Lori Frisor becomes the main enablement/handoff/pragmatic-delivery evidence case.
+- DNB page should present these as one cross-project pattern, not disconnected examples.
+- Next implementation chunk should be "How I build with AI" plus compact cross-repo evidence strip; hero should remain unchanged unless a clarity gap appears.
+
+### Validation
+
+- Read-only external repo inspection completed via GitHub tools; no external code copied into this repo.
+- Docs-only updates in this repo; no app/component/CSS/package/deployment files touched.
+- `git status --untracked-files=all` run at end of session.
+
+### Next step
+
+Implement a small, claim-safe "How I build with AI" section chunk with a three-card cross-repo evidence strip (Klar / Companion / Lori), then run updated QA checklist.
+
 ## 2026-06-20 — Pre-implementation decisions confirmed (chunk 1)
 
 User/tech-lead decisions, resolving the open questions before any code:

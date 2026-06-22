@@ -81,6 +81,7 @@ portfolio-site/
 │   │   ├── DNB_AGENT_HANDOFF_PROTOCOL.md
 │   │   ├── DNB_AGENT_ONBOARDING_INDEX.md
 │   │   ├── DNB_CLAIM_SOURCE_MAP.md
+│   │   ├── DNB_CROSS_REPO_EVIDENCE.md
 │   │   ├── DNB_CONTENT_OUTLINE.md
 │   │   ├── DNB_COST_CONTROL.md
 │   │   ├── DNB_IMPLEMENTATION_BRIEF_FOR_AUTO.md
@@ -100,6 +101,7 @@ portfolio-site/
 │       ├── 2026-06-19-bootstrap-cleanup-report.md
 │       ├── 2026-06-19-report-format-hardening.md
 │       ├── 2026-06-20-source-synthesis-posting-report.md
+│       ├── 2026-06-22-dnb-cross-repo-evidence-synthesis-report.md
 │       └── UX_UI_COPY_REVIEW.md
 ├── public/
 │   └── images/

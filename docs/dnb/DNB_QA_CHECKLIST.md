@@ -35,6 +35,15 @@
 - [ ] Innersource/transparency/reuse language used where natural and honest.
 - [ ] TypeScript named as the language match; distributed systems / platform / MCP kept as growth direction.
 
+## Cross-repo evidence checks (2026-06-22)
+
+- [ ] DNB page frames Klar + Companion + Lori as one cross-project pattern, not unrelated project mentions.
+- [ ] Klar is still the main technical/product evidence case.
+- [ ] Companion/nikkoprogging is the main long-running workflow/process evidence case.
+- [ ] Lori Frisor is the main enablement/handoff/pragmatic-delivery evidence case.
+- [ ] External-repo claims are traceable to observed repository files (no invented stack/features).
+- [ ] No external-repo claim implies enterprise scale, organization-wide adoption, or senior distributed-systems authority.
+
 ## DNB fit
 
 - [ ] Focuses on AI-first engineering, tooling, enablement, runbooks, standards, and safe agent workflows.

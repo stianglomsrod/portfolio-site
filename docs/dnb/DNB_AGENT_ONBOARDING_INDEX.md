@@ -39,18 +39,19 @@ Strategic and source layer (read to understand _what to argue_ and _why it is sa
 6. `docs/dnb/DNB_SOURCE_EVIDENCE_NOTES.md` (safe distilled primary evidence)
 7. `docs/dnb/DNB_INSIGHT_SYNTHESIS.md` (strategy — what got stronger, role-fit)
 8. `docs/dnb/DNB_CLAIM_SOURCE_MAP.md` (claim-by-claim ratings and guardrails)
+9. `docs/dnb/DNB_CROSS_REPO_EVIDENCE.md` (cross-project pattern and claim boundaries)
 
 Execution layer (read when implementing):
 
-9. `docs/dnb/DNB_PORTFOLIO_STRATEGY.md` (page structure, evidence hierarchy, visual direction)
-10. `docs/dnb/DNB_IMPLEMENTATION_BRIEF_FOR_AUTO.md` (Copilot-Auto-ready chunks)
-11. `docs/dnb/DNB_CONTENT_OUTLINE.md`
-12. `docs/dnb/DNB_SECTION_COPY_V1.md`
-13. `docs/dnb/DNB_QA_CHECKLIST.md`
-14. `docs/dnb/DNB_AGENT_HANDOFF_PROTOCOL.md`
-15. `docs/dnb/DNB_COST_CONTROL.md`
-16. `docs/dnb/DNB_IMPLEMENTATION_LOG.md`
-17. `FILE_TREE.md`
+10. `docs/dnb/DNB_PORTFOLIO_STRATEGY.md` (page structure, evidence hierarchy, visual direction)
+11. `docs/dnb/DNB_IMPLEMENTATION_BRIEF_FOR_AUTO.md` (Copilot-Auto-ready chunks)
+12. `docs/dnb/DNB_CONTENT_OUTLINE.md`
+13. `docs/dnb/DNB_SECTION_COPY_V1.md`
+14. `docs/dnb/DNB_QA_CHECKLIST.md`
+15. `docs/dnb/DNB_AGENT_HANDOFF_PROTOCOL.md`
+16. `docs/dnb/DNB_COST_CONTROL.md`
+17. `docs/dnb/DNB_IMPLEMENTATION_LOG.md`
+18. `FILE_TREE.md`
 
 Doc roles at a glance: posting = the target; evidence notes = safe facts; synthesis = strategy; claim map = what you may say; strategy = how the page is shaped; brief = how to build it in small chunks.
 

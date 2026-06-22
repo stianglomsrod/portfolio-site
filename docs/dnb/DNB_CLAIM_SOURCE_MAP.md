@@ -39,6 +39,26 @@ This map is not a final content approval. It is a quality gate.
 | Self-authored exam prep    | `sources/Eksamensmanus_ord_for_ord.md`, `sources/QA_bank_samtale.md` (local-only)                            | Useful for reasoning/language only. Treat as supporting, NOT load-bearing proof (circular).                                                                                           |
 | Klar live deployment       | klar-sigma.vercel.app                                                                                        | Tech stack visually verifiable; now also thesis-backed.                                                                                                                               |
 
+### Cross-repo project evidence (2026-06-22, observed read-only)
+
+Observed repositories:
+
+- `https://github.com/stianglomsrod/klar`
+- `https://github.com/stianglomsrod/nikkoprogging` (focus: `companion_app`)
+- `https://github.com/stianglomsrod/lori-frisor`
+
+Observed source examples:
+
+- Klar: `PROJECT_DNA.md`, `FILE_TREE.md`, `src/middleware.ts`, `src/app/page.tsx`, `src/app/auth/callback/route.ts`, `src/app/(dashboard)/student/page.tsx`, `src/app/(dashboard)/teacher/students/[id]/page.tsx`, `HANDOVER_STATE.md`, `CODE_AUDIT.md`, `TECH_DEBT.md`.
+- Companion: `companion_app/PROJECT_DNA.md`, `companion_app/README.md`, `companion_app/DB_NOTES.md`, `companion_app/docs/plans/PLAN_HISTORY_AND_STATS.md`, `companion_app/docs/plans/PLAN_COMPANION_EVENTS.md`, `companion_app/lib/core/database/app_database.dart`, `companion_app/lib/core/history/drift_history_repository.dart`, `companion_app/test/core/history/drift_history_repository_test.dart`.
+- Lori Frisor: `PROJECT_DNA.md`, `DECISIONS.md`, `HANDOFF.md`, `AGENTS.md`, `astro.config.mjs`, `keystatic.config.ts`, `src/lib/content.ts`, `src/layouts/BaseLayout.astro`.
+
+Claim support this enables:
+
+- Cross-project workflow discipline claim support: **Strong project evidence**.
+- Enablement/handoff/pragmatic build-vs-integrate claim support: **Strong project evidence**.
+- Enterprise-scale platform/distributed-systems claim support: **Not supported** (must remain out of scope).
+
 ---
 
 ## 3. Claim map
@@ -327,4 +347,4 @@ Residual edits still required before/at implementation:
 GitHub Copilot Auto can safely implement using `DNB_IMPLEMENTATION_BRIEF_FOR_AUTO.md`, because the copy is pre-rated and the agent only assembles — it does not invent claims. 4. Then proceed to implementation chunk: DNB page skeleton with agentic workflow and Klar sections only.
 
 Recommended next single chunk:
-Create a minimal DNB page skeleton (route + layout) with hero section and agentic workflow section only. Do not implement Klar, workshops, or learning velocity until source rewrites are applied and the tech stack note is committed.
+Implement the "How I build with AI" section with a compact cross-repo evidence strip (Klar / Companion / Lori), without expanding the hero.

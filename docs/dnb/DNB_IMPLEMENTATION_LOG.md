@@ -1,5 +1,35 @@
 # DNB Implementation Log
 
+## 2026-06-22 — Final copy/label fix pass (copy-only)
+
+### Purpose
+
+Five small copy/label corrections on the DNB page, in Norwegian and English where relevant. No redesign, no layout change, no new sections, no dependencies. VG X / master and the Skamløs pitch/game were untouched.
+
+### Branch
+
+`dnb-main`
+
+### Changes
+
+1. Klar Smart Import step label: NO `Validert med brukere` → `Evaluert med lærere`; EN `Validated with users` → `Evaluated with teachers` (avoids implying student user-testing / broad user validation).
+2. Klar workflow card note: NO `Det nærmeste jeg har et helhetlig produkt.` → `Mitt tydeligste fullstack-produkt.`; EN `The closest thing I have to a complete product.` → `My clearest fullstack product.`
+3. Klar system spec: NO removed `åpent,` → `Et standardisert datalag jeg kan bygge videre på.`; EN removed `open` → `A standardised data layer I can keep building on.` (avoids implying open/public data).
+4. Klar argued text: NO `løsningen virker på utstyret skolene allerede har` → `løsningen fungerer på utstyret skolene allerede har`. EN already read "works on the hardware schools already have" — no change needed.
+5. Card chip label: `Repo` → `GitHub` on the Klar and Lori Frisør cards (NO + EN), hrefs unchanged (`github.com/stianglomsrod/klar`, `github.com/stianglomsrod/lori-frisor`).
+
+### Files changed
+
+- `app/components/DnbKlar.tsx` (copy only: items 1, 3, 4 in NO + EN)
+- `app/components/DnbWorkflow.tsx` (copy/label only: items 2, 5 in NO + EN)
+- `docs/dnb/DNB_IMPLEMENTATION_LOG.md` (updated)
+- `docs/reports/2026-06-22-dnb-final-copy-label-fix-report.md` (created)
+- `FILE_TREE.md` (updated: this report)
+
+### Validation
+
+`npm run lint` clean, `npm run build` succeeded, visual QA in NO + EN confirmed all five corrections render and no layout changed. Not committed, not pushed.
+
 ## 2026-06-22 — Hero portrait + layout/gamification/UX refinement pass (UI/code)
 
 ### Purpose

@@ -21,7 +21,7 @@ const content = {
       {
         label: "Backend og data",
         value:
-          "Supabase med PostgreSQL. Et åpent, standardisert datalag jeg kan bygge videre på.",
+          "Supabase med PostgreSQL. Et standardisert datalag jeg kan bygge videre på.",
       },
       {
         label: "Innlogging og roller",
@@ -35,7 +35,7 @@ const content = {
       },
     ],
     argued:
-      "Valgene henger sammen. PWA, Supabase/PostgreSQL og én delt React/Next.js-kodebase trekker mot de samme målene: at løsningen virker på utstyret skolene allerede har, og at terskelen for å ta den i bruk er lav.",
+      "Valgene henger sammen. PWA, Supabase/PostgreSQL og én delt React/Next.js-kodebase trekker mot de samme målene: at løsningen fungerer på utstyret skolene allerede har, og at terskelen for å ta den i bruk er lav.",
     smartTitle: "Smart Import — AI som et bevisst produktvalg",
     smartLede:
       "Ingen ba om «en AI som leser ukebrevet mitt». Det var mitt tekniske svar på det tydeligste behovet, med en kontrollert grense rundt seg.",
@@ -54,7 +54,7 @@ const content = {
         text: "Alt AI-en tolker vises i en redigerbar forhåndsvisning før publisering. Ingenting går ut automatisk; læreren beholder kontroll og ansvar.",
       },
       {
-        label: "Validert med brukere",
+        label: "Evaluert med lærere",
         text: "I evalueringen med lærere var nettopp denne importen det sterkeste funnet og den klareste grunnen til å ta verktøyet i bruk.",
       },
     ],
@@ -88,7 +88,7 @@ const content = {
       {
         label: "Backend and data",
         value:
-          "Supabase with PostgreSQL. An open, standardised data layer I can keep building on.",
+          "Supabase with PostgreSQL. A standardised data layer I can keep building on.",
       },
       {
         label: "Sign-in and roles",
@@ -121,7 +121,7 @@ const content = {
         text: "Everything the AI interprets shows up in an editable preview before publishing. Nothing goes out on its own; the teacher keeps control and responsibility.",
       },
       {
-        label: "Validated with users",
+        label: "Evaluated with teachers",
         text: "In the evaluation with teachers, this import was the strongest finding and the clearest reason to start using the tool.",
       },
     ],

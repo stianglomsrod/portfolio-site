@@ -111,6 +111,16 @@ The distinctiveness is the combination: builder + method + governance + honesty.
 - Daily AI-tool fluency (Copilot / coding agents) and context-management discipline are genuine strengths — claim them plainly.
 - Lean into _enabler / open-in-the-open / reuse_ language; this is where Stian is differentiated and honest.
 
+## 8b. Cross-repo evidence insight (2026-06-22)
+
+New strategic strengthening: the DNB narrative is strongest as a **cross-project pattern** rather than forcing Klar to carry every claim.
+
+- **Klar** remains the main technical/product evidence case.
+- **Nikkoprogging / companion_app** becomes the main long-running agentic workflow evidence case (plans, chunking, tests, local-first persistence discipline).
+- **Lori Frisor** becomes the main enablement/handoff/pragmatic-delivery evidence case (owner handoff, Keystatic editing model, explicit "do not rebuild booking" decision).
+
+Implication: the DNB page should present a compact cross-repo evidence strip inside or near "How I build with AI" so readers see one repeatable engineering pattern: product building + disciplined workflow + practical enablement.
+
 ## 9. Resolved decisions (2026-06-20) and remaining option
 
 Confirmed by user/tech lead (see `DNB_IMPLEMENTATION_LOG.md`):

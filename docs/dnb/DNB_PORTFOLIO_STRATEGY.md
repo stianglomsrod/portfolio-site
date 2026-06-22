@@ -27,10 +27,11 @@ Page consequences:
 
 1. **The documented agentic workflow** — strongest and most distinctive; evidenced by the repo itself.
 2. **Klar + Smart Import** — running fullstack AI product with a human-in-the-loop safety gate, user-validated.
-3. **Examined method chain** — participatory design → architecture, from a formal master's thesis.
-4. **Formal credentials** — master in digital learning design; graded competence in participatory design, innovation/prototyping, project management, research methods.
-5. **Learning velocity** — cross-domain build, honestly framed.
-6. **Honest growth direction** — lower-level/robustness/platform as trajectory.
+3. **Cross-repo pattern evidence** — companion app as long-running workflow discipline; Lori Frisor as enablement/handoff and pragmatic delivery judgement.
+4. **Examined method chain** — participatory design → architecture, from a formal master's thesis.
+5. **Formal credentials** — master in digital learning design; graded competence in participatory design, innovation/prototyping, project management, research methods.
+6. **Learning velocity** — cross-domain build, honestly framed.
+7. **Honest growth direction** — lower-level/robustness/platform as trajectory.
 
 Design implication: the page should not bury the workflow and Klar below a generic hero. Get to evidence fast.
 
@@ -42,6 +43,7 @@ Eight sections, mapping to the approved outline but re-prioritised so evidence l
 
 1. **Hero** — one clear sentence on what Stian is (AI-first builder / software engineering candidate with system understanding) + what the page is. Three proof bullets. Primary CTA jumps to the workflow or Klar section.
 2. **How I build with AI** (the differentiator) — the documented agentic workflow: context → requirements → human review → correction → QA → documentation → handoff → safety gates. State plainly that the repo itself is the evidence.
+   Include a compact cross-repo evidence strip (Klar / Companion / Lori) so the reader sees one repeatable pattern rather than three unrelated projects.
 3. **Klar as evidence** — the product: fullstack PWA, React/Next.js, Supabase/PostgreSQL, auth + RBAC, teacher/student roles. Lead the AI story with Smart Import (bottleneck → AI choice → human preview gate → user validation). Keep the non-enterprise-scale disclaimer.
 4. **From unclear needs to buildable systems** (method) — participatory design + design science, the probe → workshops → build → evaluation chain, landing each insight on a _technical_ decision. Plain language, no citation dump.
 5. **Learning velocity and work capacity** — evidence-based, professional framing; the cross-domain build and sustained documented output.
@@ -60,6 +62,7 @@ Order rationale: sections 2 and 3 are the strongest exhibits and should come imm
 - One sentence, plain. Avoid buzzword stacking.
 - Three proof bullets max, each pointing at a real artefact (Klar, the workflow, the method).
 - Visual: restrained, technical, lots of whitespace. No stocky hero imagery.
+- Keep hero scope stable; do not add a large cross-repo block here unless review reveals a clarity gap.
 
 ### How I build with AI
 
@@ -67,6 +70,10 @@ Order rationale: sections 2 and 3 are the strongest exhibits and should come imm
 - State the honest meta-point: "this site was built with this workflow; the repo docs are the receipts."
 - Tie to DNB: tempo without control creates rework; this method gives speed _and_ safety. Frame it as **enablement** — a workflow designed to be shared, reused, and run by others (matches the posting's force-multiplier theme).
 - Soften the reuse claim: "designet for å kunne deles og læres av andre," not "proven reusable."
+- Add a compact three-card evidence strip:
+  - Klar = AI-first fullstack product evidence.
+  - Companion = long-running workflow/test/documentation evidence.
+  - Lori Frisor = enablement/handoff and pragmatic build-vs-integrate evidence.
 
 ### Klar as evidence
 
@@ -133,10 +140,12 @@ A `ModeToggle` already exists, but the DNB variant is **not** a mode toggle: it 
 
 ## 7. Implementation priorities
 
-1. **First**: hero + "How I build with AI" section. Highest evidence, lowest claim risk, fully backed by repo docs.
+1. **First**: complete "How I build with AI" with a compact cross-repo evidence strip.
 2. **Second**: Klar evidence section with Smart Import + screenshots.
 3. **Third**: method section.
 4. **Fourth**: learning velocity + growth direction.
 5. **Last**: contact/CTA polish and the optional proof/receipts section.
+
+Hero should remain unchanged in this step unless a specific clarity issue is discovered during review.
 
 Each step is a separate reviewable chunk. See `DNB_IMPLEMENTATION_BRIEF_FOR_AUTO.md` for chunk-level acceptance criteria suitable for GitHub Copilot Auto.

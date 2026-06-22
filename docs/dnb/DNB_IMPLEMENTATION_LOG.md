@@ -40,6 +40,46 @@ Strengthen DNB strategy by synthesizing read-only evidence across three reposito
 
 Implement a small, claim-safe "How I build with AI" section chunk with a three-card cross-repo evidence strip (Klar / Companion / Lori), then run updated QA checklist.
 
+## 2026-06-20 — DNB scaffold + Hero (chunk 2, UI/code)
+
+### Purpose
+
+First code/UI implementation chunk: replace `app/page.tsx` on branch `feature/dnb-scaffold-hero` with a DNB-specific root page rendering only the DnbHero component.
+
+### Branch
+
+`feature/dnb-scaffold-hero`
+
+### Files changed
+
+- `app/page.tsx` (replaced: VG X `Portfolio` import removed; DNB `DnbHero` + page-level `metadata` added)
+- `app/components/DnbHero.tsx` (created)
+- `app/components/DnbHero.module.css` (created)
+- `docs/dnb/DNB_IMPLEMENTATION_LOG.md` (updated)
+- `FILE_TREE.md` (updated)
+
+### Key decisions
+
+- Replaced `app/page.tsx` on this branch — cleanest structure for a separate Vercel deploy. VG X's `page.tsx` is preserved intact on `master`; this branch's `page.tsx` is DNB-specific.
+- Did not touch `app/layout.tsx` — it is minimal (just renders `children`) and works for both variants.
+- Added a page-level `metadata` export to `page.tsx` to override layout-level title/description for the DNB deploy without modifying the shared layout.
+- Created `DnbHero.tsx` + `DnbHero.module.css` as isolated DNB-only components; no changes to existing VG X components.
+- Hero copy: Norwegian, softened per claim map ("vist rask overgang" pattern, no "dokumentert"); no "lagbar og lærbar" overclaim; correct role framing (AI-first builder/software engineering candidate).
+- Contact CTA uses real email `stianglomsrod@gmail.com` from `portfolio.ts` footer data.
+- Primary CTA points to `#arbeidsflyt` anchor (future workflow section).
+- No new dependencies added.
+
+### Validation
+
+- `npm run lint` — run, see report.
+- `npm run build` — run, see report.
+- `git status --untracked-files=all` — run, see report.
+- Visual QA: human review needed (screenshots requested in report).
+
+### Next step
+
+Chunk 3: "How I build with AI" workflow section (the lead exhibit). After human visual QA of the Hero on desktop and mobile.
+
 ## 2026-06-20 — Pre-implementation decisions confirmed (chunk 1)
 
 User/tech-lead decisions, resolving the open questions before any code:

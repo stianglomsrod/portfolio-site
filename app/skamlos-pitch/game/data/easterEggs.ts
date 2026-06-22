@@ -23,7 +23,10 @@ export const EASTER_EGGS: EasterEgg[] = [
   {
     id: "laser-egg",
     kind: "egg",
-    name: { no: "De Urimelige Søknaders Egg", en: "The Egg of Unreasonable Applications" },
+    name: {
+      no: "De Urimelige Søknaders Egg",
+      en: "The Egg of Unreasonable Applications",
+    },
     lore: {
       no: "Et gyllent egg, gravert med laser, ligger gjemt i utkanten. Noen søker på papir. Noen søker på egg. Du valgte en spillbar kompetansesti. Legendarisk gjenstand låst opp.",
       en: "A golden egg, laser-engraved, lies hidden at the edge. Some apply on paper. Some apply on an egg. You chose a playable competence path. Legendary item unlocked.",

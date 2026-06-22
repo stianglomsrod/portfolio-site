@@ -36,7 +36,11 @@ export default function QuestModal({ questId, onClose }: QuestModalProps) {
     const option = quest!.mission?.options.find((o) => o.id === optionId);
     if (!option) return;
     setPickedId(optionId);
-    dispatch({ type: "MISSION_RESULT", questId: quest!.id, correct: option.correct });
+    dispatch({
+      type: "MISSION_RESULT",
+      questId: quest!.id,
+      correct: option.correct,
+    });
   }
 
   const rewardSkills = quest.grantsSkills
@@ -49,7 +53,12 @@ export default function QuestModal({ questId, onClose }: QuestModalProps) {
         className={`${styles.modal} ${styles.modalWide}`}
         onClick={(e) => e.stopPropagation()}
       >
-        <button type="button" className={styles.closeX} onClick={onClose} aria-label={ui.close}>
+        <button
+          type="button"
+          className={styles.closeX}
+          onClick={onClose}
+          aria-label={ui.close}
+        >
           ×
         </button>
         <p className={styles.modalKicker}>{quest.kicker[lang]}</p>
@@ -92,15 +101,23 @@ export default function QuestModal({ questId, onClose }: QuestModalProps) {
                   ))}
                 </div>
                 <div className={styles.btnRow}>
-                  <button type="button" className={`${styles.btn} ${styles.btnGhost}`} onClick={onClose}>
+                  <button
+                    type="button"
+                    className={`${styles.btn} ${styles.btnGhost}`}
+                    onClick={onClose}
+                  >
                     {ui.close}
                   </button>
                 </div>
               </>
             ) : quest.mission ? (
               <div className={styles.mission}>
-                <p className={styles.missionSetup}>{quest.mission.setup[lang]}</p>
-                <p className={styles.missionPrompt}>{quest.mission.prompt[lang]}</p>
+                <p className={styles.missionSetup}>
+                  {quest.mission.setup[lang]}
+                </p>
+                <p className={styles.missionPrompt}>
+                  {quest.mission.prompt[lang]}
+                </p>
                 {!picked || !picked.correct ? (
                   <div className={styles.options}>
                     {quest.mission.options.map((option) => (
@@ -167,7 +184,11 @@ export default function QuestModal({ questId, onClose }: QuestModalProps) {
                   >
                     {ui.acceptComplete}
                   </button>
-                  <button type="button" className={`${styles.btn} ${styles.btnGhost}`} onClick={onClose}>
+                  <button
+                    type="button"
+                    className={`${styles.btn} ${styles.btnGhost}`}
+                    onClick={onClose}
+                  >
                     {ui.close}
                   </button>
                 </div>

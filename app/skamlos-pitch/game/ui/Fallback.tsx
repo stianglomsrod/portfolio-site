@@ -21,7 +21,10 @@ export default function Fallback({ onBack }: FallbackProps) {
   return (
     <div className={styles.fallback}>
       <div className={styles.fallbackCard}>
-        <div className={styles.startLinks} style={{ justifyContent: "flex-start", marginBottom: 18 }}>
+        <div
+          className={styles.startLinks}
+          style={{ justifyContent: "flex-start", marginBottom: 18 }}
+        >
           <button
             type="button"
             className={styles.startLink}

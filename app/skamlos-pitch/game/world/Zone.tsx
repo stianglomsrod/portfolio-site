@@ -64,7 +64,9 @@ export default function Zone({ quest }: { quest: Quest }) {
     <group position={[x, 0, z]}>
       {/* Platform */}
       <mesh position={[0, 0.1, 0]} receiveShadow>
-        <cylinderGeometry args={[PLATFORM_RADIUS, PLATFORM_RADIUS + 0.4, 0.2, 48]} />
+        <cylinderGeometry
+          args={[PLATFORM_RADIUS, PLATFORM_RADIUS + 0.4, 0.2, 48]}
+        />
         <meshStandardMaterial
           color="#11161c"
           emissive={monolithEmissive}
@@ -75,7 +77,9 @@ export default function Zone({ quest }: { quest: Quest }) {
       </mesh>
       {/* Glowing rim ring */}
       <mesh position={[0, 0.22, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[PLATFORM_RADIUS - 0.15, PLATFORM_RADIUS + 0.05, 64]} />
+        <ringGeometry
+          args={[PLATFORM_RADIUS - 0.15, PLATFORM_RADIUS + 0.05, 64]}
+        />
         <meshBasicMaterial
           color={quest.color}
           transparent
@@ -87,8 +91,15 @@ export default function Zone({ quest }: { quest: Quest }) {
       {/* Active highlight pulse */}
       {active && (
         <mesh position={[0, 0.24, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[PLATFORM_RADIUS + 0.2, PLATFORM_RADIUS + 0.55, 64]} />
-          <meshBasicMaterial color="#ffffff" transparent opacity={0.55} side={THREE.DoubleSide} />
+          <ringGeometry
+            args={[PLATFORM_RADIUS + 0.2, PLATFORM_RADIUS + 0.55, 64]}
+          />
+          <meshBasicMaterial
+            color="#ffffff"
+            transparent
+            opacity={0.55}
+            side={THREE.DoubleSide}
+          />
         </mesh>
       )}
 
@@ -142,7 +153,13 @@ export default function Zone({ quest }: { quest: Quest }) {
       )}
 
       {/* Floating label */}
-      <Html position={[0, 4.4, 0]} center distanceFactor={16} zIndexRange={[20, 0]} prepend>
+      <Html
+        position={[0, 4.4, 0]}
+        center
+        distanceFactor={16}
+        zIndexRange={[20, 0]}
+        prepend
+      >
         <div className={styles.label}>
           <div className={styles.kicker}>{quest.kicker[lang]}</div>
           <div className={styles.title}>{quest.title[lang]}</div>

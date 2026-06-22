@@ -20,7 +20,10 @@ export const ARTIFACTS: Artifact[] = [
   {
     id: "cs50-cert",
     kind: "cert",
-    title: { no: "CS50x-sertifikat (Harvard)", en: "CS50x certificate (Harvard)" },
+    title: {
+      no: "CS50x-sertifikat (Harvard)",
+      en: "CS50x certificate (Harvard)",
+    },
     description: {
       no: "Grunnmuren bygget stein for stein: C, Python, SQL og webfundamentene HTML, CSS og JavaScript. Foundational læring — ikke en CS-grad.",
       en: "The foundation built piece by piece: C, Python, SQL and the web basics HTML, CSS and JavaScript. Foundational learning — not a CS degree.",
@@ -35,7 +38,10 @@ export const ARTIFACTS: Artifact[] = [
   {
     id: "pd-method",
     kind: "concept",
-    title: { no: "Participatory Design-metode", en: "Participatory design method" },
+    title: {
+      no: "Participatory Design-metode",
+      en: "Participatory design method",
+    },
     description: {
       no: "Meddesign med lærere som meddesignere: empatikart, Crazy Eights, dot-voting og scenariebasert journey mapping. Liten, ikke-representativ skala — verdien er overførbare prinsipper.",
       en: "Co-design with teachers as co-designers: empathy maps, Crazy Eights, dot-voting and scenario-based journey mapping. Small, non-representative scale — the value is transferable principles.",
@@ -48,7 +54,10 @@ export const ARTIFACTS: Artifact[] = [
   {
     id: "pd-frontend",
     kind: "repo",
-    title: { no: "Forløperprosjekt: frontend (Vue)", en: "Predecessor project: frontend (Vue)" },
+    title: {
+      no: "Forløperprosjekt: frontend (Vue)",
+      en: "Predecessor project: frontend (Vue)",
+    },
     description: {
       no: "Forløperen til Klar. Frontend bygget i JavaScript/Vue, sammen med elever som meddesignere.",
       en: "The project that preceded Klar. Frontend built in JavaScript/Vue, with pupils as co-designers.",
@@ -63,7 +72,10 @@ export const ARTIFACTS: Artifact[] = [
   {
     id: "pd-backend",
     kind: "repo",
-    title: { no: "Forløperprosjekt: backend (Django)", en: "Predecessor project: backend (Django)" },
+    title: {
+      no: "Forløperprosjekt: backend (Django)",
+      en: "Predecessor project: backend (Django)",
+    },
     description: {
       no: "Backend bygget i Python/Django. Her ble frontend/backend-splitten ekte for første gang.",
       en: "Backend built in Python/Django. This is where the frontend/backend split first became real.",
@@ -145,7 +157,10 @@ export const ARTIFACTS: Artifact[] = [
   {
     id: "companion-flutter",
     kind: "repo",
-    title: { no: "Companion-app (Flutter/Dart)", en: "Companion app (Flutter/Dart)" },
+    title: {
+      no: "Companion-app (Flutter/Dart)",
+      en: "Companion app (Flutter/Dart)",
+    },
     description: {
       no: "Et sideprosjekt i Flutter/Dart med local-first arkitektur, Drift + SQLite og tester. Bevis på vedvarende, dokumentert agentisk arbeidsflyt over tid — og nysgjerrighet på rolige, lokale systemer.",
       en: "A side project in Flutter/Dart with local-first architecture, Drift + SQLite and tests. Evidence of sustained, documented agentic workflow over time — and curiosity about calm, local systems.",
@@ -160,7 +175,10 @@ export const ARTIFACTS: Artifact[] = [
   {
     id: "laser-egg",
     kind: "concept",
-    title: { no: "De Urimelige Søknaders Egg", en: "The Egg of Unreasonable Applications" },
+    title: {
+      no: "De Urimelige Søknaders Egg",
+      en: "The Egg of Unreasonable Applications",
+    },
     description: {
       no: "Legendarisk gjenstand. Noen søker på papir. Noen søker på et egg gravert med laser. Du valgte en spillbar kompetansesti. Alle tre er litt for mye — og det er liksom poenget.",
       en: "Legendary item. Some apply on paper. Some apply on an egg engraved with a laser. You chose a playable competence path. All three are slightly too much — which is sort of the point.",

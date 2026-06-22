@@ -25,7 +25,10 @@ function interact(value: GameContextValue) {
   if (!at) return;
   switch (at.kind) {
     case "quest":
-      value.dispatch({ type: "OPEN_OVERLAY", overlay: { type: "quest", id: at.id } });
+      value.dispatch({
+        type: "OPEN_OVERLAY",
+        overlay: { type: "quest", id: at.id },
+      });
       break;
     case "artifact":
       value.dispatch({
@@ -36,7 +39,10 @@ function interact(value: GameContextValue) {
     case "egg": {
       const eggId = at.id.replace("egg:", "");
       value.dispatch({ type: "FIND_EGG", eggId });
-      value.dispatch({ type: "OPEN_OVERLAY", overlay: { type: "egg", id: eggId } });
+      value.dispatch({
+        type: "OPEN_OVERLAY",
+        overlay: { type: "egg", id: eggId },
+      });
       break;
     }
     case "gate":
@@ -45,7 +51,10 @@ function interact(value: GameContextValue) {
       } else {
         value.dispatch({
           type: "OPEN_OVERLAY",
-          overlay: { type: "gate-locked", missing: gateMissingSkills(value.state) },
+          overlay: {
+            type: "gate-locked",
+            missing: gateMissingSkills(value.state),
+          },
         });
       }
       break;
@@ -142,7 +151,12 @@ export default function Game({ webglSupported }: { webglSupported: boolean }) {
       <div className={styles.root}>
         <div className={styles.canvasWrap}>
           <Canvas
-            camera={{ fov: 72, near: 0.1, far: 200, position: [0, EYE_HEIGHT, 8] }}
+            camera={{
+              fov: 72,
+              near: 0.1,
+              far: 200,
+              position: [0, EYE_HEIGHT, 8],
+            }}
             dpr={[1, 1.8]}
             gl={{ antialias: true, powerPreference: "high-performance" }}
           >
@@ -157,7 +171,10 @@ export default function Game({ webglSupported }: { webglSupported: boolean }) {
         </div>
 
         {phase === "start" && (
-          <StartScreen onPlay={handlePlay} onShowFallback={() => setShowFallback(true)} />
+          <StartScreen
+            onPlay={handlePlay}
+            onShowFallback={() => setShowFallback(true)}
+          />
         )}
 
         {phase === "won" && <Endgame onReplay={handleReplay} />}
@@ -167,10 +184,16 @@ export default function Game({ webglSupported }: { webglSupported: boolean }) {
             <Hud
               locked={locked}
               onOpenLog={() =>
-                value.dispatch({ type: "OPEN_OVERLAY", overlay: { type: "log" } })
+                value.dispatch({
+                  type: "OPEN_OVERLAY",
+                  overlay: { type: "log" },
+                })
               }
               onOpenSkills={() =>
-                value.dispatch({ type: "OPEN_OVERLAY", overlay: { type: "skills" } })
+                value.dispatch({
+                  type: "OPEN_OVERLAY",
+                  overlay: { type: "skills" },
+                })
               }
               onResume={handleResume}
             />
@@ -187,7 +210,10 @@ export default function Game({ webglSupported }: { webglSupported: boolean }) {
             {overlay?.type === "log" && <QuestLog onClose={closeOverlay} />}
             {overlay?.type === "skills" && <SkillTree onClose={closeOverlay} />}
             {overlay?.type === "gate-locked" && (
-              <GateLockedModal missing={overlay.missing} onClose={closeOverlay} />
+              <GateLockedModal
+                missing={overlay.missing}
+                onClose={closeOverlay}
+              />
             )}
           </>
         )}

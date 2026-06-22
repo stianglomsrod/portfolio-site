@@ -11,14 +11,22 @@ interface GateLockedModalProps {
 }
 
 /** Shown when the player reaches the DNB gate before unlocking the signatures. */
-export default function GateLockedModal({ missing, onClose }: GateLockedModalProps) {
+export default function GateLockedModal({
+  missing,
+  onClose,
+}: GateLockedModalProps) {
   const { lang } = useGame();
   const ui = UI[lang];
 
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-        <button type="button" className={styles.closeX} onClick={onClose} aria-label={ui.close}>
+        <button
+          type="button"
+          className={styles.closeX}
+          onClick={onClose}
+          aria-label={ui.close}
+        >
           ×
         </button>
         <span className={styles.kindBadge}>DNB AI Tech</span>
@@ -36,7 +44,11 @@ export default function GateLockedModal({ missing, onClose }: GateLockedModalPro
           })}
         </div>
         <div className={styles.btnRow}>
-          <button type="button" className={`${styles.btn} ${styles.btnPrimary}`} onClick={onClose}>
+          <button
+            type="button"
+            className={`${styles.btn} ${styles.btnPrimary}`}
+            onClick={onClose}
+          >
             {ui.close}
           </button>
         </div>

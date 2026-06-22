@@ -12,7 +12,10 @@ interface StartScreenProps {
 }
 
 /** Title / intro screen shown before pointer lock. */
-export default function StartScreen({ onPlay, onShowFallback }: StartScreenProps) {
+export default function StartScreen({
+  onPlay,
+  onShowFallback,
+}: StartScreenProps) {
   const { lang } = useGame();
   const ui = UI[lang];
 
@@ -49,7 +52,11 @@ export default function StartScreen({ onPlay, onShowFallback }: StartScreenProps
         </button>
 
         <div className={styles.startLinks}>
-          <button type="button" className={styles.startLink} onClick={onShowFallback}>
+          <button
+            type="button"
+            className={styles.startLink}
+            onClick={onShowFallback}
+          >
             {ui.a11yToggle}
           </button>
           <Link href="/" className={styles.startLink}>

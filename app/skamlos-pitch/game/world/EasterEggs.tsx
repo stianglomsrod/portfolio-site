@@ -39,7 +39,8 @@ export default function EggPickup({ egg }: { egg: EasterEgg }) {
       );
     } else if (!reduced) {
       group.current.rotation.y = t * (egg.kind === "egg" ? 0.6 : 0.0);
-      group.current.position.y = ay + Math.sin(t * 2 + ax) * (egg.kind === "duck" ? 0.12 : 0.06);
+      group.current.position.y =
+        ay + Math.sin(t * 2 + ax) * (egg.kind === "duck" ? 0.12 : 0.06);
     }
   });
 
@@ -51,7 +52,11 @@ export default function EggPickup({ egg }: { egg: EasterEgg }) {
         <>
           <mesh>
             <capsuleGeometry args={[0.05, 0.3, 4, 8]} />
-            <meshStandardMaterial color="#0e2630" emissive={egg.color} emissiveIntensity={0.6} />
+            <meshStandardMaterial
+              color="#0e2630"
+              emissive={egg.color}
+              emissiveIntensity={0.6}
+            />
           </mesh>
           <group ref={leftWing} position={[0, 0.05, 0]}>
             <mesh position={[-0.28, 0, 0]}>
@@ -89,7 +94,11 @@ export default function EggPickup({ egg }: { egg: EasterEgg }) {
           {/* Pedestal */}
           <mesh position={[0, -0.55, 0]}>
             <cylinderGeometry args={[0.45, 0.55, 0.3, 16]} />
-            <meshStandardMaterial color="#161b22" emissive="#3a2f12" emissiveIntensity={0.3} />
+            <meshStandardMaterial
+              color="#161b22"
+              emissive="#3a2f12"
+              emissiveIntensity={0.3}
+            />
           </mesh>
           <mesh scale={[1, 1.32, 1]}>
             <sphereGeometry args={[0.5, 32, 32]} />
@@ -108,15 +117,29 @@ export default function EggPickup({ egg }: { egg: EasterEgg }) {
         <>
           <mesh>
             <sphereGeometry args={[0.35, 24, 24]} />
-            <meshStandardMaterial color={egg.color} emissive={egg.color} emissiveIntensity={active ? 0.8 : 0.35} roughness={0.4} />
+            <meshStandardMaterial
+              color={egg.color}
+              emissive={egg.color}
+              emissiveIntensity={active ? 0.8 : 0.35}
+              roughness={0.4}
+            />
           </mesh>
           <mesh position={[0, 0.32, 0.12]}>
             <sphereGeometry args={[0.22, 24, 24]} />
-            <meshStandardMaterial color={egg.color} emissive={egg.color} emissiveIntensity={active ? 0.8 : 0.35} roughness={0.4} />
+            <meshStandardMaterial
+              color={egg.color}
+              emissive={egg.color}
+              emissiveIntensity={active ? 0.8 : 0.35}
+              roughness={0.4}
+            />
           </mesh>
           <mesh position={[0, 0.3, 0.34]} rotation={[Math.PI / 2, 0, 0]}>
             <coneGeometry args={[0.08, 0.2, 12]} />
-            <meshStandardMaterial color="#ff9b21" emissive="#ff7a00" emissiveIntensity={0.5} />
+            <meshStandardMaterial
+              color="#ff9b21"
+              emissive="#ff7a00"
+              emissiveIntensity={0.5}
+            />
           </mesh>
           <mesh position={[0.09, 0.38, 0.27]}>
             <sphereGeometry args={[0.035, 8, 8]} />
@@ -129,8 +152,20 @@ export default function EggPickup({ egg }: { egg: EasterEgg }) {
         </>
       )}
 
-      <pointLight color={egg.color} intensity={active ? 5 : 2.4} distance={7} decay={2} />
-      <Sparkles count={16} scale={2} size={2.2} speed={reduced ? 0 : 0.5} color={egg.color} opacity={0.85} />
+      <pointLight
+        color={egg.color}
+        intensity={active ? 5 : 2.4}
+        distance={7}
+        decay={2}
+      />
+      <Sparkles
+        count={16}
+        scale={2}
+        size={2.2}
+        speed={reduced ? 0 : 0.5}
+        color={egg.color}
+        opacity={0.85}
+      />
     </group>
   );
 }

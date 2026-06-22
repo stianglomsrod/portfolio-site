@@ -33,7 +33,12 @@ export const QUESTS: Quest[] = [
       ],
     },
     requires: [],
-    grantsSkills: ["needfinding", "classroom-insight", "problem-framing", "teaching-design"],
+    grantsSkills: [
+      "needfinding",
+      "classroom-insight",
+      "problem-framing",
+      "teaching-design",
+    ],
     grantsArtifacts: ["teacher-note"],
     position: [-12, -6],
     color: "#f2a65a",
@@ -66,7 +71,14 @@ export const QUESTS: Quest[] = [
       ],
     },
     requires: [],
-    grantsSkills: ["cs-foundations", "c-basics", "python-basics", "js-basics", "sql-basics", "web-fundamentals"],
+    grantsSkills: [
+      "cs-foundations",
+      "c-basics",
+      "python-basics",
+      "js-basics",
+      "sql-basics",
+      "web-fundamentals",
+    ],
     grantsArtifacts: ["cs50-cert"],
     position: [12, -10],
     color: "#6aa6ee",
@@ -75,7 +87,10 @@ export const QUESTS: Quest[] = [
     id: "participatory-design",
     order: 3,
     kicker: { no: "Sone 03", en: "Zone 03" },
-    title: { no: "Participatory Design-verksted", en: "Participatory Design workshop" },
+    title: {
+      no: "Participatory Design-verksted",
+      en: "Participatory Design workshop",
+    },
     intro: {
       no: "Her bygger vi med folk, ikke for dem. Lærere som meddesignere. Lapper på veggen, ikke gjetning.",
       en: "Here we build with people, not for them. Teachers as co-designers. Notes on the wall, not guesswork.",
@@ -99,7 +114,13 @@ export const QUESTS: Quest[] = [
       ],
     },
     requires: [],
-    grantsSkills: ["participatory-design", "co-design", "design-thinking", "workshop-methods", "needs-synthesis"],
+    grantsSkills: [
+      "participatory-design",
+      "co-design",
+      "design-thinking",
+      "workshop-methods",
+      "needs-synthesis",
+    ],
     grantsArtifacts: ["pd-method"],
     position: [-22, -22],
     color: "#7ad1c0",
@@ -169,7 +190,11 @@ export const QUESTS: Quest[] = [
       ],
     },
     requires: ["participatory-design"],
-    grantsSkills: ["design-science", "build-evaluate-justify", "artifact-thinking"],
+    grantsSkills: [
+      "design-science",
+      "build-evaluate-justify",
+      "artifact-thinking",
+    ],
     grantsArtifacts: ["design-science-frame"],
     position: [24, -26],
     color: "#5ad1f0",
@@ -208,7 +233,14 @@ export const QUESTS: Quest[] = [
       ],
     },
     requires: ["fullstack-split", "design-science"],
-    grantsSkills: ["ai-first-fullstack", "react-next", "supabase-postgres", "auth-roles", "smart-import", "human-in-the-loop"],
+    grantsSkills: [
+      "ai-first-fullstack",
+      "react-next",
+      "supabase-postgres",
+      "auth-roles",
+      "smart-import",
+      "human-in-the-loop",
+    ],
     grantsArtifacts: ["klar-live", "klar-repo", "smart-import-artifact"],
     position: [-16, -42],
     color: "#6ee7a8",
@@ -229,7 +261,10 @@ export const QUESTS: Quest[] = [
       options: [
         {
           id: "publish",
-          label: { no: "Publiser direkte til elevene", en: "Publish straight to the students" },
+          label: {
+            no: "Publiser direkte til elevene",
+            en: "Publish straight to the students",
+          },
           correct: false,
           tag: { no: "Guardrail utløst", en: "Guardrail triggered" },
           feedback: {
@@ -239,7 +274,10 @@ export const QUESTS: Quest[] = [
         },
         {
           id: "review",
-          label: { no: "Forhåndsvis, rett opp, og godkjenn først", en: "Preview, correct, then approve first" },
+          label: {
+            no: "Forhåndsvis, rett opp, og godkjenn først",
+            en: "Preview, correct, then approve first",
+          },
           correct: true,
           tag: { no: "Menneske-i-løkka", en: "Human-in-the-loop" },
           feedback: {
@@ -249,7 +287,10 @@ export const QUESTS: Quest[] = [
         },
         {
           id: "delete",
-          label: { no: "Slett alt — AI er for skummelt", en: "Delete everything — AI is too scary" },
+          label: {
+            no: "Slett alt — AI er for skummelt",
+            en: "Delete everything — AI is too scary",
+          },
           correct: false,
           tag: { no: "Overkorreksjon", en: "Over-correction" },
           feedback: {
@@ -264,7 +305,10 @@ export const QUESTS: Quest[] = [
     id: "agentic",
     order: 7,
     kicker: { no: "Sone 07", en: "Zone 07" },
-    title: { no: "Agentisk arbeidsflyt-verksted", en: "Agentic Workflow workshop" },
+    title: {
+      no: "Agentisk arbeidsflyt-verksted",
+      en: "Agentic Workflow workshop",
+    },
     intro: {
       no: "En AI-agent vil hjelpe. Veldig gjerne. Litt for gjerne. Din jobb: gi den rammer den kan stole på.",
       en: "An AI agent wants to help. Very eagerly. A bit too eagerly. Your job: give it boundaries it can trust.",
@@ -290,7 +334,13 @@ export const QUESTS: Quest[] = [
       ],
     },
     requires: ["ai-first-fullstack"],
-    grantsSkills: ["agentic-engineering", "copilot-partner", "context-discipline", "qa-handoff", "claim-boundaries"],
+    grantsSkills: [
+      "agentic-engineering",
+      "copilot-partner",
+      "context-discipline",
+      "qa-handoff",
+      "claim-boundaries",
+    ],
     grantsArtifacts: ["agentic-dna"],
     position: [16, -46],
     color: "#b58cff",
@@ -311,9 +361,15 @@ export const QUESTS: Quest[] = [
       options: [
         {
           id: "yolo",
-          label: { no: "Kjør på! Mer agent, mindre review.", en: "Go for it! More agent, less review." },
+          label: {
+            no: "Kjør på! Mer agent, mindre review.",
+            en: "Go for it! More agent, less review.",
+          },
           correct: false,
-          tag: { no: "Scope Creep Slime vokser", en: "Scope Creep Slime grows" },
+          tag: {
+            no: "Scope Creep Slime vokser",
+            en: "Scope Creep Slime grows",
+          },
           feedback: {
             no: "Og dermed vokste Scope Creep Slime seg dobbelt så stor. Å rebygge alt som en distribuert plattform er ikke der jeg er — det er en vekstretning, ikke en quick win. Master skal dessuten ikke røres.",
             en: "And so the Scope Creep Slime grew twice as large. Rebuilding everything as a distributed platform isn't where I am — that's a growth direction, not a quick win. Also: don't touch master.",
@@ -321,9 +377,15 @@ export const QUESTS: Quest[] = [
         },
         {
           id: "discipline",
-          label: { no: "Gi kontekst, krav, review og QA — og hold scope.", en: "Give context, requirements, review and QA — and hold scope." },
+          label: {
+            no: "Gi kontekst, krav, review og QA — og hold scope.",
+            en: "Give context, requirements, review and QA — and hold scope.",
+          },
           correct: true,
-          tag: { no: "Overclaim-monsteret beseiret", en: "Overclaim Monster defeated" },
+          tag: {
+            no: "Overclaim-monsteret beseiret",
+            en: "Overclaim Monster defeated",
+          },
           feedback: {
             no: "Riktig. Du gir agenten kontekst og krav, krever review og QA, og holder deg til et trygt scope. Overclaim-monsteret krymper. Distribuerte systemer er noe jeg er motivert for å vokse inn i — ikke noe jeg påstår å mestre i dag.",
             en: "Correct. You give the agent context and requirements, demand review and QA, and keep a safe scope. The Overclaim Monster shrinks. Distributed systems are something I'm motivated to grow into — not something I claim to master today.",
@@ -331,7 +393,10 @@ export const QUESTS: Quest[] = [
         },
         {
           id: "ignore",
-          label: { no: "Ignorer agenten helt, kod alt for hånd.", en: "Ignore the agent entirely, hand-code everything." },
+          label: {
+            no: "Ignorer agenten helt, kod alt for hånd.",
+            en: "Ignore the agent entirely, hand-code everything.",
+          },
           correct: false,
           tag: { no: "Poenget mistet", en: "Missing the point" },
           feedback: {

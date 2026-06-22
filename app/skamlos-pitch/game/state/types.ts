@@ -16,12 +16,7 @@ export interface LocList {
   en: string[];
 }
 
-export type SkillGroup =
-  | "foundation"
-  | "design"
-  | "fullstack"
-  | "ai"
-  | "craft";
+export type SkillGroup = "foundation" | "design" | "fullstack" | "ai" | "craft";
 
 export interface Skill {
   id: string;

@@ -16,7 +16,10 @@ export default function Decor() {
     for (let i = 0; i < count; i++) {
       const a = (i / count) * Math.PI * 2;
       const h = 10 + ((i * 37) % 9);
-      items.push({ pos: [cx + Math.cos(a) * radius, h / 2, cz + Math.sin(a) * radius], h });
+      items.push({
+        pos: [cx + Math.cos(a) * radius, h / 2, cz + Math.sin(a) * radius],
+        h,
+      });
     }
     return items;
   }, []);
@@ -24,7 +27,11 @@ export default function Decor() {
   return (
     <group>
       {/* Solid dark base under the grid. */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, -26]} receiveShadow>
+      <mesh
+        rotation={[-Math.PI / 2, 0, 0]}
+        position={[0, 0, -26]}
+        receiveShadow
+      >
         <circleGeometry args={[80, 64]} />
         <meshStandardMaterial color="#0a0d10" roughness={1} metalness={0} />
       </mesh>

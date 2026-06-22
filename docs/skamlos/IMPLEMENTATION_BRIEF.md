@@ -92,7 +92,7 @@ package. Skamløs (shameless) in ambition, but truthful and claim-safe.
 8. Modal UI for quest descriptions + mission choices.
 9. Two **decision missions** that bake in claim discipline:
    - **Smart Import** (Klar): feed weekly letter → AI proposes structure → must
-     *Review & approve* before publish. Publishing first → human-in-the-loop
+     _Review & approve_ before publish. Publishing first → human-in-the-loop
      guardrail warning (teaches the gate, no student data shown).
    - **Agentic Workflow**: an AI agent proposes a too-broad/unsafe rewrite;
      player must apply context/requirements/review/QA to win and beat the

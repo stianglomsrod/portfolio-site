@@ -45,9 +45,35 @@ export const DNB_GATE = {
 
 /** What the gate verifies, shown as a checklist on approach. */
 export const GATE_CHECKS: { id: string; skill: string; label: Loc }[] = [
-  { id: "foundation", skill: "cs-foundations", label: { no: "Programmerings­grunnmur", en: "Programming foundation" } },
-  { id: "needs", skill: "participatory-design", label: { no: "Design og brukerbehov", en: "Design & user needs" } },
-  { id: "science", skill: "design-science", label: { no: "Metode­disiplin (design science)", en: "Method discipline (design science)" } },
-  { id: "fullstack", skill: "ai-first-fullstack", label: { no: "Fullstack AI-prototype (Klar)", en: "Fullstack AI prototype (Klar)" } },
-  { id: "agentic", skill: "agentic-engineering", label: { no: "Agentisk arbeidsflyt + QA", en: "Agentic workflow + QA" } },
+  {
+    id: "foundation",
+    skill: "cs-foundations",
+    label: { no: "Programmerings­grunnmur", en: "Programming foundation" },
+  },
+  {
+    id: "needs",
+    skill: "participatory-design",
+    label: { no: "Design og brukerbehov", en: "Design & user needs" },
+  },
+  {
+    id: "science",
+    skill: "design-science",
+    label: {
+      no: "Metode­disiplin (design science)",
+      en: "Method discipline (design science)",
+    },
+  },
+  {
+    id: "fullstack",
+    skill: "ai-first-fullstack",
+    label: {
+      no: "Fullstack AI-prototype (Klar)",
+      en: "Fullstack AI prototype (Klar)",
+    },
+  },
+  {
+    id: "agentic",
+    skill: "agentic-engineering",
+    label: { no: "Agentisk arbeidsflyt + QA", en: "Agentic workflow + QA" },
+  },
 ];

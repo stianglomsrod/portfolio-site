@@ -43,8 +43,20 @@ export default function ArtifactPickup({ id, pos, color }: Props) {
           flatShading
         />
       </mesh>
-      <pointLight color={color} intensity={active ? 6 : 3} distance={6} decay={2} />
-      <Sparkles count={14} scale={1.6} size={2} speed={reduced ? 0 : 0.4} color={color} opacity={0.8} />
+      <pointLight
+        color={color}
+        intensity={active ? 6 : 3}
+        distance={6}
+        decay={2}
+      />
+      <Sparkles
+        count={14}
+        scale={1.6}
+        size={2}
+        speed={reduced ? 0 : 0.4}
+        color={color}
+        opacity={0.8}
+      />
     </group>
   );
 }

@@ -8,7 +8,7 @@
 ## 1. Intent
 
 A "shameless in ambition, honest in content" interactive pitch. It demonstrates
-— by *being* a non-trivial, data-driven, bilingual, accessible, agentically-built
+— by _being_ a non-trivial, data-driven, bilingual, accessible, agentically-built
 software artifact — exactly the AI-first builder profile the DNB role targets.
 
 The endgame never says "I got the job." It says "the application package is
@@ -66,14 +66,14 @@ not a code change.
 
 React context does **not** cross the react-three-fiber `<Canvas>` renderer
 boundary. So the same `GameContextValue` is provided twice: once around the DOM
-UI tree, and again *inside* the `<Canvas>` around `<Scene>`. Both share the exact
+UI tree, and again _inside_ the `<Canvas>` around `<Scene>`. Both share the exact
 same object from `useGameController()`, so DOM and 3D stay in lockstep.
 
 ### Why movement uses refs, not state
 
 The first-person controller mutates `camera.position` every frame inside
 `useFrame`. Per-frame React state would thrash. Movement, velocity, head-bob and
-the proximity scan all run on refs; only the *result* of the proximity scan
+the proximity scan all run on refs; only the _result_ of the proximity scan
 (`activeTarget`) is pushed to React state, and only when the focused id changes.
 
 ## 5. Controls & flow
@@ -93,14 +93,14 @@ held; interacting with the open gate triggers the endgame.
 Two zones contain a small "do the responsible thing" choice that turns a real
 working-method into gameplay:
 
-- **Klar / Smart Import** — an AI parses messy input. Do you ship it raw, *review
-  it as a human in the loop*, or delete the feature? Correct = human-in-the-loop.
+- **Klar / Smart Import** — an AI parses messy input. Do you ship it raw, _review
+  it as a human in the loop_, or delete the feature? Correct = human-in-the-loop.
 - **Agentic workflow** — an agent proposes a huge unscoped change. Do you YOLO it,
-  *hold scope and context discipline*, or ignore the agent? Correct = discipline.
+  _hold scope and context discipline_, or ignore the agent? Correct = discipline.
 
 A wrong pick is framed playfully ("scope creep", "overclaim") and can be retried;
 the correct pick completes the zone and increments the "guardrails passed" stat.
-This dramatizes the *honest engineering discipline* the positioning rules require.
+This dramatizes the _honest engineering discipline_ the positioning rules require.
 
 ## 7. Claim safety (non-negotiable)
 
@@ -110,8 +110,8 @@ All copy is kept inside what can actually be shown. Encoded directly in the data
 - **Klar** = robust prototype **evaluated with teachers** — never students, never
   enterprise/production scale, never user-outcome claims.
 - Every artifact card carries an **honest boundary** line.
-- No DNB logos or official branding; the gate is clearly a *symbolic* goal.
-- The endgame states the package is *ready* and invites contact — it never implies
+- No DNB logos or official branding; the gate is clearly a _symbolic_ goal.
+- The endgame states the package is _ready_ and invites contact — it never implies
   the job is won or deserved.
 - No private/medical framing anywhere.
 

@@ -21,14 +21,18 @@ export default function DnbGate() {
   const open = isGateOpen(state);
   const active = activeTarget?.id === DNB_GATE.id;
   const [x, z] = DNB_GATE.position;
-  const passed = GATE_CHECKS.filter((c) => state.skills.includes(c.skill)).length;
+  const passed = GATE_CHECKS.filter((c) =>
+    state.skills.includes(c.skill),
+  ).length;
 
   useFrame((s) => {
     const t = s.clock.elapsedTime;
     if (portal.current) {
       const mat = portal.current.material as THREE.MeshBasicMaterial;
       const base = open ? 0.55 : 0.22;
-      mat.opacity = reduced ? base : base + Math.sin(t * 2.2) * (open ? 0.18 : 0.06);
+      mat.opacity = reduced
+        ? base
+        : base + Math.sin(t * 2.2) * (open ? 0.18 : 0.06);
     }
     if (ring.current && open && !reduced) {
       ring.current.rotation.z = t * 0.8;
@@ -67,7 +71,12 @@ export default function DnbGate() {
       {/* Base platform */}
       <mesh position={[0, 0.12, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <ringGeometry args={[3.0, 6.0, 64]} />
-        <meshBasicMaterial color={DNB_GATE.color} transparent opacity={open ? 0.7 : 0.25} side={THREE.DoubleSide} />
+        <meshBasicMaterial
+          color={DNB_GATE.color}
+          transparent
+          opacity={open ? 0.7 : 0.25}
+          side={THREE.DoubleSide}
+        />
       </mesh>
 
       {/* Portal field */}
@@ -87,20 +96,43 @@ export default function DnbGate() {
       {open && (
         <mesh ref={ring} position={[0, 3.6, 0.1]}>
           <torusGeometry args={[2.4, 0.12, 12, 64]} />
-          <meshBasicMaterial color="#aef4ff" transparent opacity={0.8} blending={THREE.AdditiveBlending} depthWrite={false} />
+          <meshBasicMaterial
+            color="#aef4ff"
+            transparent
+            opacity={0.8}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+          />
         </mesh>
       )}
 
-      <pointLight position={[0, 4, 1.5]} color={DNB_GATE.color} intensity={open ? 22 : 8} distance={20} decay={2} />
+      <pointLight
+        position={[0, 4, 1.5]}
+        color={DNB_GATE.color}
+        intensity={open ? 22 : 8}
+        distance={20}
+        decay={2}
+      />
 
       {active && (
         <mesh position={[0, 0.16, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <ringGeometry args={[6.0, 6.5, 64]} />
-          <meshBasicMaterial color="#ffffff" transparent opacity={0.5} side={THREE.DoubleSide} />
+          <meshBasicMaterial
+            color="#ffffff"
+            transparent
+            opacity={0.5}
+            side={THREE.DoubleSide}
+          />
         </mesh>
       )}
 
-      <Html position={[0, 8.6, 0]} center distanceFactor={22} zIndexRange={[20, 0]} prepend>
+      <Html
+        position={[0, 8.6, 0]}
+        center
+        distanceFactor={22}
+        zIndexRange={[20, 0]}
+        prepend
+      >
         <div className={styles.label}>
           <div className={styles.gateLabel}>{DNB_GATE.title[lang]}</div>
           <div

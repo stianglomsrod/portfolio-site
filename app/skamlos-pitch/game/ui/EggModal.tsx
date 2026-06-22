@@ -26,7 +26,12 @@ export default function EggModal({ eggId, onClose }: EggModalProps) {
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-        <button type="button" className={styles.closeX} onClick={onClose} aria-label={ui.close}>
+        <button
+          type="button"
+          className={styles.closeX}
+          onClick={onClose}
+          aria-label={ui.close}
+        >
           ×
         </button>
         <span className={styles.kindBadge}>Easter egg</span>
@@ -50,7 +55,11 @@ export default function EggModal({ eggId, onClose }: EggModalProps) {
               ↗ {egg.linkLabel?.[lang] ?? ui.visitLink}
             </a>
           )}
-          <button type="button" className={`${styles.btn} ${styles.btnPrimary}`} onClick={onClose}>
+          <button
+            type="button"
+            className={`${styles.btn} ${styles.btnPrimary}`}
+            onClick={onClose}
+          >
             {ui.close}
           </button>
         </div>

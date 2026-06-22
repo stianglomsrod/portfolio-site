@@ -36,7 +36,9 @@ export default function Endgame({ onReplay }: EndgameProps) {
     `🥚 ${ui.statEggs}: ${progress.eggsFound}/${EGG_BY_ID.size}`,
   ];
 
-  const completedQuests = QUESTS.filter((q) => state.completedQuests.includes(q.id));
+  const completedQuests = QUESTS.filter((q) =>
+    state.completedQuests.includes(q.id),
+  );
   const skills = state.skills
     .map((id) => SKILL_BY_ID.get(id))
     .filter((s): s is NonNullable<typeof s> => Boolean(s));
@@ -165,7 +167,11 @@ export default function Endgame({ onReplay }: EndgameProps) {
         </div>
 
         <div className={styles.endActions}>
-          <button type="button" className={`${styles.btn} ${styles.btnPrimary}`} onClick={onReplay}>
+          <button
+            type="button"
+            className={`${styles.btn} ${styles.btnPrimary}`}
+            onClick={onReplay}
+          >
             {ui.replay}
           </button>
           <Link href="/" className={`${styles.btn} ${styles.btnGhost}`}>

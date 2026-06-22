@@ -40,11 +40,17 @@ interface HudProps {
 }
 
 /** Heads-up display + transient toasts. */
-export default function Hud({ locked, onOpenLog, onOpenSkills, onResume }: HudProps) {
+export default function Hud({
+  locked,
+  onOpenLog,
+  onOpenSkills,
+  onResume,
+}: HudProps) {
   const { state, dispatch, activeTarget, lang } = useGame();
   const ui = UI[lang];
   const progress = getProgress(state);
-  const showResume = state.phase === "playing" && state.overlay === null && !locked;
+  const showResume =
+    state.phase === "playing" && state.overlay === null && !locked;
 
   // Auto-dismiss the oldest toast on a timer.
   useEffect(() => {
@@ -81,7 +87,9 @@ export default function Hud({ locked, onOpenLog, onOpenSkills, onResume }: HudPr
             <div className={styles.counterLabel}>{ui.skillsLabel}</div>
           </div>
           <div className={styles.counter}>
-            <div className={styles.counterNum}>{progress.artifactsCollected}</div>
+            <div className={styles.counterNum}>
+              {progress.artifactsCollected}
+            </div>
             <div className={styles.counterLabel}>{ui.evidenceLabel}</div>
           </div>
         </div>
@@ -118,7 +126,11 @@ export default function Hud({ locked, onOpenLog, onOpenSkills, onResume }: HudPr
           <button type="button" className={styles.panelBtn} onClick={onOpenLog}>
             {ui.openQuestLog}
           </button>
-          <button type="button" className={styles.panelBtn} onClick={onOpenSkills}>
+          <button
+            type="button"
+            className={styles.panelBtn}
+            onClick={onOpenSkills}
+          >
             {ui.openSkills}
           </button>
         </div>

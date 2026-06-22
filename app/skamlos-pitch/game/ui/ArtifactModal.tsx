@@ -19,7 +19,10 @@ interface ArtifactModalProps {
 }
 
 /** Evidence card with an honest claim boundary and an optional public link. */
-export default function ArtifactModal({ artifactId, onClose }: ArtifactModalProps) {
+export default function ArtifactModal({
+  artifactId,
+  onClose,
+}: ArtifactModalProps) {
   const { state, dispatch, lang } = useGame();
   const ui = UI[lang];
   const artifact = ARTIFACT_BY_ID.get(artifactId);
@@ -30,10 +33,17 @@ export default function ArtifactModal({ artifactId, onClose }: ArtifactModalProp
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-        <button type="button" className={styles.closeX} onClick={onClose} aria-label={ui.close}>
+        <button
+          type="button"
+          className={styles.closeX}
+          onClick={onClose}
+          aria-label={ui.close}
+        >
           ×
         </button>
-        <span className={styles.kindBadge}>{KIND_LABEL[artifact.kind][lang]}</span>
+        <span className={styles.kindBadge}>
+          {KIND_LABEL[artifact.kind][lang]}
+        </span>
         <h2 className={styles.modalTitle}>{artifact.title[lang]}</h2>
         <p className={styles.cardDesc}>{artifact.description[lang]}</p>
 
@@ -51,7 +61,9 @@ export default function ArtifactModal({ artifactId, onClose }: ArtifactModalProp
             <button
               type="button"
               className={`${styles.btn} ${styles.btnPrimary}`}
-              onClick={() => dispatch({ type: "COLLECT_ARTIFACT", artifactId: artifact.id })}
+              onClick={() =>
+                dispatch({ type: "COLLECT_ARTIFACT", artifactId: artifact.id })
+              }
             >
               {ui.collect}
             </button>
@@ -66,7 +78,11 @@ export default function ArtifactModal({ artifactId, onClose }: ArtifactModalProp
               ↗ {artifact.linkLabel?.[lang] ?? ui.visitLink}
             </a>
           )}
-          <button type="button" className={`${styles.btn} ${styles.btnGhost}`} onClick={onClose}>
+          <button
+            type="button"
+            className={`${styles.btn} ${styles.btnGhost}`}
+            onClick={onClose}
+          >
             {ui.close}
           </button>
         </div>

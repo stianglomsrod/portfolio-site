@@ -196,7 +196,8 @@ export default function Player({ lockedRef }: PlayerProps) {
     if (!reducedMotion.current) {
       const speed = velocity.current.length();
       bobPhase.current += dt * speed * 1.1;
-      const bob = Math.sin(bobPhase.current) * Math.min(speed, WALK_SPEED) * 0.006;
+      const bob =
+        Math.sin(bobPhase.current) * Math.min(speed, WALK_SPEED) * 0.006;
       camera.position.y = EYE_HEIGHT + bob;
     } else {
       camera.position.y = EYE_HEIGHT;
@@ -216,7 +217,12 @@ export default function Player({ lockedRef }: PlayerProps) {
     }
     setActiveTarget(
       best
-        ? { id: best.id, kind: best.kind, action: best.action, locked: best.locked }
+        ? {
+            id: best.id,
+            kind: best.kind,
+            action: best.action,
+            locked: best.locked,
+          }
         : null,
     );
   });

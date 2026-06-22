@@ -33,7 +33,9 @@ const GameContext = createContext<GameContextValue | null>(null);
  */
 export function useGameController(): GameContextValue {
   const [state, dispatch] = useReducer(gameReducer, initialState);
-  const [activeTarget, setActiveTargetRaw] = useState<ActiveTarget | null>(null);
+  const [activeTarget, setActiveTargetRaw] = useState<ActiveTarget | null>(
+    null,
+  );
   const { lang, setLang } = useLanguage();
 
   // Only update when the focused target id actually changes, to avoid churn
@@ -55,6 +57,7 @@ export { GameContext };
 
 export function useGame(): GameContextValue {
   const ctx = useContext(GameContext);
-  if (!ctx) throw new Error("useGame must be used within a GameContext provider");
+  if (!ctx)
+    throw new Error("useGame must be used within a GameContext provider");
   return ctx;
 }

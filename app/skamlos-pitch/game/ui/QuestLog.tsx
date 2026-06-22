@@ -19,7 +19,12 @@ export default function QuestLog({ onClose }: QuestLogProps) {
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.panel} onClick={(e) => e.stopPropagation()}>
-        <button type="button" className={styles.closeX} onClick={onClose} aria-label={ui.close}>
+        <button
+          type="button"
+          className={styles.closeX}
+          onClick={onClose}
+          aria-label={ui.close}
+        >
           ×
         </button>
         <h2 className={styles.panelTitle}>{ui.questLogTitle}</h2>
@@ -31,14 +36,20 @@ export default function QuestLog({ onClose }: QuestLogProps) {
             : unlocked
               ? styles.qStatusOpen
               : styles.qStatusLocked;
-          const statusLabel = done ? ui.done : unlocked ? ui.inProgress : ui.locked;
+          const statusLabel = done
+            ? ui.done
+            : unlocked
+              ? ui.inProgress
+              : ui.locked;
           return (
             <div key={quest.id} className={styles.questItem}>
               <div className={styles.questItemTop}>
                 <span className={styles.questItemTitle}>
                   {quest.kicker[lang]} · {quest.title[lang]}
                 </span>
-                <span className={`${styles.qStatus} ${statusClass}`}>{statusLabel}</span>
+                <span className={`${styles.qStatus} ${statusClass}`}>
+                  {statusLabel}
+                </span>
               </div>
               <p className={styles.questItemObj}>
                 {done

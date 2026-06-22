@@ -16,7 +16,8 @@ function hasWebGL(): boolean {
     const canvas = document.createElement("canvas");
     return (
       !!window.WebGLRenderingContext &&
-      (!!canvas.getContext("webgl") || !!canvas.getContext("experimental-webgl"))
+      (!!canvas.getContext("webgl") ||
+        !!canvas.getContext("experimental-webgl"))
     );
   } catch {
     return false;

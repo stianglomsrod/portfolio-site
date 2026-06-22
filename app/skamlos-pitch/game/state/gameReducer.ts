@@ -58,7 +58,9 @@ function completeQuest(state: GameState, questId: string): GameState {
     completedQuests: [...state.completedQuests, questId],
     revealedArtifacts: [
       ...state.revealedArtifacts,
-      ...quest.grantsArtifacts.filter((a) => !state.revealedArtifacts.includes(a)),
+      ...quest.grantsArtifacts.filter(
+        (a) => !state.revealedArtifacts.includes(a),
+      ),
     ],
   };
 
@@ -145,7 +147,10 @@ export function gameReducer(state: GameState, action: Action): GameState {
       return { ...state, phase: "won", overlay: null };
 
     case "DISMISS_TOAST":
-      return { ...state, toasts: state.toasts.filter((t) => t.id !== action.id) };
+      return {
+        ...state,
+        toasts: state.toasts.filter((t) => t.id !== action.id),
+      };
 
     case "RESET":
       return { ...initialState, phase: "playing" };

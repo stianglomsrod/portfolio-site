@@ -21,7 +21,11 @@ interface SceneProps {
   onLockChange: (locked: boolean) => void;
 }
 
-export default function Scene({ controlsRef, lockedRef, onLockChange }: SceneProps) {
+export default function Scene({
+  controlsRef,
+  lockedRef,
+  onLockChange,
+}: SceneProps) {
   const { state } = useGame();
 
   return (
@@ -31,7 +35,11 @@ export default function Scene({ controlsRef, lockedRef, onLockChange }: ScenePro
 
       <ambientLight intensity={0.35} color="#9fb6d6" />
       <hemisphereLight args={["#2b3d57", "#05070a", 0.5]} />
-      <directionalLight position={[12, 24, 8]} intensity={0.3} color="#cfe0ff" />
+      <directionalLight
+        position={[12, 24, 8]}
+        intensity={0.3}
+        color="#cfe0ff"
+      />
 
       <Decor />
 

@@ -79,10 +79,12 @@ automatically, do not push automatically, and report exactly what changed."
 ## 4. Files created, modified, moved, deleted (full relative paths)
 
 Created — page shell and styling:
+
 - app/skamlos-pitch/skamlos-pitch.module.css — HUD, modals, side panels, start screen,
   endgame and fallback styling (dark-tech, accents #6aa6ee / #7cc0ff / #b58cff).
 
 Created — UI overlay layer (app/skamlos-pitch/game/ui/):
+
 - LangToggle.tsx — NO/EN switch reused on start screen and HUD.
 - StartScreen.tsx — title, tagline, honesty note, controls grid, play button, accessibility
   note, fallback toggle, back-to-portfolio link.
@@ -102,23 +104,27 @@ Created — UI overlay layer (app/skamlos-pitch/game/ui/):
   skills, contacts); uses the shared language store directly.
 
 Created — orchestrator (replaced the temporary placeholder):
+
 - app/skamlos-pitch/game/Game.tsx — builds the controller value, renders the Canvas with the
   double GameContext.Provider, owns the controls/locked refs, the global keyboard listener
   (E interact, Q log, K skills, Esc close), the pointer-lock coordination, overlay routing,
   and the start/playing/won phase switch.
 
 Created — docs:
+
 - docs/skamlos/SKAMLOS_GAME_DNA.md — architecture, route pattern, double-provider rationale,
   controls, claim-safety, accessibility, validation status, and how to extend.
 - docs/skamlos/QUEST_AND_SKILL_TREE.md — zone dependency graph (mermaid), per-zone table,
   decision-mission tables, evidence + boundaries table, easter eggs, skill groups.
 
 Moved / renamed:
+
 - app/skamlos-pitch/game/world/layout.ts -> app/skamlos-pitch/game/world/placement.ts
   (a file named layout.ts anywhere under app/ is treated by Next.js as a reserved route
   Layout and breaks the build). Updated the two importers (Scene.tsx, Player.tsx).
 
 Modified — game internals:
+
 - app/skamlos-pitch/game/state/GameContext.tsx — exported GameContextValue; replaced the
   ReturnType-helper state type with the direct GameState type (removed an unused-symbol warning).
 - app/skamlos-pitch/game/world/Scene.tsx — typed controlsRef via ComponentRef<typeof
@@ -129,14 +135,15 @@ Modified — game internals:
   WebGL probe (client-only detection).
 
 Modified — shared / config:
+
 - app/components/Reveal.tsx (SHARED, used by VG X) — behaviour-preserving fix for the
   whole-program build error caused by react-three-fiber's global JSX augmentation. Kept JSX,
   removed the `as React.ElementType` widening (Tag stays the narrow union
   "div"|"section"|"li"|"article"), and cast the ref. Output markup and behaviour are identical.
 - eslint.config.mjs — added a scoped override turning off react-hooks/immutability only for
-  app/skamlos-pitch/game/world/**, because R3F mutates the camera (a useThree value) every
+  app/skamlos-pitch/game/world/\*\*, because R3F mutates the camera (a useThree value) every
   frame inside useFrame. No global lint posture changed.
-- .gitignore — added !docs/skamlos/ and !docs/skamlos/*.md so the design docs and this report
+- .gitignore — added !docs/skamlos/ and !docs/skamlos/\*.md so the design docs and this report
   are trackable (the repo otherwise ignores all markdown except dnb/ and reports/).
 - FILE_TREE.md — added the full app/skamlos-pitch/ subtree, the docs/skamlos/ docs, and this report.
 

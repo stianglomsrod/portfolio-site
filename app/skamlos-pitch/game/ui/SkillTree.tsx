@@ -14,7 +14,13 @@ const GROUP_LABEL: Record<SkillGroup, Record<Lang, string>> = {
   craft: { no: "Håndverk & disiplin", en: "Craft & discipline" },
 };
 
-const GROUP_ORDER: SkillGroup[] = ["foundation", "design", "fullstack", "ai", "craft"];
+const GROUP_ORDER: SkillGroup[] = [
+  "foundation",
+  "design",
+  "fullstack",
+  "ai",
+  "craft",
+];
 
 interface SkillTreeProps {
   onClose: () => void;
@@ -28,17 +34,26 @@ export default function SkillTree({ onClose }: SkillTreeProps) {
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.panel} onClick={(e) => e.stopPropagation()}>
-        <button type="button" className={styles.closeX} onClick={onClose} aria-label={ui.close}>
+        <button
+          type="button"
+          className={styles.closeX}
+          onClick={onClose}
+          aria-label={ui.close}
+        >
           ×
         </button>
         <h2 className={styles.panelTitle}>{ui.skillTreeTitle}</h2>
-        {state.skills.length === 0 && <p className={styles.emptyNote}>{ui.noSkillsYet}</p>}
+        {state.skills.length === 0 && (
+          <p className={styles.emptyNote}>{ui.noSkillsYet}</p>
+        )}
         {GROUP_ORDER.map((group) => {
           const groupSkills = SKILLS.filter((s) => s.group === group);
           if (groupSkills.length === 0) return null;
           return (
             <div key={group} className={styles.skillGroup}>
-              <p className={styles.skillGroupTitle}>{GROUP_LABEL[group][lang]}</p>
+              <p className={styles.skillGroupTitle}>
+                {GROUP_LABEL[group][lang]}
+              </p>
               <div className={styles.skillGrid}>
                 {groupSkills.map((skill) => {
                   const on = state.skills.includes(skill.id);

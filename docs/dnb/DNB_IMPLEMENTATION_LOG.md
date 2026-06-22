@@ -40,8 +40,6 @@ Implement the workflow section (id="arbeidsflyt") with a compact three-card cros
 
 Human visual QA on desktop + mobile, then proceed to Klar deep-dive section (chunk 4).
 
-
-
 ### Purpose
 
 Strengthen DNB strategy by synthesizing read-only evidence across three repositories (`klar`, `nikkoprogging/companion_app`, `lori-frisor`) and map this to safe claim boundaries and next-step implementation sequencing.

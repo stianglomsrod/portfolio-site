@@ -108,9 +108,8 @@ export default function DnbWorkflow() {
 
         <Reveal delay={100}>
           <p className={styles.relevance}>
-            Tempo uten kontroll skaper rework. Denne arbeidsformen gir både
-            fart og trygghet — og er designet for å kunne deles og læres av
-            andre.
+            Tempo uten kontroll skaper rework. Denne arbeidsformen gir både fart
+            og trygghet — og er designet for å kunne deles og læres av andre.
           </p>
         </Reveal>
 

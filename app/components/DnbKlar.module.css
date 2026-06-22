@@ -11,7 +11,7 @@
 
 /* Spacing between the stacked sub-blocks within the section. */
 .blockTitle:not(:first-of-type) {
-  margin-top: 52px;
+  margin-top: 80px;
 }
 
 .blockLede {
@@ -64,12 +64,12 @@
 }
 
 .argued {
-  margin-top: 20px;
+  margin-top: 28px;
   max-width: 68ch;
   color: var(--muted-strong);
   font-size: 0.97rem;
-  line-height: 1.6;
-  padding-left: 16px;
+  line-height: 1.65;
+  padding: 4px 0 4px 18px;
   border-left: 2px solid var(--accent);
 }
 

@@ -31,6 +31,8 @@ Confirmed by user/tech lead (logged in `DNB_IMPLEMENTATION_LOG.md`):
 
 With these resolved, chunk 2 can proceed.
 
+Cross-repo update (2026-06-22): do not expand hero unless a clear gap appears in review. The next substantive UI move is chunk 3 ("How I build with AI") with a compact cross-repo evidence strip (Klar / Companion / Lori).
+
 ---
 
 ## 2. Chunk: DNB page scaffold + Hero
@@ -47,10 +49,16 @@ With these resolved, chunk 2 can proceed.
 ## 3. Chunk: "How I build with AI" section (lead exhibit)
 
 - **Goal**: the documented agentic workflow as a labelled sequence (context → requirements → human review → correction → QA → documentation → handoff → safety gates).
+- **Goal**: the documented agentic workflow as a labelled sequence (context → requirements → human review → correction → QA → documentation → handoff → safety gates), plus a compact cross-repo evidence strip.
 - **Copy**: `DNB_SECTION_COPY_V1.md` §2, with softened reuse wording ("designet for å kunne deles og læres av andre").
 - **DNB hook**: connect to the posting's _enabler / force-multiplier_ and _guardrails_ themes — honestly, at Stian's scale.
+- **Evidence strip content**:
+  - Klar = AI-first fullstack product evidence.
+  - Companion/nikkoprogging = long-running workflow/test/documentation discipline.
+  - Lori Frisor = enablement/handoff and pragmatic build-vs-integrate judgement.
 - **Likely files**: new section component + CSS module; reuse `Reveal`.
 - **Acceptance criteria**: scannable, not a wall of prose; no overclaim beyond claim map; mobile-friendly.
+- **Acceptance criteria (strip-specific)**: cards are concrete and non-hype; each card states "what this proves" without implying enterprise scale.
 - **Validation**: lint, build, visual check.
 - **Risks**: sounding boastful; implying enterprise-scale guardrails. Keep honest.
 - **Screenshots needed?** Yes.
@@ -105,6 +113,10 @@ With these resolved, chunk 2 can proceed.
 - Each chunk is small, isolated from VG X, and independently verifiable.
 - Acceptance criteria and the claim map make "done" objective.
 - Human/ChatGPT review gates catch tone and accuracy before anything ships.
+
+Recommended next single chunk after this documentation update:
+
+1. Implement chunk 3 (workflow section + cross-repo evidence strip) without extending hero.
 
 ## 9. What still needs a human or stronger model
 

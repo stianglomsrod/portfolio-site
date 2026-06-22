@@ -41,6 +41,8 @@ portfolio-site/
 │   │   ├── CaseScreenshotGallery.tsx
 │   │   ├── DnbHero.module.css          (DNB variant only)
 │   │   ├── DnbHero.tsx                 (DNB variant only)
+│   │   ├── DnbWorkflow.module.css      (DNB variant only)
+│   │   ├── DnbWorkflow.tsx             (DNB variant only)
 │   │   ├── FeaturedKlar.module.css
 │   │   ├── FeaturedKlar.tsx
 │   │   ├── FitScan.module.css
@@ -104,6 +106,7 @@ portfolio-site/
 │       ├── 2026-06-19-report-format-hardening.md
 │       ├── 2026-06-20-source-synthesis-posting-report.md
 │       ├── 2026-06-22-dnb-cross-repo-evidence-synthesis-report.md
+│       ├── 2026-06-22-dnb-ai-workflow-section-report.md
 │       └── UX_UI_COPY_REVIEW.md
 ├── public/
 │   └── images/

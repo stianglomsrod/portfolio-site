@@ -1,6 +1,46 @@
 # DNB Implementation Log
 
-## 2026-06-22 — Cross-repo evidence synthesis (documentation-only)
+## 2026-06-22 — "How I build with AI" section + cross-repo evidence strip (chunk 3, UI/code)
+
+### Purpose
+
+Implement the workflow section (id="arbeidsflyt") with a compact three-card cross-repo evidence strip as a standalone component below DnbHero on the root DNB page.
+
+### Branch
+
+`feature/dnb-ai-workflow-section`
+
+### Files changed
+
+- `app/components/DnbWorkflow.tsx` (created)
+- `app/components/DnbWorkflow.module.css` (created)
+- `app/page.tsx` (updated: import + render DnbWorkflow below DnbHero)
+- `docs/dnb/DNB_IMPLEMENTATION_LOG.md` (updated)
+- `docs/reports/2026-06-22-dnb-ai-workflow-section-report.md` (created)
+- `FILE_TREE.md` (updated)
+
+### Key decisions
+
+- Section `id="arbeidsflyt"` on the `<section>` element so the existing Hero CTA `href="#arbeidsflyt"` works immediately.
+- Workflow steps rendered as a numbered `<ol>` inside a bordered table-like layout — scannable, not prose.
+- Softened reuse claim per claim map: "designet for å kunne deles og læres av andre" (not "proven reusable across teams").
+- Cross-repo evidence strip: three cards (Klar / Companion / Lori) with honest "what this proves" and "what this is not" notes per card.
+- No enterprise-scale claims; Klar explicitly noted as "robust prototype og fullstack bevis — ikke enterprise-plattform".
+- Reused `Reveal`, `Shared.module.css`, and existing CSS token patterns; no new dependencies.
+- Hero not changed.
+
+### Validation
+
+- `npm run lint` → 0 errors.
+- `npm run build` → compiled successfully; static route `/` generated cleanly.
+- `git status --untracked-files=all` confirmed only new/modified expected files.
+- Visual QA on desktop and mobile requested from user.
+
+### Next step
+
+Human visual QA on desktop + mobile, then proceed to Klar deep-dive section (chunk 4).
+
+
 
 ### Purpose
 

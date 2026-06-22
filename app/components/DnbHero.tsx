@@ -5,9 +5,9 @@ import shared from "./Shared.module.css";
 import styles from "./DnbHero.module.css";
 
 const bullets = [
-  "Bygget Klar — en fullstack PWA-prototype med roller, arbeidsflyt, auth og AI-assistert import med menneske-i-løkka-kontroll.",
+  "Bygget Klar — en fullstack PWA-prototype med roller, arbeidsflyt, innlogging og AI-assistert import med menneske-i-løkka-kontroll.",
   "Bruker AI-agenter som utviklingspartnere med klare krav, review-løkker, QA og aktiv korreksjon.",
-  "Dokumenterer beslutninger, handoff og sikkerhetgrenser slik at arbeidet kan etterprøves og videreføres.",
+  "Dokumenterer beslutninger, handoff og sikkerhetsgrenser slik at arbeidet kan etterprøves og videreføres.",
 ];
 
 export default function DnbHero() {
@@ -20,7 +20,7 @@ export default function DnbHero() {
 
         <Reveal delay={80}>
           <h1 className={styles.title}>
-            Jeg bygger AI-første programvare som gjør komplekse behov om til
+            Jeg bygger AI-first programvare som gjør komplekse behov om til
             trygge, fungerende løsninger.
           </h1>
         </Reveal>

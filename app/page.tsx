@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
 import DnbHero from "./components/DnbHero";
+import DnbWorkflow from "./components/DnbWorkflow";
+import DnbKlar from "./components/DnbKlar";
+import DnbMethod from "./components/DnbMethod";
+import DnbCapacity from "./components/DnbCapacity";
+import DnbContact from "./components/DnbContact";
 
 // Page-level metadata overrides the layout-level defaults for the DNB deploy.
 export const metadata: Metadata = {
@@ -12,8 +17,11 @@ export default function DnbPage() {
   return (
     <main>
       <DnbHero />
-      {/* Remaining sections (workflow, Klar, method, velocity, growth, contact)
-          will be added in subsequent implementation chunks. */}
+      <DnbWorkflow />
+      <DnbKlar />
+      <DnbMethod />
+      <DnbCapacity />
+      <DnbContact />
     </main>
   );
 }

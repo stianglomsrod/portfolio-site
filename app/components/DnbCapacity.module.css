@@ -1,0 +1,76 @@
+/* DnbCapacity — learning velocity + honest growth direction, two paired columns.
+   Inherits all CSS custom properties from globals.css. No DNB brand colours. */
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 760px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+
+.col {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px 24px 26px;
+}
+
+.colTitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--foreground);
+  margin-bottom: 16px;
+}
+
+.growthLede {
+  font-size: 0.92rem;
+  color: var(--muted);
+  line-height: 1.55;
+  margin-bottom: 16px;
+}
+
+.list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.item {
+  position: relative;
+  padding-left: 20px;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--muted-strong);
+}
+
+.item::before {
+  content: "—";
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.growthList .item::before {
+  content: "›";
+}
+
+/* ── Honest closing line ────────────────────────────────────── */
+
+.honest {
+  margin-top: 28px;
+  max-width: 76ch;
+  color: var(--muted-strong);
+  font-size: 1rem;
+  line-height: 1.65;
+  padding-left: 16px;
+  border-left: 2px solid var(--accent);
+}

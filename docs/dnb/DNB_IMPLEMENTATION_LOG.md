@@ -1,5 +1,47 @@
 # DNB Implementation Log
 
+## 2026-06-22 — Full DNB page buildout (chunk 3, UI/code)
+
+### Purpose
+
+One larger self-directed buildout pass: expand the DNB page from hero-only into a near-complete AI-First Engineering portfolio page. Excludes the Skamløs pitch / playable-game concept by explicit instruction.
+
+### Branch
+
+`feature/dnb-opus-full-page-buildout`
+
+### Files changed
+
+- `app/page.tsx` (modified: now renders DnbHero, DnbWorkflow, DnbKlar, DnbMethod, DnbCapacity, DnbContact)
+- `app/components/DnbHero.tsx` (modified: "AI-første" → "AI-first"; copy fixes — "sikkerhetgrenser" → "sikkerhetsgrenser", "auth" → "innlogging" for terminology consistency)
+- `app/components/DnbWorkflow.tsx` + `.module.css` (created: ported and polished from `feature/dnb-ai-workflow-section` — 8-step agentic workflow, relevance note, three-card cross-repo evidence strip, boundary line)
+- `app/components/DnbKlar.tsx` + `.module.css` (created: system spec, "Smart Import — AI as a deliberate product choice" four-step arc, real Klar screenshot gallery via CaseScreenshotGallery, safety/disclaimer note)
+- `app/components/DnbMethod.tsx` + `.module.css` (created: participatory-design + design-science basis, five need → technical-decision mappings, closing relevance)
+- `app/components/DnbCapacity.tsx` + `.module.css` (created: "what I can show now" vs "what I want to build next", honest growth framing)
+- `app/components/DnbContact.tsx` + `.module.css` (created: receipts strip, CTA, footer with honest AI-agent note)
+- `docs/dnb/DNB_IMPLEMENTATION_LOG.md` (updated)
+- `FILE_TREE.md` (updated)
+
+### Key decisions
+
+- Workflow step labels and cross-repo cards reused from existing workflow-section branch rather than re-invented; polished into Norwegian and aligned with claim-safe wording.
+- Klar presented as the central fullstack AI-product evidence; Smart Import framed as a deliberate engineering/product choice with human-in-the-loop control, not an AI gimmick.
+- Method section frames Stian as engineering-minded (need → technical decision), explicitly "not pure UX".
+- Capacity section keeps distributed systems, low-level engineering, robustness/observability strictly as growth direction ("motivert for"), not current senior experience.
+- Skamløs pitch / playable game deliberately NOT implemented.
+
+### Validation
+
+- `npm run lint` — clean.
+- `npm run build` — compiled successfully, TypeScript valid, all routes prerendered static.
+- Visual QA on `npm run start` (localhost:3000) via automated browser: hero, workflow, cross-repo strip, Klar (Smart Import arc + real screenshot gallery), method, capacity, contact all verified on desktop (1280px). Mobile hero verified at 390px; deeper automated mobile capture limited by browser viewport-reset flakiness, but responsive media queries (collapse at 680px) confirmed by code inspection.
+- `.qa-shots/` screenshot artifacts deleted before completion (not committed).
+- VG X portfolio on `master` untouched; no master merge into DNB branch.
+
+### Next step
+
+Product-owner visual review on local environment (desktop + mobile), then decide on deployment as a separate Vercel project. Optional polish: add the dedicated Skamløs section later if/when desired (separate chunk).
+
 ## 2026-06-22 — Cross-repo evidence synthesis (documentation-only)
 
 ### Purpose

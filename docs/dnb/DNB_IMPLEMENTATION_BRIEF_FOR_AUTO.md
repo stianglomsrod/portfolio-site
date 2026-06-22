@@ -53,9 +53,9 @@ Cross-repo update (2026-06-22): do not expand hero unless a clear gap appears in
 - **Copy**: `DNB_SECTION_COPY_V1.md` §2, with softened reuse wording ("designet for å kunne deles og læres av andre").
 - **DNB hook**: connect to the posting's _enabler / force-multiplier_ and _guardrails_ themes — honestly, at Stian's scale.
 - **Evidence strip content**:
-	- Klar = AI-first fullstack product evidence.
-	- Companion/nikkoprogging = long-running workflow/test/documentation discipline.
-	- Lori Frisor = enablement/handoff and pragmatic build-vs-integrate judgement.
+  - Klar = AI-first fullstack product evidence.
+  - Companion/nikkoprogging = long-running workflow/test/documentation discipline.
+  - Lori Frisor = enablement/handoff and pragmatic build-vs-integrate judgement.
 - **Likely files**: new section component + CSS module; reuse `Reveal`.
 - **Acceptance criteria**: scannable, not a wall of prose; no overclaim beyond claim map; mobile-friendly.
 - **Acceptance criteria (strip-specific)**: cards are concrete and non-hype; each card states "what this proves" without implying enterprise scale.

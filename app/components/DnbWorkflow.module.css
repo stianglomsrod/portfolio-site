@@ -134,6 +134,17 @@
   gap: 8px;
 }
 
+/* Lead card (Klar) carries a little more weight than the other two so the
+   strip reads as one product plus two supporting projects, not three clones. */
+.card:first-child {
+  border-color: var(--border-strong);
+  background: color-mix(in srgb, var(--accent) 6%, var(--surface));
+}
+
+.card:first-child .cardLink {
+  color: var(--accent-strong);
+}
+
 .cardTag {
   font-size: 0.72rem;
   font-weight: 700;

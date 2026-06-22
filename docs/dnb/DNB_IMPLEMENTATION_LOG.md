@@ -1,5 +1,51 @@
 # DNB Implementation Log
 
+## 2026-06-22 — De-AI copy polish + NO/EN toggle + redundancy pass (UI/code)
+
+### Purpose
+
+Make the DNB page read less like AI-generated marketing and more like Stian: concrete, sober, technically curious, human, credible. Same pass also adds a Norwegian↔English content toggle and removes cross-section copy/design redundancies. No flashy redesign — the dark engineering-lab direction is kept.
+
+### Branch
+
+`feature/dnb-opus-full-page-buildout`
+
+### Files changed
+
+- `app/components/LanguageContext.tsx` (created: `useSyncExternalStore`-backed NO/EN store + `LanguageProvider` that syncs `document.lang`; default "no", persists to localStorage `dnb-lang`)
+- `app/components/LanguageToggle.tsx` + `.module.css` (created: fixed top-right NO/EN pill, mirrors ModeToggle styling)
+- `app/page.tsx` (modified: wraps content in `LanguageProvider`, renders `LanguageToggle`)
+- `app/components/DnbHero.tsx` (rewritten: bilingual `content.no/en`; removed "kvalitetsporter"/"agentisk utviklingspraksis"; de-formulaic title/intro)
+- `app/components/DnbWorkflow.tsx` (rewritten: bilingual; removed "ikke autopilot"/"fart og trygghet i samme bevegelse"/"merarbeid"; lead-card now "Det nærmeste jeg har et helhetlig produkt.")
+- `app/components/DnbWorkflow.module.css` (modified: subtle accent tint + stronger border on lead card `:first-child` so the three project cards aren't identical)
+- `app/components/DnbKlar.tsx` (rewritten: bilingual; removed "argumentert, ikke tilfeldig"; reduced em dashes in body; label "Hovedbevis" → "Hovedprosjekt"; kept "med lærere, ikke elever")
+- `app/components/DnbMethod.tsx` (rewritten: bilingual; removed "Det er ikke ren UX —" framing; trimmed closing redundancy)
+- `app/components/DnbCapacity.tsx` (rewritten: bilingual; removed duplicate "retning jeg jobber mot"; growth kept strictly as direction)
+- `app/components/DnbContact.tsx` (rewritten: bilingual; REMOVED the receipts strip — redundant with the workflow project strip and heavy on "Bevis/proof" framing; removed "solid bygger"/salesy CTA)
+- `app/components/DnbContact.module.css` (modified: deleted unused receipt styles; reset CTA spacing)
+- `docs/dnb/DNB_IMPLEMENTATION_LOG.md` (updated)
+- `FILE_TREE.md` (updated)
+- `docs/reports/2026-06-22-dnb-deai-bilingual-redundancy-report.md` (created)
+
+### Key decisions
+
+- AI-writing tells removed: "ikke X, men Y" / "X, ikke Y" formulas, "fart og trygghet", heavy em dashes in prose, repeated "bevis/proof/receipts" framing, "enterprise-skala", awkward hybrids ("agentisk utviklingsflyt"), generic salesy CTAs.
+- Single em dashes kept in a few section titles/headings (Klar title, "Smart Import — …") as deliberate stylistic punctuation; removed only from body prose.
+- Redundancies removed: "menneske-i-løkka" mentioned 4× → trimmed to Hero + Klar arc; Klar card note vs disclaimer overlap resolved; "i praksis" repetition trimmed; contact receipts strip (Klar+Lori) duplicated the workflow strip → removed.
+- Bilingual implemented with a global external store (no Context re-render churn, lint-clean, SSR renders "no" so hydration matches).
+- Claim boundaries preserved: no senior distributed-systems claim, no enterprise-scale maturity, no DNB branding, no student-outcome claim, growth = direction.
+
+### Validation
+
+- `npm run lint` — clean (after refactoring the localStorage read to `useSyncExternalStore` to satisfy `react-hooks/set-state-in-effect`).
+- `npm run build` — compiled successfully, TypeScript valid, `/` prerendered static.
+- Visual QA via automated browser (localhost:3000): confirmed NO↔EN toggle flips every section heading (workflow/Klar/method/capacity/contact) + hero title, sets `html lang` nb↔en and `aria-pressed`; lead workflow card renders accent-tinted vs plain siblings; contact receipts strip absent; toggle `position: fixed` top-right verified at desktop and 390px mobile.
+- VG X portfolio on `master` and the Skamløs pitch/game untouched.
+
+### Next step
+
+Product-owner read-through of tone in both languages (especially the EN copy, which is a fresh translation, not yet voice-reviewed by Stian), then decide on deployment.
+
 ## 2026-06-22 — Full DNB page buildout (chunk 3, UI/code)
 
 ### Purpose

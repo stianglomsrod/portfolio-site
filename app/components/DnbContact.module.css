@@ -1,4 +1,4 @@
-/* DnbContact — receipts strip + final CTA + footer.
+/* DnbContact — final CTA + footer.
    Inherits all CSS custom properties from globals.css. No DNB brand colours. */
 
 .contact {
@@ -6,77 +6,10 @@
   background: color-mix(in srgb, var(--surface) 50%, transparent);
 }
 
-/* ── Receipts ───────────────────────────────────────────────── */
-
-.receiptsHead {
-  margin-bottom: 18px;
-}
-
-.receiptsLede {
-  margin-top: 8px;
-  font-size: 0.95rem;
-  color: var(--muted);
-}
-
-.receipts {
-  list-style: none;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-}
-
-@media (max-width: 680px) {
-  .receipts {
-    grid-template-columns: 1fr;
-  }
-}
-
-.receipt {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  position: relative;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 18px 20px;
-  transition:
-    border-color 0.18s var(--ease),
-    transform 0.18s var(--ease);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .receipt:hover {
-    border-color: var(--accent);
-    transform: translateY(-2px);
-  }
-}
-
-.receiptName {
-  font-weight: 700;
-  font-size: 1rem;
-  color: var(--foreground);
-}
-
-.receiptDesc {
-  font-size: 0.85rem;
-  color: var(--muted);
-}
-
-.receiptArrow {
-  position: absolute;
-  top: 18px;
-  right: 20px;
-  color: var(--accent);
-  font-weight: 700;
-}
-
 /* ── CTA ────────────────────────────────────────────────────── */
 
 .cta {
-  margin-top: 64px;
-  border-top: 1px solid var(--border);
-  padding-top: 48px;
+  margin-top: 8px;
 }
 
 .ctaTitle {

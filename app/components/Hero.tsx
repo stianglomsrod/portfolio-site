@@ -23,14 +23,6 @@ export default function Hero({ copy }: { copy: HomeCopy["hero"] }) {
           </Reveal>
 
           <Reveal delay={160}>
-            <ul className={styles.proofList}>
-              {copy.proof.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </Reveal>
-
-          <Reveal delay={200}>
             <div className={styles.actions}>
               <a className={styles.ctaPrimary} href="#arbeid">
                 {copy.primaryCta}
@@ -42,53 +34,23 @@ export default function Hero({ copy }: { copy: HomeCopy["hero"] }) {
           </Reveal>
         </div>
 
-        <Reveal delay={160} className={styles.workPanelWrap}>
-          <aside
-            id="arbeid"
-            className={styles.workPanel}
-            aria-labelledby="work-panel-heading"
-          >
-            <figure className={styles.portraitFrame}>
+        <Reveal delay={180} className={styles.portraitPanel}>
+          <figure className={styles.portraitFigure}>
+            <span className={styles.portraitRing}>
               <Image
                 src="/images/avatar/stian-portrait.webp"
                 alt={copy.portraitAlt}
                 width={420}
-                height={520}
-                sizes="(max-width: 560px) 0px, (max-width: 900px) 100vw, 360px"
+                height={420}
+                sizes="(max-width: 760px) 0px, 320px"
                 className={styles.portrait}
               />
-            </figure>
-
-            <div className={styles.identity}>
-              <div>
-                <p className={styles.identityLabel}>{copy.name}</p>
-                <h2 id="work-panel-heading" className={styles.workPanelTitle}>
-                  {copy.workPanelTitle}
-                </h2>
-              </div>
-            </div>
-
-            <p className={styles.workPanelIntro}>{copy.workPanelIntro}</p>
-
-            <ol className={styles.workList}>
-              {copy.highlights.map((item, index) => (
-                <li key={item.href}>
-                  <a href={item.href} className={styles.workLink}>
-                    <span className={styles.workIndex}>
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <span className={styles.workText}>
-                      <span className={styles.workTitle}>{item.title}</span>
-                      <span className={styles.workMeta}>{item.meta}</span>
-                      <span className={styles.workDescription}>
-                        {item.text}
-                      </span>
-                    </span>
-                  </a>
-                </li>
-              ))}
-            </ol>
-          </aside>
+            </span>
+            <figcaption className={styles.portraitCaption}>
+              <span>{copy.name}</span>
+              <span>{copy.eyebrow}</span>
+            </figcaption>
+          </figure>
         </Reveal>
       </div>
     </header>

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { home, htmlLang, localeLabels, type Locale } from "../data/homepage";
 import Hero from "./Hero";
+import EvidenceOverview from "./EvidenceOverview";
 import FeaturedKlar from "./FeaturedKlar";
 import SupportingCases from "./SupportingCases";
 import AgenticWorkflow from "./AgenticWorkflow";
@@ -71,6 +72,7 @@ export default function Portfolio() {
 
       <main id="content" className={styles.main}>
         <Hero copy={copy.hero} />
+        <EvidenceOverview copy={copy.hero} />
         <FeaturedKlar
           copy={copy.featuredSection}
           data={copy.featuredCase}

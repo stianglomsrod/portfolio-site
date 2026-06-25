@@ -1,8 +1,8 @@
 .hero {
-  min-height: calc(100svh - 260px);
+  min-height: auto;
   display: flex;
-  align-items: center;
-  padding: 56px 0 48px;
+  align-items: flex-start;
+  padding: 88px 0 96px;
 }
 
 .layout {
@@ -139,7 +139,6 @@
 
 @media (max-width: 900px) {
   .hero {
-    min-height: auto;
     padding: 64px 0 52px;
   }
 

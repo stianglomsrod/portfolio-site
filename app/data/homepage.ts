@@ -198,7 +198,7 @@ export const home: Record<Locale, HomeCopy> = {
       ],
       workPanelTitle: "Konkrete spor",
       workPanelIntro:
-        "Noen konkrete spor: et masterprosjekt som ble en fungerende prototype, prosjekter over tid og en arbeidsmåte der AI må tåle review.",
+        "Noen konkrete spor: et masterprosjekt som ble en fungerende prototype, prosjekter over tid og en arbeidsmåte der valgene kan sjekkes.",
       highlights: [
         {
           href: "#klar",
@@ -241,11 +241,11 @@ export const home: Record<Locale, HomeCopy> = {
           text: "Én React/Next.js-kodebase serverer to ulike grensesnitt: lærer og elev. Valgene er gjort rundt faktisk bruk i skolen: nettleser, Chromebook, mobil, lav terskel og tydelige roller.",
         },
         {
-          label: "Backend, data og auth",
+          label: "Data og innlogging",
           text: "Supabase/PostgreSQL gir et standardisert datalag, autentisering og rollebasert tilgang. Det gjør prototypen mer enn en klikkbar demo: den har reelle systemgrenser.",
         },
         {
-          label: "AI som produktvalg",
+          label: "Smart Import",
           text: "Smart Import tolker ukebrev og foreslår oppgaver, fag og timeplan. Det løser en konkret flaskehals for læreren, i stedet for å bruke AI som pynt.",
         },
         {
@@ -626,7 +626,7 @@ export const home: Record<Locale, HomeCopy> = {
       ],
       workPanelTitle: "Concrete work",
       workPanelIntro:
-        "A few concrete threads: a master's project that became a working prototype, projects over time, and a way of using AI that still has to survive review.",
+        "A few concrete threads: a master's project that became a working prototype, projects over time, and a way of working where choices can be checked.",
       highlights: [
         {
           href: "#klar",
@@ -670,11 +670,11 @@ export const home: Record<Locale, HomeCopy> = {
           text: "One React/Next.js codebase serves two different interfaces: teacher and student. The choices are built around real school use: browser, Chromebook, mobile, low friction and clear roles.",
         },
         {
-          label: "Backend, data and auth",
+          label: "Data and sign-in",
           text: "Supabase/PostgreSQL provides a standardised data layer, authentication and role-based access. That makes the prototype more than a clickable demo: it has real system boundaries.",
         },
         {
-          label: "AI as a product choice",
+          label: "Smart Import",
           text: "Smart Import interprets weekly letters and suggests tasks, subjects and schedules. It solves a concrete teacher bottleneck instead of using AI as decoration.",
         },
         {

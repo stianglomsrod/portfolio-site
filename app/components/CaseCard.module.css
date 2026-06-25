@@ -224,10 +224,6 @@
 }
 
 /* ---------- Tier variants ---------- */
-.primary {
-  border-color: var(--border-strong);
-}
-
 .secondary {
   background: color-mix(in srgb, var(--surface) 78%, var(--background));
 }

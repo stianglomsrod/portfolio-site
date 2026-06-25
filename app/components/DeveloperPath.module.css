@@ -23,7 +23,7 @@
   height: 100%;
   padding: 28px;
   border-radius: 8px;
-  background: color-mix(in srgb, var(--surface-elevated) 86%, transparent);
+  background: var(--surface);
   box-shadow: inset 0 0 0 1px var(--border);
 }
 
@@ -97,7 +97,7 @@
   align-items: center;
   padding: 22px 24px;
   border-radius: 8px;
-  background: color-mix(in srgb, var(--surface-2) 56%, transparent);
+  background: color-mix(in srgb, var(--surface-2) 68%, var(--surface));
   box-shadow: inset 0 0 0 1px var(--border);
 }
 

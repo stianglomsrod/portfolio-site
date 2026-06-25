@@ -10,9 +10,9 @@ const siteUrl =
     ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
     : "http://localhost:3000");
 
-const title = "Stian Glomsrød — AI-first utviklerportefølje";
+const title = "Stian Glomsrød — fullstack utvikler";
 const description =
-  "AI-first fullstack produktutvikling, dokumentert agentisk arbeidsflyt og praktisk kvalitetssikring.";
+  "Fullstackutvikling, brukerinnsikt fra workshops og AI som praktisk utviklingsverktøy.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -23,8 +23,9 @@ export const metadata: Metadata = {
   creator: "Stian Glomsrød",
   keywords: [
     "fullstack utvikler",
-    "AI-first utvikling",
-    "agentisk arbeidsflyt",
+    "brukerinnsikt",
+    "workshops",
+    "produktutvikling",
     "Next.js",
     "React",
     "TypeScript",

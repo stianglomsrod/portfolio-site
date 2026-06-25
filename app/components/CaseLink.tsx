@@ -24,7 +24,7 @@ export default function CaseLink({
   }
 
   return (
-    <a className={styles.link} href={href} target="_blank" rel="noreferrer">
+    <a className={styles.link} href={href}>
       {label}
     </a>
   );

@@ -1,0 +1,136 @@
+.section {
+  background: color-mix(in srgb, var(--surface-2) 42%, transparent);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: 24px;
+  align-items: stretch;
+}
+
+.current {
+  display: flex;
+}
+
+.stack {
+  display: grid;
+  gap: 24px;
+}
+
+.panel {
+  width: 100%;
+  height: 100%;
+  padding: 28px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.panelTitle {
+  font-size: 1.22rem;
+  line-height: 1.25;
+  font-weight: 760;
+  letter-spacing: 0;
+  color: var(--foreground);
+}
+
+.panelLede {
+  margin-top: 12px;
+  color: var(--muted-strong);
+}
+
+.evidenceList,
+.compactList,
+.timeline {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.evidenceList,
+.compactList {
+  list-style: none;
+}
+
+.evidenceList li,
+.compactList li {
+  position: relative;
+  padding-left: 24px;
+  color: var(--muted-strong);
+}
+
+.evidenceList li::before,
+.compactList li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-2);
+}
+
+.timeline {
+  list-style: decimal;
+  padding-left: 22px;
+}
+
+.timeline li {
+  padding-left: 6px;
+  color: var(--muted-strong);
+}
+
+.timeline li::marker {
+  color: var(--accent-strong);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.honestNote {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 22px;
+  align-items: center;
+  padding: 22px 24px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: var(--surface-elevated);
+}
+
+.honestNote p {
+  color: var(--muted-strong);
+  font-weight: 620;
+}
+
+.links {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+@media (max-width: 860px) {
+  .layout,
+  .honestNote {
+    grid-template-columns: 1fr;
+  }
+
+  .links {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 600px) {
+  .panel {
+    padding: 22px;
+  }
+
+  .honestNote {
+    padding: 20px;
+  }
+}

@@ -1,22 +1,34 @@
 .hero {
-  padding: clamp(72px, 12vh, 128px) 0 clamp(56px, 9vh, 96px);
+  padding: 72px 0 56px;
   border-bottom: 1px solid var(--border);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(340px, 0.75fr);
+  gap: 48px;
+  align-items: start;
+}
+
+.copyBlock {
+  max-width: 720px;
+  min-width: 0;
 }
 
 .eyebrow {
   font-size: 0.95rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  font-weight: 700;
+  letter-spacing: 0;
   color: var(--accent);
   margin-bottom: 18px;
 }
 
 .title {
-  font-size: clamp(2.1rem, 5.4vw, 3.3rem);
-  line-height: 1.1;
-  font-weight: 700;
-  letter-spacing: -0.025em;
-  max-width: 20ch;
+  font-size: 4rem;
+  line-height: 1.05;
+  font-weight: 760;
+  letter-spacing: 0;
+  max-width: 13ch;
   text-wrap: balance;
 }
 
@@ -27,22 +39,27 @@
   color: var(--muted-strong);
 }
 
-.tags {
+.proofList {
   margin-top: 26px;
   display: flex;
   flex-wrap: wrap;
-  gap: 9px;
+  gap: 10px;
   list-style: none;
 }
 
-.tag {
-  font-size: 0.86rem;
-  font-weight: 600;
+.proofList li {
+  max-width: 100%;
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
   color: var(--muted-strong);
-  padding: 6px 13px;
-  border-radius: 999px;
-  border: 1px solid var(--border-strong);
-  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  font-size: 0.9rem;
+  font-weight: 650;
+  overflow-wrap: anywhere;
 }
 
 .actions {
@@ -57,10 +74,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 50px;
-  padding: 0 26px;
+  min-height: 50px;
+  padding: 0 24px;
   border-radius: 999px;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 1rem;
   border: 1px solid transparent;
   transition:
@@ -78,91 +95,204 @@
 .ctaSecondary {
   border-color: var(--border-strong);
   color: var(--foreground);
-  background: color-mix(in srgb, var(--surface) 60%, transparent);
+  background: var(--surface);
+}
+
+.workPanelWrap {
+  width: 100%;
+  min-width: 0;
+}
+
+.workPanel {
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: var(--surface-elevated);
+  box-shadow: var(--shadow-soft);
+  padding: 18px;
+}
+
+.portraitFrame {
+  aspect-ratio: 5 / 4;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  margin-bottom: 20px;
+}
+
+.portrait {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.identity {
+  display: block;
+}
+
+.identityLabel {
+  font-size: 0.92rem;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.workPanelTitle {
+  margin-top: 2px;
+  font-size: 1.55rem;
+  line-height: 1.2;
+  font-weight: 760;
+  letter-spacing: 0;
+}
+
+.workPanelIntro {
+  margin-top: 18px;
+  color: var(--muted-strong);
+  font-size: 1rem;
+}
+
+.workList {
+  margin-top: 22px;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.workLink {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 14px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  min-height: 112px;
+  transition:
+    transform 0.18s var(--ease),
+    border-color 0.18s var(--ease),
+    background-color 0.18s var(--ease);
+}
+
+.workIndex {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-contrast);
+  background: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.workText {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.workTitle {
+  color: var(--foreground);
+  font-weight: 760;
+  line-height: 1.25;
+}
+
+.workMeta {
+  color: var(--accent-strong);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.workDescription {
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.45;
 }
 
 @media (hover: hover) and (pointer: fine) {
   .ctaPrimary:hover {
     background: var(--accent-strong);
     transform: translateY(-1px);
-    box-shadow: 0 10px 30px -12px var(--glow-1);
+    box-shadow: var(--shadow-accent);
   }
-  .ctaSecondary:hover {
+
+  .ctaSecondary:hover,
+  .workLink:hover {
     border-color: var(--accent);
     transform: translateY(-1px);
   }
-}
 
-/* Agentic-only "problem -> tested artifact" storyline */
-.storyline {
-  margin-top: 44px;
-  list-style: none;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  counter-reset: story;
-}
-
-.storyStep {
-  position: relative;
-  padding: 18px 16px;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--surface) 64%, transparent);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.storyStep::after {
-  content: "→";
-  position: absolute;
-  right: -11px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
-.storyStep:last-child::after {
-  content: none;
-}
-
-.storyIndex {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--accent-contrast);
-  background: var(--accent);
-}
-
-.storyLabel {
-  font-weight: 700;
-  font-size: 0.98rem;
-}
-
-.storyText {
-  font-size: 0.88rem;
-  color: var(--muted);
-  line-height: 1.45;
-}
-
-@media (max-width: 760px) {
-  .storyline {
-    grid-template-columns: 1fr 1fr;
-  }
-  .storyStep::after {
-    content: none;
+  .workLink:hover {
+    background: var(--surface-2);
   }
 }
 
-@media (max-width: 440px) {
-  .storyline {
+@media (max-width: 900px) {
+  .hero {
+    padding: 64px 0 52px;
+  }
+
+  .layout {
     grid-template-columns: 1fr;
+    gap: 36px;
+  }
+
+  .title {
+    font-size: 3.1rem;
+    max-width: 15ch;
+  }
+}
+
+@media (max-width: 560px) {
+  .hero {
+    padding: 44px 0 44px;
+  }
+
+  .copyBlock,
+  .workPanelWrap {
+    width: 100%;
+    max-width: 360px;
+  }
+
+  .title {
+    font-size: 2.35rem;
+    line-height: 1.1;
+  }
+
+  .intro {
+    font-size: 1rem;
+    overflow-wrap: break-word;
+  }
+
+  .proofList {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .proofList li {
+    width: 100%;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .ctaPrimary,
+  .ctaSecondary {
+    width: 100%;
+  }
+
+  .workPanel {
+    padding: 16px;
+  }
+
+  .portraitFrame {
+    display: none;
+    margin-bottom: 16px;
   }
 }

@@ -39,17 +39,17 @@
 .type {
   font-size: 0.85rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0;
   text-transform: uppercase;
   color: var(--accent);
   margin-bottom: 12px;
 }
 
 .title {
-  font-size: clamp(1.5rem, 3.2vw, 2.1rem);
+  font-size: 2.1rem;
   line-height: 1.18;
   font-weight: 700;
-  letter-spacing: -0.015em;
+  letter-spacing: 0;
   max-width: 24ch;
 }
 
@@ -69,7 +69,7 @@
 .metaRow dt {
   font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0;
   text-transform: uppercase;
   color: var(--muted);
 }
@@ -91,7 +91,7 @@
 .facet {
   background: color-mix(in srgb, var(--surface) 88%, transparent);
   padding: 22px;
-  border-radius: 12px;
+  border-radius: 8px;
 }
 
 .facetLabel {
@@ -163,6 +163,10 @@
 }
 
 @media (max-width: 680px) {
+  .title {
+    font-size: 1.55rem;
+  }
+
   .facets {
     grid-template-columns: 1fr;
   }

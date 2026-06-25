@@ -1,62 +1,54 @@
 :root {
-  /* Neutral dark theme (calm, professional, subtle blue accent) */
-  --background: #0e1012;
-  --surface: #16191c;
-  --surface-2: #1c2024;
-  --surface-3: #20262c;
-  --foreground: #e9eaec;
-  --muted: #a4abb3;
-  --muted-strong: #c5ccd3;
-  --border: #282d32;
-  --border-strong: #353c44;
-  --accent: #6aa6ee;
-  --accent-strong: #82b6f4;
-  --accent-2: #6aa6ee;
-  --accent-contrast: #0e1012;
-  --placeholder: #1f2429;
-  --radius: 14px;
-  --radius-lg: 22px;
+  --background: #f7f8fa;
+  --surface: #ffffff;
+  --surface-elevated: #ffffff;
+  --surface-2: #eef2f6;
+  --surface-3: #e5ebf1;
+  --foreground: #171a1d;
+  --muted: #5a626d;
+  --muted-strong: #343c46;
+  --border: #dce2e8;
+  --border-strong: #b9c5d1;
+  --accent: #175fa6;
+  --accent-strong: #0f4f8d;
+  --accent-2: #16736c;
+  --accent-contrast: #ffffff;
+  --placeholder: #edf1f5;
+  --radius: 8px;
+  --radius-lg: 8px;
   --max-width: 1080px;
-  --glow-1: rgba(106, 166, 238, 0.16);
-  --glow-2: rgba(106, 166, 238, 0.08);
+  --glow-1: rgba(23, 95, 166, 0.12);
+  --glow-2: rgba(22, 115, 108, 0.08);
+  --shadow-soft: 0 22px 60px -34px rgba(42, 54, 68, 0.34);
+  --shadow-accent: 0 14px 32px -18px rgba(23, 95, 166, 0.5);
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
-  --font-sans:
-    var(--font-geist-sans), system-ui, -apple-system, "Segoe UI", Roboto, Arial,
-    sans-serif;
-  color-scheme: dark;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  color-scheme: light;
 }
 
-/* Light-theme fallback only for users who explicitly prefer light.
-   The intended direction is the calm dark theme above. */
-@media (prefers-color-scheme: light) {
+@media (prefers-color-scheme: dark) {
   :root {
-    --background: #f7f8fa;
-    --surface: #ffffff;
-    --surface-2: #eef1f5;
-    --surface-3: #e7ebf1;
-    --foreground: #1a1c1e;
-    --muted: #5b6066;
-    --muted-strong: #3c4148;
-    --border: #e1e4e9;
-    --border-strong: #cfd4db;
-    --accent: #1f5fae;
-    --accent-strong: #184d90;
-    --accent-2: #1f5fae;
-    --accent-contrast: #ffffff;
-    --placeholder: #eceef1;
-    --glow-1: rgba(31, 95, 174, 0.12);
-    --glow-2: rgba(31, 95, 174, 0.06);
-    color-scheme: light;
+    --background: #0e1012;
+    --surface: #16191c;
+    --surface-elevated: #191d21;
+    --surface-2: #1d2227;
+    --surface-3: #232a31;
+    --foreground: #eceff2;
+    --muted: #a6aeb7;
+    --muted-strong: #c8ced5;
+    --border: #293039;
+    --border-strong: #3a4350;
+    --accent: #7ab8f3;
+    --accent-strong: #9acbff;
+    --accent-2: #6fd4c7;
+    --accent-contrast: #0b1117;
+    --placeholder: #20262d;
+    --glow-1: rgba(122, 184, 243, 0.14);
+    --glow-2: rgba(111, 212, 199, 0.1);
+    --shadow-soft: 0 24px 64px -38px rgba(0, 0, 0, 0.72);
+    --shadow-accent: 0 14px 32px -18px rgba(122, 184, 243, 0.45);
+    color-scheme: dark;
   }
-}
-
-/* Agentic pitch mode: keep the calm dark base, push accents + glow a little. */
-[data-mode="agentic"] {
-  --accent: #7cc0ff;
-  --accent-strong: #9bd0ff;
-  --accent-2: #b58cff;
-  --glow-1: rgba(124, 192, 255, 0.2);
-  --glow-2: rgba(181, 140, 255, 0.12);
 }
 
 html {
@@ -75,25 +67,15 @@ body {
   display: flex;
   flex-direction: column;
   color: var(--foreground);
-  background: var(--background);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--accent) 7%, transparent), transparent 380px),
+    linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent-2) 5%, transparent) 68%, transparent),
+    var(--background);
   font-family: var(--font-sans);
   font-size: 17px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-/* Layered background depth: two soft radial glows behind everything. */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    radial-gradient(60% 50% at 50% -8%, var(--glow-1), transparent 70%),
-    radial-gradient(45% 40% at 100% 30%, var(--glow-2), transparent 70%);
-  transition: background 0.6s var(--ease);
 }
 
 * {
@@ -107,9 +89,13 @@ a {
   text-decoration: none;
 }
 
+button {
+  color: inherit;
+}
+
 :focus-visible {
   outline: 2px solid var(--accent-strong);
-  outline-offset: 2px;
+  outline-offset: 3px;
   border-radius: 6px;
 }
 

@@ -1,62 +1,50 @@
-import type { Mode, PortfolioCase } from "../data/portfolio";
+import type { HomeCopy, ShowcaseCase } from "../data/homepage";
 import CaseScreenshotGallery from "./CaseScreenshotGallery";
 import CaseLink from "./CaseLink";
 import styles from "./CaseCard.module.css";
 
-function getCaseLinkLabel(caseId: string): string {
-  const labels: Record<string, string> = {
-    forloper: "Åpne PD-app",
-    "ask-away": "Åpne ASK Away i Figma",
-    fagtekst: "Åpne Warp Read i Figma",
-    acad: "Åpne ACAD i Figma",
-    wordhunt: "Se Wordhunt-video",
-  };
-  return labels[caseId] ?? "Lenke";
-}
-
 export default function CaseCard({
   data,
-  mode,
+  labels,
 }: {
-  data: PortfolioCase;
-  mode: Mode;
+  data: ShowcaseCase;
+  labels: HomeCopy["caseLabels"];
 }) {
   const tier = data.tier ?? "primary";
   const isSecondary = tier === "secondary";
-  const showPitch = mode === "agentic" && data.pitch;
 
   return (
     <article
       id={data.id}
       className={`${styles.card} ${isSecondary ? styles.secondary : styles.primary}`}
+      aria-labelledby={`${data.id}-title`}
     >
       <div className={styles.body}>
         <p className={styles.type}>{data.type}</p>
-        <h3 className={styles.title}>{data.title}</h3>
-
-        {showPitch && <p className={styles.pitch}>{data.pitch}</p>}
+        <h3 id={`${data.id}-title`} className={styles.title}>
+          {data.title}
+        </h3>
 
         {(data.role || data.tech) && (
           <dl className={styles.meta}>
             {data.role && (
               <div className={styles.metaRow}>
-                <dt>Rolle</dt>
+                <dt>{labels.role}</dt>
                 <dd>{data.role}</dd>
               </div>
             )}
             {data.tech && (
               <div className={styles.metaRow}>
-                <dt>Teknologi</dt>
+                <dt>{labels.tech}</dt>
                 <dd>{data.tech}</dd>
               </div>
             )}
           </dl>
         )}
 
-        {/* Secondary cases stay lean: show the first paragraph only */}
         {(isSecondary ? data.description.slice(0, 1) : data.description).map(
-          (paragraph, i) => (
-            <p key={i} className={styles.paragraph}>
+          (paragraph) => (
+            <p key={paragraph} className={styles.paragraph}>
               {paragraph}
             </p>
           ),
@@ -71,20 +59,21 @@ export default function CaseCard({
         )}
 
         <div className={styles.actions}>
-          <CaseLink href={data.link} label={getCaseLinkLabel(data.id)} />
-          {data.id === "forloper" && (
-            <span className={styles.accessNote}>
-              Ta kontakt for brukertilgang: stianglomsrod@gmail.com
-            </span>
+          <CaseLink
+            href={data.link}
+            label={data.linkLabel ?? labels.fallbackLink}
+          />
+          {data.accessNote && (
+            <span className={styles.accessNote}>{data.accessNote}</span>
           )}
         </div>
       </div>
 
-      {/* Only primary cases carry the screenshot gallery, to keep hierarchy */}
       {!isSecondary && data.screenshots && data.screenshots.length > 0 && (
         <CaseScreenshotGallery
           caseId={data.id}
-          labels={data.screenshots}
+          screenshots={data.screenshots}
+          labels={labels}
           className={styles.gallery}
         />
       )}

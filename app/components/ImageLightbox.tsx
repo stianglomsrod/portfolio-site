@@ -3,12 +3,14 @@
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import type { HomeCopy } from "../data/homepage";
 import type { CaseScreenshot } from "./caseScreenshotData";
 import styles from "./ImageLightbox.module.css";
 
 type Props = {
   images: CaseScreenshot[];
   initialIndex: number;
+  labels: HomeCopy["caseLabels"];
   onClose: () => void;
 };
 
@@ -22,6 +24,7 @@ function clampIndex(index: number, len: number): number {
 export default function ImageLightbox({
   images,
   initialIndex,
+  labels,
   onClose,
 }: Props) {
   const [index, setIndex] = useState(() =>
@@ -32,9 +35,6 @@ export default function ImageLightbox({
 
   const hasMany = images.length > 1;
   const current = images[index] ?? null;
-
-  // Derived from the currently loaded src so the new image fades in on every
-  // navigation without a setState-in-effect.
   const loaded = current != null && loadedSrc === current.src;
 
   const prev = useCallback(() => {
@@ -60,23 +60,21 @@ export default function ImageLightbox({
   }, []);
 
   useEffect(() => {
-    // preventScroll stops the browser from scrolling the page to bring the
-    // focused dialog into view (the modal is already centered via position: fixed).
     dialogRef.current?.focus({ preventScroll: true });
 
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        e.preventDefault();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
         onClose();
         return;
       }
-      if (e.key === "ArrowLeft") {
-        e.preventDefault();
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
         prev();
         return;
       }
-      if (e.key === "ArrowRight") {
-        e.preventDefault();
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
         next();
       }
     };
@@ -86,16 +84,11 @@ export default function ImageLightbox({
   }, [next, onClose, prev]);
 
   const title = useMemo(() => {
-    if (!current) return "Skjermbilde";
+    if (!current) return labels.screenshotFallback;
     return current.caption;
-  }, [current]);
+  }, [current, labels.screenshotFallback]);
 
-  if (!current) return null;
-  // The lightbox must escape any ancestor with a transform / will-change
-  // (e.g. the Reveal wrapper), otherwise position: fixed anchors to that
-  // element instead of the viewport. Portalling to <body> guarantees the
-  // overlay covers the real viewport and centers correctly.
-  if (typeof document === "undefined") return null;
+  if (!current || typeof document === "undefined") return null;
 
   return createPortal(
     <div className={styles.overlay} role="presentation">
@@ -103,7 +96,7 @@ export default function ImageLightbox({
         type="button"
         className={styles.backdrop}
         onClick={onClose}
-        aria-label="Lukk bildefremviser"
+        aria-label={labels.closeViewer}
       />
 
       <div
@@ -111,11 +104,14 @@ export default function ImageLightbox({
         className={styles.dialog}
         role="dialog"
         aria-modal="true"
-        aria-label={`Bildefremviser: ${title}`}
+        aria-label={`${labels.viewerLabel}: ${title}`}
         tabIndex={-1}
         onClick={onClose}
       >
-        <header className={styles.topbar} onClick={(e) => e.stopPropagation()}>
+        <header
+          className={styles.topbar}
+          onClick={(event) => event.stopPropagation()}
+        >
           <p className={styles.title}>{title}</p>
           <p className={styles.count} aria-live="polite">
             {index + 1} / {images.length}
@@ -124,7 +120,7 @@ export default function ImageLightbox({
             type="button"
             className={styles.close}
             onClick={onClose}
-            aria-label="Lukk bildefremviser"
+            aria-label={labels.closeViewer}
           >
             <span aria-hidden="true">×</span>
           </button>
@@ -135,11 +131,11 @@ export default function ImageLightbox({
             <button
               type="button"
               className={`${styles.nav} ${styles.prev}`}
-              onClick={(e) => {
-                e.stopPropagation();
+              onClick={(event) => {
+                event.stopPropagation();
                 prev();
               }}
-              aria-label="Forrige bilde"
+              aria-label={labels.previousImage}
             >
               <span aria-hidden="true">‹</span>
             </button>
@@ -149,7 +145,7 @@ export default function ImageLightbox({
             <div
               className={styles.frame}
               data-loaded={loaded}
-              onClick={(e) => e.stopPropagation()}
+              onClick={(event) => event.stopPropagation()}
             >
               <Image
                 key={current.src}
@@ -173,11 +169,11 @@ export default function ImageLightbox({
             <button
               type="button"
               className={`${styles.nav} ${styles.next}`}
-              onClick={(e) => {
-                e.stopPropagation();
+              onClick={(event) => {
+                event.stopPropagation();
                 next();
               }}
-              aria-label="Neste bilde"
+              aria-label={labels.nextImage}
             >
               <span aria-hidden="true">›</span>
             </button>

@@ -1,7 +1,5 @@
 .section {
-  background:
-    radial-gradient(70% 80% at 100% 0%, var(--glow-1), transparent 55%),
-    color-mix(in srgb, var(--surface-2) 55%, transparent);
+  background: color-mix(in srgb, var(--surface-2) 55%, transparent);
 }
 
 .layout {
@@ -72,12 +70,107 @@
 .stepPhase {
   font-size: 1.05rem;
   font-weight: 700;
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
   margin-bottom: 3px;
 }
 
 .stepText {
   color: var(--muted-strong);
+}
+
+.evidence {
+  margin-top: 44px;
+  padding: 28px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: var(--surface-elevated);
+}
+
+.evidenceHead {
+  max-width: 720px;
+}
+
+.evidenceLabel {
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.evidenceTitle {
+  font-size: 1.5rem;
+  line-height: 1.25;
+  font-weight: 760;
+  letter-spacing: 0;
+}
+
+.evidenceIntro {
+  margin-top: 10px;
+  color: var(--muted-strong);
+}
+
+.evidenceGrid {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.evidenceCard {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.evidenceTag {
+  color: var(--accent-strong);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.projectName {
+  margin-top: 8px;
+  font-size: 1.16rem;
+  line-height: 1.25;
+  font-weight: 760;
+  letter-spacing: 0;
+}
+
+.projectProof {
+  margin-top: 12px;
+  color: var(--muted-strong);
+  font-size: 0.96rem;
+}
+
+.projectNote {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.projectLinks {
+  margin-top: auto;
+  padding-top: 18px;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.boundary {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.95rem;
 }
 
 @media (max-width: 820px) {
@@ -87,5 +180,15 @@
   }
   .lead {
     position: static;
+  }
+
+  .evidenceGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .evidence {
+    padding: 22px;
   }
 }

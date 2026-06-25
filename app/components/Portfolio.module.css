@@ -6,14 +6,31 @@
   width: 100%;
 }
 
-/* Slim sticky control bar holding the brand + mode toggle. */
+.skipLink {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 100;
+  transform: translateY(-160%);
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-weight: 800;
+  transition: transform 0.16s var(--ease);
+}
+
+.skipLink:focus {
+  transform: translateY(0);
+}
+
 .topbar {
   position: sticky;
   top: 0;
   z-index: 50;
   border-bottom: 1px solid var(--border);
-  background: color-mix(in srgb, var(--background) 78%, transparent);
-  backdrop-filter: blur(10px);
+  background: color-mix(in srgb, var(--background) 88%, transparent);
+  backdrop-filter: blur(12px);
 }
 
 .topbarInner {
@@ -24,27 +41,143 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 20px;
 }
 
 .brand {
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  flex: 0 0 auto;
+  font-weight: 800;
+  letter-spacing: 0;
   font-size: 1rem;
   color: var(--foreground);
 }
 
+.headerControls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+  min-width: 0;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--muted-strong);
+  font-size: 0.94rem;
+  font-weight: 700;
+}
+
+.nav a {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 10px;
+  border-radius: 8px;
+}
+
+.languageToggle {
+  display: flex;
+  align-items: center;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.languageButton {
+  appearance: none;
+  border: 0;
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted-strong);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.languageButton[aria-pressed="true"] {
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.languageCode {
+  font-variant-caps: all-small-caps;
+}
+
+.languageName {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 @media (hover: hover) and (pointer: fine) {
-  .brand:hover {
-    color: var(--accent);
+  .brand:hover,
+  .nav a:hover {
+    color: var(--accent-strong);
+  }
+
+  .nav a:hover {
+    background: var(--surface);
   }
 }
 
-@media (max-width: 480px) {
-  .brand {
+@media (max-width: 760px) {
+  .topbarInner {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .headerControls {
+    width: 100%;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .nav {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .nav::-webkit-scrollbar {
     display: none;
   }
+}
+
+@media (max-width: 520px) {
   .topbarInner {
-    justify-content: center;
+    padding: 10px 18px;
+  }
+
+  .headerControls {
+    align-items: center;
+    flex-direction: row;
+  }
+
+  .nav {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .nav a {
+    flex: 0 0 auto;
+    padding: 0 8px;
+  }
+
+  .languageToggle {
+    flex: 0 0 auto;
   }
 }

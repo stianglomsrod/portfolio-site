@@ -2,20 +2,20 @@
 
 import Image from "next/image";
 import { useMemo, useRef, useState } from "react";
+import type { HomeCopy, ScreenshotCopy } from "../data/homepage";
 import ImageLightbox from "./ImageLightbox";
-import {
-  getCaseScreenshot,
-  getCaseScreenshotItems,
-} from "./caseScreenshotData";
+import { getCaseScreenshot } from "./caseScreenshotData";
 import styles from "./CaseCard.module.css";
 
 export default function CaseScreenshotGallery({
   caseId,
+  screenshots,
   labels,
   className,
 }: {
   caseId: string;
-  labels: string[];
+  screenshots: ScreenshotCopy[];
+  labels: HomeCopy["caseLabels"];
   className: string;
 }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -23,16 +23,23 @@ export default function CaseScreenshotGallery({
 
   const entries = useMemo(
     () =>
-      labels.map((label) => ({
-        label,
-        shot: getCaseScreenshot(caseId, label),
+      screenshots.map((copy) => ({
+        ...copy,
+        shot: getCaseScreenshot(caseId, copy.lookup),
       })),
-    [caseId, labels],
+    [caseId, screenshots],
   );
 
   const items = useMemo(
-    () => getCaseScreenshotItems(caseId, labels),
-    [caseId, labels],
+    () =>
+      entries
+        .filter((entry) => entry.shot !== null)
+        .map((entry) => ({
+          ...entry.shot!,
+          caption: entry.label,
+          alt: entry.alt,
+        })),
+    [entries],
   );
 
   const openFromLabel = (label: string, trigger: HTMLButtonElement) => {
@@ -54,10 +61,10 @@ export default function CaseScreenshotGallery({
           if (!entry.shot) {
             return (
               <div
-                key={entry.label}
+                key={entry.lookup}
                 className={styles.screenshot}
                 role="img"
-                aria-label={`Skjermbilde: ${entry.label}`}
+                aria-label={`${labels.screenshotFallback}: ${entry.alt}`}
               >
                 <span className={styles.screenshotLabel}>{entry.label}</span>
               </div>
@@ -66,18 +73,18 @@ export default function CaseScreenshotGallery({
 
           return (
             <button
-              key={entry.label}
+              key={entry.lookup}
               type="button"
               className={styles.screenshotButton}
-              onClick={(e) => openFromLabel(entry.label, e.currentTarget)}
-              aria-label={`Apne stor visning: ${entry.label}`}
+              onClick={(event) => openFromLabel(entry.label, event.currentTarget)}
+              aria-label={entry.alt}
             >
               <figure className={styles.screenshotFigure}>
                 <span className={styles.screenshotThumb}>
                   <Image
                     className={styles.screenshotImage}
                     src={entry.shot.src}
-                    alt={entry.shot.alt}
+                    alt={entry.alt}
                     width={entry.shot.width}
                     height={entry.shot.height}
                     sizes="(max-width: 600px) 45vw, 280px"
@@ -98,6 +105,7 @@ export default function CaseScreenshotGallery({
           key={`${caseId}-${openIndex}`}
           images={items}
           initialIndex={openIndex}
+          labels={labels}
           onClose={close}
         />
       )}

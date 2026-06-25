@@ -187,7 +187,7 @@ export const home: Record<Locale, HomeCopy> = {
       title:
         "Jeg utvikler programvare fra uklare behov til fungerende systemer.",
       intro:
-        "Jeg jobber fullstack og bruker AI som støtte i utviklingen. Det viktigste for meg er å forstå behovene først: planlegge workshops, hente inn brukerinnsikt og gjøre funnene om til noe som kan prøves i kode.",
+        "Jeg jobber fullstack og bruker AI som støtte i utviklingen. Jeg liker å starte med behov og brukerinnsikt, prøve løsningene i kode, og teste dem opp mot produktmål og designprinsipper.",
       portraitAlt: "Portrett av Stian Glomsrød",
       primaryCta: "Se teknisk arbeid",
       secondaryCta: "Ta kontakt",
@@ -509,7 +509,7 @@ export const home: Record<Locale, HomeCopy> = {
           tag: "Enablement og handoff",
           name: "Lori Frisør",
           proof:
-            "Astro, Keystatic, Vercel, owner-editing, handoff og pragmatisk integrasjon fremfor overbygging.",
+            "Astro, Keystatic, Vercel, owner-editing, handoff og pragmatisk integrasjon uten unødvendig plattformlag.",
           note: "Praktisk leveranse for en ekte eier.",
           primary: {
             label: "Se repoet",
@@ -615,7 +615,7 @@ export const home: Record<Locale, HomeCopy> = {
       eyebrow: "Full-stack developer using AI as a tool",
       title: "I turn unclear needs into working software.",
       intro:
-        "I work full-stack and use AI as support while developing. The important part for me is understanding the need first: planning workshops, gathering user insight, and turning findings into something that can be tried in code.",
+        "I work full-stack and use AI as support while developing. I like starting from needs and user insight, trying solutions in code, and testing them against product goals and design principles.",
       portraitAlt: "Portrait of Stian Glomsrød",
       primaryCta: "View technical work",
       secondaryCta: "Contact me",

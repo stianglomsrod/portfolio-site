@@ -1,5 +1,5 @@
 .card {
-  background: color-mix(in srgb, var(--surface-elevated) 92%, transparent);
+  background: var(--surface);
   border-radius: var(--radius);
   overflow: hidden;
   display: flex;
@@ -229,7 +229,7 @@
 }
 
 .secondary {
-  background: color-mix(in srgb, var(--surface) 58%, transparent);
+  background: color-mix(in srgb, var(--surface) 78%, var(--background));
 }
 
 .secondary .title {

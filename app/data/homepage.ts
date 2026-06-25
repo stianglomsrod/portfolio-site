@@ -483,7 +483,7 @@ export const home: Record<Locale, HomeCopy> = {
       evidenceIntro:
         "Prosjektene viser samme mønster i ulike størrelser: forstå behovet, lage noe som virker, og gjøre arbeidet mulig å ta videre.",
       evidenceBoundary:
-        "Dette er først og fremst prototype- og produktarbeid. Dypere plattform- og driftsansvar er noe jeg bygger videre mot.",
+        "Dette er først og fremst prototype- og produktarbeid. Dypere plattform- og driftsansvar er noe jeg utvikler meg videre mot.",
       evidenceProjects: [
         {
           tag: "Fullstack produkt",
@@ -612,7 +612,7 @@ export const home: Record<Locale, HomeCopy> = {
     },
     hero: {
       name: "Stian Glomsrød",
-      eyebrow: "AI-first full-stack developer",
+      eyebrow: "Full-stack developer using AI as a tool",
       title: "I turn unclear needs into working software.",
       intro:
         "I work full-stack and use AI as support while developing. The important part for me is understanding the need first: planning workshops, gathering user insight, and turning findings into something that can be tried in code.",
@@ -657,7 +657,7 @@ export const home: Record<Locale, HomeCopy> = {
       title:
         "Klar — a full-stack PWA with AI-assisted import and role logic",
       type: "Master's project / working full-stack web prototype",
-      role: "Product developer, full-stack prototype developer and agentic development lead",
+      role: "Product developer, full-stack prototype developer and facilitator",
       tech: "React, Next.js, TypeScript, Supabase/PostgreSQL, auth/RBAC, PWA, AI-supported development workflow",
       link: "https://klar-sigma.vercel.app/",
       linkLabel: "Open Klar",
@@ -912,7 +912,7 @@ export const home: Record<Locale, HomeCopy> = {
       evidenceIntro:
         "The projects show the same pattern at different sizes: understand the need, make something that works, and leave the work possible to continue.",
       evidenceBoundary:
-        "This is mostly product and prototype work. Deeper platform and operations work is something I am building toward.",
+        "This is mostly product and prototype work. Deeper platform and operations work is something I am working toward.",
       evidenceProjects: [
         {
           tag: "Full-stack product",
@@ -978,7 +978,7 @@ export const home: Record<Locale, HomeCopy> = {
         "Klar brought together Next.js, React, Supabase, auth, role logic and AI-assisted import.",
         "The Companion track shows interest in local-first architecture, SQLite/Drift and testable app logic.",
       ],
-      linksAria: "Links to programming evidence and technical projects",
+      linksAria: "Links to programming certificates and technical projects",
       links: [
         {
           label: "CS50x certificate",
@@ -994,7 +994,7 @@ export const home: Record<Locale, HomeCopy> = {
         },
       ],
       honest:
-        "Short version: I am strongest in full-stack product development, user insight, quality-controlled AI use and clear handoff. Deeper platform and low-level work is the direction ahead.",
+        "Short version: I am strongest in full-stack product development, user insight, careful AI use and clear handoff. Deeper platform and low-level work is the direction ahead.",
     },
     footer: {
       title: "Contact",

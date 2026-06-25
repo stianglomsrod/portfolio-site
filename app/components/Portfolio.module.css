@@ -28,9 +28,9 @@
   position: sticky;
   top: 0;
   z-index: 50;
-  border-bottom: 1px solid var(--border);
-  background: color-mix(in srgb, var(--background) 88%, transparent);
-  backdrop-filter: blur(12px);
+  background: color-mix(in srgb, var(--background) 84%, transparent);
+  backdrop-filter: blur(18px);
+  box-shadow: inset 0 -1px var(--border);
 }
 
 .topbarInner {
@@ -81,9 +81,9 @@
   display: flex;
   align-items: center;
   padding: 3px;
-  border: 1px solid var(--border);
+  box-shadow: inset 0 0 0 1px var(--border);
   border-radius: 8px;
-  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
 }
 
 .languageButton {

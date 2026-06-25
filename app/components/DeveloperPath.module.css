@@ -1,5 +1,5 @@
 .section {
-  background: color-mix(in srgb, var(--surface-2) 42%, transparent);
+  background: transparent;
 }
 
 .layout {
@@ -22,9 +22,9 @@
   width: 100%;
   height: 100%;
   padding: 28px;
-  border: 1px solid var(--border);
   border-radius: 8px;
-  background: var(--surface);
+  background: color-mix(in srgb, var(--surface-elevated) 86%, transparent);
+  box-shadow: inset 0 0 0 1px var(--border);
 }
 
 .panelTitle {
@@ -96,9 +96,9 @@
   gap: 22px;
   align-items: center;
   padding: 22px 24px;
-  border: 1px solid var(--border-strong);
   border-radius: 8px;
-  background: var(--surface-elevated);
+  background: color-mix(in srgb, var(--surface-2) 56%, transparent);
+  box-shadow: inset 0 0 0 1px var(--border);
 }
 
 .honestNote p {

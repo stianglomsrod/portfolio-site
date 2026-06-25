@@ -1,5 +1,5 @@
 .section {
-  background: color-mix(in srgb, var(--surface-2) 55%, transparent);
+  background: transparent;
 }
 
 .layout {
@@ -44,16 +44,16 @@
   gap: 18px;
   padding: 20px 22px;
   border-radius: var(--radius);
-  border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--surface) 78%, transparent);
+  background: color-mix(in srgb, var(--surface-elevated) 82%, transparent);
+  box-shadow: inset 0 0 0 1px var(--border);
   transition:
-    border-color 0.2s var(--ease),
+    box-shadow 0.2s var(--ease),
     background-color 0.2s var(--ease);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .step:hover {
-    border-color: var(--accent);
+    box-shadow: inset 0 0 0 1px var(--border-strong);
     background: color-mix(in srgb, var(--surface) 92%, transparent);
   }
 }
@@ -81,9 +81,11 @@
 .evidence {
   margin-top: 44px;
   padding: 28px;
-  border: 1px solid var(--border-strong);
   border-radius: 8px;
-  background: var(--surface-elevated);
+  background: color-mix(in srgb, var(--surface-elevated) 90%, transparent);
+  box-shadow:
+    inset 0 0 0 1px var(--border),
+    var(--shadow-soft);
 }
 
 .evidenceHead {
@@ -123,9 +125,8 @@
   flex-direction: column;
   min-height: 100%;
   padding: 20px;
-  border: 1px solid var(--border);
   border-radius: 8px;
-  background: var(--surface);
+  background: color-mix(in srgb, var(--surface-2) 50%, transparent);
 }
 
 .evidenceTag {
@@ -168,7 +169,7 @@
 .boundary {
   margin-top: 20px;
   padding-top: 18px;
-  border-top: 1px solid var(--border);
+  box-shadow: inset 0 1px var(--border);
   color: var(--muted);
   font-size: 0.95rem;
 }

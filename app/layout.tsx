@@ -12,7 +12,7 @@ const siteUrl =
 
 const title = "Stian Glomsrød — AI-first utviklerportefølje";
 const description =
-  "AI-first fullstack produktbygging, dokumentert agentisk arbeidsflyt og praktisk kvalitetssikring.";
+  "AI-first fullstack produktutvikling, dokumentert agentisk arbeidsflyt og praktisk kvalitetssikring.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

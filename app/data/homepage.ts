@@ -154,15 +154,15 @@ const email = "stianglomsrod@gmail.com";
 
 export const home: Record<Locale, HomeCopy> = {
   no: {
-    metaTitle: "Stian Glomsrød — AI-first utviklerportefølje",
+    metaTitle: "Stian Glomsrød — fullstack utvikler",
     metaDescription:
-      "AI-first fullstack produktbygging, dokumentert agentisk arbeidsflyt og praktisk kvalitetssikring.",
+      "Fullstackutvikling, brukerinnsikt fra workshops og AI som praktisk utviklingsverktøy.",
     skipLink: "Hopp til innhold",
     nav: {
       label: "Hovednavigasjon",
       work: "Arbeid",
       klar: "Klar",
-      workflow: "Arbeidsflyt",
+      workflow: "Prosess",
       dev: "Dev-spor",
       contact: "Kontakt",
     },
@@ -183,22 +183,22 @@ export const home: Record<Locale, HomeCopy> = {
     },
     hero: {
       name: "Stian Glomsrød",
-      eyebrow: "AI-first fullstack bygger",
+      eyebrow: "Fullstack utvikler med AI som verktøy",
       title:
-        "Jeg bygger programvare fra uklare behov til fungerende systemer.",
+        "Jeg utvikler programvare fra uklare behov til fungerende systemer.",
       intro:
-        "Jeg jobber fullstack og bruker AI-agenter aktivt i utviklingen, men alltid med tydelige krav, review-løkker og menneskelig vurdering. Styrken min er å koble brukerinnsikt, systemforståelse og praktisk bygging til noe som faktisk kan testes.",
+        "Jeg jobber fullstack og bruker AI som støtte i utviklingen. Det viktigste for meg er å forstå behovene først: planlegge workshops, hente inn brukerinnsikt og gjøre funnene om til noe som kan prøves i kode.",
       portraitAlt: "Portrett av Stian Glomsrød",
       primaryCta: "Se teknisk arbeid",
       secondaryCta: "Ta kontakt",
       proof: [
-        "Next.js, React, TypeScript og Supabase i fungerende PWA",
-        "AI-agenter brukt med krav, QA, dokumentasjon og handoff",
-        "Python/Django, Vue, Flutter/Dart, Astro og praktiske repoer",
+        "Klar: Next.js, React, TypeScript og Supabase i en fungerende PWA",
+        "Brukerinnsikt fra lærerworkshops, scenarioer og prototypetesting",
+        "Python/Django, Vue, Flutter/Dart og Astro i praktiske prosjekter",
       ],
-      workPanelTitle: "Teknisk bevis",
+      workPanelTitle: "Konkrete spor",
       workPanelIntro:
-        "Et konsentrert spor gjennom fullstack produktbygging, agentisk arbeidsflyt og programmeringslæring.",
+        "Noen konkrete spor: et masterprosjekt som ble en fungerende prototype, prosjekter over tid og en arbeidsmåte der AI må tåle review.",
       highlights: [
         {
           href: "#klar",
@@ -208,37 +208,37 @@ export const home: Record<Locale, HomeCopy> = {
         },
         {
           href: "#workflow",
-          title: "Agentisk workflow",
+          title: "Utviklingsflyt med AI",
           meta: "Krav · review · QA · handoff",
-          text: "AI brukes som utviklingspartner, ikke autopilot. Arbeidet styres av kontekst og kontrollpunkter.",
+          text: "AI brukes som støtte, men kode, valg og vurderinger må fortsatt forstås og sjekkes.",
         },
         {
           href: "#dev-path",
-          title: "Dev-spor",
+          title: "Veien hit",
           meta: "CS50x · Python · JS · Flutter",
-          text: "En ærlig teknisk progresjon fra små verktøy til fullstack og lokal-first arkitektur.",
+          text: "En teknisk progresjon fra små verktøy til fullstack og lokal-first apparkitektur.",
         },
       ],
     },
     featuredSection: {
       label: "Hovedcase",
-      title: "Klar som teknisk bevis",
+      title: "Klar som hovedcase",
     },
     featuredCase: {
       id: "klar",
-      title: "Klar — fullstack PWA med AI-assistert import og rollelogikk",
+      title: "Klar — fullstack PWA for struktur, oversikt og støtte i skolen",
       type: "Masterprosjekt / fungerende fullstack webprototype",
-      role: "Produktbygger, fullstack prototypeutvikler og agentisk utviklingsleder",
-      tech: "React, Next.js, TypeScript, Supabase/PostgreSQL, auth/RBAC, PWA, AI-støttet utviklingsworkflow",
+      role: "Produktutvikler, fullstack prototypeutvikler og fasilitator",
+      tech: "React, Next.js, TypeScript, Supabase/PostgreSQL, auth/RBAC, PWA, AI-støttet utviklingsflyt",
       link: "https://klar-sigma.vercel.app/",
       linkLabel: "Åpne Klar",
       accessNote: `Demo-/brukertilgang gis ved forespørsel: ${email}`,
       summary:
-        "Klar er mitt sterkeste eksempel på AI-first produktbygging: en fungerende PWA med to roller, innlogging, strukturert dataflyt og AI-assistert import med menneske-i-løkka-kontroll.",
+        "Klar startet i masterprosjektet mitt og ble utviklet gjennom lærerworkshops, scenarioer og en fungerende prototype. Resultatet er en PWA med lærer- og elevrolle, innlogging, strukturert dataflyt og AI-assistert import med kontroll før publisering.",
       facets: [
         {
-          label: "Systemet",
-          text: "Én React/Next.js-kodebase serverer to ulike grensesnitt: lærer og elev. Valgene er gjort rundt faktisk bruk: nettleser, Chromebook, mobil, lav terskel og tydelige roller.",
+          label: "Produktet",
+          text: "Én React/Next.js-kodebase serverer to ulike grensesnitt: lærer og elev. Valgene er gjort rundt faktisk bruk i skolen: nettleser, Chromebook, mobil, lav terskel og tydelige roller.",
         },
         {
           label: "Backend, data og auth",
@@ -249,18 +249,19 @@ export const home: Record<Locale, HomeCopy> = {
           text: "Smart Import tolker ukebrev og foreslår oppgaver, fag og timeplan. Det løser en konkret flaskehals for læreren, i stedet for å bruke AI som pynt.",
         },
         {
-          label: "Kontroll og ansvar",
-          text: "AI-output går gjennom en redigerbar forhåndsvisning før publisering. Læreren beholder kontrollen, og systemet får et tydelig kvalitetspunkt.",
+          label: "Kontroll før publisering",
+          text: "AI-forslag går gjennom en redigerbar forhåndsvisning før publisering. Læreren beholder kontrollen, og feil kan fanges før elevene ser innholdet.",
         },
       ],
-      lookForHeading: "Hva du bør se etter",
+      lookForHeading: "Se spesielt etter",
       description: [],
       bullets: [
         "Next.js/React/TypeScript i fungerende produktkontekst",
         "Supabase/PostgreSQL, innlogging og rollebasert tilgang",
         "AI-import med menneske-i-løkka forhåndsvisning",
+        "Brukerinnsikt fra planlagte workshops og scenariobasert evaluering",
         "PWA og plattformuavhengighet som praktisk engineering-valg",
-        "Robust prototype, ikke påstand om enterprise-skala",
+        "En prototype som er klar for videre elevtesting, ikke en ferdig skoleplattform",
       ],
       screenshots: [
         {
@@ -300,11 +301,11 @@ export const home: Record<Locale, HomeCopy> = {
         },
       ],
     },
-    supportingSection: {
+      supportingSection: {
       label: "Flere tekniske spor",
-      title: "Prosjekter som viser bygging, ikke bare ideer",
+      title: "Prosjekter som har blitt til noe",
       lede:
-        "Jeg vil at porteføljen skal vise hvordan jeg tenker som utvikler: stackvalg, avgrensninger, dokumentasjon, og når noe bør bygges eller integreres.",
+        "Jeg vil at porteføljen skal vise hvordan jeg jobber: stackvalg, avgrensninger, dokumentasjon, og når noe bør bygges eller integreres.",
       secondaryLabel: "Tidligere og støttende arbeid",
     },
     supportingCases: [
@@ -320,7 +321,7 @@ export const home: Record<Locale, HomeCopy> = {
         accessNote: `Ta kontakt for brukertilgang: ${email}`,
         description: [
           "Dette prosjektet var forløperen til Klar. Jeg bygget en fungerende prototype for oversikt og prioritering av skolearbeid, med backend i Django og frontend i Vue.",
-          "Det er tidlig kode, men viktig bevis: jeg gikk fra behovsarbeid til faktisk system, med elever som meddesignere og begrensede ressurser.",
+          "Det er tidlig kode, men retningen er tydelig: behovsarbeid med elever ble oversatt til et system som kunne prøves.",
         ],
         bullets: [
           "Python/Django backend og SQLite",
@@ -339,12 +340,12 @@ export const home: Record<Locale, HomeCopy> = {
         id: "companion",
         tier: "primary",
         title: "Companion / nikkoprogging",
-        type: "Flutter/Dart / lokal-first app og dokumentert utviklingsflyt",
+        type: "Flutter/Dart / lokal-first app og dokumentert utvikling",
         tech: "Flutter, Dart, Drift, SQLite, tester, plan- og epic-dokumenter",
         link: "https://github.com/stianglomsrod/nikkoprogging",
         linkLabel: "Se repoet",
         description: [
-          "Companion-prosjektet er det tydeligste beviset mitt på langsiktig agentisk utviklingsdisiplin: små trygge leveranser, plan-dokumenter, databasevalg og tester.",
+          "Companion-prosjektet viser hvordan jeg jobber over tid: små leveranser, plan-dokumenter, databasevalg og tester rundt app-logikken.",
         ],
         bullets: [
           "Lokal-first arkitektur med Drift/SQLite",
@@ -436,12 +437,12 @@ export const home: Record<Locale, HomeCopy> = {
       },
     ],
     workflow: {
-      label: "Arbeidsflyt",
-      title: "Slik bygger jeg med AI",
+      label: "Prosess",
+      title: "Hvordan jeg bruker AI i utvikling",
       text:
-        "AI-agenter gjør meg raskere, men de får ikke siste ord. Jeg jobber i en fast utviklingsflyt der hvert steg har en eier, en grense og et tydelig tegn på hva som teller som ferdig.",
+        "AI gjør meg raskere, men den får ikke siste ord. Jeg prøver å holde arbeidet konkret: forstå målet, dele det opp, teste underveis og skrive ned valgene mens konteksten fortsatt er fersk.",
       note:
-        "Målet er ikke å være en prompt-person. Målet er å bygge programvare raskere uten å miste ansvar, testbarhet eller teknisk dømmekraft.",
+        "Målet er ikke å slippe å kunne ting. Målet er å utvikle raskere uten å miste ansvar, testbarhet eller teknisk dømmekraft.",
       stepsAria: "Utviklingsprosessen steg for steg",
       steps: [
         {
@@ -449,15 +450,15 @@ export const home: Record<Locale, HomeCopy> = {
           text: "Starte med mål, rammer, kilder, risiko og akseptansekriterier.",
         },
         {
-          phase: "Krav",
-          text: "Bryte arbeidet ned i små, reviewbare steg med tydelig scope.",
+          phase: "Avgrense",
+          text: "Bryte arbeidet ned i små steg som kan leses, testes og endres.",
         },
         {
-          phase: "Bygge",
-          text: "Bruke agent-output som utkast til kode, struktur, tester eller docs.",
+          phase: "Utvikle",
+          text: "Bruke AI-output som utkast til kode, struktur, tester eller dokumentasjon.",
         },
         {
-          phase: "Review",
+          phase: "Lese",
           text: "Lese, teste og vurdere forslagene før de får gå videre.",
         },
         {
@@ -465,7 +466,7 @@ export const home: Record<Locale, HomeCopy> = {
           text: "Fange feil antagelser, stramme scope og rette avvik.",
         },
         {
-          phase: "QA",
+          phase: "Sjekke",
           text: "Sjekke påstander, edge cases, tilgjengelighet og teknisk risiko.",
         },
         {
@@ -477,15 +478,15 @@ export const home: Record<Locale, HomeCopy> = {
           text: "Gjøre arbeidet forståelig nok til at andre kan ta det videre.",
         },
       ],
-      evidenceLabel: "Tre prosjekter · samme mønster",
-      evidenceTitle: "Produkt, arbeidsflyt og overlevering",
+      evidenceLabel: "Tre prosjekter · samme arbeidsmåte",
+      evidenceTitle: "Produkt, prosess og overlevering",
       evidenceIntro:
-        "Dette er ikke tre tilfeldige prosjekter. Samlet viser de hvordan jeg bygger med AI i praksis: produkt, utviklingsdisiplin og enablement.",
+        "Prosjektene viser samme mønster i ulike størrelser: forstå behovet, lage noe som virker, og gjøre arbeidet mulig å ta videre.",
       evidenceBoundary:
-        "Eksemplene viser arbeidsmåte og engineering judgement i prototypeskala. De er ikke påstander om senior plattformansvar eller enterprise-skala.",
+        "Dette er først og fremst prototype- og produktarbeid. Dypere plattform- og driftsansvar er noe jeg bygger videre mot.",
       evidenceProjects: [
         {
-          tag: "Fullstack AI-produkt",
+          tag: "Fullstack produkt",
           name: "Klar",
           proof:
             "Next.js, React, TypeScript, Supabase/PostgreSQL, auth/RBAC og AI-assistert import med forhåndsvisning.",
@@ -498,7 +499,7 @@ export const home: Record<Locale, HomeCopy> = {
           name: "Companion",
           proof:
             "Flutter, Dart, Drift/SQLite, lokal-first arkitektur, plan-dokumenter, epics og tester.",
-          note: "Langsiktig agentisk utviklingsdisiplin i praksis.",
+          note: "Langsiktig utviklingsarbeid i praksis.",
           primary: {
             label: "Se repoet",
             href: "https://github.com/stianglomsrod/nikkoprogging",
@@ -522,23 +523,23 @@ export const home: Record<Locale, HomeCopy> = {
       ],
     },
     developer: {
-      label: "Dev-spor",
-      title: "Læringshastighet og ærlig vekstretning",
+      label: "Veien hit",
+      title: "Hvor jeg står, og hva jeg lærer nå",
       lede:
-        "Jeg er ikke en tradisjonell senior plattformutvikler. Det jeg kan vise nå, er høy læringshastighet, fungerende fullstack-prototyper og en dokumentert måte å bruke AI i utvikling på.",
+        "Jeg er ikke en tradisjonell senior plattformutvikler. Det jeg kan vise nå, er høy læringshastighet, fungerende fullstack-prototyper og en ryddig måte å bruke AI i utvikling på.",
       nowTitle: "Det jeg kan vise nå",
       now: [
         "Fungerende webprodukter og prototyper på tvers av Next.js/React, Supabase/PostgreSQL, Python/Django, Vue, Astro og Flutter/Dart.",
         "Jevn produksjon over tid på tvers av kode, dokumentasjon, QA, teknisk gjeld og forbedringsløkker.",
         "Evne til å gjøre ny kunnskap om til noe andre kan bruke: prototyper, sjekklister, handoff-dokumenter og arbeidsflyter.",
       ],
-      growthTitle: "Det jeg bygger videre",
+      growthTitle: "Det jeg utvikler videre",
       growthLede:
-        "Dette er retningen min, ikke et forsøk på å overselge dagens nivå:",
+        "Dette er retningen min videre:",
       growth: [
-        "Dypere programmering, verktøybygging og plattformtenkning.",
+        "Dypere programmering, verktøyutvikling og plattformtenkning.",
         "Robusthet, observability og mer driftsnær praksis.",
-        "Distribuerte systemer, GitHub Actions/API og agentiske rammeverk som MCP.",
+        "Distribuerte systemer, GitHub Actions/API og rammeverk som MCP.",
       ],
       learningTitle: "Programmering og veien hit",
       learningLede:
@@ -565,7 +566,7 @@ export const home: Record<Locale, HomeCopy> = {
         },
       ],
       honest:
-        "Den ærlige posisjonen: sterkest bevis i dag er AI-first fullstack produktbygging, kvalitetssikret arbeidsflyt og tydelig overlevering. Dypere plattform- og lavnivåarbeid er vekstretningen.",
+        "Kortversjonen: Jeg står sterkest i fullstack produktutvikling, brukerinnsikt, kvalitetssikret AI-bruk og tydelig overlevering. Dypere plattform- og lavnivåarbeid er retningen videre.",
     },
     footer: {
       title: "Kontakt",
@@ -582,16 +583,16 @@ export const home: Record<Locale, HomeCopy> = {
     },
   },
   en: {
-    metaTitle: "Stian Glomsrød — AI-first developer portfolio",
+    metaTitle: "Stian Glomsrød — full-stack developer",
     metaDescription:
-      "AI-first full-stack product building, documented agentic workflow, and practical quality control.",
+      "Full-stack development, user insight from workshops, and AI as a practical development tool.",
     skipLink: "Skip to content",
     nav: {
       label: "Main navigation",
       work: "Work",
       klar: "Klar",
-      workflow: "Workflow",
-      dev: "Dev path",
+      workflow: "Process",
+      dev: "Path",
       contact: "Contact",
     },
     languageToggle: {
@@ -611,10 +612,10 @@ export const home: Record<Locale, HomeCopy> = {
     },
     hero: {
       name: "Stian Glomsrød",
-      eyebrow: "AI-first full-stack builder",
-      title: "I build software from unclear needs into working systems.",
+      eyebrow: "AI-first full-stack developer",
+      title: "I turn unclear needs into working software.",
       intro:
-        "I work full-stack and use AI agents actively while building, but always with explicit requirements, review loops and human judgement. My strength is connecting user insight, system thinking and practical implementation into something that can actually be tested.",
+        "I work full-stack and use AI as support while developing. The important part for me is understanding the need first: planning workshops, gathering user insight, and turning findings into something that can be tried in code.",
       portraitAlt: "Portrait of Stian Glomsrød",
       primaryCta: "View technical work",
       secondaryCta: "Contact me",
@@ -623,9 +624,9 @@ export const home: Record<Locale, HomeCopy> = {
         "AI agents used with requirements, QA, documentation and handoff",
         "Python/Django, Vue, Flutter/Dart, Astro and practical repositories",
       ],
-      workPanelTitle: "Technical evidence",
+      workPanelTitle: "Concrete work",
       workPanelIntro:
-        "A focused path through full-stack product building, agentic workflow and programming growth.",
+        "A few concrete threads: a master's project that became a working prototype, projects over time, and a way of using AI that still has to survive review.",
       highlights: [
         {
           href: "#klar",
@@ -635,38 +636,38 @@ export const home: Record<Locale, HomeCopy> = {
         },
         {
           href: "#workflow",
-          title: "Agentic workflow",
+          title: "AI in my dev flow",
           meta: "Requirements · review · QA · handoff",
-          text: "AI is used as a development partner, not autopilot. The work is guided by context and checkpoints.",
+          text: "AI helps with drafts, but code, choices and tradeoffs still have to be understood and checked.",
         },
         {
           href: "#dev-path",
-          title: "Dev path",
+          title: "Path here",
           meta: "CS50x · Python · JS · Flutter",
-          text: "An honest technical progression from small tools to full-stack and local-first architecture.",
+          text: "A technical progression from small tools to full-stack and local-first app architecture.",
         },
       ],
     },
     featuredSection: {
       label: "Main case",
-      title: "Klar as technical evidence",
+      title: "Klar as the main case",
     },
     featuredCase: {
       id: "klar",
       title:
         "Klar — a full-stack PWA with AI-assisted import and role logic",
       type: "Master's project / working full-stack web prototype",
-      role: "Product builder, full-stack prototype developer and agentic development lead",
+      role: "Product developer, full-stack prototype developer and agentic development lead",
       tech: "React, Next.js, TypeScript, Supabase/PostgreSQL, auth/RBAC, PWA, AI-supported development workflow",
       link: "https://klar-sigma.vercel.app/",
       linkLabel: "Open Klar",
       accessNote: `Demo/user access available on request: ${email}`,
       summary:
-        "Klar is my strongest example of AI-first product building: a working PWA with two roles, sign-in, structured data flow and AI-assisted import with a human-in-the-loop check.",
+        "Klar started in my master's project and was developed through teacher workshops, scenarios and a working prototype. The result is a PWA with teacher and student roles, sign-in, structured data flow and AI-assisted import with review before publishing.",
       facets: [
         {
-          label: "The system",
-          text: "One React/Next.js codebase serves two different interfaces: teacher and student. The choices are built around real use: browser, Chromebook, mobile, low friction and clear roles.",
+          label: "The product",
+          text: "One React/Next.js codebase serves two different interfaces: teacher and student. The choices are built around real school use: browser, Chromebook, mobile, low friction and clear roles.",
         },
         {
           label: "Backend, data and auth",
@@ -677,8 +678,8 @@ export const home: Record<Locale, HomeCopy> = {
           text: "Smart Import interprets weekly letters and suggests tasks, subjects and schedules. It solves a concrete teacher bottleneck instead of using AI as decoration.",
         },
         {
-          label: "Control and responsibility",
-          text: "AI output goes through an editable preview before publishing. The teacher keeps control, and the system gets a clear quality checkpoint.",
+          label: "Review before publishing",
+          text: "AI suggestions go through an editable preview before publishing. The teacher keeps control, and errors can be caught before students see the content.",
         },
       ],
       lookForHeading: "What to look for",
@@ -687,8 +688,9 @@ export const home: Record<Locale, HomeCopy> = {
         "Next.js/React/TypeScript in a working product context",
         "Supabase/PostgreSQL, sign-in and role-based access",
         "AI import with a human-in-the-loop preview",
+        "User insight from planned workshops and scenario-based evaluation",
         "PWA and platform independence as practical engineering choices",
-        "Robust prototype, not an enterprise-scale claim",
+        "A prototype ready for further student testing, not a finished school platform",
       ],
       screenshots: [
         {
@@ -730,9 +732,9 @@ export const home: Record<Locale, HomeCopy> = {
     },
     supportingSection: {
       label: "More technical threads",
-      title: "Projects that show building, not just ideas",
+      title: "Projects that became something",
       lede:
-        "I want the portfolio to show how I think as a developer: stack choices, boundaries, documentation, and when something should be built or integrated.",
+        "I want the portfolio to show how I work: stack choices, boundaries, documentation, and when something should be built or integrated.",
       secondaryLabel: "Earlier and supporting work",
     },
     supportingCases: [
@@ -748,7 +750,7 @@ export const home: Record<Locale, HomeCopy> = {
         accessNote: `Contact me for user access: ${email}`,
         description: [
           "This project was the precursor to Klar. I built a working prototype for overview and prioritization of schoolwork, with a Django backend and Vue frontend.",
-          "It is early code, but important evidence: I moved from needs work into an actual system, with students as co-designers and limited resources.",
+          "It is early code, but the direction is clear: needs work with students was translated into a system that could be tried.",
         ],
         bullets: [
           "Python/Django backend and SQLite",
@@ -767,12 +769,12 @@ export const home: Record<Locale, HomeCopy> = {
         id: "companion",
         tier: "primary",
         title: "Companion / nikkoprogging",
-        type: "Flutter/Dart / local-first app and documented dev workflow",
+        type: "Flutter/Dart / local-first app and documented development",
         tech: "Flutter, Dart, Drift, SQLite, tests, planning and epic documents",
         link: "https://github.com/stianglomsrod/nikkoprogging",
         linkLabel: "View repo",
         description: [
-          "The Companion project is my clearest evidence of long-running agentic development discipline: small safe deliveries, planning documents, database choices and tests.",
+          "The Companion project shows how I work over time: small deliveries, planning documents, database choices and tests around app logic.",
         ],
         bullets: [
           "Local-first architecture with Drift/SQLite",
@@ -864,12 +866,12 @@ export const home: Record<Locale, HomeCopy> = {
       },
     ],
     workflow: {
-      label: "Workflow",
-      title: "How I build with AI",
+      label: "Process",
+      title: "How I use AI in development",
       text:
-        "AI agents make me faster, but they do not get the last word. I work in a fixed development flow where every step has an owner, a boundary and a clear sign of what counts as done.",
+        "AI makes me faster, but it does not get the last word. I try to keep the work concrete: understand the goal, break it down, test as I go, and write down choices while the context is still fresh.",
       note:
-        "The goal is not to be a prompt person. The goal is to build software faster without losing responsibility, testability or technical judgement.",
+        "The goal is not to avoid knowing things. The goal is to develop faster without losing responsibility, testability or technical judgement.",
       stepsAria: "The development process step by step",
       steps: [
         {
@@ -877,15 +879,15 @@ export const home: Record<Locale, HomeCopy> = {
           text: "Start with goals, constraints, sources, risks and acceptance criteria.",
         },
         {
-          phase: "Requirements",
-          text: "Break the work into small, reviewable steps with clear scope.",
+          phase: "Scope",
+          text: "Break the work into small steps that can be read, tested and changed.",
         },
         {
-          phase: "Build",
-          text: "Use agent output as drafts for code, structure, tests or docs.",
+          phase: "Develop",
+          text: "Use AI output as drafts for code, structure, tests or documentation.",
         },
         {
-          phase: "Review",
+          phase: "Read",
           text: "Read, test and judge the suggestions before they move forward.",
         },
         {
@@ -893,7 +895,7 @@ export const home: Record<Locale, HomeCopy> = {
           text: "Catch false assumptions, tighten scope and fix deviations.",
         },
         {
-          phase: "QA",
+          phase: "Check",
           text: "Check claims, edge cases, accessibility and technical risk.",
         },
         {
@@ -905,15 +907,15 @@ export const home: Record<Locale, HomeCopy> = {
           text: "Make the work understandable enough for others to carry forward.",
         },
       ],
-      evidenceLabel: "Three projects · one pattern",
-      evidenceTitle: "Product, workflow and handoff",
+      evidenceLabel: "Three projects · same working style",
+      evidenceTitle: "Product, process and handoff",
       evidenceIntro:
-        "These are not three random projects. Together they show how I build with AI in practice: product, development discipline and enablement.",
+        "The projects show the same pattern at different sizes: understand the need, make something that works, and leave the work possible to continue.",
       evidenceBoundary:
-        "The examples show how I work and the engineering judgement behind it, at prototype scale. They are not claims of senior platform ownership or enterprise scale.",
+        "This is mostly product and prototype work. Deeper platform and operations work is something I am building toward.",
       evidenceProjects: [
         {
-          tag: "Full-stack AI product",
+          tag: "Full-stack product",
           name: "Klar",
           proof:
             "Next.js, React, TypeScript, Supabase/PostgreSQL, auth/RBAC and AI-assisted import with a preview gate.",
@@ -926,7 +928,7 @@ export const home: Record<Locale, HomeCopy> = {
           name: "Companion",
           proof:
             "Flutter, Dart, Drift/SQLite, local-first architecture, planning docs, epics and tests.",
-          note: "Long-running agentic development discipline in practice.",
+          note: "Long-running development work in practice.",
           primary: {
             label: "View repo",
             href: "https://github.com/stianglomsrod/nikkoprogging",
@@ -950,23 +952,22 @@ export const home: Record<Locale, HomeCopy> = {
       ],
     },
     developer: {
-      label: "Dev path",
-      title: "Learning speed and an honest growth direction",
+      label: "Path here",
+      title: "Where I am, and what I am learning now",
       lede:
-        "I am not a traditional senior platform engineer. What I can show today is fast learning, working full-stack prototypes and a documented way of using AI in development.",
+        "I am not a traditional senior platform engineer. What I can show today is fast learning, working full-stack prototypes and a tidy way of using AI in development.",
       nowTitle: "What I can show now",
       now: [
         "Working web products and prototypes across Next.js/React, Supabase/PostgreSQL, Python/Django, Vue, Astro and Flutter/Dart.",
         "Steady output over time across code, documentation, QA, technical debt and improvement loops.",
         "Ability to turn new knowledge into something others can use: prototypes, checklists, handoff documents and workflows.",
       ],
-      growthTitle: "What I am building toward",
-      growthLede:
-        "This is my direction, not an attempt to oversell my current level:",
+      growthTitle: "What I am working toward",
+      growthLede: "This is the direction I am moving in:",
       growth: [
         "Deeper programming, tooling and platform thinking.",
         "Robustness, observability and more operational practice.",
-        "Distributed systems, GitHub Actions/API and agentic frameworks such as MCP.",
+        "Distributed systems, GitHub Actions/API and frameworks such as MCP.",
       ],
       learningTitle: "Programming and how I got here",
       learningLede:
@@ -993,7 +994,7 @@ export const home: Record<Locale, HomeCopy> = {
         },
       ],
       honest:
-        "The honest position: my strongest evidence today is AI-first full-stack product building, quality-controlled workflow and clear handoff. Deeper platform and low-level work is the growth direction.",
+        "Short version: I am strongest in full-stack product development, user insight, quality-controlled AI use and clear handoff. Deeper platform and low-level work is the direction ahead.",
     },
     footer: {
       title: "Contact",

@@ -7,8 +7,7 @@
 }
 
 .section {
-  padding: 84px 0;
-  border-bottom: 1px solid var(--border);
+  padding: 96px 0;
   scroll-margin-top: 72px;
 }
 
@@ -41,7 +40,7 @@
 
 @media (max-width: 600px) {
   .section {
-    padding: 60px 0;
+    padding: 68px 0;
   }
   .sectionHead {
     margin-bottom: 28px;

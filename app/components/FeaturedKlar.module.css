@@ -5,35 +5,15 @@
 .card {
   position: relative;
   border-radius: var(--radius-lg);
-  border: 1px solid var(--border-strong);
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--surface) 92%, transparent),
-    color-mix(in srgb, var(--surface-2) 92%, transparent)
-  );
-  overflow: hidden;
+  background: transparent;
 }
 
-/* Accent edge to emphasize Klar above all other cases */
 .card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(135deg, var(--accent), transparent 55%);
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-  opacity: 0.7;
+  content: none;
 }
 
 .head {
-  padding: clamp(24px, 4vw, 40px);
-  border-bottom: 1px solid var(--border);
+  padding: 0;
 }
 
 .type {
@@ -81,17 +61,18 @@
 
 /* Facets: scannable 2x2 grid */
 .facets {
-  padding: clamp(24px, 4vw, 40px);
+  margin-top: 34px;
+  padding: 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1px;
-  background: var(--border);
+  gap: 12px;
 }
 
 .facet {
-  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  background: color-mix(in srgb, var(--surface-elevated) 86%, transparent);
   padding: 22px;
   border-radius: 8px;
+  box-shadow: inset 0 0 0 1px var(--border);
 }
 
 .facetLabel {
@@ -108,8 +89,8 @@
 }
 
 .lookForBlock {
-  padding: clamp(24px, 4vw, 40px);
-  border-top: 1px solid var(--border);
+  margin-top: 34px;
+  padding: 0;
 }
 
 .lookForHeading {
@@ -143,7 +124,8 @@
 }
 
 .actions {
-  padding: 0 clamp(24px, 4vw, 40px) clamp(24px, 4vw, 40px);
+  margin-top: 28px;
+  padding: 0;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -156,10 +138,11 @@
 }
 
 .gallery {
-  padding: 0 clamp(24px, 4vw, 40px) clamp(24px, 4vw, 40px);
+  margin-top: 34px;
+  padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
 }
 
 @media (max-width: 680px) {

@@ -3,13 +3,7 @@ import Phaser from "phaser";
 import type { GameBridge } from "../bridge";
 import type { GameRuntime } from "../runtime";
 import { buildSolidGrid, tileCenter, validateMap } from "../systems/grid";
-import type {
-  ContentPack,
-  Dir,
-  Interactable,
-  MapDef,
-  Npc,
-} from "../types";
+import type { ContentPack, Dir, Interactable, MapDef, Npc } from "../types";
 
 interface WorldData {
   mapId: string;
@@ -46,7 +40,10 @@ export class WorldScene extends Phaser.Scene {
   private reducedMotion = false;
 
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
-  private wasd!: Record<"up" | "down" | "left" | "right", Phaser.Input.Keyboard.Key>;
+  private wasd!: Record<
+    "up" | "down" | "left" | "right",
+    Phaser.Input.Keyboard.Key
+  >;
   private interactKey!: Phaser.Input.Keyboard.Key;
   private unsub: Array<() => void> = [];
 
@@ -77,7 +74,8 @@ export class WorldScene extends Phaser.Scene {
 
     if (process.env.NODE_ENV !== "production") {
       const issues = validateMap(map, this.pack);
-      if (issues.length) console.warn("[skamlos-rpg] map issues:\n" + issues.join("\n"));
+      if (issues.length)
+        console.warn("[skamlos-rpg] map issues:\n" + issues.join("\n"));
     }
 
     const worldW = map.width * this.size;
@@ -190,10 +188,12 @@ export class WorldScene extends Phaser.Scene {
     const lang = this.runtime.state.lang;
     const labels = [...(this.map.labels ?? [])];
     for (const b of this.map.buildings ?? []) {
-      if (b.label) labels.push({ text: b.label, x: b.x + b.wTiles / 2, y: b.y - 0.4 });
+      if (b.label)
+        labels.push({ text: b.label, x: b.x + b.wTiles / 2, y: b.y - 0.4 });
     }
     for (const l of labels) {
-      const text = typeof l.text === "string" ? l.text : l.text[lang] ?? l.text.no;
+      const text =
+        typeof l.text === "string" ? l.text : (l.text[lang] ?? l.text.no);
       const t = this.add.text(l.x * s, l.y * s, text, {
         fontFamily: "monospace",
         fontSize: l.small ? "11px" : "13px",
@@ -215,7 +215,14 @@ export class WorldScene extends Phaser.Scene {
     for (let y = 0; y < this.map.height; y++) {
       for (let x = 0; x < this.map.width; x++) {
         if (!grid[y][x]) continue;
-        const cell = this.add.rectangle(x * s + s / 2, y * s + s / 2, s, s, 0x000000, 0);
+        const cell = this.add.rectangle(
+          x * s + s / 2,
+          y * s + s / 2,
+          s,
+          s,
+          0x000000,
+          0,
+        );
         this.physics.add.existing(cell, true);
         this.solids.add(cell);
       }
@@ -225,7 +232,8 @@ export class WorldScene extends Phaser.Scene {
   /* ---------- actors ---------- */
 
   private spawnPlayer(spawnId: string): void {
-    const spawn = this.map.spawns[spawnId] ?? this.runtime.state.player ?? { x: 2, y: 2 };
+    const spawn = this.map.spawns[spawnId] ??
+      this.runtime.state.player ?? { x: 2, y: 2 };
     const c = tileCenter(spawn.x, spawn.y, this.size);
     const key = this.pack.meta.theme.playerSpriteKey;
 
@@ -254,7 +262,11 @@ export class WorldScene extends Phaser.Scene {
       if (data.showWhen && !this.runtime.met(data.showWhen)) continue;
       const c = tileCenter(data.position.x, data.position.y, s);
       if (data.spriteKey && this.textures.exists(data.spriteKey)) {
-        const img = this.add.image(c.x, data.tall ? (data.position.y + 1) * s : c.y, data.spriteKey);
+        const img = this.add.image(
+          c.x,
+          data.tall ? (data.position.y + 1) * s : c.y,
+          data.spriteKey,
+        );
         img.setOrigin(0.5, data.tall ? 1 : 0.5);
         img.setDepth(data.tall ? (data.position.y + 1) * s : c.y);
       }
@@ -322,10 +334,13 @@ export class WorldScene extends Phaser.Scene {
     this.player.setVelocity(0, 0);
     this.runtime.setPlayer(0, 0, this.facing);
     this.cameras.main.fadeOut(200);
-    this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
-      this.runtime.setMap(mapId);
-      this.scene.restart({ mapId, spawn, autostart: true });
-    });
+    this.cameras.main.once(
+      Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE,
+      () => {
+        this.runtime.setMap(mapId);
+        this.scene.restart({ mapId, spawn, autostart: true });
+      },
+    );
   }
 
   /* ---------- input & bridge ---------- */
@@ -355,8 +370,10 @@ export class WorldScene extends Phaser.Scene {
   private registerBridge(): void {
     const pauseEvents = ["dialogue", "openMinigame"] as const;
     const resumeEvents = ["cmd:closeDialogue", "closeMinigame"] as const;
-    for (const ev of pauseEvents) this.unsub.push(this.bridge.on(ev, () => this.pause()));
-    for (const ev of resumeEvents) this.unsub.push(this.bridge.on(ev, () => this.resume()));
+    for (const ev of pauseEvents)
+      this.unsub.push(this.bridge.on(ev, () => this.pause()));
+    for (const ev of resumeEvents)
+      this.unsub.push(this.bridge.on(ev, () => this.resume()));
     this.unsub.push(this.bridge.on("cmd:pause", () => this.pause()));
     this.unsub.push(this.bridge.on("cmd:resume", () => this.resume()));
     this.unsub.push(this.bridge.on("cmd:start", () => this.beginPlay()));
@@ -424,7 +441,10 @@ export class WorldScene extends Phaser.Scene {
       this.cueFired = true;
       return;
     }
-    if (cue.whenActiveQuest && this.runtime.activeQuest()?.id !== cue.whenActiveQuest) {
+    if (
+      cue.whenActiveQuest &&
+      this.runtime.activeQuest()?.id !== cue.whenActiveQuest
+    ) {
       // The gated quest is no longer active; skip the cue silently.
       this.cueFired = true;
       this.runtime.setFlag(seen, true);
@@ -459,7 +479,10 @@ export class WorldScene extends Phaser.Scene {
         this.runDialogue(a.tree);
         break;
       case "inspect":
-        this.bridge.emit("dialogue", { id: `inspect:${data.id}`, lines: [{ text: a.text }] });
+        this.bridge.emit("dialogue", {
+          id: `inspect:${data.id}`,
+          lines: [{ text: a.text }],
+        });
         break;
       case "startMinigame":
         this.bridge.emit("openMinigame", a.minigame);
@@ -472,20 +495,30 @@ export class WorldScene extends Phaser.Scene {
         break;
       case "signpost": {
         const hint = this.runtime.activeQuest()?.nextHint;
-        if (hint) this.bridge.emit("dialogue", { id: "signpost", lines: [{ text: hint }] });
+        if (hint)
+          this.bridge.emit("dialogue", {
+            id: "signpost",
+            lines: [{ text: hint }],
+          });
         break;
       }
     }
   }
 
-  private runDialogue(treeId: string, speaker?: { no: string; en?: string }): void {
+  private runDialogue(
+    treeId: string,
+    speaker?: { no: string; en?: string },
+  ): void {
     const tree = this.pack.dialogue[treeId];
     if (!tree || tree.length === 0) return;
     const lines = speaker ? tree.map((l) => ({ speaker, ...l })) : tree;
     this.bridge.emit("dialogue", { id: treeId, lines });
   }
 
-  private setPrompt(id: string | null, text?: { no: string; en?: string }): void {
+  private setPrompt(
+    id: string | null,
+    text?: { no: string; en?: string },
+  ): void {
     if (id === this.lastPromptId) return;
     this.lastPromptId = id;
     this.bridge.emit("prompt", id && text ? text : null);
@@ -515,7 +548,10 @@ export class WorldScene extends Phaser.Scene {
       else if (vx > 0) this.facing = "right";
       else if (vy < 0) this.facing = "up";
       else if (vy > 0) this.facing = "down";
-      this.player.anims.play(`${this.pack.meta.theme.playerSpriteKey}-walk-${this.facing}`, true);
+      this.player.anims.play(
+        `${this.pack.meta.theme.playerSpriteKey}-walk-${this.facing}`,
+        true,
+      );
     } else {
       this.player.setVelocity(0, 0);
       this.player.anims.stop();
@@ -539,7 +575,12 @@ export class WorldScene extends Phaser.Scene {
     let best: Target | null = null;
     let bestDist = range;
     for (const tgt of this.targets) {
-      const d = Phaser.Math.Distance.Between(this.player.x, this.player.y, tgt.x, tgt.y);
+      const d = Phaser.Math.Distance.Between(
+        this.player.x,
+        this.player.y,
+        tgt.x,
+        tgt.y,
+      );
       if (d < bestDist) {
         best = tgt;
         bestDist = d;
@@ -550,7 +591,13 @@ export class WorldScene extends Phaser.Scene {
       this.setPrompt(null);
       return;
     }
-    const prompt = best.kind === "npc" ? { no: `Snakk med ${best.data.name.no}` } : best.data.prompt;
-    this.setPrompt(best.kind === "npc" ? `npc:${best.data.id}` : best.data.id, prompt);
+    const prompt =
+      best.kind === "npc"
+        ? { no: `Snakk med ${best.data.name.no}` }
+        : best.data.prompt;
+    this.setPrompt(
+      best.kind === "npc" ? `npc:${best.data.id}` : best.data.id,
+      prompt,
+    );
   }
 }

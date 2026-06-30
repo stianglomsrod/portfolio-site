@@ -6,7 +6,8 @@ export function playBell(): void {
   try {
     const Ctor =
       window.AudioContext ??
-      (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      (window as unknown as { webkitAudioContext?: typeof AudioContext })
+        .webkitAudioContext;
     if (!Ctor) return;
     ctx = ctx ?? new Ctor();
     const now = ctx.currentTime;

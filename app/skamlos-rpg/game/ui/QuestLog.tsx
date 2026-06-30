@@ -14,7 +14,9 @@ interface Props {
 
 export default function QuestLog({ pack, snapshot, lang, onClose }: Props) {
   const done = snapshot?.completedQuests ?? [];
-  const activeTitle = snapshot?.questTitle ? t(snapshot.questTitle, lang) : null;
+  const activeTitle = snapshot?.questTitle
+    ? t(snapshot.questTitle, lang)
+    : null;
   const quests = [...pack.quests].sort((a, b) => a.order - b.order);
 
   return (
@@ -22,7 +24,11 @@ export default function QuestLog({ pack, snapshot, lang, onClose }: Props) {
       <div className={styles.panel} onClick={(e) => e.stopPropagation()}>
         <header className={styles.panelHead}>
           <h2>{lang === "no" ? "Oppdrag" : "Quests"}</h2>
-          <button className={styles.panelClose} onClick={onClose} aria-label="close">
+          <button
+            className={styles.panelClose}
+            onClick={onClose}
+            aria-label="close"
+          >
             ✕
           </button>
         </header>
@@ -36,7 +42,9 @@ export default function QuestLog({ pack, snapshot, lang, onClose }: Props) {
                 <span className={styles.questDot} data-status={status} />
                 <div>
                   <strong>{t(q.title, lang)}</strong>
-                  <span className={styles.questObjective}>{t(q.objective, lang)}</span>
+                  <span className={styles.questObjective}>
+                    {t(q.objective, lang)}
+                  </span>
                 </div>
                 <span className={styles.questBadge}>
                   {isDone

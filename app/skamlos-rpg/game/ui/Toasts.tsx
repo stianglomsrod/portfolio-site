@@ -16,7 +16,13 @@ const ICON: Record<ToastItem["kind"], string> = {
   info: "✨",
 };
 
-export default function Toasts({ items, lang }: { items: ToastItem[]; lang: Lang }) {
+export default function Toasts({
+  items,
+  lang,
+}: {
+  items: ToastItem[];
+  lang: Lang;
+}) {
   if (items.length === 0) return null;
   return (
     <div className={styles.toasts}>

@@ -44,7 +44,10 @@ export class BootScene extends Phaser.Scene {
       }
     }
 
-    if (this.textures.exists("flutterfly") && !this.anims.exists("flutterfly-flap")) {
+    if (
+      this.textures.exists("flutterfly") &&
+      !this.anims.exists("flutterfly-flap")
+    ) {
       this.anims.create({
         key: "flutterfly-flap",
         frames: [

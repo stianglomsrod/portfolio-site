@@ -21,7 +21,11 @@ export default function SkillLog({ pack, snapshot, lang, onClose }: Props) {
       <div className={styles.panel} onClick={(e) => e.stopPropagation()}>
         <header className={styles.panelHead}>
           <h2>{lang === "no" ? "Ferdigheter" : "Skills"}</h2>
-          <button className={styles.panelClose} onClick={onClose} aria-label="close">
+          <button
+            className={styles.panelClose}
+            onClick={onClose}
+            aria-label="close"
+          >
             ✕
           </button>
         </header>
@@ -50,7 +54,9 @@ export default function SkillLog({ pack, snapshot, lang, onClose }: Props) {
                       </span>
                     ))}
                   </div>
-                  {boundary && <em className={styles.boundary}>{t(boundary, lang)}</em>}
+                  {boundary && (
+                    <em className={styles.boundary}>{t(boundary, lang)}</em>
+                  )}
                 </li>
               );
             })}

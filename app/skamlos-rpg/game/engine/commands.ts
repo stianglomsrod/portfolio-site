@@ -34,7 +34,9 @@ export function wireCommands(
     }),
   );
 
-  unsub.push(bridge.on("cmd:minigameCancel", () => bridge.emit("closeMinigame")));
+  unsub.push(
+    bridge.on("cmd:minigameCancel", () => bridge.emit("closeMinigame")),
+  );
 
   unsub.push(
     bridge.on("cmd:restart", () => {

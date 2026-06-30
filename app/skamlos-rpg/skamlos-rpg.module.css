@@ -13,8 +13,12 @@
   align-items: center;
   justify-content: center;
   padding: clamp(8px, 3vw, 28px);
-  background:
-    radial-gradient(120% 90% at 50% 0%, #34507f 0%, #1d2433 55%, #14171f 100%);
+  background: radial-gradient(
+    120% 90% at 50% 0%,
+    #34507f 0%,
+    #1d2433 55%,
+    #14171f 100%
+  );
   font-family: var(--font-geist-sans, system-ui, sans-serif);
 }
 
@@ -67,7 +71,11 @@
   display: grid;
   place-items: center;
   padding: 16px;
-  background: linear-gradient(180deg, rgba(13, 16, 24, 0.55), rgba(13, 16, 24, 0.82));
+  background: linear-gradient(
+    180deg,
+    rgba(13, 16, 24, 0.55),
+    rgba(13, 16, 24, 0.82)
+  );
   backdrop-filter: blur(2px);
 }
 .startCard {
@@ -141,7 +149,10 @@
   border-radius: 10px;
   padding: 11px 18px;
   border: 2px solid transparent;
-  transition: transform 0.08s ease, filter 0.15s ease, background 0.15s ease;
+  transition:
+    transform 0.08s ease,
+    filter 0.15s ease,
+    background 0.15s ease;
 }
 .primaryBtn {
   background: linear-gradient(180deg, var(--accent), #cf8b27);
@@ -296,7 +307,9 @@
   padding: 9px 16px;
   font-size: 0.9rem;
   color: #f3e7c8;
-  animation: subIn 0.3s ease, subOut 0.4s ease 3.5s forwards;
+  animation:
+    subIn 0.3s ease,
+    subOut 0.4s ease 3.5s forwards;
 }
 
 /* ---- dialogue ---- */

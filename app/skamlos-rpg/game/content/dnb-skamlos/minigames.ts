@@ -34,7 +34,10 @@ export const minigames: MinigameDef[] = [
         no: "5 linjer, 1 til 5. Løkka går rundt akkurat nok ganger.",
         en: "5 lines, 1 to 5. The loop runs exactly enough times.",
       },
-      hint: { no: "Tell fra 1 til 5. Ikke noe mer.", en: "Count from 1 to 5. Nothing more." },
+      hint: {
+        no: "Tell fra 1 til 5. Ikke noe mer.",
+        en: "Count from 1 to 5. Nothing more.",
+      },
     },
   },
   {
@@ -52,8 +55,14 @@ export const minigames: MinigameDef[] = [
         en: "Three files changed. Stage, write a message, and commit.",
       },
       files: ["index.html", "ordkryss.js", "styles.css"],
-      stageLabel: { no: "Legg til alle endringer (git add .)", en: "Stage all changes (git add .)" },
-      messagePrompt: { no: "Velg en commit-melding.", en: "Choose a commit message." },
+      stageLabel: {
+        no: "Legg til alle endringer (git add .)",
+        en: "Stage all changes (git add .)",
+      },
+      messagePrompt: {
+        no: "Velg en commit-melding.",
+        en: "Choose a commit message.",
+      },
       messageOptions: [
         {
           id: "good",
@@ -80,7 +89,10 @@ export const minigames: MinigameDef[] = [
         },
       ],
       commitLabel: { no: "Commit", en: "Commit" },
-      successText: { no: "Committed. Arbeidet er lagret.", en: "Committed. The work is saved." },
+      successText: {
+        no: "Committed. Arbeidet er lagret.",
+        en: "Committed. The work is saved.",
+      },
     },
   },
 ];

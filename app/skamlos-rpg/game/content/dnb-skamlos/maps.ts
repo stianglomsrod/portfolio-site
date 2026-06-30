@@ -52,7 +52,11 @@ const classroom: MapDef = {
     "spawn-default": { x: 6, y: 7 },
   },
   exits: [
-    { id: "door", at: { x: 6, y: 9, w: 1, h: 1 }, to: { map: "town", spawn: "from-school" } },
+    {
+      id: "door",
+      at: { x: 6, y: 9, w: 1, h: 1 },
+      to: { map: "town", spawn: "from-school" },
+    },
   ],
   npcs: ["elev1", "elev2"],
   interactables: [],
@@ -150,7 +154,11 @@ const town: MapDef = {
     "from-home-town": { x: 17, y: 17 },
   },
   exits: [
-    { id: "enter-home", at: { x: 19, y: 17, w: 1, h: 1 }, to: { map: "home", spawn: "from-home" } },
+    {
+      id: "enter-home",
+      at: { x: 19, y: 17, w: 1, h: 1 },
+      to: { map: "home", spawn: "from-home" },
+    },
   ],
   npcs: [],
   interactables: [
@@ -216,11 +224,18 @@ const home: MapDef = {
     default: { x: 5, y: 7 },
   },
   exits: [
-    { id: "door", at: { x: 5, y: 8, w: 2, h: 1 }, to: { map: "town", spawn: "from-home-town" } },
+    {
+      id: "door",
+      at: { x: 5, y: 8, w: 2, h: 1 },
+      to: { map: "town", spawn: "from-home-town" },
+    },
   ],
   npcs: [],
   interactables: ["home-pc", "home-duck"],
-  ambient: { no: "Hjemme igjen. PC-en venter på pulten.", en: "Home again. The PC is waiting on the desk." },
+  ambient: {
+    no: "Hjemme igjen. PC-en venter på pulten.",
+    en: "Home again. The PC is waiting on the desk.",
+  },
 };
 
 export const maps: MapDef[] = [classroom, town, home];

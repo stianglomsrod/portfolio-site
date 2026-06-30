@@ -33,7 +33,8 @@ const CRC_TABLE = (() => {
 
 function crc32(buf) {
   let c = 0xffffffff;
-  for (let i = 0; i < buf.length; i++) c = CRC_TABLE[(c ^ buf[i]) & 0xff] ^ (c >>> 8);
+  for (let i = 0; i < buf.length; i++)
+    c = CRC_TABLE[(c ^ buf[i]) & 0xff] ^ (c >>> 8);
   return (c ^ 0xffffffff) >>> 0;
 }
 
@@ -57,10 +58,18 @@ function encodePNG(c) {
   const raw = Buffer.alloc((stride + 1) * c.h);
   for (let y = 0; y < c.h; y++) {
     raw[y * (stride + 1)] = 0; // filter: none
-    raw.set(c.data.subarray(y * stride, y * stride + stride), y * (stride + 1) + 1);
+    raw.set(
+      c.data.subarray(y * stride, y * stride + stride),
+      y * (stride + 1) + 1,
+    );
   }
   const idat = deflateSync(raw, { level: 9 });
-  return Buffer.concat([sig, chunk("IHDR", ihdr), chunk("IDAT", idat), chunk("IEND", Buffer.alloc(0))]);
+  return Buffer.concat([
+    sig,
+    chunk("IHDR", ihdr),
+    chunk("IDAT", idat),
+    chunk("IEND", Buffer.alloc(0)),
+  ]);
 }
 
 /* ----------------------------------------------------------------------- *
@@ -72,7 +81,12 @@ function Canvas(w, h) {
 }
 function hex(s) {
   s = s.replace("#", "");
-  return [parseInt(s.slice(0, 2), 16), parseInt(s.slice(2, 4), 16), parseInt(s.slice(4, 6), 16), 255];
+  return [
+    parseInt(s.slice(0, 2), 16),
+    parseInt(s.slice(2, 4), 16),
+    parseInt(s.slice(4, 6), 16),
+    255,
+  ];
 }
 function shade(col, f) {
   return [
@@ -93,12 +107,14 @@ function px(c, x, y, col) {
   c.data[i + 3] = col[3] ?? 255;
 }
 function rect(c, x, y, w, h, col) {
-  for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) px(c, xx, yy, col);
+  for (let yy = y; yy < y + h; yy++)
+    for (let xx = x; xx < x + w; xx++) px(c, xx, yy, col);
 }
 // rounded-ish filled circle
 function disc(c, cx, cy, r, col) {
   for (let yy = -r; yy <= r; yy++)
-    for (let xx = -r; xx <= r; xx++) if (xx * xx + yy * yy <= r * r + r * 0.5) px(c, cx + xx, cy + yy, col);
+    for (let xx = -r; xx <= r; xx++)
+      if (xx * xx + yy * yy <= r * r + r * 0.5) px(c, cx + xx, cy + yy, col);
 }
 // stamp a char grid with a palette, scaled by `s`
 function mulberry32(a) {
@@ -186,7 +202,7 @@ async function save(dir, name, c) {
  * GROUND TILES (32×32) — procedural, seamless-ish
  * ----------------------------------------------------------------------- */
 
-function groundTile(base, dark, light, seed, density = 0.10) {
+function groundTile(base, dark, light, seed, density = 0.1) {
   const c = Canvas(32, 32);
   rect(c, 0, 0, 32, 32, base);
   const rnd = mulberry32(seed);
@@ -500,7 +516,7 @@ function buildingBase(w, h, wall, wallD, roof, roofD, opts = {}) {
   for (let y = roofH + 2; y < h - 2; y += 6) rect(c, 3, y, w - 6, 1, wallD);
   // roof (trapezoid)
   for (let y = 0; y < roofH; y++) {
-    const inset = Math.round((roofH - y) * ((w / 2) / roofH)) - 2;
+    const inset = Math.round((roofH - y) * (w / 2 / roofH)) - 2;
     rect(c, inset, y, w - inset * 2, 1, y < 3 ? roofD : roof);
   }
   rect(c, 0, roofH - 3, w, 3, roofD); // eave
@@ -528,7 +544,9 @@ function addDoor(c, w, h, col = P.woodD) {
 }
 
 function school() {
-  const { c } = buildingBase(192, 132, P.cottage, P.cottageD, P.roof, P.roofD, { roofH: 44 });
+  const { c } = buildingBase(192, 132, P.cottage, P.cottageD, P.roof, P.roofD, {
+    roofH: 44,
+  });
   // bell cupola
   rect(c, 88, 4, 16, 14, P.cottageD);
   rect(c, 90, 6, 12, 10, P.cottage);
@@ -544,7 +562,9 @@ function school() {
   return c;
 }
 function homeExt() {
-  const { c } = buildingBase(128, 112, P.wood, P.woodD, P.roof, P.roofD, { roofH: 40 });
+  const { c } = buildingBase(128, 112, P.wood, P.woodD, P.roof, P.roofD, {
+    roofH: 40,
+  });
   addWindows(c, 16, 56, 2, 1, 34, 0, true);
   addWindows(c, 90, 56, 1, 1, 0, 0, true);
   addDoor(c, 128, 112, P.woodD);
@@ -574,7 +594,15 @@ function tower() {
   return c;
 }
 function university() {
-  const { c } = buildingBase(192, 140, P.brick, P.brickD, P.stoneD, shade(P.stoneD, 0.8), { roofH: 30 });
+  const { c } = buildingBase(
+    192,
+    140,
+    P.brick,
+    P.brickD,
+    P.stoneD,
+    shade(P.stoneD, 0.8),
+    { roofH: 30 },
+  );
   // columned institutional front
   for (let x = 24; x < 170; x += 24) {
     rect(c, x, 44, 8, 80, P.stoneL);
@@ -589,7 +617,15 @@ function university() {
   return c;
 }
 function nikkoHouse() {
-  const { c } = buildingBase(128, 104, P.cottage, P.cottageD, P.green, shade(P.green, 0.8), { roofH: 38 });
+  const { c } = buildingBase(
+    128,
+    104,
+    P.cottage,
+    P.cottageD,
+    P.green,
+    shade(P.green, 0.8),
+    { roofH: 38 },
+  );
   addWindows(c, 18, 52, 1, 1, 0, 0, false);
   addWindows(c, 92, 52, 1, 1, 0, 0, true);
   addDoor(c, 128, 104, P.woodD);
@@ -691,7 +727,8 @@ function playerSheet() {
   };
   const dirs = ["down", "left", "right", "up"];
   for (let r = 0; r < 4; r++)
-    for (let q = 0; q < 3; q++) drawChar(c, q * 32, r * 128 / 4, colors, dirs[r], q, 2);
+    for (let q = 0; q < 3; q++)
+      drawChar(c, q * 32, (r * 128) / 4, colors, dirs[r], q, 2);
   return c;
 }
 
@@ -818,4 +855,6 @@ for (const [name, c] of Object.entries(sprites)) {
   count++;
 }
 
-console.log(`Generated ${count} original Skamløs RPG PNG assets into public/skamlos-rpg/`);
+console.log(
+  `Generated ${count} original Skamløs RPG PNG assets into public/skamlos-rpg/`,
+);

@@ -3,7 +3,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { GameBridge, StateSnapshot } from "../engine/bridge";
 import type { GameRuntime } from "../engine/runtime";
-import type { Artifact, ContentPack, DialogueLine, Lang, Loc, Skill } from "../engine/types";
+import type {
+  Artifact,
+  ContentPack,
+  DialogueLine,
+  Lang,
+  Loc,
+  Skill,
+} from "../engine/types";
 import styles from "../../skamlos-rpg.module.css";
 import { playBell } from "./bell";
 import StartScreen from "./StartScreen";
@@ -22,7 +29,11 @@ interface Props {
   pack: ContentPack;
 }
 
-type DialogueState = { id: string; lines: DialogueLine[]; index: number } | null;
+type DialogueState = {
+  id: string;
+  lines: DialogueLine[];
+  index: number;
+} | null;
 type Panel = "quest" | "skill" | null;
 
 export default function GameUI({ bridge, runtime, pack }: Props) {
@@ -30,10 +41,15 @@ export default function GameUI({ bridge, runtime, pack }: Props) {
   const [lang, setLang] = useState<Lang>(runtime?.state.lang ?? "no");
   const [objective, setObjective] = useState<Loc | null>(null);
   const [prompt, setPrompt] = useState<Loc | null>(null);
-  const [subtitle, setSubtitle] = useState<{ text: Loc; n: number } | null>(null);
+  const [subtitle, setSubtitle] = useState<{ text: Loc; n: number } | null>(
+    null,
+  );
   const [dialogue, setDialogue] = useState<DialogueState>(null);
   const [toasts, setToasts] = useState<ToastItem[]>([]);
-  const [reward, setReward] = useState<{ skills: Skill[]; artifacts: Artifact[] } | null>(null);
+  const [reward, setReward] = useState<{
+    skills: Skill[];
+    artifacts: Artifact[];
+  } | null>(null);
   const [minigameId, setMinigameId] = useState<string | null>(null);
   const [panel, setPanel] = useState<Panel>(null);
   const [snapshot, setSnapshot] = useState<StateSnapshot | null>(null);
@@ -49,7 +65,10 @@ export default function GameUI({ bridge, runtime, pack }: Props) {
   const pushToast = useCallback((text: Loc, kind: ToastItem["kind"]) => {
     const id = ++toastId.current;
     setToasts((prev) => [...prev, { id, text, kind }]);
-    window.setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3600);
+    window.setTimeout(
+      () => setToasts((prev) => prev.filter((t) => t.id !== id)),
+      3600,
+    );
   }, []);
 
   useEffect(() => {
@@ -62,10 +81,17 @@ export default function GameUI({ bridge, runtime, pack }: Props) {
       bridge.on("subtitle", (text) => {
         const n = ++subId.current;
         setSubtitle({ text, n });
-        window.setTimeout(() => setSubtitle((s) => (s && s.n === n ? null : s)), 4000);
+        window.setTimeout(
+          () => setSubtitle((s) => (s && s.n === n ? null : s)),
+          4000,
+        );
       }),
     );
-    offs.push(bridge.on("dialogue", ({ id, lines }) => setDialogue({ id, lines, index: 0 })));
+    offs.push(
+      bridge.on("dialogue", ({ id, lines }) =>
+        setDialogue({ id, lines, index: 0 }),
+      ),
+    );
     offs.push(bridge.on("toast", ({ text, kind }) => pushToast(text, kind)));
     offs.push(
       bridge.on("reward", (r) => {
@@ -137,11 +163,15 @@ export default function GameUI({ bridge, runtime, pack }: Props) {
           snapshot={snapshot}
           onOpenQuest={() => togglePanel("quest")}
           onOpenSkill={() => togglePanel("skill")}
-          onToggleLang={() => bridge.emit("cmd:setLang", lang === "no" ? "en" : "no")}
+          onToggleLang={() =>
+            bridge.emit("cmd:setLang", lang === "no" ? "en" : "no")
+          }
         />
       )}
 
-      {subtitle && <Subtitle key={subtitle.n} text={subtitle.text} lang={lang} />}
+      {subtitle && (
+        <Subtitle key={subtitle.n} text={subtitle.text} lang={lang} />
+      )}
 
       <Toasts items={toasts} lang={lang} />
       {reward && <RewardBanner reward={reward} lang={lang} />}
@@ -156,10 +186,20 @@ export default function GameUI({ bridge, runtime, pack }: Props) {
       )}
 
       {panel === "quest" && (
-        <QuestLog pack={pack} snapshot={snapshot} lang={lang} onClose={closePanel} />
+        <QuestLog
+          pack={pack}
+          snapshot={snapshot}
+          lang={lang}
+          onClose={closePanel}
+        />
       )}
       {panel === "skill" && (
-        <SkillLog pack={pack} snapshot={snapshot} lang={lang} onClose={closePanel} />
+        <SkillLog
+          pack={pack}
+          snapshot={snapshot}
+          lang={lang}
+          onClose={closePanel}
+        />
       )}
 
       {minigameId && (
@@ -179,7 +219,9 @@ export default function GameUI({ bridge, runtime, pack }: Props) {
           hasProgress={hasProgress}
           onPlay={() => bridge.emit("cmd:start")}
           onRestart={() => bridge.emit("cmd:restart")}
-          onToggleLang={() => bridge.emit("cmd:setLang", lang === "no" ? "en" : "no")}
+          onToggleLang={() =>
+            bridge.emit("cmd:setLang", lang === "no" ? "en" : "no")
+          }
         />
       )}
     </div>

@@ -61,6 +61,10 @@ export const assets: AssetManifest = {
   },
   spritesheets: {
     player: { url: img("sprites", "player"), frameWidth: 32, frameHeight: 32 },
-    flutterfly: { url: img("sprites", "flutterfly"), frameWidth: 32, frameHeight: 32 },
+    flutterfly: {
+      url: img("sprites", "flutterfly"),
+      frameWidth: 32,
+      frameHeight: 32,
+    },
   },
 };

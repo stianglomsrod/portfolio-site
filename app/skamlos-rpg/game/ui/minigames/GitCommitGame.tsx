@@ -26,7 +26,9 @@ export default function GitCommitGame({ config, lang, onDone }: Props) {
       <ul className={styles.fileList}>
         {config.files.map((f) => (
           <li key={f} data-staged={step !== "stage"}>
-            <span className={styles.fileMark}>{step === "stage" ? "M" : "+"}</span>
+            <span className={styles.fileMark}>
+              {step === "stage" ? "M" : "+"}
+            </span>
             {f}
           </li>
         ))}
@@ -34,7 +36,10 @@ export default function GitCommitGame({ config, lang, onDone }: Props) {
 
       {step === "stage" && (
         <div className={styles.miniActions}>
-          <button className={styles.primaryBtn} onClick={() => setStep("message")}>
+          <button
+            className={styles.primaryBtn}
+            onClick={() => setStep("message")}
+          >
             {t(config.stageLabel, lang)}
           </button>
         </div>
@@ -75,7 +80,10 @@ export default function GitCommitGame({ config, lang, onDone }: Props) {
             </div>
           </pre>
           <div className={styles.miniActions}>
-            <button className={styles.primaryBtn} onClick={() => setStep("done")}>
+            <button
+              className={styles.primaryBtn}
+              onClick={() => setStep("done")}
+            >
               {t(config.commitLabel, lang)}
             </button>
           </div>

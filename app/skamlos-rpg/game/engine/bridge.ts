@@ -58,14 +58,20 @@ type Handler<T> = (payload: T) => void;
 export class GameBridge {
   private listeners = new Map<string, Set<Handler<unknown>>>();
 
-  on<K extends keyof AllEvents>(event: K, handler: Handler<AllEvents[K]>): () => void {
+  on<K extends keyof AllEvents>(
+    event: K,
+    handler: Handler<AllEvents[K]>,
+  ): () => void {
     const set = this.listeners.get(event as string) ?? new Set();
     set.add(handler as Handler<unknown>);
     this.listeners.set(event as string, set);
     return () => this.off(event, handler);
   }
 
-  off<K extends keyof AllEvents>(event: K, handler: Handler<AllEvents[K]>): void {
+  off<K extends keyof AllEvents>(
+    event: K,
+    handler: Handler<AllEvents[K]>,
+  ): void {
     this.listeners.get(event as string)?.delete(handler as Handler<unknown>);
   }
 

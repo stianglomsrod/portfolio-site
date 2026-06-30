@@ -24,10 +24,13 @@ export default function ForLoopGame({ config, lang, onDone }: Props) {
     let blankIndex = 0;
     return config.templateLines.map((line) => {
       const parts = line.split("___");
-      const segs: Array<{ type: "text"; value: string } | { type: "blank"; index: number }> = [];
+      const segs: Array<
+        { type: "text"; value: string } | { type: "blank"; index: number }
+      > = [];
       parts.forEach((part, pi) => {
         segs.push({ type: "text", value: part });
-        if (pi < parts.length - 1) segs.push({ type: "blank", index: blankIndex++ });
+        if (pi < parts.length - 1)
+          segs.push({ type: "blank", index: blankIndex++ });
       });
       return segs;
     });
@@ -62,7 +65,10 @@ export default function ForLoopGame({ config, lang, onDone }: Props) {
                   value={selected[seg.index] ?? ""}
                   disabled={status === "ok"}
                   onChange={(e) =>
-                    setSelected((prev) => ({ ...prev, [seg.index]: e.target.value }))
+                    setSelected((prev) => ({
+                      ...prev,
+                      [seg.index]: e.target.value,
+                    }))
                   }
                 >
                   <option value="" disabled>
@@ -110,7 +116,11 @@ export default function ForLoopGame({ config, lang, onDone }: Props) {
         </div>
       ) : (
         <div className={styles.miniActions}>
-          <button className={styles.primaryBtn} onClick={run} disabled={!allChosen}>
+          <button
+            className={styles.primaryBtn}
+            onClick={run}
+            disabled={!allChosen}
+          >
             {lang === "no" ? "Kjør" : "Run"}
           </button>
         </div>

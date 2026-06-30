@@ -74,7 +74,11 @@ export default function StartScreen({
   return (
     <div className={styles.startScreen}>
       <div className={styles.startCard}>
-        <button className={styles.langChip} onClick={onToggleLang} aria-label="language">
+        <button
+          className={styles.langChip}
+          onClick={onToggleLang}
+          aria-label="language"
+        >
           {lang === "no" ? "EN" : "NO"}
         </button>
         <p className={styles.kicker}>{L.kicker}</p>

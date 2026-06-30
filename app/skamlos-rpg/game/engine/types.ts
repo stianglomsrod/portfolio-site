@@ -104,7 +104,13 @@ export interface MapDef {
   decor?: string[];
   buildings?: BuildingPlacement[];
   /** Non-interactive decorative sprites (e.g. a fluttering insect), optionally animated. */
-  decoSprites?: Array<{ key: string; anim?: string; x: number; y: number; tall?: boolean }>;
+  decoSprites?: Array<{
+    key: string;
+    anim?: string;
+    x: number;
+    y: number;
+    tall?: boolean;
+  }>;
   spawns: Record<string, Vec2>;
   exits: Exit[];
   npcs: string[];

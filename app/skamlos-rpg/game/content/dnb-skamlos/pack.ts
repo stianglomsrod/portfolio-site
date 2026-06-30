@@ -18,7 +18,10 @@ import { tiles } from "./tiles";
 export const dnbSkamlosPack: ContentPack = {
   meta: {
     id: "dnb-skamlos",
-    title: { no: "Skamløs Pitch: Kompetansebyen", en: "Shameless Pitch: Competence Town" },
+    title: {
+      no: "Skamløs Pitch: Kompetansebyen",
+      en: "Shameless Pitch: Competence Town",
+    },
     company: { no: "DNB AI Tech" },
     role: { no: "Software Engineer, AI-First Engineering" },
     startMap: "classroom",

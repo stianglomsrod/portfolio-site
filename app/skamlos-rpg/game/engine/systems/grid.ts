@@ -73,15 +73,21 @@ export function validateMap(map: MapDef, pack: ContentPack): string[] {
   const checkLayer = (name: string, rows: string[] | undefined) => {
     if (!rows) return;
     if (rows.length !== map.height)
-      issues.push(`${map.id}.${name}: ${rows.length} rows, expected ${map.height}`);
+      issues.push(
+        `${map.id}.${name}: ${rows.length} rows, expected ${map.height}`,
+      );
     rows.forEach((row, y) => {
       if (row.length !== map.width)
-        issues.push(`${map.id}.${name}[${y}]: ${row.length} cols, expected ${map.width}`);
+        issues.push(
+          `${map.id}.${name}[${y}]: ${row.length} cols, expected ${map.width}`,
+        );
       for (const ch of row) {
         if (ch === " ") continue;
         const id = map.legend[ch];
-        if (!id) issues.push(`${map.id}.${name}[${y}]: char "${ch}" not in legend`);
-        else if (!pack.tiles[id]) issues.push(`${map.id}: tile id "${id}" not in pack.tiles`);
+        if (!id)
+          issues.push(`${map.id}.${name}[${y}]: char "${ch}" not in legend`);
+        else if (!pack.tiles[id])
+          issues.push(`${map.id}: tile id "${id}" not in pack.tiles`);
       }
     });
   };

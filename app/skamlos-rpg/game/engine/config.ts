@@ -10,7 +10,9 @@ export interface MakeConfigOptions {
   reducedMotion: boolean;
 }
 
-export function makeConfig(opts: MakeConfigOptions): Phaser.Types.Core.GameConfig {
+export function makeConfig(
+  opts: MakeConfigOptions,
+): Phaser.Types.Core.GameConfig {
   return {
     type: Phaser.AUTO,
     parent: opts.parent,

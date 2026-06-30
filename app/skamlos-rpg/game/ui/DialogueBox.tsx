@@ -15,7 +15,13 @@ interface Props {
 export default function DialogueBox({ line, hasNext, lang, onAdvance }: Props) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "e" || e.key === "E" || e.key === " " || e.key === "Enter" || e.key === "Escape") {
+      if (
+        e.key === "e" ||
+        e.key === "E" ||
+        e.key === " " ||
+        e.key === "Enter" ||
+        e.key === "Escape"
+      ) {
         e.preventDefault();
         onAdvance();
       }
@@ -26,7 +32,9 @@ export default function DialogueBox({ line, hasNext, lang, onAdvance }: Props) {
 
   return (
     <button className={styles.dialogue} onClick={onAdvance}>
-      {line.speaker && <span className={styles.speaker}>{t(line.speaker, lang)}</span>}
+      {line.speaker && (
+        <span className={styles.speaker}>{t(line.speaker, lang)}</span>
+      )}
       <span className={styles.dialogueText}>{t(line.text, lang)}</span>
       <span className={styles.dialogueHint}>{hasNext ? "▼" : "✕"}</span>
     </button>

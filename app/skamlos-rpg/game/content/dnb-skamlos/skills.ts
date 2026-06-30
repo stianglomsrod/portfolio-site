@@ -8,7 +8,10 @@ import type { Skill } from "../../engine/types";
 export const skills: Skill[] = [
   {
     id: "grunnleggende-programmering",
-    label: { no: "Grunnleggende programmering", en: "Programming fundamentals" },
+    label: {
+      no: "Grunnleggende programmering",
+      en: "Programming fundamentals",
+    },
     group: "foundation",
     glyph: "💻",
     log: {

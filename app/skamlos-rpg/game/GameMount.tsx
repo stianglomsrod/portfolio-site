@@ -48,7 +48,10 @@ export default function GameMount() {
     game.registry.set("bridge", bridge);
     game.registry.set("reducedMotion", !!reduced);
     game.registry.set("startMap", runtime.state.currentMap);
-    game.registry.set("startSpawn", hasProgress ? "__resume__" : pack.meta.startSpawn);
+    game.registry.set(
+      "startSpawn",
+      hasProgress ? "__resume__" : pack.meta.startSpawn,
+    );
     game.registry.set("phase", "start");
 
     const unwire = wireCommands(runtime, bridge, {

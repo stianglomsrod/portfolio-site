@@ -34,7 +34,9 @@ export default function Hud({
       <div className={styles.hudTop}>
         <div className={styles.objective}>
           <span className={styles.objectiveTag}>{objLabel}</span>
-          <span className={styles.objectiveText}>{objective ? t(objective, lang) : "—"}</span>
+          <span className={styles.objectiveText}>
+            {objective ? t(objective, lang) : "—"}
+          </span>
         </div>
         <div className={styles.hudButtons}>
           <button className={styles.hudChip} onClick={onOpenQuest} title="Q">
@@ -61,7 +63,9 @@ export default function Hud({
             <kbd>E</kbd> {t(prompt, lang)}
           </div>
         ) : (
-          <div className={styles.controlsHint}>WASD · E/mellomrom · Q · K · Esc</div>
+          <div className={styles.controlsHint}>
+            WASD · E/mellomrom · Q · K · Esc
+          </div>
         )}
       </div>
     </>

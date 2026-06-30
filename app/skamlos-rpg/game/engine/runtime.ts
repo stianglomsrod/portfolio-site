@@ -103,13 +103,21 @@ export class GameRuntime {
     this.persist();
 
     if (grantedSkills.length || grantedArtifacts.length) {
-      this.bridge.emit("reward", { skills: grantedSkills, artifacts: grantedArtifacts });
+      this.bridge.emit("reward", {
+        skills: grantedSkills,
+        artifacts: grantedArtifacts,
+      });
       grantedSkills.forEach((s) =>
-        this.bridge.emit("toast", { text: { no: `Ny ferdighet: ${s.label.no}` }, kind: "skill" }),
+        this.bridge.emit("toast", {
+          text: { no: `Ny ferdighet: ${s.label.no}` },
+          kind: "skill",
+        }),
       );
       if (grantedArtifacts.length) {
         this.bridge.emit("toast", {
-          text: { no: `Nytt bevis samlet: ${grantedArtifacts.map((a) => a.title.no).join(" + ")}` },
+          text: {
+            no: `Nytt bevis samlet: ${grantedArtifacts.map((a) => a.title.no).join(" + ")}`,
+          },
           kind: "artifact",
         });
       }

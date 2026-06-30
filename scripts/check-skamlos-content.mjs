@@ -45,15 +45,21 @@ for (const file of files) {
   const scanClaims = !rel.endsWith("claims.ts");
   text.split(/\r?\n/).forEach((line, i) => {
     if (TYPO.test(line) && !/ordkryss/i.test(line)) {
-      console.error(`SPELLING ERROR ${rel}:${i + 1} — found "Ordryss" (should be "Ordkryss")`);
+      console.error(
+        `SPELLING ERROR ${rel}:${i + 1} — found "Ordryss" (should be "Ordkryss")`,
+      );
       console.error(`   > ${line.trim()}`);
       typos++;
     }
     const trimmed = line.trim();
-    const isComment = trimmed.startsWith("//") || trimmed.startsWith("*") || trimmed.startsWith("/*");
+    const isComment =
+      trimmed.startsWith("//") ||
+      trimmed.startsWith("*") ||
+      trimmed.startsWith("/*");
     if (scanClaims && !isComment) {
       for (const re of DENY) {
-        if (re.test(line)) warnings.push(`${rel}:${i + 1} — claim-lint: ${re} :: ${trimmed}`);
+        if (re.test(line))
+          warnings.push(`${rel}:${i + 1} — claim-lint: ${re} :: ${trimmed}`);
       }
     }
   });
@@ -64,7 +70,9 @@ const hasOrdkryss = (
 ).some((t) => /ordkryss/i.test(t));
 
 if (!hasOrdkryss) {
-  console.error('SANITY ERROR — the string "Ordkryss" was not found anywhere in the pack.');
+  console.error(
+    'SANITY ERROR — the string "Ordkryss" was not found anywhere in the pack.',
+  );
   typos++;
 }
 
@@ -77,4 +85,6 @@ if (typos > 0) {
   console.error(`\nFAILED: ${typos} spelling/sanity problem(s).`);
   process.exit(1);
 }
-console.log(`OK — Ordkryss spelled correctly across ${files.length} files; no denied claims.`);
+console.log(
+  `OK — Ordkryss spelled correctly across ${files.length} files; no denied claims.`,
+);

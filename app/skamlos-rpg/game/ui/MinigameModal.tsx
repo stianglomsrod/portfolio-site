@@ -15,7 +15,13 @@ interface Props {
   onCancel: () => void;
 }
 
-export default function MinigameModal({ pack, startId, lang, onComplete, onCancel }: Props) {
+export default function MinigameModal({
+  pack,
+  startId,
+  lang,
+  onComplete,
+  onCancel,
+}: Props) {
   const [currentId, setCurrentId] = useState(startId);
   const def = pack.minigames.find((m) => m.id === currentId);
 
@@ -39,16 +45,30 @@ export default function MinigameModal({ pack, startId, lang, onComplete, onCance
       <div className={styles.modal}>
         <header className={styles.modalHead}>
           <h2>{t(def.title, lang)}</h2>
-          <button className={styles.panelClose} onClick={onCancel} aria-label="close">
+          <button
+            className={styles.panelClose}
+            onClick={onCancel}
+            aria-label="close"
+          >
             ✕
           </button>
         </header>
         <p className={styles.modalIntro}>{t(def.intro, lang)}</p>
         {def.kind === "code-forloop" && (
-          <ForLoopGame key={def.id} config={def.config} lang={lang} onDone={handleDone} />
+          <ForLoopGame
+            key={def.id}
+            config={def.config}
+            lang={lang}
+            onDone={handleDone}
+          />
         )}
         {def.kind === "git-commit" && (
-          <GitCommitGame key={def.id} config={def.config} lang={lang} onDone={handleDone} />
+          <GitCommitGame
+            key={def.id}
+            config={def.config}
+            lang={lang}
+            onDone={handleDone}
+          />
         )}
       </div>
     </div>

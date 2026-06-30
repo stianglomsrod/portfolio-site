@@ -61,14 +61,14 @@ abstract menu, no invisible walls.
 
 ## 2. Buildings & lock states
 
-| Building | Map id | Prologue state | Interior built in v1? | Unlock condition (later) |
-| --- | --- | --- | --- | --- |
-| **Skolen — hovedinngang** | `classroom` | **Open (start here)** | **Yes** | — (start location) |
-| Skolen — workshop-inngang | `workshop` | Visible, **LOCKED** | No | Master/Workshop quest from OsloMet |
-| **Stians hjem** | `home` | **Open** | **Yes** | — |
-| OsloMet / Universitet | `oslomet` | Visible, **LOCKED** | No | After Ordkryss reward (chain starts) |
-| Nikkos hus | `nikko` | Visible, **LOCKED** | No | Flutterfly sidequest (optional) |
-| DNB AI Tech-bygget | `dnb` | Visible, **LOCKED** | No | Søknadspakke complete (endgame) |
+| Building                  | Map id      | Prologue state        | Interior built in v1? | Unlock condition (later)             |
+| ------------------------- | ----------- | --------------------- | --------------------- | ------------------------------------ |
+| **Skolen — hovedinngang** | `classroom` | **Open (start here)** | **Yes**               | — (start location)                   |
+| Skolen — workshop-inngang | `workshop`  | Visible, **LOCKED**   | No                    | Master/Workshop quest from OsloMet   |
+| **Stians hjem**           | `home`      | **Open**              | **Yes**               | —                                    |
+| OsloMet / Universitet     | `oslomet`   | Visible, **LOCKED**   | No                    | After Ordkryss reward (chain starts) |
+| Nikkos hus                | `nikko`     | Visible, **LOCKED**   | No                    | Flutterfly sidequest (optional)      |
+| DNB AI Tech-bygget        | `dnb`       | Visible, **LOCKED**   | No                    | Søknadspakke complete (endgame)      |
 
 **Locked-door rule (all locked buildings):** the door is visibly a door; interacting shows a
 short readable line. Never a silent invisible wall. Examples:
@@ -114,22 +114,22 @@ short readable line. Never a silent invisible wall. Examples:
 - `oslomet`: larger, institutional feel (no logo/branding); Kari NPC; graduation scene.
 - `nikko`: sidequest interior tied to Flutterfly/companion app.
 - `dnb` reception: søknadsbunke, Stians søknadspakke, the egg (`"Du prøver å lese teksten,
-  men den er altfor liten."`), endgame trigger.
+men den er altfor liten."`), endgame trigger.
 
 ---
 
 ## 4. NPC placement
 
-| NPC | Where | v1? | Role | Notes |
-| --- | --- | --- | --- | --- |
-| Stian (player) | classroom start | ✅ | player | controllable avatar |
-| Elev 1, Elev 2 | classroom | optional ambience | student | **insight dialogue deferred**; composite/fictional, represent needs not real pupils |
-| Skiltpost-NPC | Bykryss | optional | signpost | gives **direction only**, not the metaphor (see §6) |
-| Kari | OsloMet | ❌ deferred | reference | former fellow student & later reference-person; appears after master chain; `showWhen` gated |
-| Lærer-NPC-er | workshop | ❌ deferred | teacher | teacher insights for master/Klar chain |
-| Nikko (implied) | Nikkos hus / Flutterfly | ❌ deferred | companion | sidequest only |
-| Badeand | home (by PC) | ✅ | hint | dry, short hints; not an NPC with a face necessarily — an interactable |
-| DNB-resepsjonist | DNB reception | ❌ deferred | receptionist | minimal; does NOT explain the egg |
+| NPC              | Where                   | v1?               | Role         | Notes                                                                                        |
+| ---------------- | ----------------------- | ----------------- | ------------ | -------------------------------------------------------------------------------------------- |
+| Stian (player)   | classroom start         | ✅                | player       | controllable avatar                                                                          |
+| Elev 1, Elev 2   | classroom               | optional ambience | student      | **insight dialogue deferred**; composite/fictional, represent needs not real pupils          |
+| Skiltpost-NPC    | Bykryss                 | optional          | signpost     | gives **direction only**, not the metaphor (see §6)                                          |
+| Kari             | OsloMet                 | ❌ deferred       | reference    | former fellow student & later reference-person; appears after master chain; `showWhen` gated |
+| Lærer-NPC-er     | workshop                | ❌ deferred       | teacher      | teacher insights for master/Klar chain                                                       |
+| Nikko (implied)  | Nikkos hus / Flutterfly | ❌ deferred       | companion    | sidequest only                                                                               |
+| Badeand          | home (by PC)            | ✅                | hint         | dry, short hints; not an NPC with a face necessarily — an interactable                       |
+| DNB-resepsjonist | DNB reception           | ❌ deferred       | receptionist | minimal; does NOT explain the egg                                                            |
 
 Claim-safety on NPCs: students/teachers are **fictional/composite** and represent needs, not
 real, identifiable people. No participant or school names anywhere.
@@ -147,7 +147,7 @@ The town is bounded and shaped by **visible** features, never invisible collisio
 - **Lyktestolper, benker, postkasser, skilt** are small collidable props that add life.
 
 Implementation: all of these sit on the Tiled `collision` layer (or are flagged collidable),
-so the barrier the player *sees* is exactly the barrier they *feel*. A quick QA pass must
+so the barrier the player _sees_ is exactly the barrier they _feel_. A quick QA pass must
 confirm there is no spot where the player stops with nothing visible there.
 
 ---
@@ -183,8 +183,8 @@ confirm there is no spot where the player stops with nothing visible there.
 
 ## 7. Visual style notes
 
-- **Top-down, Pokémon/Zelda-readable**, warm and handmade — *inspiration only, no copied
-  assets, IP, palettes or logos.*
+- **Top-down, Pokémon/Zelda-readable**, warm and handmade — _inspiration only, no copied
+  assets, IP, palettes or logos._
 - Clear silhouettes: buildings, doors, paths and barriers must read instantly at a glance.
 - Cohesive limited palette per the pack `theme` tokens; consistent tile lighting.
 - Small environmental detail (trær, busker, gjerder, skilt, benker, lyktestolper, postkasser,

@@ -37,7 +37,7 @@ Phaser owns the game loop, tiles, collisions, camera and sprites.
 
 **Why Phaser fits this specific game**
 
-- This is a *real* top-down RPG: tile maps, per-tile collision, a camera that follows the
+- This is a _real_ top-down RPG: tile maps, per-tile collision, a camera that follows the
   player, sprite animation, keyboard input, multiple scenes (classroom → town → home),
   and persistent gameplay state. Phaser provides all of this out of the box
   (`TilemapLayer`, Arcade Physics, `cameras.main.startFollow`, `Scene` manager, input
@@ -46,7 +46,7 @@ Phaser owns the game loop, tiles, collisions, camera and sprites.
   route `/skamlos-pitch`) proved a game was buildable but had two problems this pivot fixes:
   readability (first-person 3D is disorienting for a "competence town"), and testability
   (pointer-lock gameplay can't be driven in a headless browser — verified in that branch's
-  report). A top-down keyboard-driven 2D world is both more *readable* and more *testable*.
+  report). A top-down keyboard-driven 2D world is both more _readable_ and more _testable_.
 - Building the same thing in **React + Canvas / custom loop** means hand-rolling a tilemap
   renderer, collision system, camera, and sprite animation. The 3D branch already showed
   that per-frame mutation fights React's render model and forces ref-based escape hatches
@@ -54,13 +54,13 @@ Phaser owns the game loop, tiles, collisions, camera and sprites.
 
 **Alternatives considered (and why not, for now)**
 
-| Option | Verdict | Reason |
-| --- | --- | --- |
-| React + Canvas / custom loop | Rejected for v1 | Reinvents tilemap/collision/camera; per-frame React friction (seen on 3D branch). |
-| Pixi.js | Rejected | Excellent renderer, but only a renderer — still need to add collision, tilemap logic, camera, scene mgmt. |
-| Excalibur.js | Viable runner-up | TypeScript-native, batteries-included. Keep as the fallback if Phaser DX disappoints. |
-| Kaplay/Kaboom | Rejected for v1 | Lighter and fun, but less battle-tested for a portfolio centerpiece and Tiled pipelines. |
-| three.js / R3F (3D) | Explicitly out | This is the pivot *away* from 3D. |
+| Option                       | Verdict          | Reason                                                                                                    |
+| ---------------------------- | ---------------- | --------------------------------------------------------------------------------------------------------- |
+| React + Canvas / custom loop | Rejected for v1  | Reinvents tilemap/collision/camera; per-frame React friction (seen on 3D branch).                         |
+| Pixi.js                      | Rejected         | Excellent renderer, but only a renderer — still need to add collision, tilemap logic, camera, scene mgmt. |
+| Excalibur.js                 | Viable runner-up | TypeScript-native, batteries-included. Keep as the fallback if Phaser DX disappoints.                     |
+| Kaplay/Kaboom                | Rejected for v1  | Lighter and fun, but less battle-tested for a portfolio centerpiece and Tiled pipelines.                  |
+| three.js / R3F (3D)          | Explicitly out   | This is the pivot _away_ from 3D.                                                                         |
 
 > Net recommendation: **Phaser 3 primary, Excalibur.js as the documented fallback.**
 
@@ -84,7 +84,7 @@ library (Phaser has audio). This keeps the bundle lean and avoids dependency spr
 ### 1.3 Next.js 16 integration (carry forward the verified pattern)
 
 Phaser touches `window`/`canvas`, so it must run **client-only**. The archived 3D branch
-already validated the correct Next 16 loading contract in *this* repo; reuse it:
+already validated the correct Next 16 loading contract in _this_ repo; reuse it:
 
 1. `ssr: false` dynamic imports are **illegal inside a Server Component** under Next 16.
    The dynamic import must live in a Client Component.
@@ -190,7 +190,7 @@ English is optional and may be left empty for v1.
 ```ts
 type Loc = { no: string; en?: string };
 type LocList = { no: string[]; en?: string[] };
-type Vec2 = { x: number; y: number };      // tile coordinates unless noted
+type Vec2 = { x: number; y: number }; // tile coordinates unless noted
 type Dir = "up" | "down" | "left" | "right";
 
 type Requirement =
@@ -215,61 +215,67 @@ interface ContentPack {
 }
 
 interface PackMeta {
-  id: string;                 // "dnb-skamlos"
-  title: Loc;                 // "Skamløs Pitch: Kompetansebyen"
-  startMap: string;           // "classroom"
-  startSpawn: string;         // "spawn-default"
+  id: string; // "dnb-skamlos"
+  title: Loc; // "Skamløs Pitch: Kompetansebyen"
+  startMap: string; // "classroom"
+  startSpawn: string; // "spawn-default"
   lang: { default: "no" | "en"; available: ("no" | "en")[] };
-  theme: ThemeTokens;         // palette + tileset/sprite keys + music key
+  theme: ThemeTokens; // palette + tileset/sprite keys + music key
 }
 
 interface MapDef {
-  id: string;                 // "classroom" | "town" | "home"
+  id: string; // "classroom" | "town" | "home"
   kind: "interior" | "world";
-  tilemapKey: string;         // Tiled JSON key
+  tilemapKey: string; // Tiled JSON key
   tilesetKeys: string[];
   spawns: Record<string, Vec2>;
   exits: Exit[];
-  npcs: string[];             // npc ids on this map
-  interactables: string[];    // interactable ids on this map
+  npcs: string[]; // npc ids on this map
+  interactables: string[]; // interactable ids on this map
 }
 
 interface Exit {
   id: string;
-  at: { x: number; y: number; w: number; h: number };  // trigger rect, tiles
+  at: { x: number; y: number; w: number; h: number }; // trigger rect, tiles
   to: { map: string; spawn: string };
-  lock?: GateRef;             // if present and unmet => blocked with readable text
+  lock?: GateRef; // if present and unmet => blocked with readable text
 }
 
 interface GateRef {
-  id: string;                 // "dnb-reception"
+  id: string; // "dnb-reception"
   requires: Requirement;
-  lockedText: Loc;            // shown when blocked, e.g. DNB reception line
+  lockedText: Loc; // shown when blocked, e.g. DNB reception line
 }
 
 interface Npc {
   id: string;
   name: Loc;
   spriteKey: string;
-  role: "student" | "teacher" | "reference" | "receptionist" | "signpost" | "companion";
+  role:
+    | "student"
+    | "teacher"
+    | "reference"
+    | "receptionist"
+    | "signpost"
+    | "companion";
   position: Vec2;
   facing?: Dir;
   wander?: boolean;
-  dialogue: string;           // dialogue tree id (in dialogue.ts)
+  dialogue: string; // dialogue tree id (in dialogue.ts)
 }
 
 interface Interactable {
   id: string;
   kind: "pc" | "duck" | "egg" | "sign" | "prop" | "artifact-pickup";
   position: Vec2;
-  prompt: Loc;                // "Undersøk PC-en"
+  prompt: Loc; // "Undersøk PC-en"
   action: InteractAction;
 }
 
 type InteractAction =
   | { type: "dialogue"; tree: string }
   | { type: "startMinigame"; minigame: string }
-  | { type: "inspect"; text: Loc }          // e.g. the egg easter egg
+  | { type: "inspect"; text: Loc } // e.g. the egg easter egg
   | { type: "startQuest"; quest: string }
   | { type: "completeQuest"; quest: string };
 
@@ -277,21 +283,21 @@ interface Quest {
   id: string;
   order: number;
   title: Loc;
-  objective: Loc;             // one-line HUD text
+  objective: Loc; // one-line HUD text
   intro?: Loc;
   requires: Requirement;
   grantsSkills: string[];
   grantsArtifacts: string[];
-  unlocks?: string[];         // gate ids / map ids opened on completion
-  nextHint?: Loc;             // signpost-style "where to go next" (NOT the metaphor)
+  unlocks?: string[]; // gate ids / map ids opened on completion
+  nextHint?: Loc; // signpost-style "where to go next" (NOT the metaphor)
 }
 
 interface Skill {
-  id: string;                 // "grunnleggende-programmering"
-  label: Loc;                 // "Grunnleggende programmering"
+  id: string; // "grunnleggende-programmering"
+  label: Loc; // "Grunnleggende programmering"
   group: "foundation" | "design" | "fullstack" | "ai" | "craft";
-  glyph: string;              // emoji/icon key
-  log: LocList;               // the skill-log detail lines
+  glyph: string; // emoji/icon key
+  log: LocList; // the skill-log detail lines
 }
 
 interface Artifact {
@@ -299,29 +305,29 @@ interface Artifact {
   title: Loc;
   description: Loc;
   kind: "cert" | "repo" | "live" | "video" | "concept";
-  href?: string;              // external link (public, verified)
+  href?: string; // external link (public, verified)
   linkLabel?: Loc;
-  boundary?: Loc;             // honest claim boundary line
+  boundary?: Loc; // honest claim boundary line
 }
 
 interface MinigameDef {
   id: string;
   kind: "code-forloop" | "git-commit" | "choice";
   title: Loc;
-  config: unknown;            // narrowed per kind (see prologue slice doc)
+  config: unknown; // narrowed per kind (see prologue slice doc)
 }
 
 interface EndgameDef {
-  title: Loc;                 // "Søknadspakke levert"
-  message: Loc;               // the emotional-core text (see design brief §10)
+  title: Loc; // "Søknadspakke levert"
+  message: Loc; // the emotional-core text (see design brief §10)
   show: Array<"quests" | "skills" | "artifacts" | "eggs">;
-  contactSource: "reuse-dnb-contact";   // reuse existing contact data, do not invent
+  contactSource: "reuse-dnb-contact"; // reuse existing contact data, do not invent
   actions: Array<"replay" | "back-to-portfolio">;
 }
 
 interface ClaimPolicy {
-  deny: string[];             // forbidden claim categories (see §6)
-  boundaries: Record<string, Loc>;   // id -> honest boundary
+  deny: string[]; // forbidden claim categories (see §6)
+  boundaries: Record<string, Loc>; // id -> honest boundary
   notes: LocList;
 }
 

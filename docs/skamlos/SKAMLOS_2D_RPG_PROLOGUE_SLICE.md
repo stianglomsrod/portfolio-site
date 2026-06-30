@@ -123,6 +123,7 @@ Intro line in the modal:
     text (security + simplicity — see framework doc §7). Correct fill: `1`, `<=`, `++`.
   - On correct: `"5 linjer, 1 til 5. Løkka går rundt akkurat nok ganger."` → proceed.
   - On wrong: gentle retry + the duck hint; never a hard fail.
+
 - **Why this task:** it mirrors the honest "small, precise instructions repeated exactly"
   foundation framing, and it's genuinely CS50x-level.
 
@@ -216,18 +217,18 @@ flowchart TD
 
 ## 9. Per-beat acceptance (maps to the brief's criteria)
 
-| Beat | Done when |
-| --- | --- |
-| Start | `/skamlos-rpg` start screen with Spill + back link; noindex |
-| Classroom | controllable spawn, visible collidable props, mood line |
-| Bell | bell fires; Quest 1→2 transition; objective set |
-| Town | readable town; DNB + OsloMet visible & locked with text; signpost points home |
-| Home | desk + PC(2 monitors) + duck present; duck gives a dry hint |
-| Minigame A | for-loop fill-in accepts correct, retries gently on wrong |
-| Minigame B | git commit stage→message→commit; weak message nudged |
-| Reward | skill "Grunnleggende programmering" + skill log; CS50x cert + Ordkryss video (`tI5fU1aAAvI`) |
-| Handoff | objective/signpost points to OsloMet; OsloMet stays locked; chain not built |
-| Hygiene | build+lint pass; master/VG X/portfolio untouched; FILE_TREE updated |
+| Beat       | Done when                                                                                    |
+| ---------- | -------------------------------------------------------------------------------------------- |
+| Start      | `/skamlos-rpg` start screen with Spill + back link; noindex                                  |
+| Classroom  | controllable spawn, visible collidable props, mood line                                      |
+| Bell       | bell fires; Quest 1→2 transition; objective set                                              |
+| Town       | readable town; DNB + OsloMet visible & locked with text; signpost points home                |
+| Home       | desk + PC(2 monitors) + duck present; duck gives a dry hint                                  |
+| Minigame A | for-loop fill-in accepts correct, retries gently on wrong                                    |
+| Minigame B | git commit stage→message→commit; weak message nudged                                         |
+| Reward     | skill "Grunnleggende programmering" + skill log; CS50x cert + Ordkryss video (`tI5fU1aAAvI`) |
+| Handoff    | objective/signpost points to OsloMet; OsloMet stays locked; chain not built                  |
+| Hygiene    | build+lint pass; master/VG X/portfolio untouched; FILE_TREE updated                          |
 
 ---
 
@@ -252,4 +253,4 @@ Copy these strings into pack data (`dialogue.ts`, `quests.ts`). English optional
 - Signpost (OsloMet): `"OsloMet ligger oppover veien. Det kan være verdt en tur."`
 
 > Do not add the metaphor, "ærlig grense", or "claim-safe" as visible in-game text. The
-> honesty is in *what is shown*, not in lecturing the player.
+> honesty is in _what is shown_, not in lecturing the player.

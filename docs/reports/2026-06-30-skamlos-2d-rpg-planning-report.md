@@ -172,8 +172,8 @@ changed; git status; recommended next step.
   Import, participatory design, safety, learning velocity) and the PII guardrails.
 - package.json — confirmed current stack (Next 16.2.9, React 19.2.4) and that there is NO game
   dependency yet (informs the single-dependency recommendation).
-- .gitignore — confirmed *.md is ignored except allowlisted paths; docs/skamlos/*.md and
-  docs/reports/*.md are explicitly tracked, so the new docs will be tracked.
+- .gitignore — confirmed _.md is ignored except allowlisted paths; docs/skamlos/_.md and
+  docs/reports/\*.md are explicitly tracked, so the new docs will be tracked.
 - app/components/Portfolio.tsx, app/components/SkamlosWorld.tsx, app/components/skamlos/worldGyms.ts
   — the existing DOM/CSS "SkamlosWorld" embedded in the DNB portfolio page; informs the
   "keep the engine out of the portfolio bundle / link only" decision and the existing
@@ -215,6 +215,7 @@ changed; git status; recommended next step.
 ## 4. Files created, modified, moved, deleted (full relative paths)
 
 Created (docs/skamlos/):
+
 - docs/skamlos/SKAMLOS_2D_RPG_IMPLEMENTATION_BRIEF.md — first-slice implementation plan:
   Phaser-3 recommendation + alternatives, single-dependency policy, Next 16 three-layer
   client-only route, file structure (engine vs content pack), the engine-level data model
@@ -237,9 +238,11 @@ Created (docs/skamlos/):
   entry, key decisions, lessons carried from the 3D branch, and open TODOs for the next agent.
 
 Created (docs/reports/):
+
 - docs/reports/2026-06-30-skamlos-2d-rpg-planning-report.md — this report.
 
 Modified:
+
 - FILE_TREE.md — added the docs/skamlos/ folder (existing design brief + 5 new docs) and the
   new report under docs/reports/, with corrected tree connectors.
 
@@ -304,6 +307,7 @@ slice without chat history:
 
   (The report file at docs/reports/2026-06-30-skamlos-2d-rpg-planning-report.md is created
   after this command and is an additional untracked file.)
+
 - git branch verification: current branch feature/skamlos-2d-rpg-planning; the 3D branch
   origin/feature/skamlos-pitch-game was only read via git ls-tree / git show.
 - No build/lint run: documentation-only change; no app code, config, or dependencies touched
@@ -312,13 +316,14 @@ slice without chat history:
 ## 8. File tree / path updates
 
 FILE_TREE.md updated: yes.
+
 - Added docs/skamlos/ (SKAMLOS_2D_RPG_GAME_DESIGN_BRIEF.md existing; plus the 5 new docs).
 - Added docs/reports/2026-06-30-skamlos-2d-rpg-planning-report.md.
 - Corrected tree connectors for the reports/ and skamlos/ subtrees.
-Observation (pre-existing, not changed): FILE_TREE.md still lists docs/AI_PITCH_LOG.md and
-docs/epics/EPIC_SKAMLOS_AI_PITCH.md, which are not present in the working tree. This drift
-pre-dates this session; left untouched to keep the change scoped — flagged here for the tech
-lead to reconcile separately.
+  Observation (pre-existing, not changed): FILE_TREE.md still lists docs/AI_PITCH_LOG.md and
+  docs/epics/EPIC_SKAMLOS_AI_PITCH.md, which are not present in the working tree. This drift
+  pre-dates this session; left untouched to keep the change scoped — flagged here for the tech
+  lead to reconcile separately.
 
 ## 9. Git / commit status
 

@@ -15,7 +15,7 @@ Build the game so that **one engine renders many games**. Each application game 
 top-down RPG where a candidate's real journey becomes explorable places, conversations and
 small actions that unlock honest skills and evidence, ending in a "package delivered" beat.
 
-**Guiding principle:** *the engine knows nothing about DNB, Stian, or Skamløs.* Everything
+**Guiding principle:** _the engine knows nothing about DNB, Stian, or Skamløs._ Everything
 specific lives in a **content pack**. To make a new application game you author a new pack
 and swap theme assets — you do not edit the engine.
 
@@ -51,20 +51,20 @@ in engine code, that branch belongs in pack **data** instead.
 
 ### What is engine vs pack
 
-| Concern | Engine (reusable) | Content pack (per company/role) |
-| --- | --- | --- |
-| Game loop, rendering, physics | ✅ | — |
-| Tilemap loading + collisions | ✅ (generic loader) | Tiled JSON + tileset keys |
-| Player movement / camera | ✅ | spawn points |
-| Interaction + prompts | ✅ | which objects, prompt text |
-| Quest progression logic | ✅ (requirements engine) | the actual quests + gating |
-| Skills / artifacts model | ✅ (types + UI) | the actual skills/artifacts |
-| Minigame *host* | ✅ | minigame *content/config* |
-| Locked-door feedback | ✅ (mechanic) | the lock text + requirement |
-| Endgame screen | ✅ (renderer) | title, message, contact, actions |
-| Claim safety mechanic | ✅ (boundary rendering + dev lint) | the actual boundaries/denies |
-| Language switch | ✅ | the `Loc` strings |
-| Theme (palette, art, music) | ✅ (token consumer) | the tokens + asset keys |
+| Concern                       | Engine (reusable)                  | Content pack (per company/role)  |
+| ----------------------------- | ---------------------------------- | -------------------------------- |
+| Game loop, rendering, physics | ✅                                 | —                                |
+| Tilemap loading + collisions  | ✅ (generic loader)                | Tiled JSON + tileset keys        |
+| Player movement / camera      | ✅                                 | spawn points                     |
+| Interaction + prompts         | ✅                                 | which objects, prompt text       |
+| Quest progression logic       | ✅ (requirements engine)           | the actual quests + gating       |
+| Skills / artifacts model      | ✅ (types + UI)                    | the actual skills/artifacts      |
+| Minigame _host_               | ✅                                 | minigame _content/config_        |
+| Locked-door feedback          | ✅ (mechanic)                      | the lock text + requirement      |
+| Endgame screen                | ✅ (renderer)                      | title, message, contact, actions |
+| Claim safety mechanic         | ✅ (boundary rendering + dev lint) | the actual boundaries/denies     |
+| Language switch               | ✅                                 | the `Loc` strings                |
+| Theme (palette, art, music)   | ✅ (token consumer)                | the tokens + asset keys          |
 
 ---
 
@@ -89,13 +89,24 @@ import { theme } from "./theme";
 export const dnbSkamlosPack: ContentPack = {
   meta: {
     id: "dnb-skamlos",
-    title: { no: "Skamløs Pitch: Kompetansebyen", en: "Shameless Pitch: Competence Town" },
+    title: {
+      no: "Skamløs Pitch: Kompetansebyen",
+      en: "Shameless Pitch: Competence Town",
+    },
     startMap: "classroom",
     startSpawn: "spawn-default",
     lang: { default: "no", available: ["no", "en"] },
     theme,
   },
-  maps, npcs, interactables, quests, skills, artifacts, minigames, endgame, claims,
+  maps,
+  npcs,
+  interactables,
+  quests,
+  skills,
+  artifacts,
+  minigames,
+  endgame,
+  claims,
 };
 ```
 
@@ -103,7 +114,9 @@ Pack selection is trivial and future-proof:
 
 ```ts
 // app/skamlos-rpg/game/content/index.ts
-export const PACKS = { "dnb-skamlos": dnbSkamlosPack /* , "next-company": nextPack */ };
+export const PACKS = {
+  "dnb-skamlos": dnbSkamlosPack /* , "next-company": nextPack */,
+};
 export type PackId = keyof typeof PACKS;
 ```
 
@@ -163,30 +176,30 @@ type Requirement =
 // --- Theme tokens ---
 interface ThemeTokens {
   palette: { bg: string; accent: string; ink: string; lock: string };
-  tilesetKeys: string[];          // preloaded by BootScene
+  tilesetKeys: string[]; // preloaded by BootScene
   playerSpriteKey: string;
   musicKey?: string;
-  uiAccent: string;               // matches DOM HUD accent
+  uiAccent: string; // matches DOM HUD accent
 }
 
 // --- Maps & navigation ---
 interface MapDef {
   id: string;
   kind: "interior" | "world";
-  tilemapKey: string;             // Tiled JSON (loaded from public/)
+  tilemapKey: string; // Tiled JSON (loaded from public/)
   tilesetKeys: string[];
-  collisionLayer: string;         // name of the Tiled layer with collision
+  collisionLayer: string; // name of the Tiled layer with collision
   spawns: Record<string, Vec2>;
   exits: Exit[];
   npcs: string[];
   interactables: string[];
   music?: string;
-  ambient?: Loc;                  // optional one-line mood text on enter
+  ambient?: Loc; // optional one-line mood text on enter
 }
 
 interface Exit {
   id: string;
-  at: { x: number; y: number; w: number; h: number };  // trigger rect (tiles)
+  at: { x: number; y: number; w: number; h: number }; // trigger rect (tiles)
   to: { map: string; spawn: string };
   lock?: GateRef;
 }
@@ -194,8 +207,8 @@ interface Exit {
 interface GateRef {
   id: string;
   requires: Requirement;
-  lockedText: Loc;                // readable feedback when blocked
-  unlockedToast?: Loc;            // optional toast when it opens
+  lockedText: Loc; // readable feedback when blocked
+  unlockedToast?: Loc; // optional toast when it opens
 }
 
 // --- Actors & objects ---
@@ -203,12 +216,19 @@ interface Npc {
   id: string;
   name: Loc;
   spriteKey: string;
-  role: "student" | "teacher" | "reference" | "receptionist" | "signpost" | "companion" | "other";
+  role:
+    | "student"
+    | "teacher"
+    | "reference"
+    | "receptionist"
+    | "signpost"
+    | "companion"
+    | "other";
   position: Vec2;
   facing?: Dir;
   wander?: boolean;
-  dialogue: string;               // dialogue tree id
-  showWhen?: Requirement;         // appears only when met (e.g. Kari after master)
+  dialogue: string; // dialogue tree id
+  showWhen?: Requirement; // appears only when met (e.g. Kari after master)
 }
 
 interface Interactable {
@@ -236,13 +256,13 @@ interface Quest {
   title: Loc;
   objective: Loc;
   intro?: Loc;
-  requires: Requirement;          // when the quest becomes available
-  completeWhen?: Requirement;     // optional auto-complete condition
+  requires: Requirement; // when the quest becomes available
+  completeWhen?: Requirement; // optional auto-complete condition
   grantsSkills: string[];
   grantsArtifacts: string[];
   setsFlags?: string[];
-  unlocks?: string[];             // gate ids / map ids opened on completion
-  nextHint?: Loc;                 // direction only, never the whole metaphor
+  unlocks?: string[]; // gate ids / map ids opened on completion
+  nextHint?: Loc; // direction only, never the whole metaphor
 }
 
 interface Skill {
@@ -250,7 +270,7 @@ interface Skill {
   label: Loc;
   group: "foundation" | "design" | "fullstack" | "ai" | "craft";
   glyph: string;
-  log: LocList;                   // skill-log detail (where the depth lives)
+  log: LocList; // skill-log detail (where the depth lives)
 }
 
 interface Artifact {
@@ -260,7 +280,7 @@ interface Artifact {
   kind: "cert" | "repo" | "live" | "video" | "concept";
   href?: string;
   linkLabel?: Loc;
-  boundary?: Loc;                 // honest claim boundary, rendered on the card
+  boundary?: Loc; // honest claim boundary, rendered on the card
 }
 
 // --- Minigames (host is engine, content is pack) ---
@@ -270,24 +290,30 @@ type MinigameDef =
   | { id: string; kind: "choice"; title: Loc; config: ChoiceConfig };
 
 interface ForLoopConfig {
-  prompt: Loc;                    // task description
-  starter: string;               // starter code shown
+  prompt: Loc; // task description
+  starter: string; // starter code shown
   // a safe, sandboxed check — see §7 (no eval of arbitrary user code)
-  expectedOutput: string[];      // what the loop should print
-  hint: Loc;                     // the duck's hint
+  expectedOutput: string[]; // what the loop should print
+  hint: Loc; // the duck's hint
 }
 
 interface GitCommitConfig {
   prompt: Loc;
-  files: string[];               // "changed" files shown
+  files: string[]; // "changed" files shown
   steps: Array<"stage" | "message" | "commit">;
-  goodMessageHints: Loc;         // what makes a sensible message
+  goodMessageHints: Loc; // what makes a sensible message
 }
 
 interface ChoiceConfig {
   setup: Loc;
   prompt: Loc;
-  options: Array<{ id: string; label: Loc; correct: boolean; tag?: Loc; feedback: Loc }>;
+  options: Array<{
+    id: string;
+    label: Loc;
+    correct: boolean;
+    tag?: Loc;
+    feedback: Loc;
+  }>;
 }
 
 // --- Endgame ---
@@ -295,19 +321,22 @@ interface EndgameDef {
   title: Loc;
   message: Loc;
   show: Array<"quests" | "skills" | "artifacts" | "eggs">;
-  contactSource: "reuse-dnb-contact" | ContactInfo;  // reuse existing data when possible
+  contactSource: "reuse-dnb-contact" | ContactInfo; // reuse existing data when possible
   actions: Array<"replay" | "back-to-portfolio">;
 }
 
 interface ContactInfo {
-  email?: string; phone?: string; github?: string; linkedin?: string;
+  email?: string;
+  phone?: string;
+  github?: string;
+  linkedin?: string;
 }
 
 // --- Claim safety as data ---
 interface ClaimPolicy {
-  deny: string[];                 // forbidden claim categories (machine-checkable tags)
-  boundaries: Record<string, Loc>;// id -> honest boundary string
-  notes: LocList;                 // human guidance for pack authors
+  deny: string[]; // forbidden claim categories (machine-checkable tags)
+  boundaries: Record<string, Loc>; // id -> honest boundary string
+  notes: LocList; // human guidance for pack authors
 }
 
 // --- Runtime state ---
@@ -383,7 +412,7 @@ Claim safety is a **first-class data concern**, mirroring the portfolio's
    for denied phrases/patterns and fails loudly in development. This turns the QA checklist
    into an automated guardrail and is itself on-brand evidence of claim discipline.
 4. **Endgame honesty:** the endgame renderer must use the pack's `message` verbatim and must
-   never assert the job is won — only that a package is *ready/delivered*.
+   never assert the job is won — only that a package is _ready/delivered_.
 
 This makes "honest positioning" a reusable engine feature, not a per-game manual review.
 
@@ -410,7 +439,7 @@ This makes "honest positioning" a reusable engine feature, not a per-game manual
 - Communication is event-based: Phaser emits semantic events (`interact:pc`,
   `exit:blocked`, `quest:complete`) that the React layer listens to; React commands
   (`start`, `loadMap`, `grant`) are dispatched into the engine which tells Phaser what to do.
-- Avoid per-frame React state (the 3D branch lesson): only push to React when a *discrete*
+- Avoid per-frame React state (the 3D branch lesson): only push to React when a _discrete_
   thing changes (active target id, quest state, overlay open). Continuous motion stays in
   Phaser.
 

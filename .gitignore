@@ -62,3 +62,7 @@ next-env.d.ts
 # participant-sensitive thesis content). Keep as local-only evidence.
 docs/dnb/sources/
 *.pdf
+
+# Track Skamlos planning docs
+!docs/skamlos/
+!docs/skamlos/*.md

@@ -112,17 +112,25 @@ portfolio-site/
 │   │   └── sources/        (gitignored, local-only raw sources: thesis.pdf, diploma PDF [contains PII], exam prep .md — never committed)
 │   ├── epics/
 │   │   └── EPIC_SKAMLOS_AI_PITCH.md
-│   └── reports/
-│       ├── 2026-06-19-bootstrap-cleanup-report.md
-│       ├── 2026-06-19-report-format-hardening.md
-│       ├── 2026-06-20-source-synthesis-posting-report.md
-│       ├── 2026-06-22-dnb-cross-repo-evidence-synthesis-report.md
-│       ├── 2026-06-22-dnb-deai-bilingual-redundancy-report.md
-│       ├── 2026-06-22-dnb-opus-full-page-buildout-report.md
-│       ├── 2026-06-22-dnb-programming-learning-ux-pass-report.md
-│       ├── 2026-06-22-dnb-hero-portrait-ux-refinement-report.md
-│       ├── 2026-06-22-dnb-final-copy-label-fix-report.md
-│       └── UX_UI_COPY_REVIEW.md
+│   ├── reports/
+│   │   ├── 2026-06-19-bootstrap-cleanup-report.md
+│   │   ├── 2026-06-19-report-format-hardening.md
+│   │   ├── 2026-06-20-source-synthesis-posting-report.md
+│   │   ├── 2026-06-22-dnb-cross-repo-evidence-synthesis-report.md
+│   │   ├── 2026-06-22-dnb-deai-bilingual-redundancy-report.md
+│   │   ├── 2026-06-22-dnb-opus-full-page-buildout-report.md
+│   │   ├── 2026-06-22-dnb-programming-learning-ux-pass-report.md
+│   │   ├── 2026-06-22-dnb-hero-portrait-ux-refinement-report.md
+│   │   ├── 2026-06-22-dnb-final-copy-label-fix-report.md
+│   │   ├── 2026-06-30-skamlos-2d-rpg-planning-report.md
+│   │   └── UX_UI_COPY_REVIEW.md
+│   └── skamlos/
+│       ├── SKAMLOS_2D_RPG_GAME_DESIGN_BRIEF.md          (existing creative brief)
+│       ├── SKAMLOS_2D_RPG_IMPLEMENTATION_BRIEF.md       (NEW — first-slice plan)
+│       ├── SKAMLOS_2D_RPG_PROLOGUE_SLICE.md             (NEW — storyboard)
+│       ├── SKAMLOS_2D_RPG_WORLD_MAP.md                  (NEW — worldmap v1)
+│       ├── SKAMLOS_APPLICATION_RPG_FRAMEWORK.md         (NEW — reusable framework)
+│       └── SKAMLOS_IMPLEMENTATION_LOG.md                (NEW — running log)
 ├── public/
 │   └── images/
 │       ├── avatar/

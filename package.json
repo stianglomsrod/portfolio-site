@@ -6,10 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "check:skamlos": "node scripts/check-skamlos-content.mjs",
+    "assets:skamlos": "node scripts/build-skamlos-rpg-assets.mjs"
   },
   "dependencies": {
     "next": "16.2.9",
+    "phaser": "^3.90.0",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },

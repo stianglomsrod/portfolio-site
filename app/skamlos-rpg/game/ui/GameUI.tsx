@@ -121,7 +121,12 @@ export default function GameUI({ bridge, runtime, pack }: Props) {
         setObjective(s.objective);
       }),
     );
-    offs.push(bridge.on("bell", () => { audio.sfx("bell"); playBell(); }));
+    offs.push(
+      bridge.on("bell", () => {
+        audio.sfx("bell");
+        playBell();
+      }),
+    );
     offs.push(
       bridge.on("endgame", () => {
         setEndgameOpen(true);

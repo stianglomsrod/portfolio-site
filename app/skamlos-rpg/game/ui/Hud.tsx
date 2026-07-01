@@ -37,10 +37,18 @@ export default function Hud({
         </span>
       </div>
       <div className={styles.hudButtons}>
-        <button className={styles.hudChip} onClick={onOpenMenu} title="Oppdrag (Q)">
+        <button
+          className={styles.hudChip}
+          onClick={onOpenMenu}
+          title="Oppdrag (Q)"
+        >
           🗒 <span>{snapshot?.completedQuests.length ?? 0}</span>
         </button>
-        <button className={styles.hudChip} onClick={onOpenMenu} title="Ferdigheter (K)">
+        <button
+          className={styles.hudChip}
+          onClick={onOpenMenu}
+          title="Ferdigheter (K)"
+        >
           💻 <span>{skills}</span>
         </button>
         <button className={styles.hudChip} onClick={onOpenMenu} title="Bevis">
@@ -57,11 +65,14 @@ export default function Hud({
         >
           {muted ? "🔇" : "🔊"}
         </button>
-        <button className={styles.hudChip} onClick={onOpenMenu} title="Meny (Esc)">
+        <button
+          className={styles.hudChip}
+          onClick={onOpenMenu}
+          title="Meny (Esc)"
+        >
           ☰
         </button>
       </div>
     </div>
   );
 }
-

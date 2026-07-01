@@ -125,7 +125,7 @@ class GameAudio {
         // thud
         const buf = ctx.createBuffer(1, ctx.sampleRate * 0.06, ctx.sampleRate);
         const ch = buf.getChannelData(0);
-        for (let i = 0; i < ch.length; i++) ch[i] = (Math.random() * 2 - 1);
+        for (let i = 0; i < ch.length; i++) ch[i] = Math.random() * 2 - 1;
         const ns = ctx.createBufferSource();
         ns.buffer = buf;
         const nf = ctx.createBiquadFilter();
@@ -360,7 +360,10 @@ class GameAudio {
       if (this.bgmTimeout) clearTimeout(this.bgmTimeout);
       const ctx = this.getCtx();
       if (ctx && this.master) {
-        this.master.gain.setValueAtTime(this.master.gain.value, ctx.currentTime);
+        this.master.gain.setValueAtTime(
+          this.master.gain.value,
+          ctx.currentTime,
+        );
         this.master.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.4);
         // Restore volume so SFX still play
         setTimeout(() => {

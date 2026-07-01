@@ -5,8 +5,9 @@ import type { Npc } from "../../engine/types";
 export const npcs: Npc[] = [
   {
     id: "elev1",
-    name: { no: "Medelev", en: "Classmate" },
+    name: { no: "Elev", en: "Student" },
     spriteKey: "npc_student1",
+    portrait: "portrait_student1",
     role: "student",
     position: { x: 2, y: 4 },
     facing: "right",
@@ -14,8 +15,9 @@ export const npcs: Npc[] = [
   },
   {
     id: "elev2",
-    name: { no: "Medelev", en: "Classmate" },
+    name: { no: "Elev", en: "Student" },
     spriteKey: "npc_student2",
+    portrait: "portrait_student2",
     role: "student",
     position: { x: 10, y: 6 },
     facing: "left",

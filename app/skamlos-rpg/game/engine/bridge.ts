@@ -18,12 +18,18 @@ export interface StateSnapshot {
 
 export type GamePhase = "start" | "playing";
 
+/** A consistent interaction CTA: "Name — [E] Verb" shown in the bottom box. */
+export interface CtaPrompt {
+  name?: Loc;
+  verb: Loc;
+}
+
 /** Engine → UI events. */
 export interface GameEvents {
   phase: GamePhase;
   state: StateSnapshot;
   objective: Loc | null;
-  prompt: Loc | null;
+  prompt: CtaPrompt | null;
   dialogue: { id: string; lines: DialogueLine[] };
   /** Transient, non-blocking line (mood/bell) that auto-dismisses. */
   subtitle: Loc;

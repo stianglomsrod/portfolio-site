@@ -1,9 +1,18 @@
 // === REUSABLE ENGINE — WorldScene: renders any MapDef, drives play ===
 import Phaser from "phaser";
-import type { GameBridge } from "../bridge";
+import type { CtaPrompt, GameBridge } from "../bridge";
 import type { GameRuntime } from "../runtime";
 import { buildSolidGrid, tileCenter, validateMap } from "../systems/grid";
-import type { ContentPack, Dir, Interactable, MapDef, Npc } from "../types";
+import type {
+  ContentPack,
+  Dir,
+  Exit,
+  Interactable,
+  MapDef,
+  Npc,
+  QuestGuide,
+  Vec2,
+} from "../types";
 
 interface WorldData {
   mapId: string;
@@ -13,7 +22,8 @@ interface WorldData {
 
 type Target =
   | { kind: "interactable"; data: Interactable; x: number; y: number }
-  | { kind: "npc"; data: Npc; x: number; y: number };
+  | { kind: "npc"; data: Npc; x: number; y: number }
+  | { kind: "exit"; data: Exit; x: number; y: number };
 
 const SPEED = 116;
 const IDLE_FRAME: Record<Dir, number> = { down: 0, left: 3, right: 6, up: 9 };
@@ -27,11 +37,20 @@ export class WorldScene extends Phaser.Scene {
 
   private player!: Phaser.Physics.Arcade.Sprite;
   private shadow!: Phaser.GameObjects.Ellipse;
+  private avatar!: Phaser.GameObjects.Image;
+  private avatarRing!: Phaser.GameObjects.Arc;
+  private avatarBaseScale = 1;
+  private bobPhase = 0;
   private facing: Dir = "down";
   private solids!: Phaser.Physics.Arcade.StaticGroup;
+  private solidGrid: boolean[][] = [];
   private targets: Target[] = [];
   private current: Target | null = null;
   private lastPromptId: string | null = null;
+  private npcSprites: Phaser.GameObjects.Sprite[] = [];
+
+  private guideMarker!: Phaser.GameObjects.Text;
+  private edgeArrow!: Phaser.GameObjects.Image;
 
   private paused = true;
   private started = false;
@@ -56,6 +75,7 @@ export class WorldScene extends Phaser.Scene {
     this.cueFired = false;
     this.started = false;
     this.targets = [];
+    this.npcSprites = [];
     this.current = null;
     this.lastPromptId = null;
   }
@@ -93,11 +113,27 @@ export class WorldScene extends Phaser.Scene {
     this.spawnInteractables();
     this.spawnNpcs();
     this.spawnPlayer(data.spawn);
-    this.setupExits();
+    this.registerExits();
+    this.createOverlays();
     this.setupInput();
     this.registerBridge();
 
     this.cameras.main.fadeIn(220);
+
+    {
+      (window as unknown as { __skamlos?: unknown }).__skamlos = {
+        scene: this,
+        runtime: this.runtime,
+        pos: () => ({ x: this.player?.x, y: this.player?.y, tile: this.runtime.state.player }),
+        keys: () => ({
+          down: this.cursors?.down?.isDown,
+          right: this.cursors?.right?.isDown,
+          enabled: this.input?.keyboard?.enabled,
+          paused: this.paused,
+          started: this.started,
+        }),
+      };
+    }
 
     const phase = this.registry.get("phase") as string | undefined;
     if (data.autostart || phase === "playing") {
@@ -127,8 +163,14 @@ export class WorldScene extends Phaser.Scene {
         if (!tileId) continue;
         const spec = this.pack.tiles[tileId];
         if (!spec) continue;
-        const img = this.add.image(x * s + s / 2, y * s + s / 2, spec.asset);
-        img.setDepth(-1000);
+        if (spec.anim && this.anims.exists(spec.anim)) {
+          const sprite = this.add.sprite(x * s + s / 2, y * s + s / 2, spec.asset, 0);
+          sprite.setDepth(-1000);
+          if (!this.reducedMotion) sprite.anims.play(spec.anim);
+        } else {
+          const img = this.add.image(x * s + s / 2, y * s + s / 2, spec.asset);
+          img.setDepth(-1000);
+        }
       }
     }
   }
@@ -163,7 +205,9 @@ export class WorldScene extends Phaser.Scene {
     for (const b of this.map.buildings ?? []) {
       const img = this.add.image(b.x * s, b.y * s, b.textureKey);
       img.setOrigin(0, 0);
-      img.setDepth((b.y + b.hTiles) * s - 2);
+      const src = this.textures.get(b.textureKey).getSourceImage();
+      const baseY = b.y * s + (((src as { height?: number })?.height ?? b.hTiles * s));
+      img.setDepth(baseY - 2);
     }
   }
 
@@ -186,17 +230,15 @@ export class WorldScene extends Phaser.Scene {
   private renderLabels(): void {
     const s = this.size;
     const lang = this.runtime.state.lang;
-    const labels = [...(this.map.labels ?? [])];
-    for (const b of this.map.buildings ?? []) {
-      if (b.label)
-        labels.push({ text: b.label, x: b.x + b.wTiles / 2, y: b.y - 0.4 });
-    }
-    for (const l of labels) {
-      const text =
-        typeof l.text === "string" ? l.text : (l.text[lang] ?? l.text.no);
-      const t = this.add.text(l.x * s, l.y * s, text, {
+    const draw = (
+      text: string,
+      px: number,
+      py: number,
+      small: boolean,
+    ) => {
+      const t = this.add.text(px, py, text, {
         fontFamily: "monospace",
-        fontSize: l.small ? "11px" : "13px",
+        fontSize: small ? "11px" : "13px",
         color: "#fdf6e8",
         fontStyle: "bold",
       });
@@ -205,53 +247,123 @@ export class WorldScene extends Phaser.Scene {
       t.setStroke("#2b2018", 4);
       t.setShadow(0, 1, "#00000066", 2);
       t.setDepth(50_000);
+    };
+    // Building name plates: centred above each building (clamped on-screen).
+    for (const b of this.map.buildings ?? []) {
+      if (!b.label) continue;
+      const text = typeof b.label === "string" ? b.label : (b.label[lang] ?? b.label.no);
+      const cx = (b.x + b.wTiles / 2) * s;
+      const cy = Math.max(b.y * s - 9, 11);
+      draw(text, cx, cy, true);
+    }
+    // Free-standing labels from map data.
+    for (const l of this.map.labels ?? []) {
+      const text = typeof l.text === "string" ? l.text : (l.text[lang] ?? l.text.no);
+      draw(text, l.x * s, l.y * s, !!l.small);
     }
   }
 
   private buildCollision(): void {
-    const grid = buildSolidGrid(this.map, this.pack);
-    this.solids = this.physics.add.staticGroup();
     const s = this.size;
+    this.solids = this.physics.add.staticGroup();
+    // Conservative full grid for spawn-safety + guide resolution only.
+    this.solidGrid = buildSolidGrid(this.map, this.pack);
+
+    const addBody = (cx: number, cy: number, w: number, h: number) => {
+      const r = this.add.rectangle(cx, cy, w, h, 0, 0);
+      this.physics.add.existing(r, true);
+      this.solids.add(r);
+    };
+
+    // Ground-layer solids (walls, water): full tile.
     for (let y = 0; y < this.map.height; y++) {
+      const row = this.map.ground[y] ?? "";
       for (let x = 0; x < this.map.width; x++) {
-        if (!grid[y][x]) continue;
-        const cell = this.add.rectangle(
-          x * s + s / 2,
-          y * s + s / 2,
-          s,
-          s,
-          0x000000,
-          0,
-        );
-        this.physics.add.existing(cell, true);
-        this.solids.add(cell);
+        const id = this.resolveTile(row[x]);
+        const spec = id ? this.pack.tiles[id] : undefined;
+        if (spec?.solid) addBody(x * s + s / 2, y * s + s / 2, s, s);
       }
+    }
+
+    // Decor-layer solids (props): small, FORGIVING base hitboxes so the player
+    // brushes past trees/bushes instead of getting wedged on them.
+    if (this.map.decor) {
+      for (let y = 0; y < this.map.height; y++) {
+        const row = this.map.decor[y] ?? "";
+        for (let x = 0; x < this.map.width; x++) {
+          const id = this.resolveTile(row[x]);
+          const spec = id ? this.pack.tiles[id] : undefined;
+          if (!spec?.solid) continue;
+          if (spec.tall) addBody(x * s + s / 2, (y + 1) * s - 5, 12, 8); // trunk base
+          else addBody(x * s + s / 2, y * s + s * 0.66, 18, 12); // bush/rock base
+        }
+      }
+    }
+
+    // Buildings: a single thin wall at the IMAGE base (matches the visible
+    // bottom of the facade), so the player can walk on the road behind the
+    // upper part of a building and never clips through the wall.
+    for (const b of this.map.buildings ?? []) {
+      const src = this.textures.get(b.textureKey).getSourceImage();
+      const W = (src as { width?: number })?.width ?? b.wTiles * s;
+      const H = (src as { height?: number })?.height ?? b.hTiles * s;
+      const baseY = b.y * s + H;
+      const wallH = Math.min(16, H);
+      addBody(b.x * s + W / 2, baseY - wallH / 2, W - 8, wallH);
     }
   }
 
   /* ---------- actors ---------- */
 
   private spawnPlayer(spawnId: string): void {
-    const spawn = this.map.spawns[spawnId] ??
+    let spawn = this.map.spawns[spawnId] ??
       this.runtime.state.player ?? { x: 2, y: 2 };
+    spawn = this.safeSpawn(spawn);
     const c = tileCenter(spawn.x, spawn.y, this.size);
     const key = this.pack.meta.theme.playerSpriteKey;
 
-    this.shadow = this.add.ellipse(c.x, c.y + 10, 20, 8, 0x000000, 0.22);
+    this.shadow = this.add.ellipse(c.x, c.y + 12, 22, 9, 0x000000, 0.25);
     this.shadow.setDepth(c.y - 1);
 
+    // Invisible physics body drives movement/collision; the visible "character"
+    // is the player's real avatar photo (a fun bouncing head).
     this.player = this.physics.add.sprite(c.x, c.y, key, IDLE_FRAME.down);
-    this.player.setDepth(c.y);
+    this.player.setVisible(false);
     const body = this.player.body as Phaser.Physics.Arcade.Body;
-    body.setSize(15, 12);
-    body.setOffset(8.5, 18);
+    body.setSize(16, 14);
+    body.setOffset(8, 16);
     this.player.setCollideWorldBounds(true);
     this.facing = this.runtime.state.facing ?? "down";
-    this.player.setFrame(IDLE_FRAME[this.facing]);
-
+    this.runtime.setPlayer(spawn.x, spawn.y, this.facing);
+    this.runtime.persist();
     this.physics.add.collider(this.player, this.solids);
-    this.cameras.main.startFollow(this.player, true, 0.12, 0.12);
-    this.cameras.main.setDeadzone(this.size * 3, this.size * 2.2);
+    this.cameras.main.startFollow(this.player, true, 0.16, 0.16);
+    this.cameras.main.setDeadzone(this.size * 0.5, this.size * 0.5);
+
+    const D = 30;
+    this.avatarRing = this.add.circle(c.x, c.y, D / 2 + 2, 0x2b2018);
+    this.avatar = this.add.image(c.x, c.y, this.textures.exists("avatar") ? "avatar" : key);
+    if (this.textures.exists("avatar")) this.avatar.setDisplaySize(D, D);
+    this.avatarBaseScale = this.avatar.scaleX;
+    this.bobPhase = 0;
+  }
+
+  /** If a spawn lands on a solid tile, nudge to the nearest free tile. */
+  private safeSpawn(spawn: Vec2): Vec2 {
+    const g = this.solidGrid;
+    const inb = (x: number, y: number) =>
+      y >= 0 && x >= 0 && y < this.map.height && x < this.map.width;
+    if (inb(spawn.x, spawn.y) && !g[spawn.y]?.[spawn.x]) return spawn;
+    for (let r = 1; r < 6; r++) {
+      for (let dy = -r; dy <= r; dy++) {
+        for (let dx = -r; dx <= r; dx++) {
+          const x = spawn.x + dx;
+          const y = spawn.y + dy;
+          if (inb(x, y) && !g[y]?.[x]) return { x, y };
+        }
+      }
+    }
+    return spawn;
   }
 
   private spawnInteractables(): void {
@@ -283,35 +395,81 @@ export class WorldScene extends Phaser.Scene {
       const c = tileCenter(data.position.x, data.position.y, s);
       const sprite = this.add.sprite(c.x, c.y, data.spriteKey, 0);
       sprite.setDepth(c.y);
+      // Idle blink anim (2-frame sheet) makes NPCs feel alive.
+      const animKey = `${data.spriteKey}-idle`;
+      if (!this.anims.exists(animKey) && this.textures.get(data.spriteKey).frameTotal > 2) {
+        this.anims.create({
+          key: animKey,
+          frames: [
+            { key: data.spriteKey, frame: 0 },
+            { key: data.spriteKey, frame: 0 },
+            { key: data.spriteKey, frame: 0 },
+            { key: data.spriteKey, frame: 0 },
+            { key: data.spriteKey, frame: 1 },
+          ],
+          frameRate: 3,
+          repeat: -1,
+        });
+      }
+      if (this.anims.exists(animKey)) sprite.anims.play(animKey);
+      if (!this.reducedMotion) {
+        this.tweens.add({
+          targets: sprite,
+          scaleY: 1.04,
+          duration: 1100,
+          yoyo: true,
+          repeat: -1,
+          ease: "Sine.inOut",
+          delay: Math.random() * 600,
+        });
+      }
+      this.npcSprites.push(sprite);
       this.targets.push({ kind: "npc", data, x: c.x, y: c.y });
     }
   }
 
   /* ---------- exits & gates ---------- */
 
-  private setupExits(): void {
+  private registerExits(): void {
     const s = this.size;
     for (const exit of this.map.exits) {
-      const zone = this.add.zone(
-        exit.at.x * s,
-        exit.at.y * s,
-        exit.at.w * s,
-        exit.at.h * s,
-      );
-      zone.setOrigin(0, 0);
-      this.physics.add.existing(zone, true);
-      this.physics.add.overlap(this.player, zone, () => this.tryExit(exit.id));
+      // Doors are interaction targets (press E / Space), never silent auto-walk.
+      const cx = (exit.at.x + exit.at.w / 2) * s;
+      const cy = (exit.at.y + exit.at.h / 2) * s;
+      this.targets.push({ kind: "exit", data: exit, x: cx, y: cy });
     }
   }
 
-  private tryExit(exitId: string): void {
-    if (this.paused || this.transitioning) return;
-    const exit = this.map.exits.find((e) => e.id === exitId);
-    if (!exit) return;
+  /* ---------- in-world guidance overlays ---------- */
 
+  private createOverlays(): void {
+    // WoW-style quest marker (yellow ! to go, yellow ? to deliver), hovering.
+    this.guideMarker = this.add
+      .text(0, 0, "!", {
+        fontFamily: "monospace",
+        fontSize: "26px",
+        color: "#ffd23c",
+        fontStyle: "bold",
+      })
+      .setOrigin(0.5)
+      .setResolution(3)
+      .setStroke("#5a3a08", 5)
+      .setShadow(0, 2, "#00000088", 3)
+      .setDepth(60_000)
+      .setVisible(false);
+
+    // Off-screen edge arrow pointing toward the active objective.
+    this.edgeArrow = this.add
+      .image(0, 0, "arrow")
+      .setScrollFactor(0)
+      .setDepth(60_001)
+      .setVisible(false);
+  }
+
+  private enterExit(exit: Exit): void {
+    if (this.paused || this.transitioning) return;
     // The classroom bell rings if the player heads for the door early.
     this.ensureCueFired();
-
     const blocked = this.runtime.evaluateGate(exit.lock);
     if (blocked) {
       this.emitLocked(blocked.lockedText);
@@ -332,7 +490,7 @@ export class WorldScene extends Phaser.Scene {
   private doTransition(mapId: string, spawn: string): void {
     this.transitioning = true;
     this.player.setVelocity(0, 0);
-    this.runtime.setPlayer(0, 0, this.facing);
+    this.bridge.emit("prompt", null);
     this.cameras.main.fadeOut(200);
     this.cameras.main.once(
       Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE,
@@ -466,7 +624,11 @@ export class WorldScene extends Phaser.Scene {
     if (this.paused || this.transitioning || !this.current) return;
     const target = this.current;
     if (target.kind === "npc") {
-      this.runDialogue(target.data.dialogue, target.data.name);
+      this.runDialogue(target.data.dialogue, target.data.name, target.data.portrait);
+      return;
+    }
+    if (target.kind === "exit") {
+      this.enterExit(target.data);
       return;
     }
     this.runAction(target.data);
@@ -508,28 +670,32 @@ export class WorldScene extends Phaser.Scene {
   private runDialogue(
     treeId: string,
     speaker?: { no: string; en?: string },
+    portrait?: string,
   ): void {
     const tree = this.pack.dialogue[treeId];
     if (!tree || tree.length === 0) return;
-    const lines = speaker ? tree.map((l) => ({ speaker, ...l })) : tree;
+    const lines = tree.map((l) => ({
+      ...(speaker ? { speaker } : {}),
+      ...(portrait ? { portrait } : {}),
+      ...l,
+    }));
     this.bridge.emit("dialogue", { id: treeId, lines });
   }
 
-  private setPrompt(
-    id: string | null,
-    text?: { no: string; en?: string },
-  ): void {
+  private setPrompt(id: string | null, cta?: CtaPrompt): void {
     if (id === this.lastPromptId) return;
     this.lastPromptId = id;
-    this.bridge.emit("prompt", id && text ? text : null);
+    this.bridge.emit("prompt", id && cta ? cta : null);
   }
 
   /* ---------- update loop ---------- */
 
-  update(): void {
+  update(time: number): void {
     if (!this.player) return;
     if (this.paused || this.transitioning) {
       this.player.setVelocity(0, 0);
+      this.guideMarker.setVisible(false);
+      this.edgeArrow.setVisible(false);
       return;
     }
 
@@ -548,30 +714,50 @@ export class WorldScene extends Phaser.Scene {
       else if (vx > 0) this.facing = "right";
       else if (vy < 0) this.facing = "up";
       else if (vy > 0) this.facing = "down";
-      this.player.anims.play(
-        `${this.pack.meta.theme.playerSpriteKey}-walk-${this.facing}`,
-        true,
-      );
     } else {
       this.player.setVelocity(0, 0);
-      this.player.anims.stop();
-      this.player.setFrame(IDLE_FRAME[this.facing]);
     }
 
-    this.player.setDepth(this.player.y);
-    this.shadow.setPosition(this.player.x, this.player.y + 10);
-    this.shadow.setDepth(this.player.y - 1);
+    // Bouncy avatar: a hop + squash/stretch while moving, a gentle bob at rest.
+    const px = this.player.x;
+    const py = this.player.y;
+    let bob = 0;
+    let sx = 1;
+    let sy = 1;
+    if (this.reducedMotion) {
+      bob = 0;
+    } else if (moving) {
+      this.bobPhase += (this.game.loop.delta || 16) * 0.014;
+      bob = Math.abs(Math.sin(this.bobPhase)) * 6;
+      const sq = Math.cos(this.bobPhase) * 0.08;
+      sx = 1 + sq;
+      sy = 1 - sq;
+    } else {
+      bob = (Math.sin(time * 0.004) + 1) * 0.9;
+    }
+    const base = this.avatarBaseScale;
+    this.avatar.setPosition(px, py - 7 - bob);
+    this.avatar.setScale(base * sx, base * sy);
+    this.avatar.setDepth(py + 1);
+    this.avatarRing.setPosition(px, py - 7 - bob);
+    this.avatarRing.setScale(sx, sy);
+    this.avatarRing.setDepth(py);
+    this.shadow.setPosition(px, py + 12);
+    this.shadow.setDepth(py - 1);
+    this.shadow.setScale(1 - bob * 0.03);
+
     this.runtime.setPlayer(
-      Math.floor(this.player.x / this.size),
-      Math.floor(this.player.y / this.size),
+      Math.floor(px / this.size),
+      Math.floor(py / this.size),
       this.facing,
     );
 
     this.updateTarget();
+    this.updateGuide(time);
   }
 
   private updateTarget(): void {
-    const range = this.size * 1.35;
+    const range = this.size * 1.6;
     let best: Target | null = null;
     let bestDist = range;
     for (const tgt of this.targets) {
@@ -591,13 +777,90 @@ export class WorldScene extends Phaser.Scene {
       this.setPrompt(null);
       return;
     }
-    const prompt =
-      best.kind === "npc"
-        ? { no: `Snakk med ${best.data.name.no}` }
-        : best.data.prompt;
-    this.setPrompt(
-      best.kind === "npc" ? `npc:${best.data.id}` : best.data.id,
-      prompt,
-    );
+    let id: string;
+    let cta: CtaPrompt;
+    if (best.kind === "npc") {
+      id = `npc:${best.data.id}`;
+      cta = { name: best.data.name, verb: { no: "Snakk", en: "Talk" } };
+    } else if (best.kind === "exit") {
+      id = `exit:${best.data.id}`;
+      cta = { name: best.data.name, verb: best.data.prompt ?? { no: "Gå", en: "Go" } };
+    } else {
+      id = best.data.id;
+      cta = { name: best.data.name, verb: best.data.prompt };
+    }
+    this.setPrompt(id, cta);
+  }
+
+  /** Resolve a quest guide's target id (interactable/npc/exit/building) to px. */
+  private resolveGuidePos(g: QuestGuide): Vec2 | null {
+    const s = this.size;
+    if (g.at) return tileCenter(g.at.x, g.at.y, s);
+    if (!g.target) return null;
+    for (const t of this.targets) {
+      if (t.kind === "interactable" && t.data.id === g.target) return { x: t.x, y: t.y };
+      if (t.kind === "npc" && t.data.id === g.target) return { x: t.x, y: t.y };
+      if (t.kind === "exit" && t.data.id === g.target) return { x: t.x, y: t.y };
+    }
+    const b = this.map.buildings?.find((bb) => bb.id === g.target);
+    if (b) {
+      const src = this.textures.get(b.textureKey).getSourceImage();
+      const W = (src as { width?: number })?.width ?? b.wTiles * s;
+      const H = (src as { height?: number })?.height ?? b.hTiles * s;
+      return { x: b.x * s + W / 2, y: b.y * s + H + 4 };
+    }
+    return null;
+  }
+
+  private updateGuide(time: number): void {
+    const q = this.runtime.activeQuest();
+    const guide = q?.guides?.find((g) => g.map === this.map.id);
+    const pos = guide ? this.resolveGuidePos(guide) : null;
+    if (!guide || !pos) {
+      this.guideMarker.setVisible(false);
+      this.edgeArrow.setVisible(false);
+      return;
+    }
+    const cam = this.cameras.main;
+    const view = cam.worldView;
+    const margin = this.size;
+    const onScreen =
+      pos.x > view.x + margin &&
+      pos.x < view.right - margin &&
+      pos.y > view.y + margin &&
+      pos.y < view.bottom - margin;
+    if (onScreen) {
+      // Once the player is standing at the target, the bottom-box CTA takes
+      // over, so hide the hovering marker to avoid doubled cues.
+      const atTarget =
+        !!this.current &&
+        Phaser.Math.Distance.Between(this.player.x, this.player.y, pos.x, pos.y) <
+          this.size * 1.7;
+      if (atTarget) {
+        this.guideMarker.setVisible(false);
+        this.edgeArrow.setVisible(false);
+        return;
+      }
+      const bob = Math.sin(time * 0.005) * 4;
+      this.guideMarker.setText(guide.kind === "deliver" ? "?" : "!");
+      this.guideMarker.setColor("#ffd23c");
+      this.guideMarker.setPosition(pos.x, pos.y - this.size * 1.15 + bob);
+      this.guideMarker.setVisible(true);
+      this.edgeArrow.setVisible(false);
+    } else {
+      this.guideMarker.setVisible(false);
+      const ang = Math.atan2(
+        pos.y - (view.y + view.height / 2),
+        pos.x - (view.x + view.width / 2),
+      );
+      const rx = cam.width / 2 - 28;
+      const ry = cam.height / 2 - 28;
+      this.edgeArrow.setPosition(
+        cam.width / 2 + Math.cos(ang) * rx,
+        cam.height / 2 + Math.sin(ang) * ry,
+      );
+      this.edgeArrow.setRotation(ang + Math.PI / 2);
+      this.edgeArrow.setVisible(true);
+    }
   }
 }

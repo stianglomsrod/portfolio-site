@@ -59,6 +59,18 @@ export class BootScene extends Phaser.Scene {
       });
     }
 
+    if (this.textures.exists("water") && !this.anims.exists("water")) {
+      this.anims.create({
+        key: "water",
+        frames: [
+          { key: "water", frame: 0 },
+          { key: "water", frame: 1 },
+        ],
+        frameRate: 2,
+        repeat: -1,
+      });
+    }
+
     const phase = this.registry.get("phase") as string | undefined;
     this.scene.start("WorldScene", {
       mapId: this.registry.get("startMap"),

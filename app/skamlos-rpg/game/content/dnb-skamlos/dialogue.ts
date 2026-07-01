@@ -4,7 +4,17 @@ import type { DialogueTree } from "../../engine/types";
 // grense" as visible text — the honesty lives in WHAT is shown, not in lecturing.
 export const dialogue: Record<string, DialogueTree> = {
   "duck-hint": [
-    { speaker: { no: "Badeanda" }, text: { no: "Ta én løkke av gangen." } },
+    {
+      speaker: { no: "Badeanda" },
+      text: {
+        no: "Forklar koden høyt for meg. Det er sånn rubber duck-debugging funker.",
+        en: "Explain the code out loud to me. That's how rubber-duck debugging works.",
+      },
+    },
+    {
+      speaker: { no: "Badeanda" },
+      text: { no: "…og ta én løkke av gangen.", en: "…and take one loop at a time." },
+    },
   ],
   "duck-hint-retry": [
     {
@@ -14,19 +24,31 @@ export const dialogue: Record<string, DialogueTree> = {
   ],
   elev1: [
     {
-      speaker: { no: "Medelev" },
+      speaker: { no: "Elev" },
       text: { no: "Endelig snart helg. Hva skal du gjøre?" },
     },
     {
       speaker: { no: "Du" },
+      portrait: "stian",
       text: { no: "Gjøre ferdig Ordkryss. Det er nesten i mål." },
     },
   ],
   elev2: [
-    { speaker: { no: "Medelev" }, text: { no: "Koding ser vanskelig ut." } },
+    { speaker: { no: "Elev" }, text: { no: "Koding ser vanskelig ut." } },
     {
       speaker: { no: "Du" },
+      portrait: "stian",
       text: { no: "Det ser verre ut enn det er. Én bit av gangen." },
+    },
+  ],
+  // A deadpan optional interaction (treated as a completely normal build step).
+  "flutterfly-compile": [
+    { text: { no: "$ kompiler flutterfly", en: "$ compile flutterfly" } },
+    {
+      text: {
+        no: "Bygget uten feil. 0 advarsler. Den fladrer videre.",
+        en: "Built with no errors. 0 warnings. It flutters on.",
+      },
     },
   ],
   // Locked-building lines (read on E). Readable feedback, never silent walls.
@@ -36,7 +58,14 @@ export const dialogue: Record<string, DialogueTree> = {
   "oslomet-locked": [
     {
       text: {
-        no: "Universitetet venter. Du er ikke helt klar for dette ennå.",
+        no: "OsloMet står klart — men porten hit hører til neste kapittel.",
+        en: "OsloMet stands ready — but the gate here belongs to the next chapter.",
+      },
+    },
+    {
+      text: {
+        no: "Slutt på første del. Takk for at du spilte! Resten bygges stein for stein.",
+        en: "End of part one. Thanks for playing! The rest is built stone by stone.",
       },
     },
   ],
@@ -47,11 +76,13 @@ export const dialogue: Record<string, DialogueTree> = {
       },
     },
   ],
-  "workshop-locked": [
+  "schoolside-locked": [
     {
       text: {
-        no: "Workshoprommet er låst. Du trenger et metodeoppdrag fra OsloMet først.",
+        no: "Skolens sideinngang er låst. Den åpner når du starter et oppdrag om lærerinnsikt.",
+        en: "The school side entrance is locked. It opens when you start a teacher-insight quest.",
       },
     },
   ],
 };
+

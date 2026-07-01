@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { GameBridge, StateSnapshot } from "../engine/bridge";
+import type { CtaPrompt, GameBridge, StateSnapshot } from "../engine/bridge";
 import type { GameRuntime } from "../engine/runtime";
 import type {
   Artifact,
@@ -15,12 +15,10 @@ import styles from "../../skamlos-rpg.module.css";
 import { playBell } from "./bell";
 import StartScreen from "./StartScreen";
 import Hud from "./Hud";
-import DialogueBox from "./DialogueBox";
-import Subtitle from "./Subtitle";
+import GameBox from "./GameBox";
 import Toasts, { type ToastItem } from "./Toasts";
 import RewardBanner from "./RewardBanner";
-import QuestLog from "./QuestLog";
-import SkillLog from "./SkillLog";
+import PauseMenu from "./PauseMenu";
 import MinigameModal from "./MinigameModal";
 
 interface Props {
@@ -34,13 +32,12 @@ type DialogueState = {
   lines: DialogueLine[];
   index: number;
 } | null;
-type Panel = "quest" | "skill" | null;
 
 export default function GameUI({ bridge, runtime, pack }: Props) {
   const [phase, setPhase] = useState<"start" | "playing">("start");
   const [lang, setLang] = useState<Lang>(runtime?.state.lang ?? "no");
   const [objective, setObjective] = useState<Loc | null>(null);
-  const [prompt, setPrompt] = useState<Loc | null>(null);
+  const [prompt, setPrompt] = useState<CtaPrompt | null>(null);
   const [subtitle, setSubtitle] = useState<{ text: Loc; n: number } | null>(
     null,
   );
@@ -51,7 +48,8 @@ export default function GameUI({ bridge, runtime, pack }: Props) {
     artifacts: Artifact[];
   } | null>(null);
   const [minigameId, setMinigameId] = useState<string | null>(null);
-  const [panel, setPanel] = useState<Panel>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [showControls, setShowControls] = useState(true);
   const [snapshot, setSnapshot] = useState<StateSnapshot | null>(null);
 
   const toastId = useRef(0);
@@ -113,34 +111,50 @@ export default function GameUI({ bridge, runtime, pack }: Props) {
   }, [bridge, pushToast]);
 
   // Panel hotkeys (Q/K) and Escape-to-close. Movement is paused while a panel
-  // is open via cmd:pause/cmd:resume.
+  // Esc / Q / K open the pause-menu. Movement is paused while it is open.
   useEffect(() => {
     if (!bridge) return;
     const onKey = (e: KeyboardEvent) => {
       if (phase !== "playing") return;
-      const key = e.key.toLowerCase();
       if (dialogue || minigameId) return;
-      if (key === "q") togglePanel("quest");
-      else if (key === "k") togglePanel("skill");
-      else if (key === "escape" && panel) closePanel();
+      const key = e.key.toLowerCase();
+      if (key === "escape" || key === "q" || key === "k") {
+        e.preventDefault();
+        setMenuOpen((m) => {
+          const v = !m;
+          bridge.emit(v ? "cmd:pause" : "cmd:resume");
+          return v;
+        });
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bridge, phase, panel, dialogue, minigameId]);
+  }, [bridge, phase, dialogue, minigameId]);
 
-  function togglePanel(next: Panel) {
-    setPanel((cur) => {
-      const value = cur === next ? null : next;
-      if (value) bridge?.emit("cmd:pause");
-      else bridge?.emit("cmd:resume");
-      return value;
-    });
+  function openMenu() {
+    setMenuOpen(true);
+    bridge?.emit("cmd:pause");
   }
-  function closePanel() {
-    setPanel(null);
+  function closeMenu() {
+    setMenuOpen(false);
     bridge?.emit("cmd:resume");
   }
+
+  // Controls are taught briefly at the start, then fade (best practice). They
+  // also live permanently in the pause menu, so the text box never has to.
+  useEffect(() => {
+    if (phase !== "playing" || !showControls) return;
+    const move = ["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright"];
+    const onMove = (e: KeyboardEvent) => {
+      if (move.includes(e.key.toLowerCase())) setShowControls(false);
+    };
+    const timer = window.setTimeout(() => setShowControls(false), 8000);
+    window.addEventListener("keydown", onMove);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("keydown", onMove);
+    };
+  }, [phase, showControls]);
 
   function advanceDialogue() {
     setDialogue((d) => {
@@ -159,46 +173,50 @@ export default function GameUI({ bridge, runtime, pack }: Props) {
         <Hud
           lang={lang}
           objective={objective}
-          prompt={prompt}
           snapshot={snapshot}
-          onOpenQuest={() => togglePanel("quest")}
-          onOpenSkill={() => togglePanel("skill")}
+          onOpenMenu={openMenu}
           onToggleLang={() =>
             bridge.emit("cmd:setLang", lang === "no" ? "en" : "no")
           }
         />
       )}
 
-      {subtitle && (
-        <Subtitle key={subtitle.n} text={subtitle.text} lang={lang} />
-      )}
-
       <Toasts items={toasts} lang={lang} />
       {reward && <RewardBanner reward={reward} lang={lang} />}
 
-      {dialogue && (
-        <DialogueBox
-          line={dialogue.lines[dialogue.index]}
-          hasNext={dialogue.index + 1 < dialogue.lines.length}
+      {phase === "playing" && showControls && !menuOpen && (
+        <div className={styles.controlsBanner}>
+          {lang === "no"
+            ? "Beveg: WASD / piltaster   ·   Undersøk: E   ·   Meny: Esc"
+            : "Move: WASD / arrows   ·   Interact: E   ·   Menu: Esc"}
+        </div>
+      )}
+
+      {phase === "playing" && (
+        <GameBox
+          dialogue={
+            dialogue
+              ? {
+                  line: dialogue.lines[dialogue.index],
+                  hasNext: dialogue.index + 1 < dialogue.lines.length,
+                }
+              : null
+          }
+          subtitle={subtitle?.text ?? null}
+          cta={prompt}
           lang={lang}
           onAdvance={advanceDialogue}
+          onInteract={() => bridge.emit("cmd:interact")}
         />
       )}
 
-      {panel === "quest" && (
-        <QuestLog
+      {menuOpen && (
+        <PauseMenu
           pack={pack}
           snapshot={snapshot}
           lang={lang}
-          onClose={closePanel}
-        />
-      )}
-      {panel === "skill" && (
-        <SkillLog
-          pack={pack}
-          snapshot={snapshot}
-          lang={lang}
-          onClose={closePanel}
+          onResume={closeMenu}
+          onRestart={() => bridge.emit("cmd:restart")}
         />
       )}
 

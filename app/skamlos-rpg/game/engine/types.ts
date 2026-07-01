@@ -40,6 +40,8 @@ export interface TileSpec {
   solid?: boolean;
   /** Prop taller than one tile: drawn anchored at its bottom and depth-sorted by y. */
   tall?: boolean;
+  /** Animation key (for animated ground tiles like water). */
+  anim?: string;
   /** Optional render width/height override in px (defaults to the texture size). */
   w?: number;
   h?: number;
@@ -84,6 +86,10 @@ export interface Exit {
   /** Trigger rectangle in tile units. */
   at: { x: number; y: number; w: number; h: number };
   to: { map: string; spawn: string };
+  /** Object name shown in the bottom box CTA, e.g. "Døra". */
+  name?: Loc;
+  /** Prompt verb shown on the door (e.g. "Gå inn" / "Gå ut"). Doors require a key press. */
+  prompt?: Loc;
   /** When present and unmet, the exit is blocked and shows lockedText. */
   lock?: GateRef;
 }
@@ -144,6 +150,8 @@ export interface Npc {
   id: string;
   name: Loc;
   spriteKey: string;
+  /** Portrait sheet key (2-frame talk) shown in the dialogue box. */
+  portrait?: string;
   role: NpcRole;
   position: Vec2;
   facing?: Dir;
@@ -175,9 +183,22 @@ export interface Interactable {
   spriteKey?: string;
   tall?: boolean;
   position: Vec2;
+  /** Optional object name shown in the bottom-box CTA; `prompt` is the action verb. */
+  name?: Loc;
   prompt: Loc;
   action: InteractAction;
   showWhen?: Requirement;
+}
+
+/** WoW-style guidance: where to go for the active quest, on a given map. */
+export interface QuestGuide {
+  map: string;
+  /** Resolve a target by id (interactable / npc / building / exit). */
+  target?: string;
+  /** Or a raw tile position. */
+  at?: Vec2;
+  /** "go"/"start" → exclamation marker, "deliver" → question marker. */
+  kind: "go" | "start" | "deliver";
 }
 
 export interface Quest {
@@ -193,6 +214,8 @@ export interface Quest {
   unlocks?: string[];
   /** Direction-only hint for the next step (never the whole metaphor). */
   nextHint?: Loc;
+  /** On-map guidance markers + edge arrow targets. */
+  guides?: QuestGuide[];
 }
 
 export type SkillGroup = "foundation" | "design" | "fullstack" | "ai" | "craft";
@@ -292,6 +315,8 @@ export interface ClaimPolicy {
 /** Dialogue is a map of tree id → ordered lines (Loc). Speaker optional. */
 export interface DialogueLine {
   speaker?: Loc;
+  /** Portrait sheet key (2-frame talk) shown beside the line. */
+  portrait?: string;
   text: Loc;
 }
 export type DialogueTree = DialogueLine[];

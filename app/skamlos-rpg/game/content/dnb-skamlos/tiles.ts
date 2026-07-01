@@ -9,7 +9,7 @@ export const tiles: Record<string, TileSpec> = {
   grass2: { asset: "grass2" },
   path: { asset: "path" },
   dirt: { asset: "dirt" },
-  water: { asset: "water", solid: true },
+  water: { asset: "water", solid: true, anim: "water" },
   floorC: { asset: "floor_class" },
   wallC: { asset: "wall_class", solid: true },
   floorH: { asset: "floor_home" },
@@ -32,5 +32,8 @@ export const tiles: Record<string, TileSpec> = {
   books: { asset: "books" },
   bed: { asset: "bed", solid: true },
   plant: { asset: "plant", solid: true, tall: true },
+  guitar: { asset: "guitar", solid: true, tall: true },
+  amp: { asset: "amp", solid: true },
+  mic: { asset: "mic", solid: true, tall: true },
   door: { asset: "door" },
 };

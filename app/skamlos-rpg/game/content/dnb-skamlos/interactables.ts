@@ -18,43 +18,50 @@ export const interactables: Interactable[] = [
     prompt: { no: "Snakk med badeanda", en: "Talk to the rubber duck" },
     action: { type: "dialogue", tree: "duck-hint" },
   },
-  // --- Town: signpost ---
+  // --- Town ---
   {
     id: "bykryss-sign",
     kind: "sign",
     spriteKey: "sign",
-    position: { x: 14, y: 17 },
+    position: { x: 14, y: 15 },
     prompt: { no: "Les skiltet", en: "Read the sign" },
     action: { type: "signpost" },
   },
-  // --- Town: locked building doors (readable feedback, never silent) ---
+  // A deadpan optional interaction (the game treats it as totally normal).
+  {
+    id: "flutterfly-compile",
+    kind: "prop",
+    position: { x: 17, y: 12 },
+    prompt: { no: "Kompiler flutterfly", en: "Compile flutterfly" },
+    action: { type: "dialogue", tree: "flutterfly-compile" },
+  },
+  // Locked building doors (readable feedback, never silent).
   {
     id: "dnb-door",
     kind: "door",
-    position: { x: 11, y: 6 },
-    prompt: { no: "DNB AI Tech — inngang", en: "DNB AI Tech — entrance" },
+    position: { x: 12, y: 8 },
+    prompt: { no: "Prøv DNB-inngangen", en: "Try the DNB entrance" },
     action: { type: "dialogue", tree: "dnb-locked" },
   },
   {
     id: "oslomet-door",
     kind: "door",
-    position: { x: 5, y: 12 },
-    prompt: { no: "OsloMet — inngang", en: "OsloMet — entrance" },
+    position: { x: 5, y: 14 },
+    prompt: { no: "Gå inn på OsloMet", en: "Enter OsloMet" },
     action: { type: "dialogue", tree: "oslomet-locked" },
   },
   {
     id: "nikko-door",
     kind: "door",
-    position: { x: 20, y: 12 },
-    prompt: { no: "Nikkos hus", en: "Nikko's house" },
+    position: { x: 20, y: 14 },
+    prompt: { no: "Bank på hos Nikko", en: "Knock at Nikko's" },
     action: { type: "dialogue", tree: "nikko-locked" },
   },
   {
-    id: "workshop-door",
+    id: "schoolside-door",
     kind: "door",
-    spriteKey: "door",
-    position: { x: 7, y: 16 },
-    prompt: { no: "Verkstedinngang", en: "Workshop entrance" },
-    action: { type: "dialogue", tree: "workshop-locked" },
+    position: { x: 9, y: 21 },
+    prompt: { no: "Prøv skolens sideinngang", en: "Try the school side entrance" },
+    action: { type: "dialogue", tree: "schoolside-locked" },
   },
 ];

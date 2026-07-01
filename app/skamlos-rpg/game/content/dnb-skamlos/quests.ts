@@ -13,6 +13,7 @@ export const quests: Quest[] = [
     requires: { always: true },
     grantsSkills: [],
     grantsArtifacts: [],
+    guides: [{ map: "classroom", at: { x: 6, y: 9 }, kind: "go" }],
   },
   {
     id: "hjem-til-ordkryss",
@@ -26,9 +27,13 @@ export const quests: Quest[] = [
     grantsSkills: ["grunnleggende-programmering"],
     grantsArtifacts: ["cs50x-cert", "ordkryss-video"],
     nextHint: {
-      no: "Hjem er nedover veien. Ordkryss venter.",
-      en: "Home is down the road. Ordkryss is waiting.",
+      no: "Hjem ligger bortover til høyre. Ordkryss venter.",
+      en: "Home is over to the right. Ordkryss is waiting.",
     },
+    guides: [
+      { map: "town", target: "home", kind: "go" },
+      { map: "home", target: "home-pc", kind: "deliver" },
+    ],
   },
   {
     id: "til-oslomet",
@@ -43,5 +48,6 @@ export const quests: Quest[] = [
       no: "OsloMet ligger oppover veien. Det kan være verdt en tur.",
       en: "OsloMet is up the road. It might be worth a visit.",
     },
+    guides: [{ map: "town", target: "oslomet", kind: "go" }],
   },
 ];

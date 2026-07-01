@@ -138,8 +138,18 @@ export const skills: Skill[] = [
     group: "craft",
     glyph: "🦋",
     log: {
-      no: ["Flutter/Dart", "Companion-app", "Cross-platform", "Nysgjerrig utforsking"],
-      en: ["Flutter/Dart", "Companion app", "Cross-platform", "Curious exploration"],
+      no: [
+        "Flutter/Dart",
+        "Companion-app",
+        "Cross-platform",
+        "Nysgjerrig utforsking",
+      ],
+      en: [
+        "Flutter/Dart",
+        "Companion app",
+        "Cross-platform",
+        "Curious exploration",
+      ],
     },
   },
   {

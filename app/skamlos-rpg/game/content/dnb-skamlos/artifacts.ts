@@ -71,7 +71,10 @@ export const artifacts: Artifact[] = [
   },
   {
     id: "pd-app-backend",
-    title: { no: "Forløper: backend (Django)", en: "Precursor: backend (Django)" },
+    title: {
+      no: "Forløper: backend (Django)",
+      en: "Precursor: backend (Django)",
+    },
     description: {
       no: "Forløperprosjektet til Klar — backend i Python/Django.",
       en: "The precursor to Klar — backend in Python/Django.",

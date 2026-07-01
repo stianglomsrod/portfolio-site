@@ -155,7 +155,16 @@ export default function GameUI({ bridge, runtime, pack }: Props) {
   // also live permanently in the pause menu, so the text box never has to.
   useEffect(() => {
     if (phase !== "playing" || !showControls) return;
-    const move = ["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright"];
+    const move = [
+      "w",
+      "a",
+      "s",
+      "d",
+      "arrowup",
+      "arrowdown",
+      "arrowleft",
+      "arrowright",
+    ];
     const onMove = (e: KeyboardEvent) => {
       if (move.includes(e.key.toLowerCase())) setShowControls(false);
     };

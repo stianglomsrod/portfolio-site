@@ -128,7 +128,11 @@ export class WorldScene extends Phaser.Scene {
       (window as unknown as { __skamlos?: unknown }).__skamlos = {
         scene: this,
         runtime: this.runtime,
-        pos: () => ({ x: this.player?.x, y: this.player?.y, tile: this.runtime.state.player }),
+        pos: () => ({
+          x: this.player?.x,
+          y: this.player?.y,
+          tile: this.runtime.state.player,
+        }),
         keys: () => ({
           down: this.cursors?.down?.isDown,
           right: this.cursors?.right?.isDown,
@@ -168,7 +172,12 @@ export class WorldScene extends Phaser.Scene {
         const spec = this.pack.tiles[tileId];
         if (!spec) continue;
         if (spec.anim && this.anims.exists(spec.anim)) {
-          const sprite = this.add.sprite(x * s + s / 2, y * s + s / 2, spec.asset, 0);
+          const sprite = this.add.sprite(
+            x * s + s / 2,
+            y * s + s / 2,
+            spec.asset,
+            0,
+          );
           sprite.setDepth(-1000);
           if (!this.reducedMotion) sprite.anims.play(spec.anim);
         } else {
@@ -210,7 +219,8 @@ export class WorldScene extends Phaser.Scene {
       const img = this.add.image(b.x * s, b.y * s, b.textureKey);
       img.setOrigin(0, 0);
       const src = this.textures.get(b.textureKey).getSourceImage();
-      const baseY = b.y * s + (((src as { height?: number })?.height ?? b.hTiles * s));
+      const baseY =
+        b.y * s + ((src as { height?: number })?.height ?? b.hTiles * s);
       img.setDepth(baseY - 2);
     }
   }
@@ -234,12 +244,7 @@ export class WorldScene extends Phaser.Scene {
   private renderLabels(): void {
     const s = this.size;
     const lang = this.runtime.state.lang;
-    const draw = (
-      text: string,
-      px: number,
-      py: number,
-      small: boolean,
-    ) => {
+    const draw = (text: string, px: number, py: number, small: boolean) => {
       const t = this.add.text(px, py, text, {
         fontFamily: "monospace",
         fontSize: small ? "11px" : "13px",
@@ -255,14 +260,16 @@ export class WorldScene extends Phaser.Scene {
     // Building name plates: centred above each building (clamped on-screen).
     for (const b of this.map.buildings ?? []) {
       if (!b.label) continue;
-      const text = typeof b.label === "string" ? b.label : (b.label[lang] ?? b.label.no);
+      const text =
+        typeof b.label === "string" ? b.label : (b.label[lang] ?? b.label.no);
       const cx = (b.x + b.wTiles / 2) * s;
       const cy = Math.max(b.y * s - 9, 11);
       draw(text, cx, cy, true);
     }
     // Free-standing labels from map data.
     for (const l of this.map.labels ?? []) {
-      const text = typeof l.text === "string" ? l.text : (l.text[lang] ?? l.text.no);
+      const text =
+        typeof l.text === "string" ? l.text : (l.text[lang] ?? l.text.no);
       draw(text, l.x * s, l.y * s, !!l.small);
     }
   }
@@ -298,7 +305,8 @@ export class WorldScene extends Phaser.Scene {
           const id = this.resolveTile(row[x]);
           const spec = id ? this.pack.tiles[id] : undefined;
           if (!spec?.solid) continue;
-          if (spec.tall) addBody(x * s + s / 2, (y + 1) * s - 5, 12, 8); // trunk base
+          if (spec.tall)
+            addBody(x * s + s / 2, (y + 1) * s - 5, 12, 8); // trunk base
           else addBody(x * s + s / 2, y * s + s * 0.66, 18, 12); // bush/rock base
         }
       }
@@ -543,7 +551,10 @@ export class WorldScene extends Phaser.Scene {
       sprite.setDepth(c.y);
       // Idle blink anim (2-frame sheet) makes NPCs feel alive.
       const animKey = `${data.spriteKey}-idle`;
-      if (!this.anims.exists(animKey) && this.textures.get(data.spriteKey).frameTotal > 2) {
+      if (
+        !this.anims.exists(animKey) &&
+        this.textures.get(data.spriteKey).frameTotal > 2
+      ) {
         this.anims.create({
           key: animKey,
           frames: [
@@ -776,7 +787,11 @@ export class WorldScene extends Phaser.Scene {
     if (this.paused || this.transitioning || !this.current) return;
     const target = this.current;
     if (target.kind === "npc") {
-      this.runDialogue(target.data.dialogue, target.data.name, target.data.portrait);
+      this.runDialogue(
+        target.data.dialogue,
+        target.data.name,
+        target.data.portrait,
+      );
       return;
     }
     if (target.kind === "exit") {
@@ -945,7 +960,10 @@ export class WorldScene extends Phaser.Scene {
       cta = { name: best.data.name, verb: { no: "Snakk", en: "Talk" } };
     } else if (best.kind === "exit") {
       id = `exit:${best.data.id}`;
-      cta = { name: best.data.name, verb: best.data.prompt ?? { no: "Gå", en: "Go" } };
+      cta = {
+        name: best.data.name,
+        verb: best.data.prompt ?? { no: "Gå", en: "Go" },
+      };
     } else {
       id = best.data.id;
       cta = { name: best.data.name, verb: best.data.prompt };
@@ -959,9 +977,11 @@ export class WorldScene extends Phaser.Scene {
     if (g.at) return tileCenter(g.at.x, g.at.y, s);
     if (!g.target) return null;
     for (const t of this.targets) {
-      if (t.kind === "interactable" && t.data.id === g.target) return { x: t.x, y: t.y };
+      if (t.kind === "interactable" && t.data.id === g.target)
+        return { x: t.x, y: t.y };
       if (t.kind === "npc" && t.data.id === g.target) return { x: t.x, y: t.y };
-      if (t.kind === "exit" && t.data.id === g.target) return { x: t.x, y: t.y };
+      if (t.kind === "exit" && t.data.id === g.target)
+        return { x: t.x, y: t.y };
     }
     const b = this.map.buildings?.find((bb) => bb.id === g.target);
     if (b) {
@@ -1003,7 +1023,12 @@ export class WorldScene extends Phaser.Scene {
       // over, so hide the hovering marker to avoid doubled cues.
       const atTarget =
         !!this.current &&
-        Phaser.Math.Distance.Between(this.player.x, this.player.y, pos.x, pos.y) <
+        Phaser.Math.Distance.Between(
+          this.player.x,
+          this.player.y,
+          pos.x,
+          pos.y,
+        ) <
           this.size * 1.7;
       if (atTarget) {
         this.guideMarker.setVisible(false);

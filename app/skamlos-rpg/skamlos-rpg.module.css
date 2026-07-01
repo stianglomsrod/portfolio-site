@@ -399,7 +399,9 @@
   padding: 11px 16px;
   color: var(--parch);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
-  transition: border-color 0.15s ease, opacity 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    opacity 0.15s ease;
 }
 .gameBox[data-mode="dialogue"] {
   border-bottom-color: var(--accent);
@@ -433,7 +435,9 @@
   max-width: 94%;
   overflow: hidden;
   text-overflow: ellipsis;
-  animation: fadeHint 0.4s ease, fadeHintOut 0.8s ease 7s forwards;
+  animation:
+    fadeHint 0.4s ease,
+    fadeHintOut 0.8s ease 7s forwards;
 }
 @keyframes fadeHint {
   from {
@@ -1115,7 +1119,9 @@
   font: inherit;
   font-size: 0.88rem;
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
 }
 .choiceOption:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.08);

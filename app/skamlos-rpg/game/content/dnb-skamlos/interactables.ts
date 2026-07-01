@@ -121,7 +121,10 @@ export const interactables: Interactable[] = [
     spriteKey: "papers",
     position: { x: 5, y: 4 },
     name: { no: "Søknadsbunken", en: "The application stack" },
-    prompt: { no: "Legg søknaden i bunken", en: "Add your application to the stack" },
+    prompt: {
+      no: "Legg søknaden i bunken",
+      en: "Add your application to the stack",
+    },
     action: { type: "endgame", quest: "lever-soknad" },
   },
   {

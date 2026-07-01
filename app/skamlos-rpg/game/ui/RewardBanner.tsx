@@ -66,7 +66,11 @@ export default function RewardBanner({ reward, lang, onOpen, onClose }: Props) {
           </span>
         </button>
       ))}
-      <button type="button" className={styles.rewardHint} onClick={() => onOpen?.()}>
+      <button
+        type="button"
+        className={styles.rewardHint}
+        onClick={() => onOpen?.()}
+      >
         {no
           ? "Åpne menyen for detaljer og lenker →"
           : "Open the menu for details and links →"}

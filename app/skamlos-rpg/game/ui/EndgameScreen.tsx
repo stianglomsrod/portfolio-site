@@ -23,7 +23,12 @@ const CONTACT = [
   { label: "GitHub", href: "https://github.com/stianglomsrod" },
 ];
 
-export default function EndgameScreen({ pack, snapshot, lang, onReplay }: Props) {
+export default function EndgameScreen({
+  pack,
+  snapshot,
+  lang,
+  onReplay,
+}: Props) {
   const no = lang === "no";
   const eg = pack.endgame;
   const skills = pack.skills.filter((s) => snapshot?.skills.includes(s.id));

@@ -18,7 +18,14 @@ interface Props {
 
 // Pause / main menu (Esc or the top-right button). Lets the player resume,
 // restart, and inspect everything they have collected (quests/skills/artifacts).
-export default function PauseMenu({ pack, snapshot, lang, focus, onResume, onRestart }: Props) {
+export default function PauseMenu({
+  pack,
+  snapshot,
+  lang,
+  focus,
+  onResume,
+  onRestart,
+}: Props) {
   const [openId, setOpenId] = useState<string | null>(focus ?? null);
   const toggle = (id: string) => setOpenId((o) => (o === id ? null : id));
   const focusRef = useRef<HTMLLIElement>(null);
@@ -30,7 +37,9 @@ export default function PauseMenu({ pack, snapshot, lang, focus, onResume, onRes
   const ownedSkills = snapshot?.skills ?? [];
   const ownedArtifacts = snapshot?.artifacts ?? [];
   const quests = [...pack.quests].sort((a, b) => a.order - b.order);
-  const activeTitle = snapshot?.questTitle ? t(snapshot.questTitle, lang) : null;
+  const activeTitle = snapshot?.questTitle
+    ? t(snapshot.questTitle, lang)
+    : null;
   const no = lang === "no";
 
   return (
@@ -38,7 +47,11 @@ export default function PauseMenu({ pack, snapshot, lang, focus, onResume, onRes
       <div className={styles.menu} onClick={(e) => e.stopPropagation()}>
         <header className={styles.menuHead}>
           <h2>{no ? "Meny" : "Menu"}</h2>
-          <button className={styles.panelClose} onClick={onResume} aria-label="close">
+          <button
+            className={styles.panelClose}
+            onClick={onResume}
+            aria-label="close"
+          >
             ✕
           </button>
         </header>
@@ -64,14 +77,28 @@ export default function PauseMenu({ pack, snapshot, lang, focus, onResume, onRes
                 const isActive = !isDone && t(q.title, lang) === activeTitle;
                 const status = isDone ? "done" : isActive ? "active" : "todo";
                 return (
-                  <li key={q.id} className={styles.questItem} data-status={status}>
+                  <li
+                    key={q.id}
+                    className={styles.questItem}
+                    data-status={status}
+                  >
                     <span className={styles.questDot} data-status={status} />
                     <div>
                       <strong>{t(q.title, lang)}</strong>
-                      <span className={styles.questObjective}>{t(q.objective, lang)}</span>
+                      <span className={styles.questObjective}>
+                        {t(q.objective, lang)}
+                      </span>
                     </div>
                     <span className={styles.questBadge}>
-                      {isDone ? (no ? "Ferdig" : "Done") : isActive ? (no ? "Aktiv" : "Active") : "—"}
+                      {isDone
+                        ? no
+                          ? "Ferdig"
+                          : "Done"
+                        : isActive
+                          ? no
+                            ? "Aktiv"
+                            : "Active"
+                          : "—"}
                     </span>
                   </li>
                 );
@@ -82,7 +109,9 @@ export default function PauseMenu({ pack, snapshot, lang, focus, onResume, onRes
           <section className={styles.menuSection}>
             <h3>{no ? "Ferdigheter" : "Skills"}</h3>
             {ownedSkills.length === 0 ? (
-              <p className={styles.emptyNote}>{no ? "Ingen ennå." : "None yet."}</p>
+              <p className={styles.emptyNote}>
+                {no ? "Ingen ennå." : "None yet."}
+              </p>
             ) : (
               <ul className={styles.skillList}>
                 {pack.skills
@@ -102,7 +131,9 @@ export default function PauseMenu({ pack, snapshot, lang, focus, onResume, onRes
                         >
                           <span className={styles.skillGlyph}>{s.glyph}</span>
                           <strong>{t(s.label, lang)}</strong>
-                          <span className={styles.chev}>{open ? "▴" : "▾"}</span>
+                          <span className={styles.chev}>
+                            {open ? "▴" : "▾"}
+                          </span>
                         </button>
                         {open && (
                           <div className={styles.menuItemBody}>
@@ -113,7 +144,11 @@ export default function PauseMenu({ pack, snapshot, lang, focus, onResume, onRes
                                 </span>
                               ))}
                             </div>
-                            {boundary && <em className={styles.boundary}>{t(boundary, lang)}</em>}
+                            {boundary && (
+                              <em className={styles.boundary}>
+                                {t(boundary, lang)}
+                              </em>
+                            )}
                           </div>
                         )}
                       </li>
@@ -126,7 +161,9 @@ export default function PauseMenu({ pack, snapshot, lang, focus, onResume, onRes
           <section className={styles.menuSection}>
             <h3>{no ? "Bevis" : "Evidence"}</h3>
             {ownedArtifacts.length === 0 ? (
-              <p className={styles.emptyNote}>{no ? "Ingen ennå." : "None yet."}</p>
+              <p className={styles.emptyNote}>
+                {no ? "Ingen ennå." : "None yet."}
+              </p>
             ) : (
               <ul className={styles.skillList}>
                 {pack.artifacts
@@ -145,11 +182,15 @@ export default function PauseMenu({ pack, snapshot, lang, focus, onResume, onRes
                         >
                           <span className={styles.skillGlyph}>📜</span>
                           <strong>{t(a.title, lang)}</strong>
-                          <span className={styles.chev}>{open ? "▴" : "▾"}</span>
+                          <span className={styles.chev}>
+                            {open ? "▴" : "▾"}
+                          </span>
                         </button>
                         {open && (
                           <div className={styles.menuItemBody}>
-                            <p className={styles.artDesc}>{t(a.description, lang)}</p>
+                            <p className={styles.artDesc}>
+                              {t(a.description, lang)}
+                            </p>
                             {a.href && (
                               <a
                                 className={styles.rewardLink}
@@ -157,10 +198,19 @@ export default function PauseMenu({ pack, snapshot, lang, focus, onResume, onRes
                                 target="_blank"
                                 rel="noreferrer noopener"
                               >
-                                {a.linkLabel ? t(a.linkLabel, lang) : no ? "Åpne" : "Open"} ↗
+                                {a.linkLabel
+                                  ? t(a.linkLabel, lang)
+                                  : no
+                                    ? "Åpne"
+                                    : "Open"}{" "}
+                                ↗
                               </a>
                             )}
-                            {a.boundary && <em className={styles.boundary}>{t(a.boundary, lang)}</em>}
+                            {a.boundary && (
+                              <em className={styles.boundary}>
+                                {t(a.boundary, lang)}
+                              </em>
+                            )}
                           </div>
                         )}
                       </li>

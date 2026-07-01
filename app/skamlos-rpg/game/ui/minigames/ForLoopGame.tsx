@@ -63,9 +63,16 @@ export default function ForLoopGame({ config, lang, onDone }: Props) {
             ? i === bound
             : false;
     const advance = (i: number) =>
-      step === "++" ? i + 1 : step === "--" ? i - 1 : step === "+= 2" ? i + 2 : i;
+      step === "++"
+        ? i + 1
+        : step === "--"
+          ? i - 1
+          : step === "+= 2"
+            ? i + 2
+            : i;
     const lines: string[] = [];
-    if (!Number.isFinite(start) || !op || !step) return { lines, runaway: false };
+    if (!Number.isFinite(start) || !op || !step)
+      return { lines, runaway: false };
     let i = start;
     while (cond(i)) {
       lines.push(String(i));

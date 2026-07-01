@@ -13,7 +13,10 @@ export const dialogue: Record<string, DialogueTree> = {
     },
     {
       speaker: { no: "Badeanda" },
-      text: { no: "…og ta én løkke av gangen.", en: "…and take one loop at a time." },
+      text: {
+        no: "…og ta én løkke av gangen.",
+        en: "…and take one loop at a time.",
+      },
     },
   ],
   "duck-hint-retry": [
@@ -85,4 +88,3 @@ export const dialogue: Record<string, DialogueTree> = {
     },
   ],
 };
-

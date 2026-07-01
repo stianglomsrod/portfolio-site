@@ -106,10 +106,7 @@ export const interactables: Interactable[] = [
     prompt: { no: "Bygg porteføljen", en: "Build the portfolio" },
     action: { type: "startMinigame", minigame: "portefolje-build" },
     showWhen: {
-      and: [
-        { allQuests: ["nikko"] },
-        { not: { allQuests: ["portefolje"] } },
-      ],
+      and: [{ allQuests: ["nikko"] }, { not: { allQuests: ["portefolje"] } }],
     },
   },
   {

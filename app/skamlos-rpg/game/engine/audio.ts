@@ -62,16 +62,19 @@ class GameAudio {
       this.master = this.ctx.createGain();
       this.master.gain.value = this.muted ? 0 : 0.28;
       this.master.connect(this.ctx.destination);
+      console.log(`[audio] AudioContext initialized, muted=${this.muted}`);
     } catch (e) {
       console.warn("[skamlos] AudioContext unavailable", e);
     }
   }
 
   private getCtx(): AudioContext | null {
-    if (!this.ctx) this.init();
+    if (!this.ctx) {
+      console.log("[audio] getCtx: no context, calling init()");
+      this.init();
+    }
     if (this.ctx?.state === "suspended") {
-      // Resume is async; we can fire-and-forget since the context will be ready
-      // before the next audio event (microseconds later).
+      console.log("[audio] getCtx: context suspended, calling resume()");
       this.ctx.resume().catch(() => {});
     }
     return this.ctx;
@@ -82,9 +85,16 @@ class GameAudio {
   // ---------------------------------------------------------------------------
 
   sfx(name: SfxName): void {
-    if (this.muted) return;
+    if (this.muted) {
+      console.log(`[audio] sfx("${name}") blocked by mute`);
+      return;
+    }
     const ctx = this.getCtx();
-    if (!ctx || !this.master) return;
+    if (!ctx || !this.master) {
+      console.log(`[audio] sfx("${name}") no ctx/master:`, { ctx: !!ctx, master: !!this.master });
+      return;
+    }
+    console.log(`[audio] sfx("${name}") playing`);
     const master = this.master;
     const now = ctx.currentTime;
 
@@ -383,6 +393,7 @@ class GameAudio {
   // ---------------------------------------------------------------------------
 
   setMuted(v: boolean): void {
+    console.log(`[audio] setMuted(${v})`);
     this.muted = v;
     if (this.master && this.ctx) {
       const now = this.ctx.currentTime;
@@ -405,8 +416,12 @@ class GameAudio {
 
   loadPrefs(): void {
     try {
-      this.muted = localStorage.getItem("skamlos:muted") === "1";
-    } catch {}
+      const stored = localStorage.getItem("skamlos:muted");
+      this.muted = stored === "1";
+      console.log(`[audio] loadPrefs: muted=${this.muted} (stored="${stored}")`);
+    } catch (e) {
+      console.warn("[audio] loadPrefs error:", e);
+    }
   }
 }
 

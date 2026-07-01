@@ -1,0 +1,58 @@
+/* Game entry pill — mirrors LanguageToggle's visual language, top-left corner.
+   Inherits all tokens from globals.css; no new colours. */
+
+.wrap {
+  position: fixed;
+  top: 18px;
+  left: 18px;
+  z-index: 50;
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  /* A faint accent tint sets it apart from the neutral language toggle so it
+     reads as an inviting "come play" control, not another setting. */
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, var(--border-strong));
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  backdrop-filter: blur(8px);
+  color: var(--foreground);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  transition:
+    color 0.25s var(--ease),
+    background 0.25s var(--ease),
+    border-color 0.25s var(--ease),
+    transform 0.25s var(--ease);
+}
+
+.icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tab:hover {
+    color: var(--accent-contrast);
+    background: var(--accent);
+    border-color: var(--accent);
+    transform: translateY(-1px);
+  }
+}
+
+@media (max-width: 600px) {
+  .wrap {
+    top: 12px;
+    left: 12px;
+  }
+
+  .tab {
+    padding: 8px 12px;
+    font-size: 0.78rem;
+  }
+}

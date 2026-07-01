@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { LanguageProvider } from "./components/LanguageContext";
 import LanguageToggle from "./components/LanguageToggle";
+import GameTab from "./components/GameTab";
 import DnbHero from "./components/DnbHero";
 import DnbWorkflow from "./components/DnbWorkflow";
 import DnbKlar from "./components/DnbKlar";
@@ -18,6 +19,7 @@ export const metadata: Metadata = {
 export default function DnbPage() {
   return (
     <LanguageProvider>
+      <GameTab />
       <LanguageToggle />
       <main>
         <DnbHero />

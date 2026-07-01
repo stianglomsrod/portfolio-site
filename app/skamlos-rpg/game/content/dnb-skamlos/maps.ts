@@ -160,6 +160,9 @@ const town: MapDef = {
     default: { x: 13, y: 21 },
     "from-school": { x: 6, y: 22 },
     "from-home-town": { x: 18, y: 22 },
+    "from-oslomet": { x: 5, y: 15 },
+    "from-workshop": { x: 9, y: 22 },
+    "from-dnb": { x: 12, y: 9 },
   },
   exits: [
     {
@@ -169,14 +172,57 @@ const town: MapDef = {
       name: { no: "Hjem", en: "Home" },
       prompt: { no: "Gå inn", en: "Enter" },
     },
+    {
+      id: "enter-oslomet",
+      at: { x: 5, y: 14, w: 1, h: 1 },
+      to: { map: "oslomet", spawn: "from-town" },
+      name: { no: "OsloMet", en: "OsloMet" },
+      prompt: { no: "Gå inn", en: "Enter" },
+      lock: {
+        id: "oslomet-gate",
+        requires: { allSkills: ["grunnleggende-programmering"] },
+        lockedText: {
+          no: "OsloMet åpner når grunnmuren i programmering er på plass.",
+          en: "OsloMet opens once the programming foundation is in place.",
+        },
+      },
+    },
+    {
+      id: "enter-workshop",
+      at: { x: 9, y: 21, w: 1, h: 1 },
+      to: { map: "workshop", spawn: "from-town" },
+      name: { no: "Workshop", en: "Workshop" },
+      prompt: { no: "Gå inn", en: "Enter" },
+      lock: {
+        id: "workshop-gate",
+        requires: { flag: "open:workshop" },
+        lockedText: {
+          no: "Workshoprommet er låst. Du trenger et metodeoppdrag fra OsloMet først.",
+          en: "The workshop room is locked. You need a method assignment from OsloMet first.",
+        },
+      },
+    },
+    {
+      id: "enter-dnb",
+      at: { x: 12, y: 8, w: 1, h: 1 },
+      to: { map: "dnb", spawn: "from-town" },
+      name: { no: "DNB AI Tech", en: "DNB AI Tech" },
+      prompt: { no: "Gå inn", en: "Enter" },
+      lock: {
+        id: "dnb-gate",
+        requires: { flag: "open:dnb" },
+        lockedText: {
+          no: "Resepsjonen tar bare imot komplette søknadspakker.",
+          en: "The reception only accepts complete application packages.",
+        },
+      },
+    },
   ],
   npcs: [],
   interactables: [
     "bykryss-sign",
-    "dnb-door",
-    "oslomet-door",
     "nikko-door",
-    "schoolside-door",
+    "nikko",
     "flutterfly-compile",
   ],
   labels: [],
@@ -214,7 +260,7 @@ const home: MapDef = {
     "#..........#",
     "#..........#",
     "#..........#",
-    "#####oo#####",
+    "#####o######",
   ],
   decor: [
     "...W....W...",
@@ -234,16 +280,214 @@ const home: MapDef = {
   exits: [
     {
       id: "door",
-      at: { x: 5, y: 8, w: 2, h: 1 },
+      at: { x: 5, y: 8, w: 1, h: 1 },
       to: { map: "town", spawn: "from-home-town" },
     },
   ],
   npcs: [],
-  interactables: ["home-pc", "home-duck"],
+  interactables: ["home-pc", "home-pc-pd", "home-pc-portfolio", "home-pc-idle", "home-duck"],
   ambient: {
     no: "Hjemme igjen. PC-en venter på pulten.",
     en: "Home again. The PC is waiting on the desk.",
   },
 };
 
-export const maps: MapDef[] = [classroom, town, home];
+// === OsloMet — masterstudio (interior) 13×9 ===
+const oslomet: MapDef = {
+  id: "oslomet",
+  kind: "interior",
+  tileSize: 32,
+  width: 13,
+  height: 9,
+  bg: "#241d16",
+  legend: {
+    "#": "wallC",
+    ".": "floorC",
+    o: "floorC",
+    W: "window",
+    B: "chalk",
+    e: "deskC",
+    g: "rug",
+    p: "plant",
+    D: "door",
+  },
+  ground: [
+    "#############",
+    "#...........#",
+    "#...........#",
+    "#...........#",
+    "#...........#",
+    "#...........#",
+    "#...........#",
+    "#...........#",
+    "######o######",
+  ],
+  decor: [
+    "...W.....W...",
+    "......B......",
+    "             ",
+    "          e  ",
+    "             ",
+    "     gg      ",
+    "             ",
+    " p           ",
+    "      D      ",
+  ],
+  spawns: {
+    "from-town": { x: 6, y: 7 },
+    default: { x: 6, y: 7 },
+  },
+  exits: [
+    {
+      id: "door",
+      at: { x: 6, y: 8, w: 1, h: 1 },
+      to: { map: "town", spawn: "from-oslomet" },
+      name: { no: "Døra", en: "The door" },
+      prompt: { no: "Gå ut", en: "Go out" },
+    },
+  ],
+  npcs: [],
+  interactables: [
+    "oslomet-board",
+    "oslomet-klar",
+    "oslomet-method",
+    "oslomet-veileder-pd",
+    "oslomet-veileder-master",
+    "kari",
+  ],
+  ambient: {
+    no: "Masterstudioet. Her ble uklare behov til noe man kan ta på.",
+    en: "The master's studio. Where unclear needs became something tangible.",
+  },
+  cue: {
+    delayMs: 700,
+    whenActiveQuest: "til-oslomet",
+    completeQuest: "til-oslomet",
+    line: { no: "*Du er inne på OsloMet.*", en: "*You're inside OsloMet.*" },
+  },
+};
+
+// === Skolen — lærerworkshop (interior) 12×9 ===
+const workshop: MapDef = {
+  id: "workshop",
+  kind: "interior",
+  tileSize: 32,
+  width: 12,
+  height: 9,
+  bg: "#241d16",
+  legend: {
+    "#": "wallC",
+    ".": "floorC",
+    o: "floorC",
+    W: "window",
+    B: "chalk",
+    T: "deskC",
+    g: "rug",
+    k: "books",
+    p: "plant",
+    D: "door",
+  },
+  ground: [
+    "############",
+    "#..........#",
+    "#..........#",
+    "#..........#",
+    "#..........#",
+    "#..........#",
+    "#..........#",
+    "#..........#",
+    "#####o######",
+  ],
+  decor: [
+    "...W....W...",
+    "......B.....",
+    "            ",
+    "            ",
+    "    TTTT    ",
+    "            ",
+    "            ",
+    " k          ",
+    "     D      ",
+  ],
+  spawns: {
+    "from-town": { x: 5, y: 7 },
+    default: { x: 5, y: 7 },
+  },
+  exits: [
+    {
+      id: "door",
+      at: { x: 5, y: 8, w: 1, h: 1 },
+      to: { map: "town", spawn: "from-workshop" },
+      name: { no: "Døra", en: "The door" },
+      prompt: { no: "Gå ut", en: "Go out" },
+    },
+  ],
+  npcs: [],
+  interactables: ["ws-teacher1", "ws-teacher2", "ws-teacher3", "ws-board"],
+  ambient: {
+    no: "Lærerworkshop. Journey map, lapper og friske øyne på behovene.",
+    en: "Teacher workshop. A journey map, sticky notes and fresh eyes on the needs.",
+  },
+};
+
+// === DNB AI Tech — resepsjon (interior) 12×9 ===
+const dnb: MapDef = {
+  id: "dnb",
+  kind: "interior",
+  tileSize: 32,
+  width: 12,
+  height: 9,
+  bg: "#1c2230",
+  legend: {
+    "#": "wallC",
+    ".": "floorC",
+    o: "floorC",
+    W: "window",
+    T: "deskC",
+    p: "plant",
+    D: "door",
+  },
+  ground: [
+    "############",
+    "#..........#",
+    "#..........#",
+    "#..........#",
+    "#..........#",
+    "#..........#",
+    "#..........#",
+    "#..........#",
+    "#####o######",
+  ],
+  decor: [
+    "...W....W...",
+    "            ",
+    "   TTTT     ",
+    "            ",
+    "            ",
+    "            ",
+    " p          ",
+    "            ",
+    "     D      ",
+  ],
+  spawns: {
+    "from-town": { x: 5, y: 7 },
+    default: { x: 5, y: 7 },
+  },
+  exits: [
+    {
+      id: "door",
+      at: { x: 5, y: 8, w: 1, h: 1 },
+      to: { map: "town", spawn: "from-dnb" },
+      name: { no: "Døra", en: "The door" },
+      prompt: { no: "Gå ut", en: "Go out" },
+    },
+  ],
+  npcs: [],
+  interactables: ["dnb-deliver", "dnb-egg"],
+  ambient: {
+    no: "DNB AI Tech — resepsjonen. Søknadsbunken ligger på disken.",
+    en: "DNB AI Tech — the reception. The stack of applications sits on the counter.",
+  },
+};
+
+export const maps: MapDef[] = [classroom, town, home, oslomet, workshop, dnb];

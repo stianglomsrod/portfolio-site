@@ -39,6 +39,7 @@ export interface GameEvents {
   bell: undefined;
   openMinigame: string;
   closeMinigame: undefined;
+  endgame: undefined;
   ready: undefined;
   // Engine → scene commands
   "scene:loadMap": { map: string; spawn: string };

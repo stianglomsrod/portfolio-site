@@ -19,6 +19,10 @@ export default function ForLoopGame({ config, lang, onDone }: Props) {
   const [selected, setSelected] = useState<Record<number, string>>({});
   const [status, setStatus] = useState<Status>("editing");
   const [attempts, setAttempts] = useState(0);
+  const [ran, setRan] = useState<{ lines: string[]; runaway: boolean } | null>(
+    null,
+  );
+  const no = lang === "no";
 
   const segments = useMemo(() => {
     let blankIndex = 0;
@@ -38,7 +42,42 @@ export default function ForLoopGame({ config, lang, onDone }: Props) {
 
   const allChosen = config.blanks.every((_, i) => selected[i]);
 
+  // Safe, bounded simulation of the assembled loop — NEVER eval. We only read
+  // the chosen tokens (start / comparison / step) and step a counter by hand,
+  // capped so a runaway loop (e.g. i--) can't hang the browser.
+  function simulate(): { lines: string[]; runaway: boolean } {
+    const pick = (id: string) => {
+      const idx = config.blanks.findIndex((b) => b.id === id);
+      return selected[idx] ?? "";
+    };
+    const start = Number(pick("start"));
+    const op = pick("test");
+    const step = pick("step");
+    const bound = 5;
+    const cond = (i: number) =>
+      op === "<"
+        ? i < bound
+        : op === "<="
+          ? i <= bound
+          : op === "=="
+            ? i === bound
+            : false;
+    const advance = (i: number) =>
+      step === "++" ? i + 1 : step === "--" ? i - 1 : step === "+= 2" ? i + 2 : i;
+    const lines: string[] = [];
+    if (!Number.isFinite(start) || !op || !step) return { lines, runaway: false };
+    let i = start;
+    while (cond(i)) {
+      lines.push(String(i));
+      const nextI = advance(i);
+      if (nextI === i || lines.length >= 12) return { lines, runaway: true };
+      i = nextI;
+    }
+    return { lines, runaway: false };
+  }
+
   function run() {
+    setRan(simulate());
     const correct = config.blanks.every((b, i) => selected[i] === b.correct);
     if (correct) {
       setStatus("ok");
@@ -64,12 +103,14 @@ export default function ForLoopGame({ config, lang, onDone }: Props) {
                   className={styles.codeBlank}
                   value={selected[seg.index] ?? ""}
                   disabled={status === "ok"}
-                  onChange={(e) =>
+                  onChange={(e) => {
                     setSelected((prev) => ({
                       ...prev,
                       [seg.index]: e.target.value,
-                    }))
-                  }
+                    }));
+                    setRan(null);
+                    setStatus("editing");
+                  }}
                 >
                   <option value="" disabled>
                     ___
@@ -86,14 +127,28 @@ export default function ForLoopGame({ config, lang, onDone }: Props) {
         ))}
       </pre>
 
-      {status === "ok" && (
+      {ran && (
         <div className={styles.consoleOut}>
-          {config.expected.map((l, i) => (
+          <span className={styles.consolePrompt}>$ node ordkryss.js</span>
+          <br />
+          {ran.lines.map((l, i) => (
             <Fragment key={i}>
               <span>{l}</span>
               <br />
             </Fragment>
           ))}
+          {ran.lines.length === 0 && !ran.runaway && (
+            <span className={styles.consoleDim}>
+              {no ? "(ingen utskrift)" : "(no output)"}
+            </span>
+          )}
+          {ran.runaway && (
+            <span className={styles.consoleWarn}>
+              {no
+                ? "løkka stopper ikke — juster verdiene"
+                : "loop never stops — adjust the values"}
+            </span>
+          )}
         </div>
       )}
 

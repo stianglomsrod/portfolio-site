@@ -48,6 +48,8 @@ export class WorldScene extends Phaser.Scene {
   private current: Target | null = null;
   private lastPromptId: string | null = null;
   private npcSprites: Phaser.GameObjects.Sprite[] = [];
+  private wanderers: Phaser.GameObjects.Image[] = [];
+  private hints = new Map<Target, Phaser.GameObjects.Text>();
 
   private guideMarker!: Phaser.GameObjects.Text;
   private edgeArrow!: Phaser.GameObjects.Image;
@@ -76,6 +78,8 @@ export class WorldScene extends Phaser.Scene {
     this.started = false;
     this.targets = [];
     this.npcSprites = [];
+    this.wanderers = [];
+    this.hints = new Map();
     this.current = null;
     this.lastPromptId = null;
   }
@@ -342,10 +346,38 @@ export class WorldScene extends Phaser.Scene {
 
     const D = 30;
     this.avatarRing = this.add.circle(c.x, c.y, D / 2 + 2, 0x2b2018);
-    this.avatar = this.add.image(c.x, c.y, this.textures.exists("avatar") ? "avatar" : key);
-    if (this.textures.exists("avatar")) this.avatar.setDisplaySize(D, D);
+    const avatarKey = this.ensureSmoothAvatar();
+    this.avatar = this.add.image(c.x, c.y, avatarKey ?? key);
+    if (avatarKey) this.avatar.setDisplaySize(D, D);
     this.avatarBaseScale = this.avatar.scaleX;
     this.bobPhase = 0;
+  }
+
+  /** The real avatar photo is a large image squeezed into ~30px. Under the
+   *  game's global nearest-neighbour (pixelArt) filter it aliases into dark
+   *  speckles ("four dots" on the face). We pre-downscale it once into a canvas
+   *  texture with the browser's high-quality smoothing, so it stays a crisp,
+   *  real photo cheerfully juxtaposed on the pixel-art world. */
+  private ensureSmoothAvatar(): string | null {
+    if (!this.textures.exists("avatar")) return null;
+    const key = "avatar-smooth";
+    if (this.textures.exists(key)) return key;
+    const src = this.textures.get("avatar").getSourceImage() as
+      | HTMLImageElement
+      | HTMLCanvasElement;
+    const size = 72;
+    const tex = this.textures.createCanvas(key, size, size);
+    if (!tex) return "avatar";
+    const ctx = tex.getContext();
+    if (ctx) {
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+      ctx.clearRect(0, 0, size, size);
+      ctx.drawImage(src, 0, 0, size, size);
+      tex.refresh();
+    }
+    tex.setFilter(Phaser.Textures.FilterMode.LINEAR);
+    return key;
   }
 
   /** If a spawn lands on a solid tile, nudge to the nearest free tile. */
@@ -373,17 +405,131 @@ export class WorldScene extends Phaser.Scene {
       if (!data) continue;
       if (data.showWhen && !this.runtime.met(data.showWhen)) continue;
       const c = tileCenter(data.position.x, data.position.y, s);
+      let sprite: Phaser.GameObjects.Image | null = null;
       if (data.spriteKey && this.textures.exists(data.spriteKey)) {
-        const img = this.add.image(
+        sprite = this.add.image(
           c.x,
           data.tall ? (data.position.y + 1) * s : c.y,
           data.spriteKey,
         );
-        img.setOrigin(0.5, data.tall ? 1 : 0.5);
-        img.setDepth(data.tall ? (data.position.y + 1) * s : c.y);
+        sprite.setOrigin(0.5, data.tall ? 1 : 0.5);
+        sprite.setDepth(data.tall ? (data.position.y + 1) * s : c.y);
       }
-      this.targets.push({ kind: "interactable", data, x: c.x, y: c.y });
+      const target: Target = { kind: "interactable", data, x: c.x, y: c.y };
+      this.targets.push(target);
+      if (sprite && data.wander && !this.reducedMotion) {
+        this.startWander(sprite, target, data.position);
+      } else if (data.kind !== "door") {
+        // Subtle "you can interact here" glint above stations/props.
+        this.addInteractHint(target, c.x, c.y - s * 0.62);
+      }
     }
+  }
+
+  /** A small, gently-pulsing glint that marks a prop as interactable from a
+   *  distance (before the player is close enough for the bottom-box prompt). */
+  private addInteractHint(target: Target, x: number, y: number): void {
+    const glint = this.add
+      .text(x, y, "✦", {
+        fontFamily: "monospace",
+        fontSize: "13px",
+        color: "#ffe1a8",
+      })
+      .setOrigin(0.5)
+      .setResolution(3)
+      .setAlpha(0.5)
+      .setDepth(59_000);
+    this.hints.set(target, glint);
+    if (this.reducedMotion) return;
+    this.tweens.add({
+      targets: glint,
+      y: y - 3,
+      alpha: 0.85,
+      duration: 1300,
+      yoyo: true,
+      repeat: -1,
+      ease: "Sine.inOut",
+    });
+  }
+
+  /** Ambient wander for a prop (e.g. the rubber duck): amble to a nearby free
+   *  tile, then do a little peck or hop, pause, and repeat. The interaction
+   *  target follows the sprite so it stays talk-to-able while it moves. */
+  private startWander(
+    sprite: Phaser.GameObjects.Image,
+    target: Target,
+    origin: Vec2,
+  ): void {
+    const s = this.size;
+    const pickTile = (): { x: number; y: number } => {
+      for (let tries = 0; tries < 8; tries++) {
+        const tx = origin.x + Phaser.Math.Between(-2, 2);
+        const ty = origin.y + Phaser.Math.Between(-2, 2);
+        if (
+          ty >= 0 &&
+          tx >= 0 &&
+          ty < this.map.height &&
+          tx < this.map.width &&
+          !this.solidGrid[ty]?.[tx]
+        ) {
+          return tileCenter(tx, ty, s);
+        }
+      }
+      return tileCenter(origin.x, origin.y, s);
+    };
+    const sync = () => {
+      target.x = sprite.x;
+      target.y = sprite.y;
+      sprite.setDepth(sprite.y);
+    };
+    const idle = (done: () => void) => {
+      if (Math.random() < 0.5) {
+        this.tweens.add({
+          targets: sprite,
+          scaleY: 0.78,
+          duration: 130,
+          yoyo: true,
+          repeat: 1,
+          ease: "Quad.out",
+          onComplete: done,
+        });
+      } else {
+        const y0 = sprite.y;
+        this.tweens.add({
+          targets: sprite,
+          y: y0 - 6,
+          duration: 170,
+          yoyo: true,
+          ease: "Quad.out",
+          onComplete: done,
+        });
+      }
+    };
+    this.wanderers.push(sprite);
+    const step = () => {
+      if (!sprite.active) return;
+      // Freeze while a dialogue or menu is open (e.g. talking to the duck).
+      if (this.paused) {
+        this.time.delayedCall(500, step);
+        return;
+      }
+      const dest = pickTile();
+      if (dest.x < sprite.x - 1) sprite.setFlipX(true);
+      else if (dest.x > sprite.x + 1) sprite.setFlipX(false);
+      this.tweens.add({
+        targets: sprite,
+        x: dest.x,
+        y: dest.y,
+        duration: Phaser.Math.Between(1800, 3000),
+        ease: "Sine.inOut",
+        onUpdate: sync,
+        onComplete: () =>
+          idle(() =>
+            this.time.delayedCall(Phaser.Math.Between(1600, 4200), step),
+          ),
+      });
+    };
+    this.time.delayedCall(Phaser.Math.Between(800, 2000), step);
   }
 
   private spawnNpcs(): void {
@@ -570,12 +716,18 @@ export class WorldScene extends Phaser.Scene {
     if (this.player?.body) this.player.setVelocity(0, 0);
     if (this.input.keyboard) this.input.keyboard.enabled = false;
     this.setPrompt(null);
+    this.wanderers.forEach((w) =>
+      this.tweens.getTweensOf(w).forEach((t) => t.pause()),
+    );
   }
 
   private resume(): void {
     if (!this.started) return;
     this.paused = false;
     if (this.input.keyboard) this.input.keyboard.enabled = true;
+    this.wanderers.forEach((w) =>
+      this.tweens.getTweensOf(w).forEach((t) => t.resume()),
+    );
   }
 
   /* ---------- the timed cue (school bell) ---------- */
@@ -654,6 +806,10 @@ export class WorldScene extends Phaser.Scene {
         break;
       case "startQuest":
         this.runtime.setFlag(`started:${a.quest}`, true);
+        break;
+      case "endgame":
+        if (a.quest) this.runtime.completeQuest(a.quest);
+        this.bridge.emit("endgame");
         break;
       case "signpost": {
         const hint = this.runtime.activeQuest()?.nextHint;
@@ -773,6 +929,11 @@ export class WorldScene extends Phaser.Scene {
       }
     }
     this.current = best;
+    // Hide the ambient glint on whatever you're standing next to — the bottom
+    // prompt is already showing there, so the hint is redundant up close.
+    if (this.hints.size) {
+      for (const [tgt, glint] of this.hints) glint.setVisible(tgt !== best);
+    }
     if (!best) {
       this.setPrompt(null);
       return;
@@ -815,8 +976,16 @@ export class WorldScene extends Phaser.Scene {
   private updateGuide(time: number): void {
     const q = this.runtime.activeQuest();
     const guide = q?.guides?.find((g) => g.map === this.map.id);
-    const pos = guide ? this.resolveGuidePos(guide) : null;
-    if (!guide || !pos) {
+    let pos = guide ? this.resolveGuidePos(guide) : null;
+    let kind: QuestGuide["kind"] = guide?.kind ?? "go";
+    // When the active objective lives on another map, an interior should still
+    // point the player at the way out instead of showing nothing.
+    if (!pos && q && this.map.kind === "interior" && this.map.exits.length) {
+      const ex = this.map.exits[0].at;
+      pos = tileCenter(ex.x + (ex.w - 1) / 2, ex.y + (ex.h - 1) / 2, this.size);
+      kind = "go";
+    }
+    if (!pos) {
       this.guideMarker.setVisible(false);
       this.edgeArrow.setVisible(false);
       return;
@@ -842,7 +1011,7 @@ export class WorldScene extends Phaser.Scene {
         return;
       }
       const bob = Math.sin(time * 0.005) * 4;
-      this.guideMarker.setText(guide.kind === "deliver" ? "?" : "!");
+      this.guideMarker.setText(kind === "deliver" ? "?" : "!");
       this.guideMarker.setColor("#ffd23c");
       this.guideMarker.setPosition(pos.x, pos.y - this.size * 1.15 + bob);
       this.guideMarker.setVisible(true);

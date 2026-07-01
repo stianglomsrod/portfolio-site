@@ -5,6 +5,7 @@ import type { ContentPack, Lang } from "../engine/types";
 import { t } from "../engine/i18n";
 import ForLoopGame from "./minigames/ForLoopGame";
 import GitCommitGame from "./minigames/GitCommitGame";
+import ChoiceGame from "./minigames/ChoiceGame";
 import styles from "../../skamlos-rpg.module.css";
 
 interface Props {
@@ -64,6 +65,14 @@ export default function MinigameModal({
         )}
         {def.kind === "git-commit" && (
           <GitCommitGame
+            key={def.id}
+            config={def.config}
+            lang={lang}
+            onDone={handleDone}
+          />
+        )}
+        {def.kind === "choice" && (
+          <ChoiceGame
             key={def.id}
             config={def.config}
             lang={lang}

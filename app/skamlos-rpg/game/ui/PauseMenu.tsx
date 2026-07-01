@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { StateSnapshot } from "../engine/bridge";
 import type { ContentPack, Lang } from "../engine/types";
 import { t, tList } from "../engine/i18n";
@@ -11,15 +11,20 @@ interface Props {
   pack: ContentPack;
   snapshot: StateSnapshot | null;
   lang: Lang;
+  focus?: string | null;
   onResume: () => void;
   onRestart: () => void;
 }
 
 // Pause / main menu (Esc or the top-right button). Lets the player resume,
 // restart, and inspect everything they have collected (quests/skills/artifacts).
-export default function PauseMenu({ pack, snapshot, lang, onResume, onRestart }: Props) {
-  const [openId, setOpenId] = useState<string | null>(null);
+export default function PauseMenu({ pack, snapshot, lang, focus, onResume, onRestart }: Props) {
+  const [openId, setOpenId] = useState<string | null>(focus ?? null);
   const toggle = (id: string) => setOpenId((o) => (o === id ? null : id));
+  const focusRef = useRef<HTMLLIElement>(null);
+  useEffect(() => {
+    if (focus) focusRef.current?.scrollIntoView({ block: "center" });
+  }, [focus]);
 
   const done = snapshot?.completedQuests ?? [];
   const ownedSkills = snapshot?.skills ?? [];
@@ -86,7 +91,11 @@ export default function PauseMenu({ pack, snapshot, lang, onResume, onRestart }:
                     const open = openId === `skill:${s.id}`;
                     const boundary = pack.claims.boundaries[s.id];
                     return (
-                      <li key={s.id} className={styles.skillItem}>
+                      <li
+                        key={s.id}
+                        className={styles.skillItem}
+                        ref={focus === `skill:${s.id}` ? focusRef : undefined}
+                      >
                         <button
                           className={styles.menuItemHead}
                           onClick={() => toggle(`skill:${s.id}`)}
@@ -125,7 +134,11 @@ export default function PauseMenu({ pack, snapshot, lang, onResume, onRestart }:
                   .map((a) => {
                     const open = openId === `art:${a.id}`;
                     return (
-                      <li key={a.id} className={styles.skillItem}>
+                      <li
+                        key={a.id}
+                        className={styles.skillItem}
+                        ref={focus === `art:${a.id}` ? focusRef : undefined}
+                      >
                         <button
                           className={styles.menuItemHead}
                           onClick={() => toggle(`art:${a.id}`)}

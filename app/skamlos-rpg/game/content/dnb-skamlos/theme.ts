@@ -52,8 +52,17 @@ export const assets: AssetManifest = {
     amp: img("props", "amp"),
     mic: img("props", "mic"),
     arrow: img("props", "arrow"),
-    // npc stills (now 2-frame sheets below) + the player's real avatar photo
+    journeymap: img("props", "journeymap"),
+    // npc stills + professor/teacher NPCs + the player's real avatar photo
     avatar: "/images/avatar/stian-face.png",
+    npc_prof: img("sprites", "npc_prof"),
+    npc_teacher1: img("sprites", "npc_teacher1"),
+    npc_teacher2: img("sprites", "npc_teacher2"),
+    npc_teacher3: img("sprites", "npc_teacher3"),
+    npc_kari: img("sprites", "npc_kari"),
+    npc_nikko: img("sprites", "npc_nikko"),
+    egg: img("props", "egg"),
+    papers: img("props", "papers"),
     // buildings
     school: img("buildings", "school"),
     house: img("buildings", "home"),

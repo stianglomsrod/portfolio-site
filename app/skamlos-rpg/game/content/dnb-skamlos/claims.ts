@@ -16,10 +16,6 @@ export const claims: ClaimPolicy = {
     "cs50-django", // never imply CS50x taught Django
   ],
   boundaries: {
-    "grunnleggende-programmering": {
-      no: "Grunnmur i programmering — ikke en CS-grad, ikke ekspertnivå.",
-      en: "A programming foundation — not a CS degree, not expert level.",
-    },
     "cs50x-cert": {
       no: "CS50x dekket C, Python, SQL, Flask, JavaScript og web-grunnmur.",
       en: "CS50x covered C, Python, SQL, Flask, JavaScript and web fundamentals.",

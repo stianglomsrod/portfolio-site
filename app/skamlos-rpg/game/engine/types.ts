@@ -165,6 +165,7 @@ export type InteractAction =
   | { type: "inspect"; text: Loc }
   | { type: "startQuest"; quest: string }
   | { type: "completeQuest"; quest: string }
+  | { type: "endgame"; quest?: string }
   | { type: "signpost" };
 
 export type InteractKind =
@@ -188,6 +189,8 @@ export interface Interactable {
   prompt: Loc;
   action: InteractAction;
   showWhen?: Requirement;
+  /** Ambient prop that idly wanders the room (e.g. the rubber duck). */
+  wander?: boolean;
 }
 
 /** WoW-style guidance: where to go for the active quest, on a given map. */
@@ -279,6 +282,8 @@ export interface ChoiceConfig {
   setup: Loc;
   prompt: Loc;
   options: Array<{ id: string; label: Loc; correct: boolean; feedback: Loc }>;
+  /** Optional explanatory screen shown after the correct answer (why/what next). */
+  outro?: Loc;
 }
 
 interface MinigameBase {

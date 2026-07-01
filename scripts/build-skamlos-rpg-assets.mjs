@@ -483,6 +483,44 @@ function books() {
   rect(c, 2, 10, 16, 1, shade(P.red, 1.2));
   return c;
 }
+function journeymap() {
+  // A paper journey-map with green/red/blue sticky notes and a timeline line.
+  const c = Canvas(30, 22);
+  rect(c, 1, 1, 28, 20, hex("#efe6cf"));
+  rect(c, 1, 1, 28, 2, hex("#ffffff"));
+  rect(c, 0, 0, 30, 1, P.ink);
+  rect(c, 0, 21, 30, 1, P.ink);
+  rect(c, 0, 0, 1, 22, P.ink);
+  rect(c, 29, 0, 1, 22, P.ink);
+  rect(c, 3, 15, 24, 1, hex("#b9ab8c"));
+  rect(c, 4, 4, 4, 4, hex("#5aa06a"));
+  rect(c, 13, 4, 4, 4, hex("#c0563f"));
+  rect(c, 22, 4, 4, 4, hex("#4f7fb0"));
+  rect(c, 8, 9, 4, 4, hex("#c0563f"));
+  rect(c, 18, 9, 4, 4, hex("#5aa06a"));
+  return c;
+}
+function egg() {
+  const c = Canvas(14, 18);
+  rect(c, 4, 4, 6, 12, hex("#f0e6d0"));
+  rect(c, 5, 2, 4, 3, hex("#f0e6d0"));
+  rect(c, 4, 14, 6, 2, hex("#e0d4ba"));
+  rect(c, 5, 8, 4, 1, hex("#b9ab8c"));
+  rect(c, 5, 10, 4, 1, hex("#b9ab8c"));
+  rect(c, 5, 12, 3, 1, hex("#b9ab8c"));
+  return c;
+}
+function papers() {
+  const c = Canvas(24, 20);
+  rect(c, 2, 6, 18, 12, hex("#e8e0cc"));
+  rect(c, 3, 4, 18, 12, hex("#f4eed9"));
+  rect(c, 4, 2, 18, 12, hex("#ffffff"));
+  rect(c, 4, 2, 18, 1, hex("#d9cdb0"));
+  rect(c, 6, 5, 12, 1, hex("#b9ab8c"));
+  rect(c, 6, 8, 12, 1, hex("#b9ab8c"));
+  rect(c, 6, 11, 8, 1, hex("#b9ab8c"));
+  return c;
+}
 function bed() {
   const c = Canvas(28, 36);
   rect(c, 2, 2, 24, 32, P.woodD);
@@ -802,6 +840,9 @@ const props = {
   books: books(),
   bed: bed(),
   plant: plant(),
+  journeymap: journeymap(),
+  egg: egg(),
+  papers: papers(),
 };
 
 const buildings = {
@@ -833,6 +874,66 @@ const sprites = {
     topD: hex("#3c7a58"),
     pants: hex("#3a3550"),
     shoe: hex("#242a30"),
+  }),
+  npc_prof: npc({
+    hair: hex("#c8c8c8"),
+    hairD: hex("#9a9a9a"),
+    skin: hex("#e6c39c"),
+    skinD: hex("#cda578"),
+    top: hex("#33415f"),
+    topD: hex("#25304a"),
+    pants: hex("#3a3a42"),
+    shoe: hex("#23252b"),
+  }),
+  npc_teacher1: npc({
+    hair: hex("#5b3a24"),
+    hairD: hex("#432a1a"),
+    skin: hex("#e8bd94"),
+    skinD: hex("#d0a074"),
+    top: hex("#2f8f8f"),
+    topD: hex("#236e6e"),
+    pants: hex("#3a3550"),
+    shoe: hex("#242a30"),
+  }),
+  npc_teacher2: npc({
+    hair: hex("#8a3f2f"),
+    hairD: hex("#6a2f22"),
+    skin: hex("#f0c8a0"),
+    skinD: hex("#d9aa7c"),
+    top: hex("#c08a2a"),
+    topD: hex("#9a6d1f"),
+    pants: hex("#33424f"),
+    shoe: hex("#23282d"),
+  }),
+  npc_teacher3: npc({
+    hair: hex("#2e2a28"),
+    hairD: hex("#1c1a18"),
+    skin: hex("#d9a074"),
+    skinD: hex("#c0855c"),
+    top: hex("#7a4a86"),
+    topD: hex("#5d3866"),
+    pants: hex("#333a3f"),
+    shoe: hex("#22262a"),
+  }),
+  npc_kari: npc({
+    hair: hex("#8a6a3a"),
+    hairD: hex("#6a4f2a"),
+    skin: hex("#eec6a0"),
+    skinD: hex("#d6a878"),
+    top: hex("#2f7f8f"),
+    topD: hex("#236470"),
+    pants: hex("#3a3550"),
+    shoe: hex("#242a30"),
+  }),
+  npc_nikko: npc({
+    hair: hex("#2a2420"),
+    hairD: hex("#1a1614"),
+    skin: hex("#c98d5e"),
+    skinD: hex("#a8734a"),
+    top: hex("#c56a2f"),
+    topD: hex("#9a4f22"),
+    pants: hex("#333a3f"),
+    shoe: hex("#22262a"),
   }),
   flutterfly: flutterfly(),
 };

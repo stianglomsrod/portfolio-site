@@ -7,55 +7,73 @@ import styles from "../../skamlos-rpg.module.css";
 interface Props {
   reward: { skills: Skill[]; artifacts: Artifact[] };
   lang: Lang;
+  onOpen?: (focusId?: string) => void;
+  onClose?: () => void;
 }
 
-export default function RewardBanner({ reward, lang }: Props) {
+export default function RewardBanner({ reward, lang, onOpen, onClose }: Props) {
+  const no = lang === "no";
   return (
     <div className={styles.rewardBanner} role="status">
-      <p className={styles.rewardKicker}>
-        {lang === "no" ? "Belønning" : "Reward"}
-      </p>
+      <button
+        type="button"
+        className={styles.rewardClose}
+        onClick={onClose}
+        aria-label={no ? "Lukk" : "Close"}
+      >
+        ✕
+      </button>
+      <p className={styles.rewardKicker}>{no ? "Belønning" : "Reward"}</p>
       {reward.skills.map((s) => (
-        <div key={s.id} className={styles.rewardItem}>
+        <button
+          key={s.id}
+          type="button"
+          className={styles.rewardItem}
+          onClick={() => onOpen?.(`skill:${s.id}`)}
+        >
           <span className={styles.rewardGlyph} aria-hidden>
             {s.glyph}
           </span>
           <div>
             <strong>{t(s.label, lang)}</strong>
             <span className={styles.rewardSub}>
-              {lang === "no" ? "Ny ferdighet" : "New skill"}
+              {no ? "Ny ferdighet" : "New skill"}
             </span>
           </div>
-        </div>
+          <span className={styles.rewardChev} aria-hidden>
+            ›
+          </span>
+        </button>
       ))}
       {reward.artifacts.map((a) => (
-        <div key={a.id} className={styles.rewardItem}>
+        <button
+          key={a.id}
+          type="button"
+          className={styles.rewardItem}
+          onClick={() => onOpen?.(`art:${a.id}`)}
+        >
           <span className={styles.rewardGlyph} aria-hidden>
             📜
           </span>
           <div>
             <strong>{t(a.title, lang)}</strong>
-            {a.href && (
-              <a
-                className={styles.rewardLink}
-                href={a.href}
-                target="_blank"
-                rel="noreferrer noopener"
-              >
-                {a.linkLabel
-                  ? t(a.linkLabel, lang)
-                  : lang === "no"
-                    ? "Åpne"
-                    : "Open"}{" "}
-                ↗
-              </a>
-            )}
-            {a.boundary && (
-              <em className={styles.boundary}>{t(a.boundary, lang)}</em>
-            )}
+            <span className={styles.rewardSub}>
+              {no ? "Nytt bevis" : "New evidence"}
+            </span>
           </div>
-        </div>
+          <span className={styles.rewardChev} aria-hidden>
+            ›
+          </span>
+        </button>
       ))}
+      <button type="button" className={styles.rewardHint} onClick={() => onOpen?.()}>
+        {no
+          ? "Åpne menyen for detaljer og lenker →"
+          : "Open the menu for details and links →"}
+      </button>
+      <button type="button" className={styles.rewardContinue} onClick={onClose}>
+        {no ? "Fortsett" : "Continue"}
+      </button>
     </div>
   );
 }

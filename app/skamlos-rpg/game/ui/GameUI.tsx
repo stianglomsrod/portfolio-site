@@ -20,6 +20,7 @@ import Toasts, { type ToastItem } from "./Toasts";
 import RewardBanner from "./RewardBanner";
 import PauseMenu from "./PauseMenu";
 import MinigameModal from "./MinigameModal";
+import EndgameScreen from "./EndgameScreen";
 
 interface Props {
   bridge: GameBridge | null;
@@ -49,6 +50,8 @@ export default function GameUI({ bridge, runtime, pack }: Props) {
   } | null>(null);
   const [minigameId, setMinigameId] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [menuFocus, setMenuFocus] = useState<string | null>(null);
+  const [endgameOpen, setEndgameOpen] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const [snapshot, setSnapshot] = useState<StateSnapshot | null>(null);
 
@@ -107,6 +110,12 @@ export default function GameUI({ bridge, runtime, pack }: Props) {
       }),
     );
     offs.push(bridge.on("bell", () => playBell()));
+    offs.push(
+      bridge.on("endgame", () => {
+        setEndgameOpen(true);
+        bridge.emit("cmd:pause");
+      }),
+    );
     return () => offs.forEach((fn) => fn());
   }, [bridge, pushToast]);
 
@@ -131,12 +140,14 @@ export default function GameUI({ bridge, runtime, pack }: Props) {
     return () => window.removeEventListener("keydown", onKey);
   }, [bridge, phase, dialogue, minigameId]);
 
-  function openMenu() {
+  function openMenu(focusId?: unknown) {
+    setMenuFocus(typeof focusId === "string" ? focusId : null);
     setMenuOpen(true);
     bridge?.emit("cmd:pause");
   }
   function closeMenu() {
     setMenuOpen(false);
+    setMenuFocus(null);
     bridge?.emit("cmd:resume");
   }
 
@@ -182,7 +193,14 @@ export default function GameUI({ bridge, runtime, pack }: Props) {
       )}
 
       <Toasts items={toasts} lang={lang} />
-      {reward && <RewardBanner reward={reward} lang={lang} />}
+      {reward && (
+        <RewardBanner
+          reward={reward}
+          lang={lang}
+          onOpen={openMenu}
+          onClose={() => setReward(null)}
+        />
+      )}
 
       {phase === "playing" && showControls && !menuOpen && (
         <div className={styles.controlsBanner}>
@@ -215,6 +233,7 @@ export default function GameUI({ bridge, runtime, pack }: Props) {
           pack={pack}
           snapshot={snapshot}
           lang={lang}
+          focus={menuFocus}
           onResume={closeMenu}
           onRestart={() => bridge.emit("cmd:restart")}
         />
@@ -227,6 +246,18 @@ export default function GameUI({ bridge, runtime, pack }: Props) {
           lang={lang}
           onComplete={(lastId) => bridge.emit("cmd:minigameComplete", lastId)}
           onCancel={() => bridge.emit("cmd:minigameCancel")}
+        />
+      )}
+
+      {endgameOpen && (
+        <EndgameScreen
+          pack={pack}
+          snapshot={snapshot}
+          lang={lang}
+          onReplay={() => {
+            setEndgameOpen(false);
+            bridge.emit("cmd:restart");
+          }}
         />
       )}
 

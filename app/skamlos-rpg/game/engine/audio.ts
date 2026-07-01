@@ -58,23 +58,25 @@ class GameAudio {
   init(): void {
     if (this.ctx) return;
     try {
-      this.ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const Ctor =
+        window.AudioContext ??
+        (window as unknown as { webkitAudioContext?: typeof AudioContext })
+          .webkitAudioContext;
+      if (!Ctor) return;
+      this.ctx = new Ctor();
       this.master = this.ctx.createGain();
       this.master.gain.value = this.muted ? 0 : 0.28;
       this.master.connect(this.ctx.destination);
-      console.log(`[audio] AudioContext initialized, muted=${this.muted}`);
-    } catch (e) {
-      console.warn("[skamlos] AudioContext unavailable", e);
+    } catch {
+      // AudioContext unavailable (SSR, old browser); fail silently.
     }
   }
 
   private getCtx(): AudioContext | null {
-    if (!this.ctx) {
-      console.log("[audio] getCtx: no context, calling init()");
-      this.init();
-    }
+    if (!this.ctx) this.init();
     if (this.ctx?.state === "suspended") {
-      console.log("[audio] getCtx: context suspended, calling resume()");
+      // Resume is async; fire-and-forget — the context is ready before the
+      // next scheduled audio event.
       this.ctx.resume().catch(() => {});
     }
     return this.ctx;
@@ -85,16 +87,9 @@ class GameAudio {
   // ---------------------------------------------------------------------------
 
   sfx(name: SfxName): void {
-    if (this.muted) {
-      console.log(`[audio] sfx("${name}") blocked by mute`);
-      return;
-    }
+    if (this.muted) return;
     const ctx = this.getCtx();
-    if (!ctx || !this.master) {
-      console.log(`[audio] sfx("${name}") no ctx/master:`, { ctx: !!ctx, master: !!this.master });
-      return;
-    }
-    console.log(`[audio] sfx("${name}") playing`);
+    if (!ctx || !this.master) return;
     const master = this.master;
     const now = ctx.currentTime;
 
@@ -271,8 +266,9 @@ class GameAudio {
   // ---------------------------------------------------------------------------
   // BGM — procedural chiptune town loop
   //
-  // A simple 8-bar loop in C major pentatonic, ~112 BPM.
-  // Three "instruments": bass (square), melody (square), harmony (triangle).
+  // A calm, spacious loop in C major pentatonic, ~100 BPM. Deliberately sparse:
+  // the melody is scattered with rests, the bass rings softly, and a gentle
+  // chord pad swells every couple of bars — so it never overwhelms the player.
   // Entirely procedural — nothing downloaded or licensed.
   // ---------------------------------------------------------------------------
 
@@ -281,72 +277,78 @@ class GameAudio {
     if (!ctx || !this.master || this.muted) return;
     const master = this.master;
 
-    const bpm = 112;
+    const bpm = 100;
     const beat = 60 / bpm; // seconds per beat
     const bar = beat * 4; // 4/4 time
     const now = ctx.currentTime + 0.02; // tiny look-ahead
 
-    // Bass: root → fifth alternation
-    const bassLine = [C3, C3, G3, G3, A3, A3, C3, G3];
+    // Bass: a single soft root per bar that rings out (triangle = mellow).
+    const bassLine = [C3, C3, G3, A3];
     const bassNote = bassLine[barIdx % bassLine.length];
-    const bassOsc = ctx.createOscillator();
-    bassOsc.type = "square";
-    bassOsc.frequency.value = bassNote;
-    const bassG = ctx.createGain();
-    bassG.gain.setValueAtTime(0, now);
-    bassG.gain.linearRampToValueAtTime(0.07, now + 0.01);
-    bassG.gain.setValueAtTime(0.07, now + bar - 0.06);
-    bassG.gain.linearRampToValueAtTime(0, now + bar);
-    bassOsc.connect(bassG);
-    bassG.connect(master);
-    bassOsc.start(now);
-    bassOsc.stop(now + bar + 0.01);
+    {
+      const osc = ctx.createOscillator();
+      osc.type = "triangle";
+      osc.frequency.value = bassNote;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0, now);
+      g.gain.linearRampToValueAtTime(0.05, now + 0.05);
+      g.gain.exponentialRampToValueAtTime(0.001, now + bar * 0.9);
+      osc.connect(g);
+      g.connect(master);
+      osc.start(now);
+      osc.stop(now + bar);
+    }
 
-    // Melody: 8 eighth-note pattern (2 per beat) drawn from pentatonic scale
+    // Melody: sparse, scattered pentatonic notes with plenty of rests (R = -1),
+    // each note left to ring into the space for a roomy feel.
     const pentatonic = [C4, D4, E4, G4, A4, C5, E5, G5];
+    const R = -1;
     const patterns: number[][] = [
-      [0, 2, 4, 2, 0, 4, 2, 0],
-      [4, 2, 0, 2, 4, 5, 4, 2],
-      [2, 4, 5, 4, 2, 0, 2, 4],
-      [5, 4, 2, 4, 5, 7, 5, 4],
+      [0, R, R, 2, R, R, 4, R],
+      [R, 4, R, R, 2, R, R, R],
+      [2, R, R, 4, R, 5, R, R],
+      [R, R, 4, R, R, 2, R, 0],
     ];
-    const pattern = patterns[Math.floor(barIdx / 2) % patterns.length];
+    const pattern = patterns[barIdx % patterns.length];
     pattern.forEach((deg, i) => {
+      if (deg < 0) return; // rest
       const freq = pentatonic[deg % pentatonic.length];
       const t0 = now + i * (beat / 2);
-      const t1 = t0 + beat / 2 - 0.03;
       const osc = ctx.createOscillator();
       osc.type = "square";
       osc.frequency.value = freq;
       const g = ctx.createGain();
       g.gain.setValueAtTime(0, t0);
-      g.gain.linearRampToValueAtTime(0.045, t0 + 0.012);
-      g.gain.setValueAtTime(0.045, t1 - 0.02);
-      g.gain.linearRampToValueAtTime(0, t1);
+      g.gain.linearRampToValueAtTime(0.03, t0 + 0.015);
+      g.gain.exponentialRampToValueAtTime(0.001, t0 + beat * 0.9);
       osc.connect(g);
       g.connect(master);
       osc.start(t0);
-      osc.stop(t1 + 0.01);
+      osc.stop(t0 + beat * 0.95);
     });
 
-    // Harmony: beat-1/beat-3 stabs (triangle, softer)
-    [0, beat * 2].forEach((offset) => {
-      const harmFreqs = [E4, G4, C5];
-      harmFreqs.forEach((freq) => {
-        const t0 = now + offset;
+    // Harmony: one soft chord pad every two bars, slow swell + long release,
+    // so it colours the space without crowding the melody.
+    if (barIdx % 2 === 0) {
+      const chordSets = [
+        [C4, E4, G4],
+        [A3, C4, E4],
+      ];
+      const chord = chordSets[Math.floor(barIdx / 2) % chordSets.length];
+      chord.forEach((freq) => {
         const osc = ctx.createOscillator();
         osc.type = "triangle";
         osc.frequency.value = freq;
         const g = ctx.createGain();
-        g.gain.setValueAtTime(0, t0);
-        g.gain.linearRampToValueAtTime(0.03, t0 + 0.02);
-        g.gain.exponentialRampToValueAtTime(0.001, t0 + beat * 0.6);
+        g.gain.setValueAtTime(0, now);
+        g.gain.linearRampToValueAtTime(0.016, now + 0.45);
+        g.gain.exponentialRampToValueAtTime(0.001, now + bar * 1.8);
         osc.connect(g);
         g.connect(master);
-        osc.start(t0);
-        osc.stop(t0 + beat * 0.65);
+        osc.start(now);
+        osc.stop(now + bar * 2);
       });
-    });
+    }
 
     // Schedule the next bar
     const nextBar = barIdx + 1;
@@ -393,7 +395,6 @@ class GameAudio {
   // ---------------------------------------------------------------------------
 
   setMuted(v: boolean): void {
-    console.log(`[audio] setMuted(${v})`);
     this.muted = v;
     if (this.master && this.ctx) {
       const now = this.ctx.currentTime;
@@ -416,11 +417,9 @@ class GameAudio {
 
   loadPrefs(): void {
     try {
-      const stored = localStorage.getItem("skamlos:muted");
-      this.muted = stored === "1";
-      console.log(`[audio] loadPrefs: muted=${this.muted} (stored="${stored}")`);
-    } catch (e) {
-      console.warn("[audio] loadPrefs error:", e);
+      this.muted = localStorage.getItem("skamlos:muted") === "1";
+    } catch {
+      // localStorage unavailable; keep default (unmuted).
     }
   }
 }

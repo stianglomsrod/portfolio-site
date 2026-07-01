@@ -85,6 +85,17 @@ export default function GameUI({ bridge, runtime, pack }: Props) {
     );
   }, []);
 
+  // Stop background music whenever the player leaves the game — client-side
+  // navigation (unmount), tab close, or backgrounding — so audio never lingers.
+  useEffect(() => {
+    const stop = () => audio.bgm.stop();
+    window.addEventListener("pagehide", stop);
+    return () => {
+      window.removeEventListener("pagehide", stop);
+      audio.bgm.stop();
+    };
+  }, []);
+
   useEffect(() => {
     if (!bridge) return;
     const offs: Array<() => void> = [];

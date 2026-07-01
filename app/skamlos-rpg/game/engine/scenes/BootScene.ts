@@ -61,7 +61,10 @@ export class BootScene extends Phaser.Scene {
 
     if (this.textures.exists("water") && !this.anims.exists("water")) {
       const waterTex = this.textures.get("water");
-      if (waterTex.frameTotal > 1) {
+      // Only animate if the spritesheet actually has a second frame. getFrameNames()
+      // excludes Phaser's internal "__BASE" frame, so length >= 2 means frames 0 AND 1
+      // exist. A single-cell sheet (frameTotal === 2 incl. __BASE) is left static.
+      if (waterTex.getFrameNames().length >= 2) {
         this.anims.create({
           key: "water",
           frames: [

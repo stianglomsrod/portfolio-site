@@ -57,6 +57,33 @@ export const dialogue: Record<string, DialogueTree> = {
       },
     },
   ],
+  // Nikko in town: invites the player into his house once the master's is done.
+  "nikko-invite": [
+    {
+      speaker: { no: "Nikko" },
+      text: {
+        no: "Endelig! Jeg har en idé jeg vil bygge — en app som hjelper vennene mine som er nevrodivergente med hverdagsoppgaver.",
+        en: "Finally! I've got an idea I want to build — an app that helps my neurodivergent friends with everyday tasks.",
+      },
+    },
+    {
+      speaker: { no: "Nikko" },
+      text: {
+        no: "Kom inn og sett deg ved maskinen ved siden av meg, så tar vi den sammen.",
+        en: "Come in and take the seat at the machine next to me, and we'll do it together.",
+      },
+    },
+  ],
+  // Nikko at his desk (inside): nudge the player to the second station.
+  "nikko-desk": [
+    {
+      speaker: { no: "Nikko" },
+      text: {
+        no: "Sett deg ved maskinen ved siden av meg, så starter vi.",
+        en: "Take the seat at the machine next to me, and we'll start.",
+      },
+    },
+  ],
   elev1: [
     {
       speaker: { no: "Elev" },
@@ -74,16 +101,6 @@ export const dialogue: Record<string, DialogueTree> = {
       speaker: { no: "Du" },
       portrait: "stian",
       text: { no: "Det ser verre ut enn det er. Én bit av gangen." },
-    },
-  ],
-  // A deadpan optional interaction (treated as a completely normal build step).
-  "flutterfly-compile": [
-    { text: { no: "$ kompiler flutterfly", en: "$ compile flutterfly" } },
-    {
-      text: {
-        no: "Bygget uten feil. 0 advarsler. Den fladrer videre.",
-        en: "Built with no errors. 0 warnings. It flutters on.",
-      },
     },
   ],
   // Locked-building lines (read on E). Readable feedback, never silent walls.
@@ -178,13 +195,6 @@ export const dialogue: Record<string, DialogueTree> = {
       text: {
         no: "Støtte når det passer, ikke tvang for alle.",
         en: "Support when it fits, not a mandate for everyone.",
-      },
-    },
-  ],
-  "nikko-locked": [
-    {
-      text: {
-        no: "Det er noen hjemme, men du har ingen grunn til å banke på ennå.",
       },
     },
   ],

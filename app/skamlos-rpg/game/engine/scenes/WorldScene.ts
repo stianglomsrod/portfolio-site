@@ -238,6 +238,7 @@ export class WorldScene extends Phaser.Scene {
       sprite.setOrigin(0.5, d.tall ? 1 : 0.5);
       sprite.setDepth(d.tall ? (d.y + 1) * s : d.y * s + s / 2);
       if (d.anim && this.anims.exists(d.anim)) sprite.anims.play(d.anim);
+      if (d.wander && !this.reducedMotion) this.startFlit(sprite, d.x, d.y);
     }
   }
 
@@ -538,6 +539,53 @@ export class WorldScene extends Phaser.Scene {
       });
     };
     this.time.delayedCall(Phaser.Math.Between(800, 2000), step);
+  }
+
+  /** Ambient butterfly flight for a decorative sprite: airborne, so it drifts
+   *  over anything (grass, path, water) in short erratic hops around its home
+   *  tile, wings flapping via its own anim. Freezes while a dialogue/menu is
+   *  open, and pauses/resumes with the other wanderers. */
+  private startFlit(
+    sprite: Phaser.GameObjects.Sprite,
+    tileX: number,
+    tileY: number,
+  ): void {
+    const s = this.size;
+    sprite.setDepth(5_000); // flies above the world, below UI overlays
+    this.wanderers.push(sprite);
+    const pick = () => {
+      const tx = Phaser.Math.Clamp(
+        tileX + Phaser.Math.Between(-4, 4),
+        1,
+        this.map.width - 2,
+      );
+      const ty = Phaser.Math.Clamp(
+        tileY + Phaser.Math.Between(-3, 3),
+        1,
+        this.map.height - 2,
+      );
+      return tileCenter(tx, ty, s);
+    };
+    const hop = () => {
+      if (!sprite.active) return;
+      if (this.paused) {
+        this.time.delayedCall(400, hop);
+        return;
+      }
+      const dest = pick();
+      if (dest.x < sprite.x - 1) sprite.setFlipX(true);
+      else if (dest.x > sprite.x + 1) sprite.setFlipX(false);
+      this.tweens.add({
+        targets: sprite,
+        x: dest.x,
+        y: dest.y,
+        duration: Phaser.Math.Between(900, 1700),
+        ease: "Sine.inOut",
+        onComplete: () =>
+          this.time.delayedCall(Phaser.Math.Between(150, 900), hop),
+      });
+    };
+    this.time.delayedCall(Phaser.Math.Between(300, 900), hop);
   }
 
   private spawnNpcs(): void {

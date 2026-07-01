@@ -116,6 +116,8 @@ export interface MapDef {
     x: number;
     y: number;
     tall?: boolean;
+    /** Drift around the map with a light, ambient flight path (e.g. a butterfly). */
+    wander?: boolean;
   }>;
   spawns: Record<string, Vec2>;
   exits: Exit[];

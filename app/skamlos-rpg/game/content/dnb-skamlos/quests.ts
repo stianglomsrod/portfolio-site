@@ -131,8 +131,8 @@ export const quests: Quest[] = [
     grantsSkills: ["forskningsbasert-design"],
     grantsArtifacts: ["master-oslomet", "klar-prototype"],
     nextHint: {
-      no: "Reisen peker videre mot DNB.",
-      en: "The journey points onward to DNB.",
+      no: "Nikko har en idé han vil bygge. Reisen peker hjem til huset hans.",
+      en: "Nikko has an idea he wants to build. The journey points to his house.",
     },
     guides: [
       { map: "town", at: { x: 9, y: 21 }, kind: "go" },
@@ -141,17 +141,17 @@ export const quests: Quest[] = [
   },
   {
     id: "portefolje",
-    order: 8,
+    order: 9,
     title: { no: "DNB-porteføljen", en: "The DNB portfolio" },
     objective: {
       no: "Bygg DNB-porteføljesiden hjemme ved PC-en.",
       en: "Build the DNB portfolio site at home.",
     },
     intro: {
-      no: "Kari tipset om DNB. Nå: gjør alt du har bygget om til én ærlig søknad.",
-      en: "Kari mentioned DNB. Now: turn everything you've built into one honest application.",
+      no: "Nå: gjør alt du har bygget — fra Ordkryss til Klar og Nikkos app — om til én ærlig søknad.",
+      en: "Now: turn everything you've built — from Ordkryss to Klar and Nikko's app — into one honest application.",
     },
-    requires: { allQuests: ["laererworkshop"] },
+    requires: { allQuests: ["nikko"] },
     grantsSkills: ["agentisk-workflow"],
     grantsArtifacts: ["dnb-portefolje"],
     unlocks: ["dnb"],
@@ -166,7 +166,7 @@ export const quests: Quest[] = [
   },
   {
     id: "lever-soknad",
-    order: 9,
+    order: 10,
     title: { no: "Lever søknaden", en: "Deliver the application" },
     objective: {
       no: "Gå inn i DNB-resepsjonen og lever søknaden.",
@@ -185,16 +185,27 @@ export const quests: Quest[] = [
     ],
   },
   {
-    id: "nikko-sidequest",
-    order: 90,
+    id: "nikko",
+    order: 8,
     title: { no: "Nikkos idé", en: "Nikko's idea" },
     objective: {
-      no: "Valgfritt: hjelp Nikko med companion-appen.",
-      en: "Optional: help Nikko with the companion app.",
+      no: "Gå hjem til Nikko og sett deg ved maskinen ved siden av ham.",
+      en: "Go to Nikko's and take the seat at the machine next to him.",
     },
-    requires: { always: true },
+    intro: {
+      no: "Nikko vil lage en app som hjelper vennene hans som er nevrodivergente med hverdagsoppgaver. Dere bygger den sammen.",
+      en: "Nikko wants to build an app that helps his neurodivergent friends with everyday tasks. You build it together.",
+    },
+    requires: { allQuests: ["laererworkshop"] },
     grantsSkills: ["flutter-dart", "lokal-first"],
     grantsArtifacts: ["nikkoprogging"],
-    guides: [{ map: "town", target: "nikko", kind: "start" }],
+    nextHint: {
+      no: "Nå: samle alt i én ærlig søknad hjemme ved PC-en.",
+      en: "Now: gather it all into one honest application at home.",
+    },
+    guides: [
+      { map: "town", target: "nikko", kind: "go" },
+      { map: "nikko-house", target: "nikko-station", kind: "start" },
+    ],
   },
 ];

@@ -46,7 +46,7 @@ export const interactables: Interactable[] = [
         {
           not: {
             and: [
-              { allQuests: ["laererworkshop"] },
+              { allQuests: ["nikko"] },
               { not: { allQuests: ["portefolje"] } },
             ],
           },
@@ -72,24 +72,21 @@ export const interactables: Interactable[] = [
     prompt: { no: "Les skiltet", en: "Read the sign" },
     action: { type: "signpost" },
   },
-  // A deadpan optional interaction (the game treats it as totally normal).
+  // Nikko waits by his house once the master's is done, and invites you in.
   {
-    id: "flutterfly-compile",
-    kind: "prop",
-    position: { x: 17, y: 12 },
-    prompt: { no: "Kompiler flutterfly", en: "Compile flutterfly" },
-    action: { type: "dialogue", tree: "flutterfly-compile" },
-  },
-  // Locked building doors (readable feedback, never silent).
-  {
-    id: "nikko",
+    id: "nikko-invite",
     kind: "sign",
     spriteKey: "npc_nikko",
     position: { x: 17, y: 13 },
     name: { no: "Nikko", en: "Nikko" },
     prompt: { no: "Snakk med Nikko", en: "Talk to Nikko" },
-    action: { type: "startMinigame", minigame: "nikko-build" },
-    showWhen: { not: { allQuests: ["nikko-sidequest"] } },
+    action: { type: "dialogue", tree: "nikko-invite" },
+    showWhen: {
+      and: [
+        { allQuests: ["laererworkshop"] },
+        { not: { allQuests: ["nikko"] } },
+      ],
+    },
   },
   {
     id: "kari",
@@ -110,7 +107,7 @@ export const interactables: Interactable[] = [
     action: { type: "startMinigame", minigame: "portefolje-build" },
     showWhen: {
       and: [
-        { allQuests: ["laererworkshop"] },
+        { allQuests: ["nikko"] },
         { not: { allQuests: ["portefolje"] } },
       ],
     },
@@ -136,12 +133,24 @@ export const interactables: Interactable[] = [
     prompt: { no: "Undersøk egget", en: "Examine the egg" },
     action: { type: "dialogue", tree: "dnb-egg" },
   },
+  // --- Nikkos hus (interior): two workstations side by side ---
   {
-    id: "nikko-door",
-    kind: "door",
-    position: { x: 20, y: 14 },
-    prompt: { no: "Bank på hos Nikko", en: "Knock at Nikko's" },
-    action: { type: "dialogue", tree: "nikko-locked" },
+    id: "nikko-desk",
+    kind: "sign",
+    spriteKey: "npc_nikko",
+    position: { x: 5, y: 3 },
+    name: { no: "Nikko", en: "Nikko" },
+    prompt: { no: "Snakk med Nikko", en: "Talk to Nikko" },
+    action: { type: "dialogue", tree: "nikko-desk" },
+  },
+  {
+    id: "nikko-station",
+    kind: "pc",
+    spriteKey: "pc",
+    position: { x: 6, y: 2 },
+    prompt: { no: "Sett deg ved maskinen", en: "Sit down at the machine" },
+    action: { type: "startMinigame", minigame: "nikko-build" },
+    showWhen: { not: { allQuests: ["nikko"] } },
   },
   // --- OsloMet studio stations ---
   {

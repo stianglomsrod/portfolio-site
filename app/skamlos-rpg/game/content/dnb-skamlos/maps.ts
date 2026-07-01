@@ -202,7 +202,9 @@ const town: MapDef = {
       label: "Hjem",
     },
   ],
-  decoSprites: [{ key: "flutterfly", anim: "flutterfly-flap", x: 17, y: 12 }],
+  decoSprites: [
+    { key: "flutterfly", anim: "flutterfly-flap", x: 17, y: 12, wander: true },
+  ],
   spawns: {
     default: { x: 13, y: 21 },
     "from-school": { x: 6, y: 22 },
@@ -210,6 +212,7 @@ const town: MapDef = {
     "from-oslomet": { x: 5, y: 15 },
     "from-workshop": { x: 9, y: 22 },
     "from-dnb": { x: 12, y: 9 },
+    "from-nikko": { x: 21, y: 15 },
   },
   exits: [
     {
@@ -264,9 +267,24 @@ const town: MapDef = {
         },
       },
     },
+    {
+      id: "enter-nikko",
+      at: { x: 21, y: 14, w: 1, h: 1 },
+      to: { map: "nikko-house", spawn: "from-town" },
+      name: { no: "Nikkos hus", en: "Nikko's house" },
+      prompt: { no: "Gå inn", en: "Enter" },
+      lock: {
+        id: "nikko-gate",
+        requires: { allQuests: ["laererworkshop"] },
+        lockedText: {
+          no: "Det er noen hjemme, men du har ingen grunn til å gå inn ennå.",
+          en: "Someone's home, but you have no reason to go in yet.",
+        },
+      },
+    },
   ],
   npcs: [],
-  interactables: ["bykryss-sign", "nikko-door", "nikko", "flutterfly-compile"],
+  interactables: ["bykryss-sign", "nikko-invite"],
   labels: [],
 };
 
@@ -538,4 +556,74 @@ const dnb: MapDef = {
   },
 };
 
-export const maps: MapDef[] = [classroom, town, home, oslomet, workshop, dnb];
+// === Nikkos hus (interior) 12×9 — to arbeidsstasjoner side om side ===
+const nikkoHouse: MapDef = {
+  id: "nikko-house",
+  kind: "interior",
+  tileSize: 32,
+  width: 12,
+  height: 9,
+  bg: "#2b2018",
+  legend: {
+    "#": "wallH",
+    ".": "floorH",
+    o: "floorH",
+    W: "window",
+    e: "deskH",
+    g: "rug",
+    p: "plant",
+    D: "door",
+  },
+  ground: [
+    "############",
+    "#..........#",
+    "#..........#",
+    "#..........#",
+    "#..........#",
+    "#..........#",
+    "#..........#",
+    "#..........#",
+    "#####o######",
+  ],
+  decor: [
+    "...W....W...",
+    "            ",
+    "    eeee    ",
+    "            ",
+    "     gg     ",
+    "     gg     ",
+    " p          ",
+    "            ",
+    "     D      ",
+  ],
+  decoSprites: [{ key: "pc", x: 5, y: 2 }],
+  spawns: {
+    "from-town": { x: 5, y: 7 },
+    default: { x: 5, y: 7 },
+  },
+  exits: [
+    {
+      id: "door",
+      at: { x: 5, y: 8, w: 1, h: 1 },
+      to: { map: "town", spawn: "from-nikko" },
+      name: { no: "Døra", en: "The door" },
+      prompt: { no: "Gå ut", en: "Go out" },
+    },
+  ],
+  npcs: [],
+  interactables: ["nikko-desk", "nikko-station"],
+  ambient: {
+    no: "Nikkos hus. To skjermer står klare side om side.",
+    en: "Nikko's house. Two screens stand ready side by side.",
+  },
+};
+
+export const maps: MapDef[] = [
+  classroom,
+  town,
+  home,
+  oslomet,
+  workshop,
+  dnb,
+  nikkoHouse,
+];

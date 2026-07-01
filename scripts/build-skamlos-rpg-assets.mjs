@@ -501,13 +501,52 @@ function journeymap() {
   return c;
 }
 function egg() {
-  const c = Canvas(14, 18);
-  rect(c, 4, 4, 6, 12, hex("#f0e6d0"));
-  rect(c, 5, 2, 4, 3, hex("#f0e6d0"));
-  rect(c, 4, 14, 6, 2, hex("#e0d4ba"));
-  rect(c, 5, 8, 4, 1, hex("#b9ab8c"));
-  rect(c, 5, 10, 4, 1, hex("#b9ab8c"));
-  rect(c, 5, 12, 3, 1, hex("#b9ab8c"));
+  // Ovoid silhouette: pointed top, round fat belly widest ~60% down,
+  // ~1.3:1 height:width like a real hen's egg. [y, xStart, width] per row.
+  const c = Canvas(16, 20);
+  const base = hex("#f5ebd4");
+  const mid = hex("#e6d6b3");
+  const deep = hex("#d3bf94");
+  const hi = hex("#fffdf5");
+  const rows = [
+    [1, 7, 2],
+    [2, 6, 4],
+    [3, 5, 6],
+    [4, 4, 8],
+    [5, 4, 8],
+    [6, 3, 10],
+    [7, 3, 10],
+    [8, 2, 12],
+    [9, 2, 12],
+    [10, 1, 14],
+    [11, 1, 14],
+    [12, 1, 14],
+    [13, 1, 14],
+    [14, 2, 12],
+    [15, 2, 12],
+    [16, 3, 10],
+    [17, 4, 8],
+    [18, 6, 4],
+  ];
+  // Base fill.
+  for (const [y, x, w] of rows) rect(c, x, y, w, 1, base);
+  // Core shadow across the right hemisphere (light from top-left).
+  for (const [y, x, w] of rows) {
+    if (y < 4) continue;
+    const s = x + Math.round(w * 0.56);
+    rect(c, s, y, x + w - s, 1, mid);
+  }
+  // Deep crescent lower-right + shaded underside for grounding.
+  for (const [y, x, w] of rows) {
+    if (y < 11) continue;
+    const s = x + Math.round(w * 0.72);
+    rect(c, s, y, x + w - s, 1, deep);
+  }
+  rect(c, 6, 18, 4, 1, deep);
+  // Top-left specular highlight.
+  disc(c, 6, 7, 2, hi);
+  px(c, 5, 5, hi);
+  px(c, 8, 6, hi);
   return c;
 }
 function papers() {

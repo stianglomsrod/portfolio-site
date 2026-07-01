@@ -56,7 +56,9 @@ export default function GameUI({ bridge, runtime, pack }: Props) {
   const [showControls, setShowControls] = useState(true);
   const [snapshot, setSnapshot] = useState<StateSnapshot | null>(null);
   const [muted, setMuted] = useState(() => {
-    audio.loadPrefs();
+    try {
+      audio.loadPrefs();
+    } catch {}
     return audio.getMuted();
   });
 

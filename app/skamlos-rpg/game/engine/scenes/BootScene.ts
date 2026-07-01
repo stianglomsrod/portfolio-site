@@ -60,15 +60,18 @@ export class BootScene extends Phaser.Scene {
     }
 
     if (this.textures.exists("water") && !this.anims.exists("water")) {
-      this.anims.create({
-        key: "water",
-        frames: [
-          { key: "water", frame: 0 },
-          { key: "water", frame: 1 },
-        ],
-        frameRate: 2,
-        repeat: -1,
-      });
+      const waterTex = this.textures.get("water");
+      if (waterTex.frameTotal > 1) {
+        this.anims.create({
+          key: "water",
+          frames: [
+            { key: "water", frame: 0 },
+            { key: "water", frame: 1 },
+          ],
+          frameRate: 2,
+          repeat: -1,
+        });
+      }
     }
 
     const phase = this.registry.get("phase") as string | undefined;

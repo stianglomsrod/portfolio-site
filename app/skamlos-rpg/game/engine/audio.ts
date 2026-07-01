@@ -58,18 +58,22 @@ class GameAudio {
   init(): void {
     if (this.ctx) return;
     try {
-      this.ctx = new AudioContext();
+      this.ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
       this.master = this.ctx.createGain();
       this.master.gain.value = this.muted ? 0 : 0.28;
       this.master.connect(this.ctx.destination);
-    } catch {
-      // AudioContext unavailable (SSR, old browser); fail silently.
+    } catch (e) {
+      console.warn("[skamlos] AudioContext unavailable", e);
     }
   }
 
   private getCtx(): AudioContext | null {
     if (!this.ctx) this.init();
-    if (this.ctx?.state === "suspended") this.ctx.resume().catch(() => {});
+    if (this.ctx?.state === "suspended") {
+      // Resume is async; we can fire-and-forget since the context will be ready
+      // before the next audio event (microseconds later).
+      this.ctx.resume().catch(() => {});
+    }
     return this.ctx;
   }
 

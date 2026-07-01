@@ -3,6 +3,7 @@ import Phaser from "phaser";
 import type { CtaPrompt, GameBridge } from "../bridge";
 import type { GameRuntime } from "../runtime";
 import { buildSolidGrid, tileCenter, validateMap } from "../systems/grid";
+import { audio } from "../audio";
 import type {
   ContentPack,
   Dir,
@@ -40,6 +41,8 @@ export class WorldScene extends Phaser.Scene {
   private avatar!: Phaser.GameObjects.Image;
   private avatarRing!: Phaser.GameObjects.Arc;
   private avatarBaseScale = 1;
+  private stepParity = 0;
+  private lastStepTime = 0;
   private bobPhase = 0;
   private facing: Dir = "down";
   private solids!: Phaser.Physics.Arcade.StaticGroup;
@@ -678,6 +681,7 @@ export class WorldScene extends Phaser.Scene {
     const blocked = this.runtime.evaluateGate(exit.lock);
     if (blocked) {
       this.emitLocked(blocked.lockedText);
+      audio.sfx("deny");
       return;
     }
     this.doTransition(exit.to.map, exit.to.spawn);
@@ -695,6 +699,7 @@ export class WorldScene extends Phaser.Scene {
   private doTransition(mapId: string, spawn: string): void {
     this.transitioning = true;
     this.player.setVelocity(0, 0);
+    audio.sfx("door");
     this.bridge.emit("prompt", null);
     this.cameras.main.fadeOut(200);
     this.cameras.main.once(
@@ -758,6 +763,8 @@ export class WorldScene extends Phaser.Scene {
     }
     this.started = true;
     this.paused = false;
+    audio.init();
+    audio.bgm.start();
     if (this.input.keyboard) this.input.keyboard.enabled = true;
     this.registry.set("phase", "playing");
 
@@ -822,6 +829,7 @@ export class WorldScene extends Phaser.Scene {
     this.cueFired = true;
     this.runtime.setFlag(seen, true);
     if (cue.bell) {
+      audio.sfx("bell");
       if (!this.reducedMotion) this.cameras.main.flash(260, 255, 244, 214);
       this.bridge.emit("bell");
     }
@@ -833,6 +841,7 @@ export class WorldScene extends Phaser.Scene {
 
   private tryInteract(): void {
     if (this.paused || this.transitioning || !this.current) return;
+    audio.sfx("confirm");
     const target = this.current;
     if (target.kind === "npc") {
       this.runDialogue(
@@ -951,6 +960,11 @@ export class WorldScene extends Phaser.Scene {
       const sq = Math.cos(this.bobPhase) * 0.08;
       sx = 1 + sq;
       sy = 1 - sq;
+      // Footstep on every half-stride (~220 ms apart, aligned with bob peak)
+      if (time - this.lastStepTime > 220 && Math.sin(this.bobPhase) > 0.85) {
+        this.lastStepTime = time;
+        audio.sfx("step");
+      }
     } else {
       bob = (Math.sin(time * 0.004) + 1) * 0.9;
     }

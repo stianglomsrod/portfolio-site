@@ -13,6 +13,7 @@ import type {
 } from "../engine/types";
 import styles from "../../skamlos-rpg.module.css";
 import { playBell } from "./bell";
+import { audio } from "../engine/audio";
 import StartScreen from "./StartScreen";
 import Hud from "./Hud";
 import GameBox from "./GameBox";
@@ -54,6 +55,16 @@ export default function GameUI({ bridge, runtime, pack }: Props) {
   const [endgameOpen, setEndgameOpen] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const [snapshot, setSnapshot] = useState<StateSnapshot | null>(null);
+  const [muted, setMuted] = useState(() => {
+    audio.loadPrefs();
+    return audio.getMuted();
+  });
+
+  const toggleMute = () => {
+    const next = !muted;
+    audio.setMuted(next);
+    setMuted(next);
+  };
 
   const toastId = useRef(0);
   const subId = useRef(0);
@@ -96,6 +107,7 @@ export default function GameUI({ bridge, runtime, pack }: Props) {
     offs.push(bridge.on("toast", ({ text, kind }) => pushToast(text, kind)));
     offs.push(
       bridge.on("reward", (r) => {
+        audio.sfx("reward");
         setReward(r);
         window.setTimeout(() => setReward(null), 6500);
       }),
@@ -109,7 +121,7 @@ export default function GameUI({ bridge, runtime, pack }: Props) {
         setObjective(s.objective);
       }),
     );
-    offs.push(bridge.on("bell", () => playBell()));
+    offs.push(bridge.on("bell", () => { audio.sfx("bell"); playBell(); }));
     offs.push(
       bridge.on("endgame", () => {
         setEndgameOpen(true);
@@ -177,6 +189,7 @@ export default function GameUI({ bridge, runtime, pack }: Props) {
   }, [phase, showControls]);
 
   function advanceDialogue() {
+    audio.sfx("blip");
     setDialogue((d) => {
       if (!d) return null;
       if (d.index + 1 < d.lines.length) return { ...d, index: d.index + 1 };
@@ -194,7 +207,9 @@ export default function GameUI({ bridge, runtime, pack }: Props) {
           lang={lang}
           objective={objective}
           snapshot={snapshot}
+          muted={muted}
           onOpenMenu={openMenu}
+          onToggleMute={toggleMute}
           onToggleLang={() =>
             bridge.emit("cmd:setLang", lang === "no" ? "en" : "no")
           }

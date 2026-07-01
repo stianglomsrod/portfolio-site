@@ -9,16 +9,20 @@ interface Props {
   lang: Lang;
   objective: Loc | null;
   snapshot: StateSnapshot | null;
+  muted: boolean;
   onOpenMenu: () => void;
   onToggleLang: () => void;
+  onToggleMute: () => void;
 }
 
 export default function Hud({
   lang,
   objective,
   snapshot,
+  muted,
   onOpenMenu,
   onToggleLang,
+  onToggleMute,
 }: Props) {
   const skills = snapshot?.skills.length ?? 0;
   const artifacts = snapshot?.artifacts.length ?? 0;
@@ -44,6 +48,14 @@ export default function Hud({
         </button>
         <button className={styles.hudChip} onClick={onToggleLang}>
           {lang === "no" ? "EN" : "NO"}
+        </button>
+        <button
+          className={styles.hudChip}
+          onClick={onToggleMute}
+          title={muted ? "Skru på lyd" : "Demp lyd"}
+          aria-label={muted ? "Skru på lyd" : "Demp lyd"}
+        >
+          {muted ? "🔇" : "🔊"}
         </button>
         <button className={styles.hudChip} onClick={onOpenMenu} title="Meny (Esc)">
           ☰

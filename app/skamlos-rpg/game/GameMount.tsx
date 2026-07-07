@@ -21,6 +21,9 @@ export default function GameMount() {
   // Stable singletons created once (lazy initialisers, never during re-render).
   const [bridge] = useState(() => new GameBridge());
   const [runtime] = useState(() => new GameRuntime(pack, bridge));
+  // Host element for the touch controls, which live BELOW the game frame so
+  // they never cover the map. GameUI portals the pad into it.
+  const [padHost, setPadHost] = useState<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!parentRef.current) return;
@@ -95,8 +98,14 @@ export default function GameMount() {
     <div className={styles.stage}>
       <div className={styles.canvasFrame}>
         <div ref={parentRef} className={styles.canvasParent} />
-        <GameUI bridge={bridge} runtime={runtime} pack={pack} />
+        <GameUI
+          bridge={bridge}
+          runtime={runtime}
+          pack={pack}
+          padHost={padHost}
+        />
       </div>
+      <div ref={setPadHost} className={styles.padHost} />
     </div>
   );
 }

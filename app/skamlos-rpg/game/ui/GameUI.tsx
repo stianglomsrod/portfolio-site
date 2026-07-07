@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import type { CtaPrompt, GameBridge, StateSnapshot } from "../engine/bridge";
 import type { GameRuntime } from "../engine/runtime";
 import type {
@@ -22,11 +23,14 @@ import RewardBanner from "./RewardBanner";
 import PauseMenu from "./PauseMenu";
 import MinigameModal from "./MinigameModal";
 import EndgameScreen from "./EndgameScreen";
+import VirtualPad, { useCoarsePointer } from "./VirtualPad";
 
 interface Props {
   bridge: GameBridge | null;
   runtime: GameRuntime | null;
   pack: ContentPack;
+  /** Element below the game frame that hosts the touch controls. */
+  padHost?: HTMLElement | null;
 }
 
 type DialogueState = {
@@ -35,7 +39,7 @@ type DialogueState = {
   index: number;
 } | null;
 
-export default function GameUI({ bridge, runtime, pack }: Props) {
+export default function GameUI({ bridge, runtime, pack, padHost }: Props) {
   const [phase, setPhase] = useState<"start" | "playing">("start");
   const [lang, setLang] = useState<Lang>(runtime?.state.lang ?? "no");
   const [objective, setObjective] = useState<Loc | null>(null);
@@ -67,6 +71,14 @@ export default function GameUI({ bridge, runtime, pack }: Props) {
     audio.setMuted(next);
     setMuted(next);
   };
+
+  const coarsePointer = useCoarsePointer();
+
+  // Stable identity: VirtualPad's release-on-unmount effect depends on this.
+  const emitMove = useCallback(
+    (dir: { x: number; y: number }) => bridge?.emit("cmd:move", dir),
+    [bridge],
+  );
 
   const toastId = useRef(0);
   const subId = useRef(0);
@@ -246,9 +258,13 @@ export default function GameUI({ bridge, runtime, pack }: Props) {
 
       {phase === "playing" && showControls && !menuOpen && (
         <div className={styles.controlsBanner}>
-          {lang === "no"
-            ? "Beveg: WASD / piltaster   ·   Undersøk: E   ·   Meny: Esc"
-            : "Move: WASD / arrows   ·   Interact: E   ·   Menu: Esc"}
+          {coarsePointer
+            ? lang === "no"
+              ? "Styr med knappene under spillet   ·   E undersøker"
+              : "Use the buttons below the game   ·   E inspects"
+            : lang === "no"
+              ? "Beveg: WASD / piltaster   ·   Undersøk: E   ·   Meny: Esc"
+              : "Move: WASD / arrows   ·   Interact: E   ·   Menu: Esc"}
         </div>
       )}
 
@@ -269,6 +285,22 @@ export default function GameUI({ bridge, runtime, pack }: Props) {
           onInteract={() => bridge.emit("cmd:interact")}
         />
       )}
+
+      {padHost &&
+        phase === "playing" &&
+        !endgameOpen &&
+        createPortal(
+          <VirtualPad
+            lang={lang}
+            disabled={menuOpen || !!minigameId}
+            dialogueOpen={!!dialogue}
+            onMove={emitMove}
+            onAction={() =>
+              dialogue ? advanceDialogue() : bridge.emit("cmd:interact")
+            }
+          />,
+          padHost,
+        )}
 
       {menuOpen && (
         <PauseMenu

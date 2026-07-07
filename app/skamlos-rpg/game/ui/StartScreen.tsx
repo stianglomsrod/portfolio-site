@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect } from "react";
 import type { ContentPack, Lang } from "../engine/types";
 import { t } from "../engine/i18n";
+import { useCoarsePointer } from "./VirtualPad";
 import styles from "../../skamlos-rpg.module.css";
 
 interface Props {
@@ -25,10 +26,13 @@ const LABELS = {
     kicker: "Spillbar pitch",
     move: "Beveg deg",
     moveVal: "WASD / piltaster",
+    moveValTouch: "Pilknappene under spillet",
     act: "Snakk / undersøk",
     actVal: "E eller mellomrom",
+    actValTouch: "E-knappen, eller trykk på tekstboksen",
     logs: "Oppdrag / ferdigheter",
     logsVal: "Q / K",
+    logsValTouch: "Menyknappen ☰ oppe til høyre",
     close: "Lukk",
     closeVal: "Esc",
     play: "Spill",
@@ -40,10 +44,13 @@ const LABELS = {
     kicker: "Playable pitch",
     move: "Move",
     moveVal: "WASD / arrow keys",
+    moveValTouch: "The arrow buttons under the game",
     act: "Talk / inspect",
     actVal: "E or space",
+    actValTouch: "The E button, or tap the text box",
     logs: "Quests / skills",
     logsVal: "Q / K",
+    logsValTouch: "The ☰ button in the top right",
     close: "Close",
     closeVal: "Esc",
     play: "Play",
@@ -70,6 +77,7 @@ export default function StartScreen({
   }, [onPlay]);
 
   const L = LABELS[lang];
+  const touch = useCoarsePointer();
 
   return (
     <div className={styles.startScreen}>
@@ -87,20 +95,22 @@ export default function StartScreen({
         <dl className={styles.controls}>
           <div>
             <dt>{L.move}</dt>
-            <dd>{L.moveVal}</dd>
+            <dd>{touch ? L.moveValTouch : L.moveVal}</dd>
           </div>
           <div>
             <dt>{L.act}</dt>
-            <dd>{L.actVal}</dd>
+            <dd>{touch ? L.actValTouch : L.actVal}</dd>
           </div>
           <div>
             <dt>{L.logs}</dt>
-            <dd>{L.logsVal}</dd>
+            <dd>{touch ? L.logsValTouch : L.logsVal}</dd>
           </div>
-          <div>
-            <dt>{L.close}</dt>
-            <dd>{L.closeVal}</dd>
-          </div>
+          {!touch && (
+            <div>
+              <dt>{L.close}</dt>
+              <dd>{L.closeVal}</dd>
+            </div>
+          )}
         </dl>
         <div className={styles.startActions}>
           <button className={styles.primaryBtn} onClick={onPlay}>

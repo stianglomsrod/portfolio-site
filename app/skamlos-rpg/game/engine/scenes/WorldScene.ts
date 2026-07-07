@@ -69,6 +69,7 @@ export class WorldScene extends Phaser.Scene {
     Phaser.Input.Keyboard.Key
   >;
   private interactKey!: Phaser.Input.Keyboard.Key;
+  private touchDir = { x: 0, y: 0 };
   private unsub: Array<() => void> = [];
 
   constructor() {
@@ -746,6 +747,11 @@ export class WorldScene extends Phaser.Scene {
     this.unsub.push(this.bridge.on("cmd:resume", () => this.resume()));
     this.unsub.push(this.bridge.on("cmd:start", () => this.beginPlay()));
     this.unsub.push(this.bridge.on("cmd:interact", () => this.tryInteract()));
+    this.unsub.push(
+      this.bridge.on("cmd:move", (dir) => {
+        this.touchDir = dir;
+      }),
+    );
   }
 
   private cleanup(): void {
@@ -779,6 +785,7 @@ export class WorldScene extends Phaser.Scene {
 
   private pause(): void {
     this.paused = true;
+    this.touchDir = { x: 0, y: 0 };
     if (this.player?.body) this.player.setVelocity(0, 0);
     if (this.input.keyboard) this.input.keyboard.enabled = false;
     this.setPrompt(null);
@@ -929,10 +936,18 @@ export class WorldScene extends Phaser.Scene {
 
     let vx = 0;
     let vy = 0;
-    if (this.cursors.left.isDown || this.wasd.left.isDown) vx -= 1;
-    if (this.cursors.right.isDown || this.wasd.right.isDown) vx += 1;
-    if (this.cursors.up.isDown || this.wasd.up.isDown) vy -= 1;
-    if (this.cursors.down.isDown || this.wasd.down.isDown) vy += 1;
+    if (this.cursors.left.isDown || this.wasd.left.isDown || this.touchDir.x < 0)
+      vx -= 1;
+    if (
+      this.cursors.right.isDown ||
+      this.wasd.right.isDown ||
+      this.touchDir.x > 0
+    )
+      vx += 1;
+    if (this.cursors.up.isDown || this.wasd.up.isDown || this.touchDir.y < 0)
+      vy -= 1;
+    if (this.cursors.down.isDown || this.wasd.down.isDown || this.touchDir.y > 0)
+      vy += 1;
 
     const moving = vx !== 0 || vy !== 0;
     if (moving) {

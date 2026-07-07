@@ -10,8 +10,10 @@
   --line: #4a3d2e;
   min-height: 100dvh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 10px;
   padding: clamp(8px, 3vw, 28px);
   background: radial-gradient(
     120% 90% at 50% 0%,
@@ -1282,4 +1284,89 @@
     transform: translateX(-50%) scale(0.96);
     opacity: 0;
   }
+}
+
+/* ---- touch controls (VirtualPad mounts here only on coarse pointers) ---- */
+.padHost {
+  width: min(96vw, 980px);
+}
+.padHost:empty {
+  display: none;
+}
+
+@media (pointer: coarse) {
+  .stage {
+    padding-bottom: max(clamp(8px, 3vw, 28px), env(safe-area-inset-bottom));
+  }
+  /* Leave room for the pad inside a short landscape phone viewport. */
+  @media (orientation: landscape) {
+    .canvasFrame {
+      width: min(96vw, calc((100dvh - 190px) * 1.5), 980px);
+    }
+  }
+}
+
+.padRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 4px 6px 0;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.padRow[data-disabled] {
+  opacity: 0.45;
+}
+
+.dpad {
+  display: grid;
+  grid-template-columns: repeat(3, 52px);
+  grid-template-rows: repeat(3, 52px);
+  gap: 4px;
+}
+.padBtn {
+  touch-action: none;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  color: var(--parch);
+  font-size: 1rem;
+}
+.padBtn:active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.padBtn[data-dir="up"] {
+  grid-area: 1 / 2;
+}
+.padBtn[data-dir="left"] {
+  grid-area: 2 / 1;
+}
+.padBtn[data-dir="right"] {
+  grid-area: 2 / 3;
+}
+.padBtn[data-dir="down"] {
+  grid-area: 3 / 2;
+}
+
+.actionBtn {
+  touch-action: manipulation;
+  width: 74px;
+  height: 74px;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  color: var(--parch);
+  font: 700 1.3rem var(--font-geist-mono, monospace);
+}
+.actionBtn:active {
+  background: var(--panel-2);
+  color: var(--accent);
 }

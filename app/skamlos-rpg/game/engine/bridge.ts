@@ -55,6 +55,8 @@ export interface GameCommands {
   "cmd:minigameCancel": undefined;
   "cmd:setLang": Lang;
   "cmd:interact": undefined;
+  /** Virtual D-pad direction; components in {-1, 0, 1}. {0,0} stops. */
+  "cmd:move": { x: number; y: number };
   "cmd:pause": undefined;
   "cmd:resume": undefined;
 }

@@ -1,4 +1,4 @@
-// Builds the DNB hero portrait from the source photo.
+// Builds the hero portrait from the source photo.
 //
 // Source : public/images/stian.jpg (full-body photo, EXIF-rotated to 3024×4032)
 // Output : public/images/avatar/stian-portrait.webp (head-and-shoulders bust)

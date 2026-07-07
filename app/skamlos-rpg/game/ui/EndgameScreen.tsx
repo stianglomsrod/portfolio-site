@@ -13,7 +13,7 @@ interface Props {
   onReplay: () => void;
 }
 
-// Reuses the DNB contact source rather than inventing a second copy.
+// Reuses the site's contact links rather than inventing a second copy.
 const CONTACT = [
   { label: "E-post", href: "mailto:stianglomsrod@gmail.com" },
   {

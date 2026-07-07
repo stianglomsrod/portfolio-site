@@ -1,22 +1,17 @@
-# Stian Glomsrød — Portefølje
+# stianglomsrod.no
 
-A two-mode portfolio site built as Stian Glomsrød's application for the **UX Designer** role at
-**VG X** (Schibsted). It is itself an AI-native prototype that argues its own thesis.
-
-- **Normal pitch** (default): a calm, scannable, application-ready portfolio —
-  Hero → featured case (Klar) → supporting cases → agentic workflow → contact.
-- **Skamløs AI-pitch**: a game-first, playable world ("Stians verden") where the real learning
-  journey is the pitch. All evidence is also available as text via the journal (`J`), so it stays
-  fully usable without playing.
-
-The mode toggle persists to `localStorage` (`portfolio-mode`) and drives a `data-mode` attribute.
+Stian Glomsrød's portfolio site: AI-first fullstack product building with a
+documented workflow. Norwegian first, with an English toggle. The site also
+hosts **«Skamløs pitch»** — a small playable 2D RPG prologue about building
+competence stone by stone — at [`/skamlos-rpg`](https://stianglomsrod.no/skamlos-rpg).
 
 ## Tech stack
 
-- **Next.js 16** (App Router, Turbopack) + **React 19**
-- **TypeScript** (strict)
-- **CSS Modules** + a small global theme in [`app/globals.css`](app/globals.css)
-- No runtime UI dependencies beyond React/Next.
+- **Next.js 16** (App Router) + **React 19**
+- **TypeScript** (strict), **CSS Modules**
+- **Phaser 3** — loaded only on the game route
+- No analytics or tracking. The only localStorage keys are the language
+  choice (`site-lang`) and the game's save state.
 
 ## Getting started
 
@@ -27,57 +22,38 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-## Scripts
-
-| Script          | Purpose                               |
-| --------------- | ------------------------------------- |
-| `npm run dev`   | Start the dev server (Turbopack)      |
-| `npm run build` | Production build                      |
-| `npm run start` | Serve the production build            |
-| `npm run lint`  | ESLint (core-web-vitals + TypeScript) |
+| Script                   | Purpose                                    |
+| ------------------------ | ------------------------------------------ |
+| `npm run dev`            | Start the dev server                       |
+| `npm run build`          | Production build                           |
+| `npm run lint`           | ESLint (core-web-vitals + TypeScript)      |
+| `npm run check:skamlos`  | Content guard for the game pack            |
+| `npm run assets:skamlos` | Regenerate the game's procedural PNG assets |
 
 ## Project structure
 
 ```
 app/
-  layout.tsx          Root layout + SEO/OpenGraph metadata
-  page.tsx            Renders <Portfolio/>
-  globals.css         Theme tokens, reduced-motion handling
-  components/         UI (Portfolio, SkamlosWorld, cases, footer, …)
-  data/portfolio.ts   Single source of truth for copy + the VG X fit-scan
-docs/                 Epic, AI pitch log, reports
-public/images/        Case screenshots + avatar
+  layout.tsx           Root layout + SEO/OpenGraph metadata
+  page.tsx             Front page (Hero → Workflow → Klar → Method → Capacity → Contact)
+  components/          UI components; copy lives inline as { no, en } objects
+  skamlos-rpg/         The game route
+    game/engine/       Reusable, content-agnostic RPG engine (Phaser)
+    game/content/      The "kompetansebyen" content pack (maps, quests, dialogue)
+public/skamlos-rpg/    Generated pixel-art assets (see scripts/)
+scripts/               Asset generation + content guard
 ```
 
-## Content & integrity rules
+## Content rules
 
-- Copy lives in [`app/data/portfolio.ts`](app/data/portfolio.ts) and
-  [`app/components/skamlos/worldGyms.ts`](app/components/skamlos/worldGyms.ts) — no invented
-  metrics, awards, or seniority.
-- Contact links live in `footer.links` in [`app/data/portfolio.ts`](app/data/portfolio.ts). Any
-  link written as `[bracketed text]` is treated as a placeholder and renders as a non-clickable
-  chip (see [`app/components/CaseLink.tsx`](app/components/CaseLink.tsx)).
+- All visible copy exists in both Norwegian and English.
+- The game engine knows nothing about the content pack; everything specific
+  to the story lives under `game/content/kompetansebyen/`.
+- Game assets are drawn procedurally in `scripts/build-skamlos-rpg-assets.mjs`
+  — no external or copyrighted art.
 
-## Configuration
+## Deploy
 
-Optional environment variable:
-
-| Variable               | Purpose                                                                                                                                                                  |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `NEXT_PUBLIC_SITE_URL` | Absolute site URL for canonical/OpenGraph tags (e.g. `https://…`). On Vercel it falls back automatically to the production URL, and to `http://localhost:3000` locally. |
-
-## Deploy on Vercel
-
-This is a standard Next.js app and deploys on Vercel with zero extra configuration:
-
-1. Push the repo to GitHub.
-2. At [vercel.com/new](https://vercel.com/new), import the repository — Next.js is auto-detected.
-3. (Optional) Add the `NEXT_PUBLIC_SITE_URL` environment variable for correct canonical/OpenGraph
-   URLs.
-4. Click **Deploy**.
-
-Local production check before deploying:
-
-```bash
-npm run lint && npm run build
-```
+Standard Next.js app on Vercel. Optional environment variable
+`NEXT_PUBLIC_SITE_URL` sets the absolute URL for canonical/OpenGraph tags;
+it falls back to the Vercel production URL automatically.

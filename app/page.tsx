@@ -1,33 +1,25 @@
-import type { Metadata } from "next";
 import { LanguageProvider } from "./components/LanguageContext";
 import LanguageToggle from "./components/LanguageToggle";
 import GameTab from "./components/GameTab";
-import DnbHero from "./components/DnbHero";
-import DnbWorkflow from "./components/DnbWorkflow";
-import DnbKlar from "./components/DnbKlar";
-import DnbMethod from "./components/DnbMethod";
-import DnbCapacity from "./components/DnbCapacity";
-import DnbContact from "./components/DnbContact";
+import Hero from "./components/Hero";
+import Workflow from "./components/Workflow";
+import KlarCase from "./components/KlarCase";
+import Method from "./components/Method";
+import Capacity from "./components/Capacity";
+import Contact from "./components/Contact";
 
-// Page-level metadata overrides the layout-level defaults for the DNB deploy.
-export const metadata: Metadata = {
-  title: "Stian Glomsrød — AI-first engineering",
-  description:
-    "Fullstack produktbygging med AI-agenter, disiplinert arbeidsflyt og tydelig kvalitetssikring. Portefølje for DNB AI Tech.",
-};
-
-export default function DnbPage() {
+export default function HomePage() {
   return (
     <LanguageProvider>
       <GameTab />
       <LanguageToggle />
       <main>
-        <DnbHero />
-        <DnbWorkflow />
-        <DnbKlar />
-        <DnbMethod />
-        <DnbCapacity />
-        <DnbContact />
+        <Hero />
+        <Workflow />
+        <KlarCase />
+        <Method />
+        <Capacity />
+        <Contact />
       </main>
     </LanguageProvider>
   );

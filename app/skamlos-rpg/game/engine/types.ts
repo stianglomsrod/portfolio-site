@@ -1,8 +1,8 @@
 // === REUSABLE ENGINE — type schema for any "application RPG" content pack ===
-// The engine knows nothing about DNB, Stian or Skamløs. Everything specific to a
-// game lives in a ContentPack (see game/content/<pack-id>/). If you ever feel the
-// urge to write `if (pack.id === "dnb-skamlos")` in engine code, the branch belongs
-// in pack DATA instead.
+// The engine knows nothing about the town, Stian or Skamløs. Everything specific
+// to a game lives in a ContentPack (see game/content/<pack-id>/). If you ever feel
+// the urge to write `if (pack.id === "kompetansebyen")` in engine code, the branch
+// belongs in pack DATA instead.
 
 export type Lang = "no" | "en";
 export type Loc = { no: string; en?: string };
@@ -308,7 +308,7 @@ export interface EndgameDef {
   title: Loc;
   message: Loc;
   show: Array<"quests" | "skills" | "artifacts" | "eggs">;
-  contactSource: "reuse-dnb-contact";
+  contactSource: "reuse-site-contact";
   actions: Array<"replay" | "back-to-portfolio">;
 }
 

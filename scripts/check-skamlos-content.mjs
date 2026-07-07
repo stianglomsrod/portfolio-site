@@ -3,7 +3,7 @@
 // 1. SPELLING: the project is "Ordkryss" (crossword), NEVER "Ordryss". This
 //    fails the check (exit 1) if the typo slips into any source/visible copy.
 // 2. CLAIM-LINT (light): warns if denied claim phrases appear in pack text,
-//    mirroring the portfolio's DNB claim discipline inside the game.
+//    mirroring the portfolio's claim-source discipline inside the game.
 //
 // Run with: node scripts/check-skamlos-content.mjs   (or: npm run check:skamlos)
 

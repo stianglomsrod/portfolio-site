@@ -3,7 +3,7 @@
 // Zero runtime dependencies: PNGs are encoded by hand using Node's built-in
 // `zlib` plus a small CRC32 implementation. No `sharp`, `canvas`, `pngjs`, etc.
 // Every sprite/tile/building below is drawn procedurally in code here — there
-// are NO external, copyrighted, Pokémon/Zelda/Nintendo or DNB-branded assets.
+// are NO external, copyrighted or brand-derived assets.
 //
 // Output: public/skamlos-rpg/{tiles,props,buildings,sprites}/*.png
 // Run with: node scripts/build-skamlos-rpg-assets.mjs
@@ -128,7 +128,7 @@ function mulberry32(a) {
 }
 
 /* ----------------------------------------------------------------------- *
- * Palette (warm, handmade RPG — original, NOT a DNB brand palette)
+ * Palette (warm, handmade RPG — original, not borrowed from any brand)
  * ----------------------------------------------------------------------- */
 
 const P = {
@@ -165,8 +165,8 @@ const P = {
   roof: hex("#c0532f"),
   roofD: hex("#a3421f"),
   roofL: hex("#d96a44"),
-  // neutral corporate glass tower for the symbolic "DNB AI Tech" building.
-  // Deliberately cool slate/steel — NOT the DNB brand colour.
+  // neutral corporate glass tower for the symbolic "Drømmejobben" building.
+  // Deliberately cool slate/steel — not any brand's colour.
   tower: hex("#5b6b7a"),
   towerD: hex("#46535f"),
   towerL: hex("#76879a"),
@@ -229,13 +229,20 @@ function pathTile(seed) {
 }
 
 function waterTile(seed) {
-  const c = Canvas(32, 32);
-  rect(c, 0, 0, 32, 32, P.water);
+  // Two 32×32 frames side by side (64×32). Frame 1 nudges the highlights so
+  // the tile shimmers when BootScene's 2-frame "water" animation alternates.
+  const c = Canvas(64, 32);
+  rect(c, 0, 0, 64, 32, P.water);
   const rnd = mulberry32(seed);
   for (let y = 2; y < 32; y += 6) {
     const off = (rnd() * 8) | 0;
-    rect(c, off, y, 7, 1, P.waterL);
-    rect(c, off + 16, y + 2, 6, 1, P.waterD);
+    for (const [frameX, shift] of [
+      [0, 0],
+      [32, 3],
+    ]) {
+      rect(c, frameX + off + shift, y, 7, 1, P.waterL);
+      rect(c, frameX + off + shift + 16, y + 2, 6, 1, P.waterD);
+    }
   }
   return c;
 }
@@ -651,7 +658,7 @@ function homeExt() {
   return c;
 }
 function tower() {
-  // tall, neutral glass office tower — symbolic "DNB AI Tech", NOT brand colours
+  // tall, neutral glass office tower — the symbolic "Drømmejobben" building
   const c = Canvas(160, 208);
   rect(c, 10, 8, 140, 200, P.towerD);
   rect(c, 12, 10, 136, 198, P.tower);
@@ -887,7 +894,7 @@ const props = {
 const buildings = {
   school: school(),
   home: homeExt(),
-  dnb: tower(),
+  drommejobben: tower(),
   oslomet: university(),
   nikko: nikkoHouse(),
 };

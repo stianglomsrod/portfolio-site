@@ -1,0 +1,102 @@
+/* Method — needs-to-systems mapping.
+   Inherits all CSS custom properties from globals.css. No borrowed brand colours. */
+
+.basis {
+  max-width: 70ch;
+  color: var(--muted-strong);
+  font-size: 1rem;
+  line-height: 1.65;
+  margin-bottom: 32px;
+}
+
+.basis strong {
+  color: var(--foreground);
+}
+
+/* ── Need → decision mapping ────────────────────────────────── */
+
+.map {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr auto 1.3fr;
+  align-items: stretch;
+  gap: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  background: var(--surface);
+}
+
+.need,
+.decision {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.needTag,
+.decisionTag {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.needTag {
+  color: var(--muted);
+}
+
+.decisionTag {
+  color: var(--accent);
+}
+
+.needText {
+  font-size: 0.97rem;
+  font-weight: 600;
+  color: var(--foreground);
+  line-height: 1.45;
+}
+
+.decisionText {
+  font-size: 0.95rem;
+  color: var(--muted-strong);
+  line-height: 1.55;
+}
+
+.arrow {
+  align-self: center;
+  color: var(--accent);
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+@media (max-width: 680px) {
+  .row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .arrow {
+    justify-self: start;
+    transform: rotate(90deg);
+    margin: 2px 0;
+  }
+}
+
+/* ── Closing relevance ──────────────────────────────────────── */
+
+.relevance {
+  margin-top: 32px;
+  max-width: 70ch;
+  color: var(--muted-strong);
+  font-size: 1rem;
+  line-height: 1.65;
+  padding-left: 16px;
+  border-left: 2px solid var(--accent);
+}

@@ -1,6 +1,68 @@
+/* Hero — inherits all CSS custom properties from globals.css.
+   No new variables; no borrowed brand colours. */
+
 .hero {
   padding: clamp(72px, 12vh, 128px) 0 clamp(56px, 9vh, 96px);
   border-bottom: 1px solid var(--border);
+}
+
+/* Copy on the left, a calm portrait on the right. Collapses to a single
+   column on narrower screens with the portrait scaled down above the name. */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(220px, 26vw, 312px);
+  gap: clamp(32px, 5vw, 72px);
+  align-items: center;
+}
+
+.copy {
+  min-width: 0;
+}
+
+.portrait {
+  position: relative;
+  width: 100%;
+  max-width: 312px;
+  justify-self: end;
+  aspect-ratio: 4 / 5;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 24px 60px -28px var(--glow-1);
+}
+
+/* Subtle vignette seats the daylight photo into the dark page. */
+.portrait::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent 55%,
+    color-mix(in srgb, var(--background) 36%, transparent) 100%
+  );
+}
+
+.portraitImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 18%;
+  display: block;
+}
+
+@media (max-width: 860px) {
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .portrait {
+    order: -1;
+    justify-self: start;
+    max-width: 180px;
+  }
 }
 
 .eyebrow {
@@ -16,7 +78,7 @@
   line-height: 1.1;
   font-weight: 700;
   letter-spacing: -0.025em;
-  max-width: 20ch;
+  max-width: 22ch;
   text-wrap: balance;
 }
 
@@ -27,26 +89,32 @@
   color: var(--muted-strong);
 }
 
-.tags {
+.bullets {
   margin-top: 26px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 9px;
   list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.tag {
-  font-size: 0.86rem;
-  font-weight: 600;
+.bullet {
+  position: relative;
+  padding-left: 20px;
+  font-size: 1rem;
   color: var(--muted-strong);
-  padding: 6px 13px;
-  border-radius: 999px;
-  border: 1px solid var(--border-strong);
-  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  max-width: 68ch;
+}
+
+.bullet::before {
+  content: "—";
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-weight: 700;
 }
 
 .actions {
-  margin-top: 34px;
+  margin-top: 36px;
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
@@ -63,6 +131,7 @@
   font-weight: 600;
   font-size: 1rem;
   border: 1px solid transparent;
+  text-decoration: none;
   transition:
     transform 0.18s var(--ease),
     background-color 0.18s var(--ease),
@@ -87,82 +156,22 @@
     transform: translateY(-1px);
     box-shadow: 0 10px 30px -12px var(--glow-1);
   }
+
   .ctaSecondary:hover {
     border-color: var(--accent);
     transform: translateY(-1px);
   }
 }
 
-/* Agentic-only "problem -> tested artifact" storyline */
-.storyline {
-  margin-top: 44px;
-  list-style: none;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  counter-reset: story;
-}
-
-.storyStep {
-  position: relative;
-  padding: 18px 16px;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--surface) 64%, transparent);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.storyStep::after {
-  content: "→";
-  position: absolute;
-  right: -11px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
-.storyStep:last-child::after {
-  content: none;
-}
-
-.storyIndex {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--accent-contrast);
-  background: var(--accent);
-}
-
-.storyLabel {
-  font-weight: 700;
-  font-size: 0.98rem;
-}
-
-.storyText {
-  font-size: 0.88rem;
-  color: var(--muted);
-  line-height: 1.45;
-}
-
-@media (max-width: 760px) {
-  .storyline {
-    grid-template-columns: 1fr 1fr;
+@media (max-width: 600px) {
+  .actions {
+    flex-direction: column;
+    align-items: flex-start;
   }
-  .storyStep::after {
-    content: none;
-  }
-}
 
-@media (max-width: 440px) {
-  .storyline {
-    grid-template-columns: 1fr;
+  .ctaPrimary,
+  .ctaSecondary {
+    width: 100%;
+    justify-content: center;
   }
 }

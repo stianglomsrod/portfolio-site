@@ -4,7 +4,7 @@ import { useEffect, useSyncExternalStore, type ReactNode } from "react";
 
 export type Lang = "no" | "en";
 
-const STORAGE_KEY = "dnb-lang";
+const STORAGE_KEY = "site-lang";
 
 let listeners: Array<() => void> = [];
 

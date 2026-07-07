@@ -44,25 +44,5 @@ next-env.d.ts
 *.md
 !README.md
 
-
-# DNB workflow / agent documentation
-# Keep most markdown ignored if desired, but explicitly track the DNB agent workflow docs.
-!AGENTS.md
-!FILE_TREE.md
-!README_COPY_INSTRUCTIONS.md
-!.github/
-!.github/copilot-instructions.md
-!docs/
-!docs/dnb/
-!docs/dnb/*.md
-!docs/reports/
-!docs/reports/*.md
-
-# Raw source material — never track (contains PII e.g. national ID, and
-# participant-sensitive thesis content). Keep as local-only evidence.
-docs/dnb/sources/
+# Raw source material — never track (may contain PII).
 *.pdf
-
-# Track Skamlos planning docs
-!docs/skamlos/
-!docs/skamlos/*.md

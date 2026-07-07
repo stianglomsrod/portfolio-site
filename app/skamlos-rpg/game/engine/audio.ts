@@ -32,13 +32,23 @@ const C5 = C4 * 2,
   E5 = E4 * 2,
   G5 = G4 * 2;
 
-// The BGM loop track. 224 kbps MP3, fetched lazily the first time the game
-// starts so the route itself stays light.
-const BGM_URL = "/skamlos-rpg/audio/laeringsreisen-loop.mp3";
+// The BGM loop track, fetched lazily the first time the game starts so the
+// route itself stays light. OGG first: Vorbis has no encoder delay/padding,
+// so the buffer loops bit-exactly with no click. MP3 is the fallback for
+// browsers without Vorbis in decodeAudioData (Safari/iOS).
+const BGM_URLS = [
+  "/skamlos-rpg/audio/laeringsreisen-loop.ogg",
+  "/skamlos-rpg/audio/laeringsreisen-loop.mp3",
+];
 /** BGM level relative to the master bus. */
 const BGM_LEVEL = 0.9;
 /** Amplitude below this counts as encoder-padding silence (≈ −60 dB). */
 const BGM_SILENCE = 1e-3;
+/**
+ * Edge silence shorter than this is treated as part of the music, not
+ * padding — trimming it would cut into the composed loop and cause a click.
+ */
+const BGM_MIN_TRIM_S = 0.01;
 
 // ---------------------------------------------------------------------------
 // GameAudio class
@@ -285,29 +295,65 @@ class GameAudio {
     if (this.bgmLoading) return this.bgmLoading;
     const ctx = this.getCtx();
     if (!ctx) return Promise.resolve(null);
-    this.bgmLoading = fetch(BGM_URL)
-      .then((res) => {
-        if (!res.ok) throw new Error(`BGM fetch failed: ${res.status}`);
-        return res.arrayBuffer();
-      })
-      .then((bytes) => ctx.decodeAudioData(bytes))
-      .then((decoded) => {
-        this.bgmBuffer = decoded;
-        this.bgmLoop = this.findLoopPoints(decoded);
-        return decoded;
-      })
-      .catch(() => null)
-      .finally(() => {
-        this.bgmLoading = null;
-      });
+    this.bgmLoading = (async () => {
+      for (const url of BGM_URLS) {
+        try {
+          const res = await fetch(url);
+          if (!res.ok) continue;
+          const bytes = await res.arrayBuffer();
+          const decoded = await ctx.decodeAudioData(bytes);
+          const { startSample, endSample } = this.findLoopPoints(decoded);
+          this.smoothLoopSeam(decoded, startSample, endSample);
+          this.bgmBuffer = decoded;
+          this.bgmLoop = {
+            start: startSample / decoded.sampleRate,
+            end: endSample / decoded.sampleRate,
+          };
+          return decoded;
+        } catch {
+          // Undecodable in this browser — try the next format.
+        }
+      }
+      return null;
+    })().finally(() => {
+      this.bgmLoading = null;
+    });
     return this.bgmLoading;
   }
 
   /**
-   * First/last sample above the silence threshold, searched within the outer
-   * two seconds only (encoder padding is far shorter than that).
+   * Zero the cyclic jump at the loop seam: nudge the last ~8 ms so the final
+   * sample lands exactly on the first one (per channel). This is the same
+   * correction ramp the track was mastered with — reapplied here because
+   * lossy encode/decode shifts the edge samples enough to click otherwise.
    */
-  private findLoopPoints(buf: AudioBuffer): { start: number; end: number } {
+  private smoothLoopSeam(
+    buf: AudioBuffer,
+    startSample: number,
+    endSample: number,
+  ): void {
+    const n = Math.min(Math.round(buf.sampleRate * 0.008), 4096);
+    if (endSample - startSample <= n) return;
+    for (let ch = 0; ch < buf.numberOfChannels; ch++) {
+      const d = buf.getChannelData(ch);
+      const delta = d[startSample] - d[endSample - 1];
+      if (Math.abs(delta) < 1e-6) continue;
+      for (let i = 1; i <= n; i++) {
+        d[endSample - 1 - n + i] += delta * (i / n);
+      }
+    }
+  }
+
+  /**
+   * First/last sample above the silence threshold, searched within the outer
+   * two seconds only (encoder padding is far shorter than that). Edge silence
+   * below BGM_MIN_TRIM_S is kept: it belongs to the composed loop, and
+   * trimming it would move the seam and click.
+   */
+  private findLoopPoints(buf: AudioBuffer): {
+    startSample: number;
+    endSample: number;
+  } {
     const window = Math.min(buf.length, buf.sampleRate * 2);
     const channels: Float32Array[] = [];
     for (let ch = 0; ch < buf.numberOfChannels; ch++)
@@ -326,7 +372,11 @@ class GameAudio {
         end = i + 1;
         break;
       }
-    return { start: start / buf.sampleRate, end: end / buf.sampleRate };
+    const minTrim = buf.sampleRate * BGM_MIN_TRIM_S;
+    return {
+      startSample: start >= minTrim ? start : 0,
+      endSample: buf.length - end >= minTrim ? end : buf.length,
+    };
   }
 
   private startBgmSource(): void {
@@ -340,12 +390,15 @@ class GameAudio {
     const src = ctx.createBufferSource();
     src.buffer = this.bgmBuffer;
     src.loop = true;
-    if (this.bgmLoop) {
-      src.loopStart = this.bgmLoop.start;
-      src.loopEnd = this.bgmLoop.end;
+    // Only narrow the loop when real padding was found; the default
+    // (loopStart/loopEnd untouched) loops the whole buffer bit-exactly.
+    const lp = this.bgmLoop;
+    if (lp && (lp.start > 0 || lp.end < this.bgmBuffer.duration)) {
+      src.loopStart = lp.start;
+      src.loopEnd = lp.end;
     }
     src.connect(gain);
-    src.start(now, this.bgmLoop?.start ?? 0);
+    src.start(now, lp?.start ?? 0);
     this.bgmSource = src;
     this.bgmGain = gain;
   }

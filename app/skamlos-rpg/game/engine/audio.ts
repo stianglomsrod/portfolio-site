@@ -1,9 +1,11 @@
 /**
- * Procedural Web Audio engine for Skamløs RPG.
+ * Web Audio engine for Skamløs RPG.
  *
- * All sounds are synthesised at runtime with the Web Audio API — no external
- * assets, no licensing concerns, and a perfect chiptune aesthetic to match the
- * pixel-art visuals. Lazy-initialises on the first user gesture (browser policy).
+ * SFX are synthesised at runtime (chiptune, no external assets). The
+ * background music is «Læringsreisen» — Stian's own composed loop track —
+ * decoded into an AudioBuffer and looped sample-accurately: loopStart/loopEnd
+ * skip the silent padding the MP3 encoder adds, so the seamless loop stays
+ * seamless. Lazy-initialises on the first user gesture (browser policy).
  *
  * Usage:  audio.sfx("step")   audio.sfx("door")   audio.bgm.start()
  */
@@ -22,18 +24,21 @@ export type SfxName =
 // Helpers
 // ---------------------------------------------------------------------------
 
-// Equal-tempered note frequencies (A4 = 440 Hz)
+// Equal-tempered note frequencies (A4 = 440 Hz) — used by the SFX synths.
 const C4 = 261.63,
-  D4 = 293.66,
   E4 = 329.63,
-  G4 = 392.0,
-  A4 = 440.0;
+  G4 = 392.0;
 const C5 = C4 * 2,
   E5 = E4 * 2,
   G5 = G4 * 2;
-const C3 = C4 / 2,
-  G3 = G4 / 2,
-  A3 = A4 / 2;
+
+// The BGM loop track. 224 kbps MP3, fetched lazily the first time the game
+// starts so the route itself stays light.
+const BGM_URL = "/skamlos-rpg/audio/laeringsreisen-loop.mp3";
+/** BGM level relative to the master bus. */
+const BGM_LEVEL = 0.9;
+/** Amplitude below this counts as encoder-padding silence (≈ −60 dB). */
+const BGM_SILENCE = 1e-3;
 
 // ---------------------------------------------------------------------------
 // GameAudio class
@@ -46,9 +51,12 @@ class GameAudio {
   private stepParity = 0;
 
   // BGM state
-  private bgmNodes: AudioNode[] = [];
   private bgmRunning = false;
-  private bgmTimeout: ReturnType<typeof setTimeout> | null = null;
+  private bgmBuffer: AudioBuffer | null = null;
+  private bgmLoop: { start: number; end: number } | null = null;
+  private bgmLoading: Promise<AudioBuffer | null> | null = null;
+  private bgmSource: AudioBufferSourceNode | null = null;
+  private bgmGain: GainNode | null = null;
 
   // ---------------------------------------------------------------------------
   // Init
@@ -264,129 +272,114 @@ class GameAudio {
   }
 
   // ---------------------------------------------------------------------------
-  // BGM — procedural chiptune town loop
+  // BGM — «Læringsreisen», Stian's own loop track
   //
-  // A calm, spacious loop in C major pentatonic, ~100 BPM. Deliberately sparse:
-  // the melody is scattered with rests, the bass rings softly, and a gentle
-  // chord pad swells every couple of bars — so it never overwhelms the player.
-  // Entirely procedural — nothing downloaded or licensed.
+  // The track is composed to loop seamlessly (the reverb tail of the last bars
+  // is folded into the intro). MP3 encoding pads both ends with silence, so we
+  // decode to an AudioBuffer and loop between the first and last audible
+  // samples instead of trusting the file boundaries.
   // ---------------------------------------------------------------------------
 
-  private playBgmBar(barIdx: number): void {
+  private loadBgmBuffer(): Promise<AudioBuffer | null> {
+    if (this.bgmBuffer) return Promise.resolve(this.bgmBuffer);
+    if (this.bgmLoading) return this.bgmLoading;
     const ctx = this.getCtx();
-    if (!ctx || !this.master || this.muted) return;
-    const master = this.master;
-
-    const bpm = 100;
-    const beat = 60 / bpm; // seconds per beat
-    const bar = beat * 4; // 4/4 time
-    const now = ctx.currentTime + 0.02; // tiny look-ahead
-
-    // Bass: a single soft root per bar that rings out (triangle = mellow).
-    const bassLine = [C3, C3, G3, A3];
-    const bassNote = bassLine[barIdx % bassLine.length];
-    {
-      const osc = ctx.createOscillator();
-      osc.type = "triangle";
-      osc.frequency.value = bassNote;
-      const g = ctx.createGain();
-      g.gain.setValueAtTime(0, now);
-      g.gain.linearRampToValueAtTime(0.05, now + 0.05);
-      g.gain.exponentialRampToValueAtTime(0.001, now + bar * 0.9);
-      osc.connect(g);
-      g.connect(master);
-      osc.start(now);
-      osc.stop(now + bar);
-    }
-
-    // Melody: sparse, scattered pentatonic notes with plenty of rests (R = -1),
-    // each note left to ring into the space for a roomy feel.
-    const pentatonic = [C4, D4, E4, G4, A4, C5, E5, G5];
-    const R = -1;
-    const patterns: number[][] = [
-      [0, R, R, 2, R, R, 4, R],
-      [R, 4, R, R, 2, R, R, R],
-      [2, R, R, 4, R, 5, R, R],
-      [R, R, 4, R, R, 2, R, 0],
-    ];
-    const pattern = patterns[barIdx % patterns.length];
-    pattern.forEach((deg, i) => {
-      if (deg < 0) return; // rest
-      const freq = pentatonic[deg % pentatonic.length];
-      const t0 = now + i * (beat / 2);
-      const osc = ctx.createOscillator();
-      osc.type = "square";
-      osc.frequency.value = freq;
-      const g = ctx.createGain();
-      g.gain.setValueAtTime(0, t0);
-      g.gain.linearRampToValueAtTime(0.03, t0 + 0.015);
-      g.gain.exponentialRampToValueAtTime(0.001, t0 + beat * 0.9);
-      osc.connect(g);
-      g.connect(master);
-      osc.start(t0);
-      osc.stop(t0 + beat * 0.95);
-    });
-
-    // Harmony: one soft chord pad every two bars, slow swell + long release,
-    // so it colours the space without crowding the melody.
-    if (barIdx % 2 === 0) {
-      const chordSets = [
-        [C4, E4, G4],
-        [A3, C4, E4],
-      ];
-      const chord = chordSets[Math.floor(barIdx / 2) % chordSets.length];
-      chord.forEach((freq) => {
-        const osc = ctx.createOscillator();
-        osc.type = "triangle";
-        osc.frequency.value = freq;
-        const g = ctx.createGain();
-        g.gain.setValueAtTime(0, now);
-        g.gain.linearRampToValueAtTime(0.016, now + 0.45);
-        g.gain.exponentialRampToValueAtTime(0.001, now + bar * 1.8);
-        osc.connect(g);
-        g.connect(master);
-        osc.start(now);
-        osc.stop(now + bar * 2);
+    if (!ctx) return Promise.resolve(null);
+    this.bgmLoading = fetch(BGM_URL)
+      .then((res) => {
+        if (!res.ok) throw new Error(`BGM fetch failed: ${res.status}`);
+        return res.arrayBuffer();
+      })
+      .then((bytes) => ctx.decodeAudioData(bytes))
+      .then((decoded) => {
+        this.bgmBuffer = decoded;
+        this.bgmLoop = this.findLoopPoints(decoded);
+        return decoded;
+      })
+      .catch(() => null)
+      .finally(() => {
+        this.bgmLoading = null;
       });
-    }
+    return this.bgmLoading;
+  }
 
-    // Schedule the next bar
-    const nextBar = barIdx + 1;
-    this.bgmTimeout = setTimeout(
-      () => {
-        if (this.bgmRunning) this.playBgmBar(nextBar);
-      },
-      (bar - 0.04) * 1000,
-    );
+  /**
+   * First/last sample above the silence threshold, searched within the outer
+   * two seconds only (encoder padding is far shorter than that).
+   */
+  private findLoopPoints(buf: AudioBuffer): { start: number; end: number } {
+    const window = Math.min(buf.length, buf.sampleRate * 2);
+    const channels: Float32Array[] = [];
+    for (let ch = 0; ch < buf.numberOfChannels; ch++)
+      channels.push(buf.getChannelData(ch));
+    const audible = (i: number) =>
+      channels.some((d) => Math.abs(d[i]) > BGM_SILENCE);
+    let start = 0;
+    for (let i = 0; i < window; i++)
+      if (audible(i)) {
+        start = i;
+        break;
+      }
+    let end = buf.length;
+    for (let i = buf.length - 1; i >= buf.length - window; i--)
+      if (audible(i)) {
+        end = i + 1;
+        break;
+      }
+    return { start: start / buf.sampleRate, end: end / buf.sampleRate };
+  }
+
+  private startBgmSource(): void {
+    const ctx = this.getCtx();
+    if (!ctx || !this.master || !this.bgmBuffer || this.bgmSource) return;
+    const now = ctx.currentTime;
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(BGM_LEVEL, now + 1.2);
+    gain.connect(this.master);
+    const src = ctx.createBufferSource();
+    src.buffer = this.bgmBuffer;
+    src.loop = true;
+    if (this.bgmLoop) {
+      src.loopStart = this.bgmLoop.start;
+      src.loopEnd = this.bgmLoop.end;
+    }
+    src.connect(gain);
+    src.start(now, this.bgmLoop?.start ?? 0);
+    this.bgmSource = src;
+    this.bgmGain = gain;
   }
 
   bgm = {
     start: () => {
       if (this.bgmRunning) return;
       this.bgmRunning = true;
-      const ctx = this.getCtx();
-      if (!ctx || !this.master || this.muted) return;
-      // Small fade-in when BGM begins
-      this.master.gain.setValueAtTime(0.0, ctx.currentTime);
-      this.master.gain.linearRampToValueAtTime(0.28, ctx.currentTime + 1.2);
-      this.playBgmBar(0);
+      void this.loadBgmBuffer().then(() => {
+        // Only start if nothing stopped the music while it was loading.
+        if (this.bgmRunning && !this.bgmSource) this.startBgmSource();
+      });
     },
     stop: () => {
       this.bgmRunning = false;
-      if (this.bgmTimeout) clearTimeout(this.bgmTimeout);
-      const ctx = this.getCtx();
-      if (ctx && this.master) {
-        this.master.gain.setValueAtTime(
-          this.master.gain.value,
-          ctx.currentTime,
-        );
-        this.master.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.4);
-        // Restore volume so SFX still play
-        setTimeout(() => {
-          if (!this.muted && this.master)
-            this.master.gain.setValueAtTime(0.28, ctx.currentTime);
-        }, 500);
+      const ctx = this.ctx;
+      const src = this.bgmSource;
+      const gain = this.bgmGain;
+      this.bgmSource = null;
+      this.bgmGain = null;
+      if (!ctx || !src || !gain) return;
+      const now = ctx.currentTime;
+      gain.gain.cancelScheduledValues(now);
+      gain.gain.setValueAtTime(gain.gain.value, now);
+      gain.gain.linearRampToValueAtTime(0, now + 0.4);
+      try {
+        src.stop(now + 0.45);
+      } catch {
+        // Already stopped — nothing to do.
       }
+      window.setTimeout(() => {
+        src.disconnect();
+        gain.disconnect();
+      }, 600);
     },
   };
 
@@ -401,10 +394,13 @@ class GameAudio {
       this.master.gain.cancelScheduledValues(now);
       this.master.gain.linearRampToValueAtTime(v ? 0 : 0.28, now + 0.08);
     }
-    if (v && this.bgmRunning) {
-      if (this.bgmTimeout) clearTimeout(this.bgmTimeout);
-    } else if (!v && this.bgmRunning) {
-      this.playBgmBar(0); // restart loop after unmute
+    // The BGM keeps looping (silently) through the muted master bus, so
+    // unmuting resumes mid-track. It only needs a kick-start if it never got
+    // to play at all.
+    if (!v && this.bgmRunning && !this.bgmSource) {
+      void this.loadBgmBuffer().then(() => {
+        if (this.bgmRunning && !this.bgmSource) this.startBgmSource();
+      });
     }
     try {
       localStorage.setItem("skamlos:muted", v ? "1" : "0");

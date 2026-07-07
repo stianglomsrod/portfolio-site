@@ -1,27 +1,38 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import type { Lang } from "../engine/types";
 import styles from "../../skamlos-rpg.module.css";
+
+const COARSE_QUERY = "(pointer: coarse)";
+
+function subscribeCoarse(callback: () => void) {
+  const mq = window.matchMedia(COARSE_QUERY);
+  mq.addEventListener("change", callback);
+  return () => mq.removeEventListener("change", callback);
+}
+
+function getCoarseSnapshot(): boolean {
+  return (
+    new URLSearchParams(window.location.search).has("touch") ||
+    window.matchMedia(COARSE_QUERY).matches
+  );
+}
+
+function getCoarseServerSnapshot(): boolean {
+  return false;
+}
 
 /**
  * True when the primary pointer is coarse (touch) — tracks changes live.
  * `?touch=1` forces it on, so the touch UI can be tested with a mouse.
  */
 export function useCoarsePointer(): boolean {
-  const [coarse, setCoarse] = useState(false);
-  useEffect(() => {
-    if (new URLSearchParams(window.location.search).has("touch")) {
-      setCoarse(true);
-      return;
-    }
-    const mq = window.matchMedia("(pointer: coarse)");
-    const update = () => setCoarse(mq.matches);
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, []);
-  return coarse;
+  return useSyncExternalStore(
+    subscribeCoarse,
+    getCoarseSnapshot,
+    getCoarseServerSnapshot,
+  );
 }
 
 type DirName = "up" | "down" | "left" | "right";

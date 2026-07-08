@@ -56,3 +56,20 @@
     font-size: 0.78rem;
   }
 }
+
+/* Very narrow viewports (incl. 200% text zoom on small phones): icon-only
+   pill so the two fixed corner controls can never meet in the middle. */
+@media (max-width: 360px) {
+  .label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .tab {
+    padding: 8px 10px;
+  }
+}

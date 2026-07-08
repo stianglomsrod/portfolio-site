@@ -29,6 +29,10 @@ export default function PauseMenu({
   const [openId, setOpenId] = useState<string | null>(focus ?? null);
   const toggle = (id: string) => setOpenId((o) => (o === id ? null : id));
   const focusRef = useRef<HTMLLIElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    panelRef.current?.focus({ preventScroll: true });
+  }, []);
   useEffect(() => {
     if (focus) focusRef.current?.scrollIntoView({ block: "center" });
   }, [focus]);
@@ -44,13 +48,21 @@ export default function PauseMenu({
 
   return (
     <div className={styles.menuBackdrop} onClick={onResume}>
-      <div className={styles.menu} onClick={(e) => e.stopPropagation()}>
+      <div
+        ref={panelRef}
+        className={styles.menu}
+        role="dialog"
+        aria-modal="true"
+        aria-label={no ? "Meny" : "Menu"}
+        tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
+      >
         <header className={styles.menuHead}>
           <h2>{no ? "Meny" : "Menu"}</h2>
           <button
             className={styles.panelClose}
             onClick={onResume}
-            aria-label="close"
+            aria-label={no ? "Lukk" : "Close"}
           >
             ✕
           </button>

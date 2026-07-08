@@ -196,6 +196,7 @@ export default function KlarCase() {
             caseId="klar"
             labels={[...t.galleryLabels]}
             className={styles.gallery}
+            lang={lang}
           />
         </Reveal>
 

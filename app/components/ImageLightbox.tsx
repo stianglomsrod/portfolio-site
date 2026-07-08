@@ -10,6 +10,7 @@ type Props = {
   images: CaseScreenshot[];
   initialIndex: number;
   onClose: () => void;
+  lang?: "no" | "en";
 };
 
 function clampIndex(index: number, len: number): number {
@@ -23,7 +24,12 @@ export default function ImageLightbox({
   images,
   initialIndex,
   onClose,
+  lang = "no",
 }: Props) {
+  const L =
+    lang === "no"
+      ? { close: "Lukk bildefremviser", viewer: "Bildefremviser" }
+      : { close: "Close image viewer", viewer: "Image viewer" };
   const [index, setIndex] = useState(() =>
     clampIndex(initialIndex, images.length),
   );
@@ -78,6 +84,27 @@ export default function ImageLightbox({
       if (e.key === "ArrowRight") {
         e.preventDefault();
         next();
+        return;
+      }
+      if (e.key === "Tab") {
+        // Simple focus trap: cycle within the dialog's focusable elements.
+        const root = dialogRef.current;
+        if (!root) return;
+        const els = root.querySelectorAll<HTMLElement>("button, [href]");
+        if (els.length === 0) return;
+        const first = els[0];
+        const last = els[els.length - 1];
+        const active = document.activeElement as HTMLElement | null;
+        if (!active || !root.contains(active)) {
+          e.preventDefault();
+          first.focus();
+        } else if (e.shiftKey && (active === first || active === root)) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && active === last) {
+          e.preventDefault();
+          first.focus();
+        }
       }
     };
 
@@ -103,7 +130,7 @@ export default function ImageLightbox({
         type="button"
         className={styles.backdrop}
         onClick={onClose}
-        aria-label="Lukk bildefremviser"
+        aria-label={L.close}
       />
 
       <div
@@ -111,12 +138,14 @@ export default function ImageLightbox({
         className={styles.dialog}
         role="dialog"
         aria-modal="true"
-        aria-label={`Bildefremviser: ${title}`}
+        aria-label={`${L.viewer}: ${title}`}
         tabIndex={-1}
         onClick={onClose}
       >
         <header className={styles.topbar} onClick={(e) => e.stopPropagation()}>
-          <p className={styles.title}>{title}</p>
+          <p className={styles.title} aria-live="polite">
+            {title}
+          </p>
           <p className={styles.count} aria-live="polite">
             {index + 1} / {images.length}
           </p>
@@ -124,7 +153,7 @@ export default function ImageLightbox({
             type="button"
             className={styles.close}
             onClick={onClose}
-            aria-label="Lukk bildefremviser"
+            aria-label={L.close}
           >
             <span aria-hidden="true">×</span>
           </button>

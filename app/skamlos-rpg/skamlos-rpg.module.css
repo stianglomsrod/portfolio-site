@@ -194,7 +194,8 @@
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid var(--line);
   border-radius: 7px;
-  padding: 4px 9px;
+  padding: 6px 11px;
+  min-height: 28px;
 }
 
 /* ---- HUD ---- */
@@ -250,6 +251,7 @@
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 6px 9px;
+  min-height: 28px;
   text-decoration: none;
 }
 .hudChip:hover {
@@ -1197,7 +1199,7 @@
 }
 .msgPrefix {
   font: 0.7rem var(--font-geist-mono, monospace);
-  color: #8c7e62;
+  color: #a39473;
 }
 .msgText {
   font: 0.86rem var(--font-geist-mono, monospace);

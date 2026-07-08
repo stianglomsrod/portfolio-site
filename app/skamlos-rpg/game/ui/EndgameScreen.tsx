@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useRef } from "react";
 import type { StateSnapshot } from "../engine/bridge";
 import type { ContentPack, Lang } from "../engine/types";
 import { t } from "../engine/i18n";
@@ -36,10 +37,21 @@ export default function EndgameScreen({
     snapshot?.artifacts.includes(a.id),
   );
   const questCount = snapshot?.completedQuests.length ?? 0;
+  const cardRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    cardRef.current?.focus({ preventScroll: true });
+  }, []);
 
   return (
     <div className={styles.endgameBackdrop}>
-      <div className={styles.endgameCard}>
+      <div
+        ref={cardRef}
+        className={styles.endgameCard}
+        role="dialog"
+        aria-modal="true"
+        aria-label={t(eg.title, lang)}
+        tabIndex={-1}
+      >
         <p className={styles.endgameKicker}>{no ? "Levert" : "Delivered"}</p>
         <h2 className={styles.endgameTitle}>{t(eg.title, lang)}</h2>
         <p className={styles.endgameMessage}>{t(eg.message, lang)}</p>

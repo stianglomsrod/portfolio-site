@@ -13,11 +13,17 @@ export default function CaseScreenshotGallery({
   caseId,
   labels,
   className,
+  lang = "no",
 }: {
   caseId: string;
   labels: string[];
   className: string;
+  lang?: "no" | "en";
 }) {
+  const L =
+    lang === "no"
+      ? { open: "Åpne stor visning", shot: "Skjermbilde" }
+      : { open: "Open large view", shot: "Screenshot" };
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
 
@@ -57,7 +63,7 @@ export default function CaseScreenshotGallery({
                 key={entry.label}
                 className={styles.screenshot}
                 role="img"
-                aria-label={`Skjermbilde: ${entry.label}`}
+                aria-label={`${L.shot}: ${entry.label}`}
               >
                 <span className={styles.screenshotLabel}>{entry.label}</span>
               </div>
@@ -70,7 +76,7 @@ export default function CaseScreenshotGallery({
               type="button"
               className={styles.screenshotButton}
               onClick={(e) => openFromLabel(entry.label, e.currentTarget)}
-              aria-label={`Apne stor visning: ${entry.label}`}
+              aria-label={`${L.open}: ${entry.label}`}
             >
               <figure className={styles.screenshotFigure}>
                 <span className={styles.screenshotThumb}>
@@ -99,6 +105,7 @@ export default function CaseScreenshotGallery({
           images={items}
           initialIndex={openIndex}
           onClose={close}
+          lang={lang}
         />
       )}
     </>

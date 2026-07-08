@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ContentPack, Lang } from "../engine/types";
 import { t } from "../engine/i18n";
 import ForLoopGame from "./minigames/ForLoopGame";
@@ -25,6 +25,11 @@ export default function MinigameModal({
 }: Props) {
   const [currentId, setCurrentId] = useState(startId);
   const def = pack.minigames.find((m) => m.id === currentId);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    panelRef.current?.focus({ preventScroll: true });
+  }, [currentId]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -35,6 +40,7 @@ export default function MinigameModal({
   }, [onCancel]);
 
   if (!def) return null;
+  const no = lang === "no";
 
   const handleDone = () => {
     if (def.next) setCurrentId(def.next);
@@ -43,13 +49,20 @@ export default function MinigameModal({
 
   return (
     <div className={styles.modalBackdrop}>
-      <div className={styles.modal}>
+      <div
+        ref={panelRef}
+        className={styles.modal}
+        role="dialog"
+        aria-modal="true"
+        aria-label={t(def.title, lang)}
+        tabIndex={-1}
+      >
         <header className={styles.modalHead}>
           <h2>{t(def.title, lang)}</h2>
           <button
             className={styles.panelClose}
             onClick={onCancel}
-            aria-label="close"
+            aria-label={no ? "Lukk" : "Close"}
           >
             ✕
           </button>

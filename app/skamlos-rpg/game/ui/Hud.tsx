@@ -60,6 +60,7 @@ export default function Hud({
       </div>
       <div className={styles.hudButtons}>
         <button
+          type="button"
           className={styles.hudChip}
           onClick={onOpenMenu}
           title={`${L.quests} (Q)`}
@@ -69,6 +70,7 @@ export default function Hud({
           <span>{quests}</span>
         </button>
         <button
+          type="button"
           className={styles.hudChip}
           onClick={onOpenMenu}
           title={`${L.skills} (K)`}
@@ -77,6 +79,7 @@ export default function Hud({
           <span aria-hidden="true">💻</span> <span>{skills}</span>
         </button>
         <button
+          type="button"
           className={styles.hudChip}
           onClick={onOpenMenu}
           title={L.proofs}
@@ -85,6 +88,7 @@ export default function Hud({
           <span aria-hidden="true">📜</span> <span>{artifacts}</span>
         </button>
         <button
+          type="button"
           className={styles.hudChip}
           onClick={onToggleLang}
           aria-label={L.langBtn}
@@ -92,6 +96,7 @@ export default function Hud({
           {lang === "no" ? "EN" : "NO"}
         </button>
         <button
+          type="button"
           className={styles.hudChip}
           onClick={onToggleMute}
           title={muted ? L.unmute : L.mute}
@@ -100,6 +105,7 @@ export default function Hud({
           <span aria-hidden="true">{muted ? "🔇" : "🔊"}</span>
         </button>
         <button
+          type="button"
           className={styles.hudChip}
           onClick={onOpenMenu}
           title={`${L.menu} (Esc)`}

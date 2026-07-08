@@ -59,13 +59,7 @@ export default function GameBox({
   if (!mode) return null;
 
   return (
-    <div
-      className={styles.gameBox}
-      data-mode={mode}
-      onClick={handleClick}
-      role={mode === "dialogue" || mode === "cta" ? "button" : undefined}
-      tabIndex={-1}
-    >
+    <div className={styles.gameBox} data-mode={mode} onClick={handleClick}>
       {mode === "dialogue" && dialogue && (
         <div className={styles.boxRow}>
           {dialogue.line.portrait && (

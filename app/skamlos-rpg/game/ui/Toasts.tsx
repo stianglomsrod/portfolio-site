@@ -23,9 +23,10 @@ export default function Toasts({
   items: ToastItem[];
   lang: Lang;
 }) {
-  if (items.length === 0) return null;
+  // The container stays mounted as a live region even when empty, so screen
+  // readers reliably announce new toasts.
   return (
-    <div className={styles.toasts}>
+    <div className={styles.toasts} role="status" aria-live="polite">
       {items.map((item) => (
         <div key={item.id} className={styles.toast} data-kind={item.kind}>
           <span aria-hidden>{ICON[item.kind]}</span>

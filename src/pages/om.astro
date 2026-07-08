@@ -1,8 +1,9 @@
 ---
 import Side from '../layouts/Side.astro';
+import Kontaktskjema from '../components/Kontaktskjema.astro';
 
-/* Skjelett: bygges ut med portrett, STIAN(1)-manside og kontaktskjema
-   (Done 8) i skjema-steget. */
+/* Skjelett: bygges ut med portrett og STIAN(1)-manside. Kontaktskjemaet
+   (Done 8) er på plass. */
 ---
 
 <Side
@@ -17,10 +18,7 @@ import Side from '../layouts/Side.astro';
   </p>
   <section id="kontakt" aria-labelledby="kontakt-tittel">
     <h2 id="kontakt-tittel">Ta kontakt</h2>
-    <p>
-      Kontaktskjemaet bygges nå. I mellomtiden:
-      <a href="mailto:stianglomsrod@gmail.com">stianglomsrod@gmail.com</a>
-    </p>
+    <Kontaktskjema />
   </section>
 </Side>
 

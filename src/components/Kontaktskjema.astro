@@ -1,0 +1,295 @@
+---
+/* Kontaktskjema (Done 8): klarspråkvalidering med ikon (aldri farge alene),
+   feil koblet via aria-describedby, honeypot + tidsstempel. JS sender som
+   JSON til /api/kontakt; uten JS står mailto-lenken under som fullverdig vei. */
+---
+
+<form class="skjema" data-kontakt novalidate>
+  <p class="skjema-kicker">KONTAKTSKJEMA — DIT PENDING RESOLVES</p>
+
+  <div class="felt">
+    <label for="kontakt-navn">navn <span class="valgfri">(valgfri)</span></label>
+    <input
+      id="kontakt-navn"
+      name="navn"
+      type="text"
+      maxlength="100"
+      autocomplete="name"
+      placeholder="Kari Nordmann"
+    />
+  </div>
+
+  <div class="felt">
+    <label for="kontakt-epost">e-post</label>
+    <input
+      id="kontakt-epost"
+      name="epost"
+      type="email"
+      maxlength="254"
+      autocomplete="email"
+      required
+      aria-describedby="feil-epost"
+      placeholder="kari@nordmann.no"
+    />
+    <p class="feilmelding" id="feil-epost" hidden></p>
+  </div>
+
+  <div class="felt">
+    <label for="kontakt-melding">melding</label>
+    <textarea
+      id="kontakt-melding"
+      name="melding"
+      rows="5"
+      maxlength="5000"
+      required
+      aria-describedby="feil-melding"
+      placeholder="Hei Stian, vi ser etter …"></textarea>
+    <p class="feilmelding" id="feil-melding" hidden></p>
+  </div>
+
+  <div class="hp" aria-hidden="true">
+    <label for="kontakt-hjemmeside">hjemmeside</label>
+    <input
+      id="kontakt-hjemmeside"
+      name="hjemmeside"
+      type="text"
+      tabindex="-1"
+      autocomplete="off"
+    />
+  </div>
+
+  <button type="submit" class="send knapp">resolve(kontakt) →</button>
+
+  <p class="status" data-status aria-live="polite"></p>
+
+  <p class="alternativ">
+    Foretrekker du innboksen?
+    <a href="mailto:stianglomsrod@gmail.com">stianglomsrod@gmail.com</a> går
+    rett fram.
+  </p>
+</form>
+
+<style>
+  .skjema {
+    background: var(--flate);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    padding: var(--s-4) var(--s-4) var(--s-5);
+    max-width: 480px;
+  }
+
+  .skjema-kicker {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--signal);
+    margin: 0 0 var(--s-3);
+  }
+
+  .felt {
+    margin-bottom: var(--s-3);
+  }
+
+  label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--dempet);
+    margin-bottom: var(--s-1);
+  }
+
+  .valgfri {
+    color: var(--dempet);
+    opacity: 0.8;
+  }
+
+  input[type='text'],
+  input[type='email'],
+  textarea {
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--bg);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--tekst);
+    resize: vertical;
+  }
+
+  input:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid var(--aksent-1);
+    outline-offset: 1px;
+    border-color: var(--aksent-1);
+  }
+
+  .felt[data-ugyldig] input,
+  .felt[data-ugyldig] textarea {
+    border-color: var(--aksent-2);
+  }
+
+  .felt[data-ugyldig] input:focus-visible,
+  .felt[data-ugyldig] textarea:focus-visible {
+    outline-color: var(--aksent-2);
+  }
+
+  .feilmelding {
+    font-size: 12.5px;
+    color: var(--aksent-2);
+    margin: var(--s-1) 0 0;
+  }
+
+  .hp {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .send {
+    all: unset;
+    box-sizing: border-box;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 700;
+    background: var(--signal);
+    color: var(--bg);
+    border-radius: 9px;
+    padding: 11px 20px;
+    min-height: 44px;
+    cursor: pointer;
+    display: inline-block;
+  }
+
+  .send:hover {
+    filter: brightness(1.08);
+  }
+
+  .send:focus-visible {
+    outline: 2px solid var(--tekst);
+    outline-offset: 2px;
+  }
+
+  .send[disabled] {
+    opacity: 0.6;
+    cursor: wait;
+  }
+
+  .status {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    margin: var(--s-3) 0 0;
+    color: var(--tekst);
+  }
+
+  .status:empty {
+    display: none;
+  }
+
+  .alternativ {
+    font-size: 13px;
+    color: var(--dempet);
+    margin: var(--s-3) 0 0;
+  }
+</style>
+
+<script>
+  const skjema = document.querySelector<HTMLFormElement>('[data-kontakt]');
+
+  if (skjema) {
+    const lastet = Date.now();
+    const status = skjema.querySelector<HTMLElement>('[data-status]')!;
+    const knapp = skjema.querySelector<HTMLButtonElement>('.send')!;
+
+    const visFeil = (feltId: string, melding: string | null) => {
+      const input = document.getElementById(feltId)!;
+      const felt = input.closest('.felt') as HTMLElement;
+      const boks = document.getElementById(
+        feltId.replace('kontakt-', 'feil-')
+      ) as HTMLElement;
+      if (melding) {
+        felt.dataset.ugyldig = 'true';
+        boks.hidden = false;
+        boks.textContent = `⚠ ${melding}`;
+        input.setAttribute('aria-invalid', 'true');
+      } else {
+        delete felt.dataset.ugyldig;
+        boks.hidden = true;
+        boks.textContent = '';
+        input.removeAttribute('aria-invalid');
+      }
+    };
+
+    skjema.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const navn = (document.getElementById('kontakt-navn') as HTMLInputElement).value;
+      const epost = (document.getElementById('kontakt-epost') as HTMLInputElement).value.trim();
+      const melding = (document.getElementById('kontakt-melding') as HTMLTextAreaElement).value.trim();
+      const hjemmeside = (document.getElementById('kontakt-hjemmeside') as HTMLInputElement).value;
+
+      // Klarspråkvalidering klient-side — serveren validerer uansett på nytt.
+      let harFeil = false;
+      if (!epost) {
+        visFeil('kontakt-epost', 'E-postadressen mangler.');
+        harFeil = true;
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(epost)) {
+        visFeil('kontakt-epost', 'E-postadressen mangler et gyldig domene — f.eks. kari@nordmann.no.');
+        harFeil = true;
+      } else {
+        visFeil('kontakt-epost', null);
+      }
+      if (!melding) {
+        visFeil('kontakt-melding', 'Meldingen er tom.');
+        harFeil = true;
+      } else {
+        visFeil('kontakt-melding', null);
+      }
+      if (harFeil) {
+        status.textContent = '';
+        (skjema.querySelector('[aria-invalid]') as HTMLElement | null)?.focus();
+        return;
+      }
+
+      knapp.disabled = true;
+      status.textContent = 'resolver …';
+
+      try {
+        const res = await fetch('/api/kontakt', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ navn, epost, melding, hjemmeside, ts: lastet }),
+        });
+        const data = await res.json().catch(() => ({}));
+
+        if (res.ok && data.ok) {
+          skjema.querySelectorAll('.felt, .send, .skjema-kicker').forEach((el) => {
+            (el as HTMLElement).hidden = true;
+          });
+          status.textContent = 'Promise resolved. Svarer innen 24t.';
+        } else if (data.grunn === 'ikke-konfigurert') {
+          status.textContent =
+            'Skjemaet er ikke koblet til e-postutsending ennå — bruk adressen under, den går rett fram.';
+          knapp.disabled = false;
+        } else if (res.status === 429) {
+          status.textContent = 'For mange forsøk på kort tid. Vent noen minutter og prøv igjen.';
+          knapp.disabled = false;
+        } else if (data.feil) {
+          if (data.feil.epost) visFeil('kontakt-epost', data.feil.epost);
+          if (data.feil.melding) visFeil('kontakt-melding', data.feil.melding);
+          status.textContent = '';
+          knapp.disabled = false;
+        } else {
+          status.textContent = 'Noe gikk galt. Prøv igjen — eller bruk e-postadressen under.';
+          knapp.disabled = false;
+        }
+      } catch {
+        status.textContent = 'Fikk ikke kontakt med serveren. Prøv igjen — eller bruk e-postadressen under.';
+        knapp.disabled = false;
+      }
+    });
+  }
+</script>

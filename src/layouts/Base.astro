@@ -1,0 +1,64 @@
+---
+import '../styles/tokens.css';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="nb">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    <script is:inline>
+      /* Tema før first paint: manuell overstyring i localStorage vinner,
+         ellers følges prefers-color-scheme via CSS. Cookiefritt. */
+      (() => {
+        try {
+          const t = localStorage.getItem('data-theme');
+          if (t === 'light' || t === 'dark') {
+            document.documentElement.dataset.theme = t;
+          }
+        } catch {}
+      })();
+    </script>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--tekst);
+    font-family: var(--font-sans);
+    font-size: var(--tekst-broed);
+    line-height: 1.6;
+  }
+
+  ::selection {
+    background: rgba(125, 180, 232, 0.28);
+  }
+
+  a {
+    color: var(--aksent-1);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--aksent-1);
+    outline-offset: 2px;
+  }
+</style>

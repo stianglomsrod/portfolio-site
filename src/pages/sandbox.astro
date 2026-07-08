@@ -12,9 +12,18 @@ import Side from '../layouts/Side.astro';
   <p class="kicker">/SANDBOX</p>
   <h1>Sandbox</h1>
   <p class="dempet">
-    Verkstedet. Hue-parameteren og spillet «Skamløs pitch» flytter inn her.
-    Uferdighet med hensikt.
+    Verkstedet. Uferdighet med hensikt — eksperimentene her er ekte, ikke
+    pynt.
   </p>
+  <a class="eksperiment" href="/sandbox/skamlos-pitch">
+    <span class="eks-tag">SPILL · PHASER + REACT-ØY</span>
+    <span class="eks-tittel">Skamløs Pitch: Kompetansebyen</span>
+    <span class="eks-tekst">
+      Et lite topp-ned RPG om å bygge kompetanse, stein for stein. Leser
+      samme datakilder som resten av siden — én sannhet, også i spill.
+    </span>
+    <span class="eks-cta">spill →</span>
+  </a>
 </Side>
 
 <style>
@@ -34,5 +43,48 @@ import Side from '../layouts/Side.astro';
   .dempet {
     color: var(--dempet);
     max-width: 68ch;
+  }
+
+  .eksperiment {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    background: var(--flate);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    padding: var(--s-4) var(--s-4);
+    max-width: 480px;
+    margin-top: var(--s-5);
+    text-decoration: none;
+    transition: border-color var(--dur-mikro);
+  }
+
+  .eksperiment:hover {
+    border-color: var(--aksent-1);
+  }
+
+  .eks-tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--aksent-1);
+  }
+
+  .eks-tittel {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--tekst);
+  }
+
+  .eks-tekst {
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--dempet);
+  }
+
+  .eks-cta {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--signal);
   }
 </style>

@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import profil from '../../data/profil.json';
 
 export const prerender = false;
 
@@ -137,7 +138,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       },
       body: JSON.stringify({
         from: import.meta.env.KONTAKT_FRA ?? 'kontakt@stianglomsrod.no',
-        to: ['stianglomsrod@gmail.com'],
+        to: [profil.kontakt.epost],
         reply_to: epost,
         subject: 'Melding via kontaktskjemaet på stianglomsrod.no',
         text: [

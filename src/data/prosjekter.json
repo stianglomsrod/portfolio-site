@@ -1,0 +1,25 @@
+{
+  "cs50x": {
+    "navn": "CS50x",
+    "beskrivelse": "Harvards CS50x — grunnleggende programmering.",
+    "sertifikat": "https://cs50.harvard.edu/certificates/0e9210d1-86f5-445a-b4d6-46fad1a5fd45",
+    "ordkryssDemo": "https://youtu.be/tI5fU1aAAvI"
+  },
+  "klar": {
+    "navn": "Klar",
+    "beskrivelse": "Fullstack AI-prototype, bygget som masterprosjekt.",
+    "demo": "https://klar-sigma.vercel.app/",
+    "repo": "https://github.com/stianglomsrod/klar"
+  },
+  "pdApp": {
+    "navn": "pd-app",
+    "beskrivelse": "Forløperen til Klar — Vue-frontend og Django-backend, med fremtidige brukere som meddesignere.",
+    "frontend": "https://github.com/stianglomsrod/pd-app-frontend",
+    "backend": "https://github.com/stianglomsrod/pd-app-backend"
+  },
+  "companion": {
+    "navn": "Companion (nikkoprogging)",
+    "beskrivelse": "Nikkos idé, bygget med agentisk arbeidsflyt: lokal-first, dokumentert, langvarig.",
+    "repo": "https://github.com/stianglomsrod/nikkoprogging"
+  }
+}

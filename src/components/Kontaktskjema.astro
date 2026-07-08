@@ -1,4 +1,6 @@
 ---
+import profil from '../data/profil.json';
+
 /* Kontaktskjema (Done 8): klarspråkvalidering med ikon (aldri farge alene),
    feil koblet via aria-describedby, honeypot + tidsstempel. JS sender som
    JSON til /api/kontakt; uten JS står mailto-lenken under som fullverdig vei. */
@@ -64,7 +66,7 @@
 
   <p class="alternativ">
     Foretrekker du innboksen?
-    <a href="mailto:stianglomsrod@gmail.com">stianglomsrod@gmail.com</a> går
+    <a href={`mailto:${profil.kontakt.epost}`}>{profil.kontakt.epost}</a> går
     rett fram.
   </p>
 </form>

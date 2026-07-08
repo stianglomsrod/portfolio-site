@@ -1,4 +1,6 @@
 ---
+import profil from '../data/profil.json';
+
 const aar = new Date().getFullYear();
 ---
 
@@ -15,11 +17,11 @@ const aar = new Date().getFullYear();
       <span aria-hidden="true">·</span>
       <a href="/kolofon#personvern">personvern</a>
       <span aria-hidden="true">·</span>
-      <a href="mailto:stianglomsrod@gmail.com">e-post</a>
+      <a href={`mailto:${profil.kontakt.epost}`}>e-post</a>
       <span aria-hidden="true">·</span>
-      <a href="https://github.com/stianglomsrod" rel="me">GitHub</a>
+      <a href={profil.kontakt.github} rel="me">GitHub</a>
       <span aria-hidden="true">·</span>
-      <a href="https://www.linkedin.com/in/stian-glomsr%C3%B8d-156968265/" rel="me">LinkedIn</a>
+      <a href={profil.kontakt.linkedin} rel="me">LinkedIn</a>
     </p>
   </div>
 </footer>

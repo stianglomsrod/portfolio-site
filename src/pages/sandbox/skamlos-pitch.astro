@@ -1,0 +1,27 @@
+---
+import Base from '../../layouts/Base.astro';
+import SkamlosSpill from '../../spill/SkamlosSpill';
+
+/* Deep-link til det spillbare pitch-eventyret (Done 21) — ikke en
+   indekserbar markedsside. Spillet er en ren React-øy. */
+---
+
+<Base
+  title="Skamløs Pitch: Kompetansebyen — Stian Glomsrød"
+  description="Et lite spillbart eventyr om å bygge kompetanse, stein for stein. Topp-ned RPG-prolog."
+  noindex
+>
+  <div class="spillside">
+    <SkamlosSpill client:only="react" />
+  </div>
+</Base>
+
+<style>
+  .spillside {
+    /* Spillets CSS-modul refererer den gamle sidens fontvariabler —
+       pekes hit til v2-fontene i stedet. */
+    --font-geist-sans: var(--font-sans);
+    --font-geist-mono: var(--font-mono);
+    min-height: 100dvh;
+  }
+</style>

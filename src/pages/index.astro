@@ -1,11 +1,13 @@
 ---
 import Side from '../layouts/Side.astro';
 import Hero from '../components/Hero.astro';
+import Ticker from '../components/Ticker.astro';
 ---
 
 <Side
   title="Stian Glomsrød — utvikler og UX"
   description="Personlig utviklerportefølje og sandbox. Et kjørende program, ikke en brosjyre."
 >
+  <Ticker slot="topp" />
   <Hero />
 </Side>

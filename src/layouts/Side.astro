@@ -13,6 +13,7 @@ const { title, description } = Astro.props;
 
 <Base title={title} description={description}>
   <a class="hopp" href="#innhold">Hopp til innholdet</a>
+  <slot name="topp" />
   <Nav />
   <main id="innhold" class="ramme">
     <slot />

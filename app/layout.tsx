@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -50,13 +50,26 @@ export const metadata: Metadata = {
     siteName: title,
     title,
     description,
+    images: [
+      {
+        url: "/images/avatar/stian-portrait.webp",
+        width: 760,
+        height: 919,
+        alt: "Portrett av Stian Glomsrød",
+      },
+    ],
   },
   twitter: {
     card: "summary",
     title,
     description,
+    images: ["/images/avatar/stian-portrait.webp"],
   },
   robots: { index: true, follow: true },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0e1012",
 };
 
 export default function RootLayout({

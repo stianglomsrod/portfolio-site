@@ -50,15 +50,6 @@
   }
 }
 
-/* Agentic pitch mode: keep the calm dark base, push accents + glow a little. */
-[data-mode="agentic"] {
-  --accent: #7cc0ff;
-  --accent-strong: #9bd0ff;
-  --accent-2: #b58cff;
-  --glow-1: rgba(124, 192, 255, 0.2);
-  --glow-2: rgba(181, 140, 255, 0.12);
-}
-
 html {
   height: 100%;
   scroll-behavior: smooth;
@@ -111,6 +102,25 @@ a {
   outline: 2px solid var(--accent-strong);
   outline-offset: 2px;
   border-radius: 6px;
+}
+
+/* Skip-link: off-screen until keyboard focus brings it into view. */
+.skip-link {
+  position: fixed;
+  top: -56px;
+  left: 12px;
+  z-index: 100;
+  padding: 10px 16px;
+  background: var(--surface-2);
+  color: var(--foreground);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: top 0.15s var(--ease);
+}
+.skip-link:focus,
+.skip-link:focus-visible {
+  top: 12px;
 }
 
 @media (prefers-reduced-motion: reduce) {

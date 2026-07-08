@@ -24,14 +24,36 @@ export default function Hud({
   onToggleLang,
   onToggleMute,
 }: Props) {
+  const quests = snapshot?.completedQuests.length ?? 0;
   const skills = snapshot?.skills.length ?? 0;
   const artifacts = snapshot?.artifacts.length ?? 0;
-  const objLabel = lang === "no" ? "Mål" : "Goal";
+  const L =
+    lang === "no"
+      ? {
+          obj: "Mål",
+          quests: `Oppdrag: ${quests} fullført`,
+          skills: `Ferdigheter: ${skills}`,
+          proofs: `Bevis: ${artifacts}`,
+          langBtn: "Switch to English",
+          mute: "Demp lyd",
+          unmute: "Skru på lyd",
+          menu: "Meny",
+        }
+      : {
+          obj: "Goal",
+          quests: `Quests: ${quests} completed`,
+          skills: `Skills: ${skills}`,
+          proofs: `Proof: ${artifacts}`,
+          langBtn: "Bytt til norsk",
+          mute: "Mute",
+          unmute: "Unmute",
+          menu: "Menu",
+        };
 
   return (
     <div className={styles.hudTop}>
       <div className={styles.objective}>
-        <span className={styles.objectiveTag}>{objLabel}</span>
+        <span className={styles.objectiveTag}>{L.obj}</span>
         <span className={styles.objectiveText}>
           {objective ? t(objective, lang) : "—"}
         </span>
@@ -40,37 +62,50 @@ export default function Hud({
         <button
           className={styles.hudChip}
           onClick={onOpenMenu}
-          title="Oppdrag (Q)"
+          title={`${L.quests} (Q)`}
+          aria-label={L.quests}
         >
-          🗒 <span>{snapshot?.completedQuests.length ?? 0}</span>
+          <span aria-hidden="true">🗒</span>{" "}
+          <span>{quests}</span>
         </button>
         <button
           className={styles.hudChip}
           onClick={onOpenMenu}
-          title="Ferdigheter (K)"
+          title={`${L.skills} (K)`}
+          aria-label={L.skills}
         >
-          💻 <span>{skills}</span>
+          <span aria-hidden="true">💻</span> <span>{skills}</span>
         </button>
-        <button className={styles.hudChip} onClick={onOpenMenu} title="Bevis">
-          📜 <span>{artifacts}</span>
+        <button
+          className={styles.hudChip}
+          onClick={onOpenMenu}
+          title={L.proofs}
+          aria-label={L.proofs}
+        >
+          <span aria-hidden="true">📜</span> <span>{artifacts}</span>
         </button>
-        <button className={styles.hudChip} onClick={onToggleLang}>
+        <button
+          className={styles.hudChip}
+          onClick={onToggleLang}
+          aria-label={L.langBtn}
+        >
           {lang === "no" ? "EN" : "NO"}
         </button>
         <button
           className={styles.hudChip}
           onClick={onToggleMute}
-          title={muted ? "Skru på lyd" : "Demp lyd"}
-          aria-label={muted ? "Skru på lyd" : "Demp lyd"}
+          title={muted ? L.unmute : L.mute}
+          aria-label={muted ? L.unmute : L.mute}
         >
-          {muted ? "🔇" : "🔊"}
+          <span aria-hidden="true">{muted ? "🔇" : "🔊"}</span>
         </button>
         <button
           className={styles.hudChip}
           onClick={onOpenMenu}
-          title="Meny (Esc)"
+          title={`${L.menu} (Esc)`}
+          aria-label={L.menu}
         >
-          ☰
+          <span aria-hidden="true">☰</span>
         </button>
       </div>
     </div>

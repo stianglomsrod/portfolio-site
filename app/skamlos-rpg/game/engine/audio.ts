@@ -32,14 +32,12 @@ const C5 = C4 * 2,
   E5 = E4 * 2,
   G5 = G4 * 2;
 
-// The BGM loop track, fetched lazily the first time the game starts so the
-// route itself stays light. OGG first: Vorbis has no encoder delay/padding,
-// so the buffer loops bit-exactly with no click. MP3 is the fallback for
-// browsers without Vorbis in decodeAudioData (Safari/iOS).
-const BGM_URLS = [
-  "/skamlos-rpg/audio/laeringsreisen-loop.ogg",
-  "/skamlos-rpg/audio/laeringsreisen-loop.mp3",
-];
+// The BGM loop track («Læringsreisen» v5.1), fetched lazily the first time
+// the game starts so the route itself stays light. Single MP3 source: every
+// browser decodes it, and the loop machinery below (padding trim + seam
+// ramp) makes the loop click-free regardless of how the decoder handles the
+// encoder's edge padding.
+const BGM_URLS = ["/skamlos-rpg/audio/laeringsreisen-loop.mp3"];
 /** BGM level relative to the master bus. */
 const BGM_LEVEL = 0.9;
 /** Amplitude below this counts as encoder-padding silence (≈ −60 dB). */

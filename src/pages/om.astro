@@ -16,25 +16,36 @@ import now from '../../now.json';
   <h1>Om og kontakt</h1>
 
   <div class="topp">
-    <img
-      class="portrett"
-      src="/bilder/stian-portrett.jpg"
-      alt="Portrett av Stian Glomsrød"
-      width="600"
-      height="800"
-      loading="eager"
-    />
     <div class="bio">
-      <p>
+      <p class="lead">
         Lektor med master i digital læringsdesign (OsloMet, 2026), på vei inn
         i utviklerrollen. Bygger ekte ting med agentisk KI og dokumenterer
-        alt. Halden / remote.
+        alt.
       </p>
       <p class="bio-detalj">
         Små påstander, tunge kvitteringer — det som står her skal kunne
         etterprøves ett klikk unna.
       </p>
+      <dl class="fakta" translate="no">
+        <div><dt>sted:</dt><dd>Halden / remote</dd></div>
+        <div><dt>status:</dt><dd class="signal">søker {now.soker}</dd></div>
+        <div><dt>svartid:</dt><dd>&lt; 24t</dd></div>
+      </dl>
     </div>
+    <figure class="portrett-ramme">
+      <img
+        class="portrett"
+        src="/bilder/stian-byste.jpg"
+        alt="Stian Glomsrød smiler mot kamera, i svart pikéskjorte og caps"
+        width="360"
+        height="380"
+        loading="eager"
+      />
+      <figcaption>
+        <span class="fig-markoer" aria-hidden="true"></span>
+        stian.png · ekte foto, ingen filter
+      </figcaption>
+    </figure>
   </div>
 
   <section class="manside" aria-label="STIAN(1) — manside" translate="no">
@@ -97,34 +108,100 @@ import now from '../../now.json';
 
   .topp {
     display: flex;
-    gap: var(--s-5);
+    gap: var(--s-6);
     align-items: flex-start;
-    max-width: 720px;
+    justify-content: space-between;
+    max-width: 780px;
   }
 
-  .portrett {
-    width: 168px;
-    height: 200px;
-    object-fit: cover;
-    object-position: 50% 10%;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--linje);
-    flex-shrink: 0;
+  .bio {
+    max-width: 52ch;
   }
 
   .bio p {
     margin: 0 0 var(--s-3);
     line-height: 1.6;
-    max-width: 56ch;
+  }
+
+  .lead {
+    font-size: 18px;
   }
 
   .bio-detalj {
     color: var(--dempet);
   }
 
-  @media (max-width: 560px) {
+  .fakta {
+    margin: var(--s-4) 0 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .fakta div {
+    display: flex;
+    gap: var(--s-2);
+  }
+
+  .fakta dt {
+    color: var(--dempet);
+    width: 72px;
+    flex-shrink: 0;
+  }
+
+  .fakta dd {
+    margin: 0;
+    color: var(--tekst);
+  }
+
+  .fakta .signal {
+    color: var(--signal);
+  }
+
+  /* Byste til høyre, rammet som artefakt med mono-bildetekst */
+  .portrett-ramme {
+    margin: 0;
+    flex-shrink: 0;
+    width: 250px;
+    background: var(--flate);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+
+  .portrett {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  figcaption {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--dempet);
+    padding: var(--s-2) var(--s-3);
+    border-top: 1px solid var(--linje);
+  }
+
+  .fig-markoer {
+    width: 7px;
+    height: 13px;
+    background: var(--signal);
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 640px) {
     .topp {
-      flex-direction: column;
+      flex-direction: column-reverse;
+    }
+
+    .portrett-ramme {
+      width: min(100%, 300px);
     }
   }
 

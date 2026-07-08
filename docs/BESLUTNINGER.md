@@ -18,6 +18,18 @@ med commit-hash og reverseringskommando, og push til GitHub.
 - **Commit:** a48219b
 - **Reversering:** `git revert a48219b`
 
+## 2026-07-08 · Nytt repo valgt for v2 (Fase 0-beslutningspunktet)
+
+- **Hva:** Stian valgte «nytt repo» etter Fase 0-presentasjonen: v2 bygges videre
+  i dette repoet, som pushes til GitHub som `stianglomsrod-no` (offentlig).
+  `portfolio-site` står urørt som kjørende fallback til release-gaten er grønn;
+  domene-flip i Vercel ved lansering.
+- **Begrunnelse:** Stackbytte (Next → Astro) gjør gjenbruk meningsløst; nylig
+  deployet generalisering av dagens side skal ha ro; ren byggehistorikk er selv
+  kolofon-innhold. Full vurdering i docs/innsikt/QA-RAPPORT.md.
+- **Reversering:** `git remote remove origin` + slett GitHub-repoet; dagens side
+  er uberørt uansett.
+
 ## 2026-07-08 · Guardrails-port kjørt på nytt ved onboarding
 
 - **Hva:** `norwegian-software-guardrails` kjørt; PRD-ens påstand om 🟢 GRØNT

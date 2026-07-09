@@ -643,14 +643,18 @@ const t =
       const liste = el('ok-ord-liste');
       liste.replaceChildren();
 
+      // Ordene kan ikke være lengre enn rutenettet
+      const storrelse = Number(el<HTMLSelectElement>('ok-storrelse').value);
+      const maxOrdLengde = Math.min(storrelse, 20);
+
       ordListe.forEach((ord, indeks) => {
         const rad = document.createElement('li');
         rad.className = 'ok-ord-rad';
 
         const felt = document.createElement('input');
         felt.type = 'text';
-        felt.value = ord.tekst;
-        felt.maxLength = 20;
+        felt.value = ord.tekst.slice(0, maxOrdLengde);
+        felt.maxLength = maxOrdLengde;
         felt.setAttribute('aria-label', M.ordAria(indeks + 1));
         felt.placeholder = M.ordEks;
         felt.addEventListener('input', () => {
@@ -870,6 +874,11 @@ const t =
     });
     el('ok-bildemodus').addEventListener('change', () => {
       if (sisteResultat) tegnArk();
+    });
+
+    el('ok-storrelse').addEventListener('change', () => {
+      tegnOrdListe();
+      lagreUtkast();
     });
 
     if (!lastUtkast()) {

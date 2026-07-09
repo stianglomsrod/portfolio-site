@@ -1,8 +1,10 @@
 ---
-/* Navnetrekket «stian.» — eneste sted Anybody finnes. Kinetisk ved
-   hover/fokus (300 ms): bokstavene videt ut og får hver sin farge.
-   Boksen har fast bredde målt for utvidet tilstand, så navnet aldri
-   dytter på naboelementene. */
+/* Navnetrekket «stian.» — eneste sted Anybody finnes. Kinetisk per
+   bokstav (300 ms): bokstaven under pekeren vides ut alene og får en
+   tilfeldig farge som aldri er lik naboenes forrige/nåværende.
+   Tastaturfokus på lenka gir hele ordet den faste paletten. Boksen har
+   fast bredde målt for utvidet tilstand, så navnet aldri dytter på
+   naboelementene. */
 
 interface Props {
   storrelse?: number;
@@ -26,8 +28,8 @@ const bokstaver = [
   style={`font-size: ${storrelse}px`}
 >
   {bokstaver.map((b) => (
-    <span class="bokstav" style={`--w: ${b.w}; --hovc: ${b.farge}`}>{b.c}</span>
-  ))}<span class="punktum">.</span>
+    <span class="bokstav" data-merke-bokstav style={`--w: ${b.w}; --hovc: ${b.farge}`}>{b.c}</span>
+  ))}<span class="punktum" data-farge="#8fc9a8">.</span>
 </a>
 
 <style>
@@ -52,7 +54,10 @@ const bokstaver = [
       color var(--dur-kinetikk) var(--ease);
   }
 
-  .merke:hover .bokstav,
+  .bokstav:hover {
+    font-stretch: 135%;
+  }
+
   .merke:focus-visible .bokstav {
     font-stretch: 135%;
     color: var(--hovc);
@@ -68,3 +73,36 @@ const bokstaver = [
     }
   }
 </style>
+
+<script>
+  // Tilfeldig farge per bokstav ved hover — aldri lik naboenes forrige/
+  // nåværende farge (punktumet teller som salvie-nabo for n-en).
+  const PALETT = [
+    '#8fc9a8',
+    '#c9b08a',
+    '#8ab8c9',
+    '#c98a8f',
+    '#a5c98a',
+    '#c9a8c2',
+    '#9ac9c2',
+    '#d9c08a',
+  ];
+
+  document.querySelectorAll<HTMLElement>('[data-merke-bokstav]').forEach((bokstav) => {
+    bokstav.addEventListener('mouseenter', () => {
+      const opptatt = [
+        bokstav.dataset.farge,
+        (bokstav.previousElementSibling as HTMLElement | null)?.dataset.farge,
+        (bokstav.nextElementSibling as HTMLElement | null)?.dataset.farge,
+      ];
+      const kandidater = PALETT.filter((f) => !opptatt.includes(f));
+      const farge = kandidater[Math.floor(Math.random() * kandidater.length)];
+      bokstav.dataset.farge = farge;
+      bokstav.style.color = farge;
+    });
+
+    bokstav.addEventListener('mouseleave', () => {
+      bokstav.style.color = '';
+    });
+  });
+</script>

@@ -17,7 +17,7 @@ interface Node {
   navn: string;
   tekst: string;
   betingelse?: string; // label på pila VIDERE til neste node
-  retur?: string; // løkke/retur-vei ut av noden
+  retur?: string[]; // løkke-/returveier ut av noden
 }
 
 const noder: Node[] = [
@@ -29,7 +29,7 @@ const noder: Node[] = [
   {
     navn: 'Verktøy',
     tekst:
-      'Jeg lager egne skills til Claude for jobben som skal gjøres, tilpasset domenet produktet lever i. Hva verktøyet sjekker og håndhever, avhenger av konteksten.',
+      'Jeg lager egne skills til Claude for jobben og domenet produktet lever i, og varige regler agentene må følge, for eksempel for dokumentasjon og designprinsipper. Hva som sjekkes og håndheves, avhenger av konteksten.',
     betingelse: 'rigget',
   },
   {
@@ -37,20 +37,23 @@ const noder: Node[] = [
     tekst:
       'Agenten bygger i små, avgrensede leveranser: forsøk, valider mot kriteriene, korriger. Stopper valideringen arbeidet, går løkka en runde til.',
     betingelse: 'alt grønt',
-    retur: 'ikke grønt: korriger og kjør på nytt',
+    retur: ['ikke grønt: korriger og kjør på nytt'],
   },
   {
     navn: 'Sjekkpunkt',
     tekst:
       'Her sitter mennesket: retning, avveininger og stikkprøver. Ny innsikt kan bety at kravene må justeres. Da går flyten tilbake, ikke videre.',
     betingelse: 'godkjent',
-    retur: 'ny innsikt: kravene justeres, og løkka kjøres på nytt',
+    retur: [
+      'ny innsikt: kravene justeres, og løkka kjøres på nytt',
+      'noe ble dårlig: verktøyet og reglene forbedres, så feilen ikke skjer igjen',
+    ],
   },
   {
     navn: 'Overlevering',
     tekst:
       'Tilstanden skrives ned: hva som er gjort, hva som gjenstår, og neste steg. Neste økt eller en helt ny agent kan ta over uten muntlig kontekst.',
-    retur: 'neste økt starter på kontekst, med full historikk',
+    retur: ['neste økt starter på kontekst, med full historikk'],
   },
 ];
 ---
@@ -91,12 +94,12 @@ const noder: Node[] = [
             <div class="node-innhold">
               <h3>{n.navn}</h3>
               <p>{n.tekst}</p>
-              {n.retur && (
+              {n.retur?.map((r) => (
                 <p class="retur">
                   <span class="retur-pil" aria-hidden="true">↺</span>
-                  {n.retur}
+                  {r}
                 </p>
-              )}
+              ))}
             </div>
           </div>
           {i < noder.length - 1 && (
@@ -191,8 +194,8 @@ const noder: Node[] = [
   /* Området rundt flyten har et felt til høyre der returpilene tegnes */
   .flyt-omraade {
     position: relative;
-    max-width: 740px;
-    padding-right: 120px;
+    max-width: 780px;
+    padding-right: 160px;
   }
 
   #retur-svg {
@@ -323,10 +326,13 @@ const noder: Node[] = [
   const svg = document.getElementById('retur-svg');
   const noder = [...document.querySelectorAll<HTMLElement>('.flyt .node')];
 
+  /* startOffset = avstand fra kortets bunn der pila går ut — matcher
+     rekkefølgen på returlinjene i kortet når det er flere. */
   const ruter = [
-    { fra: 2, til: 2, label: 'ikke grønt', bane: 0 },
-    { fra: 3, til: 0, label: 'krav justeres', bane: 1 },
-    { fra: 4, til: 0, label: 'neste økt', bane: 2 },
+    { fra: 2, til: 2, label: 'ikke grønt', bane: 0, startOffset: 28 },
+    { fra: 3, til: 1, label: 'verktøyet forbedres', bane: 1, startOffset: 24 },
+    { fra: 3, til: 0, label: 'krav justeres', bane: 2, startOffset: 56 },
+    { fra: 4, til: 0, label: 'neste økt', bane: 3, startOffset: 28 },
   ];
 
   const NS = 'http://www.w3.org/2000/svg';
@@ -343,8 +349,8 @@ const noder: Node[] = [
       const til = noder[rute.til].getBoundingClientRect();
 
       const startX = fra.right - boks.left;
-      const startY = fra.bottom - boks.top - 28;
-      const baneX = startX + 28 + rute.bane * 30;
+      const startY = fra.bottom - boks.top - rute.startOffset;
+      const baneX = startX + 26 + rute.bane * 30;
       const sluttY = til.top - boks.top + 26 + rute.bane * 14;
       const sluttX = til.right - boks.left + 9;
 

@@ -66,3 +66,18 @@ med commit-hash og reverseringskommando, og push til GitHub.
   databehandlere med EU-region/DPA-vurdering i personvernteksten (Done 17).
 - **Commit:** a48219b
 - **Reversering:** `git revert a48219b`
+
+## 2026-07-09 · Deploy-plan for v3 (release-gate)
+
+- **Hva:** Stian valgte utrullingsstrategi etter deploy-gjennomgangen:
+  preview først så domene-flipp; `v3` forblir produksjonsgren (ingen merge
+  til main); Resend settes opp så skjemaet sender ekte e-post; personverntekst
+  skrevet inn i kolofonen. Deploy-klargjøring lagt til: @astrojs/sitemap,
+  robots.txt, security-headers i vercel.json, og én axe-kontrastfiks.
+- **Begrunnelse:** Dagens Next.js-side beholdes som umiddelbar fallback.
+  Grønn release-gate (Done 20) kjøres på preview-URL-en før domenet flippes:
+  ekte e-postsending, live GitHub-data, headers og Lighthouse ≥ 95.
+- **Utestående før flipp (Stians hånd i Vercel/Resend):** GITHUB_TOKEN +
+  RESEND_API_KEY som miljøvariabler, Resend-domeneverifisering (DNS), og at
+  Vercel bygger som Astro (ikke Next.js).
+- **Reversering:** domenet pekes tilbake til det gamle prosjektet/deployen.

@@ -52,7 +52,7 @@ import prosjekter from '../data/prosjekter.json';
       />
     </div>
     <p class="mer">
-      <a href="/prosjekter">alle prosjekter →</a>
+      <a href="/prosjekter">alle prosjekter <span class="pil" aria-hidden="true">→</span></a>
     </p>
   </section>
 </Side>
@@ -75,5 +75,15 @@ import prosjekter from '../data/prosjekter.json';
   .mer {
     margin: var(--s-4) 0 0;
     font-size: 14px;
+  }
+
+  .pil {
+    display: inline-block;
+    transition: transform var(--dur-mikro) var(--ease);
+  }
+
+  .mer a:hover .pil,
+  .mer a:focus-visible .pil {
+    transform: translateX(3px);
   }
 </style>

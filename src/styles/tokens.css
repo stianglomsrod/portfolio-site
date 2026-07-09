@@ -1,44 +1,58 @@
 /* ============================================================
    stianglomsrod.no — design tokens v3 («Åpningstider»)
    Kanonisk kilde: docs/handoff/Endelig_Guide_v3.pdf (09.07.2026).
-   Mørk, varm og uten kode-estetikk. Salvie brukes KUN om det som
-   er levende og handlekraftig. Alle kontraster fra guiden.
-   Mørk er standard; lys følger prefers-color-scheme med manuell
-   overstyring i localStorage (data-theme, cookiefritt).
+
+   HELE paletten er hue-drevet: hver farge er oklch med låst lysstyrke
+   og metning, og deler vinkelen --hue. Slideren i /sandbox roterer
+   dermed hele siden — og fordi L/C aldri endres, holder alle målte
+   kontraster uansett tone. Default 158 reproduserer guidens grønne
+   palett (kalibrert fra hex-verdiene). --hue er @property-registrert,
+   så rotasjonen animeres mykt.
    ============================================================ */
 
 @property --hue {
   syntax: '<number>';
   inherits: true;
-  initial-value: 145;
+  initial-value: 158;
+}
+
+html {
+  transition: --hue 500ms cubic-bezier(0.2, 0, 0, 1);
 }
 
 :root {
+  --hue: 158;
+
   /* --- MØRK (standard) --- */
-  --bg: #131816;             /* grønnsvart, varm */
-  --flate: #1a211e;          /* kort, felter */
-  --tekst: #dfe8e2;          /* 14.3:1 AAA */
-  --dempet: #93a49a;         /* 6.9:1 AA */
-  --salvie: #8fc9a8;         /* 9.5:1 AAA — KUN levende/handlekraftig */
-  --salvie-kontrast: #131816; /* tekst på fylt salvie-CTA */
-  --salvie-skygge: #3f6b53;  /* trykk-skygge under CTA */
-  --linje: #263029;          /* dekorativ */
-  --feil: #c98a8f;           /* varm rød, 6.5:1 */
-  --kort-skygge: none;       /* kort-elevasjon (kun lys modus) */
+  --bg: oklch(20.3% 0.009 var(--hue));
+  --flate: oklch(24% 0.012 var(--hue));
+  --flate-2: oklch(22% 0.01 var(--hue));       /* soner inni kort */
+  --nav-bg: oklch(20.3% 0.009 var(--hue));
+  --tekst: oklch(92.2% 0.013 var(--hue));      /* 14.3:1 AAA */
+  --overskrift: oklch(90% 0.05 var(--hue));    /* grønnere enn brødtekst */
+  --dempet: oklch(70.2% 0.024 var(--hue));     /* 6.9:1 AA */
+  --salvie: oklch(78.7% 0.076 var(--hue));     /* 9.5:1 AAA — KUN levende/handlekraftig */
+  --salvie-kontrast: oklch(20.3% 0.009 var(--hue));
+  --salvie-skygge: oklch(48.8% 0.063 var(--hue));
+  --linje: oklch(29.7% 0.019 var(--hue));      /* dekorativ */
+  --feil: oklch(69.8% 0.077 calc(var(--hue) + 216)); /* varm rød ved hue 158 */
+  --kort-skygge: none;
 
-  /* --- HEATMAP (nivå 0–4, mørk rampe #1c2622 → #8fc9a8) --- */
-  --heat-0: #1c2622; --heat-1: #394f43; --heat-2: #567865;
-  --heat-3: #72a086; --heat-4: #8fc9a8;
+  /* --- HEATMAP (nivå 0–4) --- */
+  --heat-0: oklch(25.8% 0.016 var(--hue));
+  --heat-1: oklch(40.5% 0.034 var(--hue));
+  --heat-2: oklch(54.1% 0.049 var(--hue));
+  --heat-3: oklch(66.5% 0.063 var(--hue));
+  --heat-4: oklch(78.7% 0.076 var(--hue));
 
-  /* --- SANDBOX-HUE (kun /sandbox + 404, PRD Done 12) --- */
-  --hue: 145;
+  /* --- SANDBOX-AKSENT (hue-modulen + 404-roboten) --- */
   --hue-aksent: oklch(72% 0.17 var(--hue));
   --hue-flate: oklch(26% 0.045 var(--hue));
 
   /* --- TYPOGRAFI --- */
   --font-sans: 'Atkinson Hyperlegible', system-ui, sans-serif; /* brødtekst */
   --font-hd: 'Hanken Grotesk', system-ui, sans-serif; /* overskrifter 700, labels 600 sperret */
-  --font-navnetrekk: 'Anybody', var(--font-hd); /* KUN «stian.» i nav + footer */
+  --font-navnetrekk: 'Anybody', var(--font-hd); /* KUN «stiglo.» i nav + footer */
   --font-mono: ui-monospace, Consolas, monospace; /* system — kun spill-fallback */
   --tekst-hero: clamp(30px, 5.2vw, 52px); /* den levende setningen, lh 1.18 */
   --tekst-tittel: 24px;
@@ -63,18 +77,23 @@
 /* --- LYS (dagmodus) --- */
 @media (prefers-color-scheme: light) {
   :root:not([data-theme='dark']) {
-    --bg: #edf1ea;           /* grønntonet, dypere enn hvit så kort pop-er */
-    --flate: #ffffff;        /* rene hvite kort — tydelig over bakgrunnen */
-    --tekst: #232a25;        /* 12.9:1 AAA */
-    --dempet: #556158;       /* 5.7:1 AA */
-    --salvie: #2e6b4c;       /* 5.5:1 AA */
-    --salvie-kontrast: #ffffff; /* 6.3:1 AA på CTA */
-    --salvie-skygge: #1e4632;
-    --linje: #ccd7c9;        /* grønntonet, synlig kant på hvitt */
-    --feil: #a34e57;         /* 5.6:1 AA */
-    /* Heatmap-rampen løftet så tomme dager leser som et grønntonet rutenett */
-    --heat-0: #d8e2d6; --heat-1: #aecdb2; --heat-2: #7eac89;
-    --heat-3: #548b6d; --heat-4: #2e6b4c;
+    --bg: oklch(95.3% 0.01 var(--hue));         /* tonet, dypere enn hvit */
+    --flate: #ffffff;                            /* rene hvite kort */
+    --flate-2: oklch(97.3% 0.008 var(--hue));
+    --nav-bg: oklch(91% 0.016 var(--hue));       /* mørkere enn bg, skiller nav */
+    --tekst: oklch(27.6% 0.013 var(--hue));      /* 12.9:1 AAA */
+    --overskrift: oklch(33% 0.06 var(--hue));
+    --dempet: oklch(47.9% 0.021 var(--hue));     /* 5.7:1 AA */
+    --salvie: oklch(47.8% 0.081 var(--hue));     /* 5.5:1 AA */
+    --salvie-kontrast: #ffffff;                  /* 6.3:1 AA på CTA */
+    --salvie-skygge: oklch(35.9% 0.058 var(--hue));
+    --linje: oklch(86.7% 0.022 var(--hue));
+    --feil: oklch(49.5% 0.113 calc(var(--hue) + 216)); /* L lav nok til AA på alle toner */
+    --heat-0: oklch(90.2% 0.019 var(--hue));
+    --heat-1: oklch(81.8% 0.05 var(--hue));
+    --heat-2: oklch(70.2% 0.071 var(--hue));
+    --heat-3: oklch(59% 0.075 var(--hue));
+    --heat-4: oklch(47.8% 0.081 var(--hue));
     --kort-skygge: 0 1px 2px rgba(35, 42, 37, 0.05), 0 6px 16px rgba(35, 42, 37, 0.05);
     --hue-aksent: oklch(48% 0.17 var(--hue));
   }
@@ -82,17 +101,23 @@
 
 /* Manuell overstyring — samme verdier som media-queryen over. */
 [data-theme='light'] {
-  --bg: #edf1ea;
+  --bg: oklch(95.3% 0.01 var(--hue));
   --flate: #ffffff;
-  --tekst: #232a25;
-  --dempet: #556158;
-  --salvie: #2e6b4c;
+  --flate-2: oklch(97.3% 0.008 var(--hue));
+  --nav-bg: oklch(91% 0.016 var(--hue));
+  --tekst: oklch(27.6% 0.013 var(--hue));
+  --overskrift: oklch(33% 0.06 var(--hue));
+  --dempet: oklch(47.9% 0.021 var(--hue));
+  --salvie: oklch(47.8% 0.081 var(--hue));
   --salvie-kontrast: #ffffff;
-  --salvie-skygge: #1e4632;
-  --linje: #ccd7c9;
-  --feil: #a34e57;
-  --heat-0: #d8e2d6; --heat-1: #aecdb2; --heat-2: #7eac89;
-  --heat-3: #548b6d; --heat-4: #2e6b4c;
+  --salvie-skygge: oklch(35.9% 0.058 var(--hue));
+  --linje: oklch(86.7% 0.022 var(--hue));
+  --feil: oklch(49.5% 0.113 calc(var(--hue) + 216)); /* L lav nok til AA på alle toner */
+  --heat-0: oklch(90.2% 0.019 var(--hue));
+  --heat-1: oklch(81.8% 0.05 var(--hue));
+  --heat-2: oklch(70.2% 0.071 var(--hue));
+  --heat-3: oklch(59% 0.075 var(--hue));
+  --heat-4: oklch(47.8% 0.081 var(--hue));
   --kort-skygge: 0 1px 2px rgba(35, 42, 37, 0.05), 0 6px 16px rgba(35, 42, 37, 0.05);
   --hue-aksent: oklch(48% 0.17 var(--hue));
 }

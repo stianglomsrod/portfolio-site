@@ -101,8 +101,8 @@ const klarBilder = [
       Demoen har innlogging. Ta kontakt, så gir jeg deg en testbruker.
     </p>
     <p class="case-lenker">
-      <a href={prosjekter.klar.demo} class="primaer" rel="noreferrer noopener">demo →</a>
-      <a href={prosjekter.klar.repo} rel="noreferrer noopener">repo →</a>
+      <a href={prosjekter.klar.demo} class="primaer" rel="noreferrer noopener">demo <span class="pil" aria-hidden="true">→</span></a>
+      <a href={prosjekter.klar.repo} rel="noreferrer noopener">repo <span class="pil" aria-hidden="true">→</span></a>
     </p>
   </section>
 
@@ -391,6 +391,22 @@ const klarBilder = [
 
   .case-lenker a {
     text-decoration: none;
+  }
+
+  .case-lenker a:hover,
+  .case-lenker a:focus-visible {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .pil {
+    display: inline-block;
+    transition: transform var(--dur-mikro) var(--ease);
+  }
+
+  .case-lenker a:hover .pil,
+  .case-lenker a:focus-visible .pil {
+    transform: translateX(3px);
   }
 
   .case-lenker .primaer {

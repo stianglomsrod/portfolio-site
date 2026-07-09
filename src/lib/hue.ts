@@ -1,11 +1,11 @@
-/* Sandbox-hue (Done 12): klient-hjelper. Verdien clampes alltid 0–360 og
-   settes kun på sidene som importerer denne (sandbox + 404). */
+/* Hue-parameter: klient-hjelper for slideren (/sandbox) og 404. Verdien
+   clampes alltid 0–360; selve innlesingen ved sidelast skjer i Base.astro. */
 
 const NOKKEL = 'hue';
 
 export function clampHue(verdi: unknown): number {
   const n = Math.round(Number(verdi));
-  if (!Number.isFinite(n)) return 145;
+  if (!Number.isFinite(n)) return 158;
   return Math.min(360, Math.max(0, n));
 }
 

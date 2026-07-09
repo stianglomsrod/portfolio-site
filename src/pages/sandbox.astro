@@ -21,7 +21,7 @@ import HueVelger from '../components/HueVelger.astro';
       Et lite topp-ned-RPG om å bygge kompetanse. Spillet leser de samme
       datakildene som resten av siden.
     </span>
-    <span class="eks-cta">spill →</span>
+    <span class="eks-cta">spill <span class="pil" aria-hidden="true">→</span></span>
   </a>
   <HueVelger />
 </Side>
@@ -86,7 +86,17 @@ import HueVelger from '../components/HueVelger.astro';
 
   .eks-cta {
     font-family: var(--font-hd);
-    font-size: 12px;
+    font-size: 13.5px;
     color: var(--salvie);
+  }
+
+  .pil {
+    display: inline-block;
+    transition: transform var(--dur-mikro) var(--ease);
+  }
+
+  .eksperiment:hover .pil,
+  .eksperiment:focus-visible .pil {
+    transform: translateX(3px);
   }
 </style>

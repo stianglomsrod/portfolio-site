@@ -26,7 +26,7 @@ const { tag, tittel, tekst, note, lenker = [], id } = Astro.props;
     <p class="lenker">
       {lenker.map((l) => (
         <a href={l.href} class:list={[{ primaer: l.primaer }]} rel={l.href.startsWith('http') ? 'noreferrer noopener' : undefined}>
-          {l.label} →
+          {l.label} <span class="pil" aria-hidden="true">→</span>
         </a>
       ))}
     </p>
@@ -77,13 +77,17 @@ const { tag, tittel, tekst, note, lenker = [], id } = Astro.props;
     margin: 0;
   }
 
-  /* Lenkeraden pinnes til bunn: kortet med mest tekst bestemmer høyden,
-     og alle lenkerader i samme rad ligger på linje. */
+  /* Lenkesonen er kortets egen fot: pinnes til bunn (kortet med mest
+     tekst bestemmer høyden, lenkerader i samme rad ligger på linje) og
+     skilles visuelt med tonet bakgrunn kant til kant. */
   .lenker {
     display: flex;
     gap: var(--s-4);
-    margin-top: auto;
-    padding-top: var(--s-3);
+    margin: auto calc(-1 * var(--s-4)) calc(-1 * var(--s-4));
+    padding: var(--s-3) var(--s-4);
+    background: var(--flate-2);
+    border-top: 1px solid var(--linje);
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
     font-family: var(--font-hd);
     font-size: 13.5px;
     flex-wrap: wrap;
@@ -91,6 +95,22 @@ const { tag, tittel, tekst, note, lenker = [], id } = Astro.props;
 
   .lenker a {
     text-decoration: none;
+  }
+
+  .lenker a:hover,
+  .lenker a:focus-visible {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .pil {
+    display: inline-block;
+    transition: transform var(--dur-mikro) var(--ease);
+  }
+
+  .lenker a:hover .pil,
+  .lenker a:focus-visible .pil {
+    transform: translateX(3px);
   }
 
   .lenker a.primaer {

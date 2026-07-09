@@ -1,14 +1,14 @@
 ---
-/* Sandbox-hue (Done 12): én oklch-vinkel styrer aksentene på /sandbox + 404.
-   L og C er låst i tokens (72 % mørk / 48 % lys), så AA-kontrasten holder
-   uansett tone. Persisteres i localStorage 'hue' (tall, clampes 0–360) —
-   cookiefritt. Andre sider leser aldri verdien. */
+/* Hue-parameter: én oklch-vinkel styrer hele sidens palett. L og C er låst
+   i tokens, så AA-kontrasten holder uansett tone. Persisteres i localStorage
+   'hue' (tall, clampes 0–360) — cookiefritt — og leses inn før first paint
+   på alle sider (Base.astro). */
 ---
 
 <div class="hue-modul">
   <div class="hue-topp">
     <span class="hue-label">MODUL C · HUE-PARAMETER</span>
-    <span class="hue-verdi" id="hue-verdi" aria-live="polite">--hue: 145</span>
+    <span class="hue-verdi" id="hue-verdi" aria-live="polite">--hue: 158</span>
   </div>
   <input
     type="range"
@@ -16,7 +16,7 @@
     min="0"
     max="360"
     step="1"
-    value="145"
+    value="158"
     aria-label="Roter fargetonen"
   />
   <div class="hue-chips" aria-hidden="true">

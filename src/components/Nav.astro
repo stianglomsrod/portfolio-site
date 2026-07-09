@@ -19,39 +19,64 @@ const sti = Astro.url.pathname.replace(/\/$/, '') || '/';
 const erAktiv = (href: string) => sti === (href === '/' ? '/' : href);
 ---
 
-<header class="topp">
-  <Merke storrelse={17} />
-  <nav aria-label="Hovedmeny">
-    <ul class="meny">
-      {punkter.map((p) => (
-        <li>
-          <a
-            href={p.href}
-            class:list={['punkt', { aktiv: erAktiv(p.href) }]}
-            aria-current={erAktiv(p.href) ? 'page' : undefined}
-          >
-            {erAktiv(p.href) && <span class="dot" aria-hidden="true"></span>}
-            {p.label}
-          </a>
-        </li>
-      ))}
-    </ul>
-  </nav>
-  <button type="button" id="tema-toggle" class="tema">
-    <span id="tema-tekst">tema</span>
-  </button>
+<header class="topp" id="side-topp">
+  <div class="topp-indre">
+    <Merke storrelse={17} />
+    <nav aria-label="Hovedmeny">
+      <ul class="meny">
+        {punkter.map((p) => (
+          <li>
+            <a
+              href={p.href}
+              class:list={['punkt', { aktiv: erAktiv(p.href) }]}
+              aria-current={erAktiv(p.href) ? 'page' : undefined}
+            >
+              {erAktiv(p.href) && <span class="dot" aria-hidden="true"></span>}
+              {p.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+    <button type="button" id="tema-toggle" class="tema">
+      <span id="tema-tekst">tema</span>
+    </button>
+  </div>
 </header>
 
 <style>
+  /* Auto-hide: sticky rad som glir vekk ved scroll ned og tilbake ved
+     scroll opp. Skjules aldri mens noe i den har fokus (tastatur). */
   .topp {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-4);
+    padding: var(--s-3) var(--s-6);
+    background: var(--nav-bg);
+    border-bottom: 1px solid var(--linje);
+    transition: transform var(--dur-panel) var(--ease);
+  }
+
+  .topp[data-skjult] {
+    transform: translateY(-100%);
+  }
+
+  .topp:focus-within {
+    transform: none;
+  }
+
+  .topp-indre {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: var(--s-4);
     max-width: 1060px;
     margin: 0 auto;
-    padding: var(--s-3) var(--s-6);
-    border-bottom: 1px solid var(--linje);
+    width: 100%;
   }
 
   .meny {
@@ -169,4 +194,34 @@ const erAktiv = (href: string) => sti === (href === '/' ? '/' : href);
   });
 
   oppdater();
+
+  // Auto-hide: skjul ved scroll ned, vis ved scroll opp. Terskel på 10px
+  // ignorerer småbevegelser; nær toppen er raden alltid synlig.
+  const topp = document.getElementById('side-topp');
+  let forrigeY = window.scrollY;
+  let ventet = false;
+
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (ventet) return;
+      ventet = true;
+      requestAnimationFrame(() => {
+        const y = window.scrollY;
+        const delta = y - forrigeY;
+        if (y < 80) {
+          topp?.removeAttribute('data-skjult');
+        } else if (delta > 10) {
+          topp?.setAttribute('data-skjult', '');
+          forrigeY = y;
+        } else if (delta < -10) {
+          topp?.removeAttribute('data-skjult');
+          forrigeY = y;
+        }
+        if (Math.abs(delta) > 10) forrigeY = y;
+        ventet = false;
+      });
+    },
+    { passive: true }
+  );
 </script>

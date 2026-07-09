@@ -25,7 +25,7 @@
   },
   "lori": {
     "navn": "Lori Frisør",
-    "beskrivelse": "Pragmatisk leveranse for en ekte eier.",
+    "beskrivelse": "Nettside en frisørsalong kan drifte selv etter overlevering.",
     "stack": "Astro · Keystatic (eierredigering) · Vercel · handoff-dokumentasjon · valgte å integrere Timma framfor å bygge booking på nytt",
     "url": "https://lori-frisor.vercel.app/",
     "repo": "https://github.com/stianglomsrod/lori-frisor"

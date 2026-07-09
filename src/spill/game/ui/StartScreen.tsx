@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import type { ContentPack, Lang } from "../engine/types";
 import { t } from "../engine/i18n";
 import { useCoarsePointer } from "./VirtualPad";
-import now from "../../../../now.json";
+import now from "../../../data/now.json";
 import styles from "../../skamlos-rpg.module.css";
 
 interface Props {

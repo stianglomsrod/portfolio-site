@@ -12,13 +12,15 @@ interface Props {
 
 const { storrelse = 17 } = Astro.props;
 
+/* «sti» er fet (800), «glo» er lettere (400) — men begge i Anybody, så begge
+   har bredde-aksen og vokser likt på hover. */
 const bokstaver = [
-  { c: 's', w: 100, farge: '#8fc9a8' },
-  { c: 't', w: 104, farge: '#c9b08a' },
-  { c: 'i', w: 98, farge: '#8ab8c9' },
-  { c: 'g', w: 104, farge: '#c98a8f' },
-  { c: 'l', w: 100, farge: '#a5c98a' },
-  { c: 'o', w: 104, farge: '#8fc9a8' },
+  { c: 's', w: 100, vekt: 800, farge: '#8fc9a8' },
+  { c: 't', w: 104, vekt: 800, farge: '#c9b08a' },
+  { c: 'i', w: 98, vekt: 800, farge: '#8ab8c9' },
+  { c: 'g', w: 104, vekt: 400, farge: '#c98a8f' },
+  { c: 'l', w: 100, vekt: 400, farge: '#a5c98a' },
+  { c: 'o', w: 104, vekt: 400, farge: '#8fc9a8' },
 ];
 ---
 
@@ -29,14 +31,13 @@ const bokstaver = [
   style={`font-size: ${storrelse}px`}
 >
   {bokstaver.map((b) => (
-    <span class="bokstav" data-merke-bokstav style={`--w: ${b.w}; --hovc: ${b.farge}`}>{b.c}</span>
+    <span class="bokstav" data-merke-bokstav style={`--w: ${b.w}; --vekt: ${b.vekt}; --hovc: ${b.farge}`}>{b.c}</span>
   ))}<span class="punktum" data-hue="155">.</span>
 </a>
 
 <style>
   .merke {
     font-family: var(--font-navnetrekk);
-    font-weight: 800;
     color: var(--tekst);
     text-decoration: none;
     text-transform: lowercase;
@@ -47,20 +48,22 @@ const bokstaver = [
     padding: var(--s-2) 0;
   }
 
+  /* Driver akslene direkte (mer pålitelig enn font-stretch %): «sti» er
+     vekt 800, «glo» vekt 400, alle utvider bredden fra --w til 145 på hover. */
   .bokstav {
     display: inline-block;
-    font-stretch: calc(var(--w) * 1%);
+    font-variation-settings: 'wght' var(--vekt), 'wdth' var(--w);
     transition:
-      font-stretch var(--dur-kinetikk) var(--ease),
+      font-variation-settings var(--dur-kinetikk) var(--ease),
       color var(--dur-kinetikk) var(--ease);
   }
 
   .bokstav:hover {
-    font-stretch: 135%;
+    font-variation-settings: 'wght' var(--vekt), 'wdth' 145;
   }
 
   .merke:focus-visible .bokstav {
-    font-stretch: 135%;
+    font-variation-settings: 'wght' var(--vekt), 'wdth' 145;
     color: var(--hovc);
   }
 

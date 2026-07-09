@@ -142,6 +142,21 @@ const klarBilder = [
           { href: prosjekter.cs50x.ordkryssDemo, label: 'demo' },
         ]}
       />
+      <ProsjektKort
+        tag="Bygget i åpen dialog med Claude"
+        tittel={prosjekter.denneSiden.navn}
+        tekst={prosjekter.denneSiden.beskrivelse}
+        lenker={[
+          { href: prosjekter.denneSiden.repo, label: 'kildekode' },
+          { href: '/kolofon', label: 'slik ble siden til' },
+        ]}
+      />
+      <ProsjektKort
+        tag="Fremtidig startup"
+        tittel={prosjekter.claudeFirst.navn}
+        tekst={prosjekter.claudeFirst.beskrivelse}
+        lenker={[{ href: prosjekter.claudeFirst.url, label: 'nettstedet' }]}
+      />
     </div>
   </section>
 
@@ -174,7 +189,7 @@ const klarBilder = [
 
   .format {
     font-family: var(--font-hd);
-    font-size: 10.5px;
+    font-size: 13px;
     color: var(--dempet);
     margin: var(--s-3) 0 0;
   }
@@ -195,7 +210,7 @@ const klarBilder = [
   .case-tag {
     font-family: var(--font-hd);
     font-weight: 600;
-    font-size: 10.5px;
+    font-size: 12px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--dempet);
@@ -361,7 +376,7 @@ const klarBilder = [
     gap: var(--s-4);
     margin: var(--s-4) 0 0;
     font-family: var(--font-hd);
-    font-size: 12.5px;
+    font-size: 14px;
   }
 
   .case-lenker a {
@@ -381,7 +396,7 @@ const klarBilder = [
   }
 
   .grense {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--dempet);
     margin-top: var(--s-5);
   }

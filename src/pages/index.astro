@@ -34,6 +34,21 @@ import prosjekter from '../data/prosjekter.json';
         tekst={prosjekter.lori.beskrivelse}
         lenker={[{ href: prosjekter.lori.url, label: 'nettstedet' }]}
       />
+      <ProsjektKort
+        tag="Bygget i åpen dialog med Claude"
+        tittel={prosjekter.denneSiden.navn}
+        tekst={prosjekter.denneSiden.beskrivelse}
+        lenker={[
+          { href: prosjekter.denneSiden.repo, label: 'kildekode' },
+          { href: '/kolofon', label: 'slik ble siden til' },
+        ]}
+      />
+      <ProsjektKort
+        tag="Fremtidig startup"
+        tittel={prosjekter.claudeFirst.navn}
+        tekst={prosjekter.claudeFirst.beskrivelse}
+        lenker={[{ href: prosjekter.claudeFirst.url, label: 'nettstedet' }]}
+      />
     </div>
     <p class="mer">
       <a href="/prosjekter">alle prosjekter →</a>

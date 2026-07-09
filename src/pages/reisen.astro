@@ -30,7 +30,7 @@ const milepaeler = [
   { naar: 'underveis i masteren', tekst: 'Bygde pd-app, forløperen til Klar: 132 commits skrevet for hånd.' },
   { naar: '2024', tekst: 'Fullførte CS50x hos Harvard. Ordkryss som sluttprosjekt.' },
   { naar: '2018', tekst: 'Lektor på Kongeveien skole — tok programmeringen inn i klasserommet.' },
-  { naar: '2007', tekst: 'Introduction to Programming: karakter D. Reisen startet i motbakke.' },
+  { naar: '2007', tekst: 'Introduksjon til objektorientert programmering i Java og spillprogrammering i Flash.' },
 ];
 ---
 
@@ -63,10 +63,6 @@ const milepaeler = [
         </li>
       ))}
     </ul>
-    <p class="fotnote">
-      Milepælene kurateres for hånd. Aktiviteten hentes fra GitHub når siden
-      bygges, med en statisk reserve i bunn.
-    </p>
   </section>
 </Side>
 
@@ -119,7 +115,7 @@ const milepaeler = [
   }
 
   .tekst {
-    font-size: 15px;
+    font-size: 16px;
     line-height: 1.55;
     max-width: 52ch;
   }
@@ -130,16 +126,9 @@ const milepaeler = [
   }
 
   .naar {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--dempet);
     flex-shrink: 0;
-  }
-
-  .fotnote {
-    margin: var(--s-3) 0 0;
-    font-size: 13px;
-    color: var(--dempet);
-    max-width: 60ch;
   }
 </style>
 

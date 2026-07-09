@@ -29,5 +29,15 @@
     "stack": "Astro · Keystatic (eierredigering) · Vercel · handoff-dokumentasjon · valgte å integrere Timma framfor å bygge booking på nytt",
     "url": "https://lori-frisor.vercel.app/",
     "repo": "https://github.com/stianglomsrod/lori-frisor"
+  },
+  "denneSiden": {
+    "navn": "Denne siden",
+    "beskrivelse": "Porteføljen du leser nå: Astro med levende data fra now.json og GitHub, og et spill i /sandbox.",
+    "repo": "https://github.com/stianglomsrod/portfolio-site"
+  },
+  "claudeFirst": {
+    "navn": "claude-first",
+    "beskrivelse": "Landingsside for et softwarestudio under planlegging: nettsider, apper og KI-verktøy for små virksomheter.",
+    "url": "https://claude-first-taupe.vercel.app/"
   }
 }

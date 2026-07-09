@@ -7,7 +7,7 @@ import profil from '../data/profil.json';
 ---
 
 <form class="skjema" data-kontakt novalidate>
-  <p class="skjema-kicker">KONTAKTSKJEMA — DIT PENDING RESOLVES</p>
+  <p class="skjema-kicker">Kontaktskjema</p>
 
   <div class="felt">
     <label for="kontakt-navn">navn <span class="valgfri">(valgfri)</span></label>
@@ -60,7 +60,7 @@ import profil from '../data/profil.json';
     />
   </div>
 
-  <button type="submit" class="send knapp">resolve(kontakt) →</button>
+  <button type="submit" class="send knapp">Send melding</button>
 
   <p class="status" data-status aria-live="polite"></p>
 
@@ -81,10 +81,12 @@ import profil from '../data/profil.json';
   }
 
   .skjema-kicker {
-    font-family: var(--font-mono);
-    font-size: 10px;
+    font-family: var(--font-hd);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 10.5px;
     letter-spacing: 0.1em;
-    color: var(--signal);
+    color: var(--salvie);
     margin: 0 0 var(--s-3);
   }
 
@@ -94,7 +96,7 @@ import profil from '../data/profil.json';
 
   label {
     display: block;
-    font-family: var(--font-mono);
+    font-family: var(--font-hd);
     font-size: 11px;
     color: var(--dempet);
     margin-bottom: var(--s-1);
@@ -122,24 +124,24 @@ import profil from '../data/profil.json';
 
   input:focus-visible,
   textarea:focus-visible {
-    outline: 2px solid var(--aksent-1);
+    outline: 2px solid var(--salvie);
     outline-offset: 1px;
-    border-color: var(--aksent-1);
+    border-color: var(--salvie);
   }
 
   .felt[data-ugyldig] input,
   .felt[data-ugyldig] textarea {
-    border-color: var(--aksent-2);
+    border-color: var(--feil);
   }
 
   .felt[data-ugyldig] input:focus-visible,
   .felt[data-ugyldig] textarea:focus-visible {
-    outline-color: var(--aksent-2);
+    outline-color: var(--feil);
   }
 
   .feilmelding {
     font-size: 12.5px;
-    color: var(--aksent-2);
+    color: var(--feil);
     margin: var(--s-1) 0 0;
   }
 
@@ -157,7 +159,7 @@ import profil from '../data/profil.json';
     font-family: var(--font-sans);
     font-size: 14px;
     font-weight: 700;
-    background: var(--signal);
+    background: var(--salvie);
     color: var(--bg);
     border-radius: 9px;
     padding: 11px 20px;
@@ -181,7 +183,7 @@ import profil from '../data/profil.json';
   }
 
   .status {
-    font-family: var(--font-mono);
+    font-family: var(--font-hd);
     font-size: 12.5px;
     margin: var(--s-3) 0 0;
     color: var(--tekst);
@@ -257,7 +259,7 @@ import profil from '../data/profil.json';
       }
 
       knapp.disabled = true;
-      status.textContent = 'resolver …';
+      status.textContent = 'sender …';
 
       try {
         const res = await fetch('/api/kontakt', {
@@ -271,7 +273,7 @@ import profil from '../data/profil.json';
           skjema.querySelectorAll('.felt, .send, .skjema-kicker').forEach((el) => {
             (el as HTMLElement).hidden = true;
           });
-          status.textContent = 'Promise resolved. Svarer innen 24t.';
+          status.textContent = 'Meldingen er sendt. Jeg svarer innen et døgn.';
         } else if (data.grunn === 'ikke-konfigurert') {
           status.textContent =
             'Skjemaet er ikke koblet til e-postutsending ennå — bruk adressen under, den går rett fram.';

@@ -1,26 +1,18 @@
 ---
 import profil from '../data/profil.json';
-
-const aar = new Date().getFullYear();
 ---
 
 <footer class="bunn">
   <div class="indre">
-    <p class="kolofonlinje">
-      © {aar} Stian Glomsrød · bygget i åpen dialog med Claude Code · ingen
-      cookies, ingen sporing
-    </p>
-    <p class="lenker">
-      <a href="/kolofon">kolofon</a>
-      <span aria-hidden="true">·</span>
-      <a href="/kolofon#tilgjengelighet">tilgjengelighet</a>
-      <span aria-hidden="true">·</span>
-      <a href="/kolofon#personvern">personvern</a>
-      <span aria-hidden="true">·</span>
-      <a href={`mailto:${profil.kontakt.epost}`}>e-post</a>
-      <span aria-hidden="true">·</span>
-      <a href={profil.kontakt.github} rel="me">GitHub</a>
-      <span aria-hidden="true">·</span>
+    <a class="merke" href="/" aria-label="stian glomsrød — til forsiden"
+      >stian<span class="punktum">.</span></a
+    >
+    <p class="linje">
+      Bygget i åpen dialog med Claude · ingen informasjonskapsler ·
+      <a href="/kolofon">slik ble siden til</a> ·
+      <a href="/kolofon#tilgjengelighet">tilgjengelighet</a> ·
+      <a href={`mailto:${profil.kontakt.epost}`}>e-post</a> ·
+      <a href={profil.kontakt.github} rel="me">GitHub</a> ·
       <a href={profil.kontakt.linkedin} rel="me">LinkedIn</a>
     </p>
   </div>
@@ -28,7 +20,7 @@ const aar = new Date().getFullYear();
 
 <style>
   .bunn {
-    border-top: 1px dashed var(--linje);
+    border-top: 1px solid var(--linje);
     margin-top: var(--s-8);
   }
 
@@ -37,24 +29,27 @@ const aar = new Date().getFullYear();
     margin: 0 auto;
     padding: var(--s-4) var(--s-6) var(--s-5);
     display: flex;
-    justify-content: space-between;
     align-items: baseline;
-    gap: var(--s-3);
+    gap: var(--s-4);
     flex-wrap: wrap;
-    font-family: var(--font-mono);
-    font-size: 11px;
   }
 
-  .kolofonlinje {
-    margin: 0;
-    color: var(--dempet);
+  .merke {
+    font-family: var(--font-navnetrekk);
+    font-weight: 800;
+    font-size: 15px;
+    color: var(--tekst);
+    text-decoration: none;
+    text-transform: lowercase;
   }
 
-  .lenker {
+  .punktum {
+    color: var(--salvie);
+  }
+
+  .linje {
     margin: 0;
+    font-size: 13px;
     color: var(--dempet);
-    display: flex;
-    gap: var(--s-2);
-    flex-wrap: wrap;
   }
 </style>

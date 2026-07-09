@@ -1,9 +1,10 @@
 /* ============================================================
-   stianglomsrod.no v2 — design tokens
-   Implementert 1:1 fra docs/handoff/tokens.css (fasiten).
-   Alle kontraster er beregnet og dokumentert i guidene.
-   Mørk er standard. Dagmodus via prefers-color-scheme + manuell
-   overstyring i localStorage (data-theme="light" på <html>).
+   stianglomsrod.no — design tokens v3 («Åpningstider»)
+   Kanonisk kilde: docs/handoff/Endelig_Guide_v3.pdf (09.07.2026).
+   Mørk, varm og uten kode-estetikk. Salvie brukes KUN om det som
+   er levende og handlekraftig. Alle kontraster fra guiden.
+   Mørk er standard; lys følger prefers-color-scheme med manuell
+   overstyring i localStorage (data-theme, cookiefritt).
    ============================================================ */
 
 @property --hue {
@@ -14,117 +15,85 @@
 
 :root {
   /* --- MØRK (standard) --- */
-  --bg: #0f131a;
-  --flate: #161c26;
-  --tekst: #d6dce6;          /* 13.5:1 AAA på --bg */
-  --dempet: #98a1ad;         /* 7.1:1 AAA på --bg */
-  --linje: #262e3b;          /* dekorativ */
-  --badge-bg: #262e3b;
-  --badge-tekst: #a6afbb;    /* 6.2:1 AA på --badge-bg */
-  --signal: #45d945;         /* 10.0:1 AAA — KUN tilgjengelighet/handling */
-  --signal-skygge: #2c8a2c;  /* trykk-skygge under grønn knapp */
-  --aksent-1: #7db4e8;       /* 8.5:1 AAA — lenker, interaktivt */
-  --aksent-2: #e8949c;       /* 8.1:1 AAA — feil, korrektur */
-  --konst: #d19a66;          /* 7.6:1 AAA — commit-hash, tall */
-  --godkjent: #8fc98f;       /* 9.1:1 AAA */
+  --bg: #131816;             /* grønnsvart, varm */
+  --flate: #1a211e;          /* kort, felter */
+  --tekst: #dfe8e2;          /* 14.3:1 AAA */
+  --dempet: #93a49a;         /* 6.9:1 AA */
+  --salvie: #8fc9a8;         /* 9.5:1 AAA — KUN levende/handlekraftig */
+  --salvie-kontrast: #131816; /* tekst på fylt salvie-CTA */
+  --salvie-skygge: #3f6b53;  /* trykk-skygge under CTA */
+  --linje: #263029;          /* dekorativ */
+  --feil: #c98a8f;           /* varm rød, 6.5:1 */
 
-  /* --- KODEFLATEN (identisk i begge temaer — ankeret) --- */
-  --kodeflate: #1b212b;
-  --terminal: #12161e;
-  --kode-tekst: #c9d1dd;     /* 10.5:1 AAA på --kodeflate */
-  --syn-kw: #e06c75;         /* 5.1:1 AA */
-  --syn-fn: #61afef;         /* 6.8:1 AA */
-  --syn-str: #98c379;        /* 8.0:1 AAA */
-  --syn-konst: #d19a66;      /* 6.6:1 AA */
-  --syn-komm: #8b93a0;       /* 5.2:1 AA (lysnet fra IDE-ens 2.8) */
-  --syn-linjenr: #495264;    /* dekorativ */
-  --term-groenn: #45d945;    /* 9.7:1 AAA på --terminal */
-  --term-magenta: #d466d4;   /* 5.7:1 AA */
-  --term-teal: #4ec9b0;      /* 8.9:1 AAA */
-  --term-cyan: #56b6c2;      /* 7.7:1 AAA */
+  /* --- HEATMAP (nivå 0–4, mørk rampe #1c2622 → #8fc9a8) --- */
+  --heat-0: #1c2622; --heat-1: #394f43; --heat-2: #567865;
+  --heat-3: #72a086; --heat-4: #8fc9a8;
 
-  /* --- HEATMAP (mørk rampe, nivå 0–4) --- */
-  --heat-0: #1c2430; --heat-1: #234a2c; --heat-2: #2f6b3a;
-  --heat-3: #3fa04a; --heat-4: #45d945;
-
-  /* --- SANDBOX-HUE (kun /sandbox + 404) --- */
-  --hue: 145; /* registrert med @property <number> over, persisteres i localStorage */
+  /* --- SANDBOX-HUE (kun /sandbox + 404, PRD Done 12) --- */
+  --hue: 145;
   --hue-aksent: oklch(72% 0.17 var(--hue));
   --hue-flate: oklch(26% 0.045 var(--hue));
 
   /* --- TYPOGRAFI --- */
-  --font-sans: 'Atkinson Hyperlegible', system-ui, sans-serif;
-  --font-mono: 'Cascadia Code', ui-monospace, Consolas, monospace;
-  --font-display: 'Anybody', var(--font-sans); /* KUN navnetrekk + badge-tall */
-  --tekst-display: clamp(52px, 8.5vw, 96px); /* line-height 1.05 — æøå klippes aldri */
-  --tekst-tittel: 22px;
-  --tekst-broed: 16px;   /* 1.6 linjehøyde, maks 68ch */
-  --tekst-kode: 14px;    /* maks 80ch, min 12px på mobil */
-  --tekst-label: 12px;   /* mono, sperret — aldri mindre på produksjonssiden */
+  --font-sans: 'Atkinson Hyperlegible', system-ui, sans-serif; /* brødtekst */
+  --font-hd: 'Hanken Grotesk', system-ui, sans-serif; /* overskrifter 700, labels 600 sperret */
+  --font-navnetrekk: 'Anybody', var(--font-hd); /* KUN «stian.» i nav + footer */
+  --font-mono: ui-monospace, Consolas, monospace; /* system — kun spill-fallback */
+  --tekst-hero: clamp(30px, 5.2vw, 52px); /* den levende setningen, lh 1.18 */
+  --tekst-tittel: 24px;
+  --tekst-broed: 16px;   /* 1.6 linjehøyde, maks 66ch */
+  --tekst-label: 12px;   /* Hanken 600, sperret */
 
   /* --- SPACING / RADIUS --- */
   --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px;
   --s-5: 24px; --s-6: 32px; --s-7: 48px; --s-8: 64px;
-  --radius-sm: 6px;   /* tags, badges, pending-knapp */
-  --radius-md: 12px;  /* kort, kodeflate, portrett */
+  --radius-sm: 8px;   /* felter */
+  --radius-md: 12px;  /* kort */
   --radius-lg: 16px;  /* seksjoner */
 
-  /* --- MOTION --- */
-  --dur-mikro: 120ms;   /* hover, fokus */
-  --dur-trykk: 80ms;    /* modul A: knapper presses ned 2px */
-  --dur-panel: 240ms;   /* ekspander «nå:»-rader */
-  --dur-scene: 480ms;   /* resolve-sekvensen (signaturen) */
-  --ease: cubic-bezier(0.2, 0, 0, 1); /* ingen bounce */
+  /* --- MOTION (én puls synlig av gangen, ingen bounce) --- */
+  --dur-mikro: 120ms;
+  --dur-trykk: 80ms;    /* knapper trykkes fysisk ned */
+  --dur-panel: 240ms;
+  --dur-kinetikk: 300ms; /* navnetrekk hover/fokus */
+  --ease: cubic-bezier(0.2, 0, 0, 1);
 }
 
-/* --- DAGMODUS (arvet fra v1, papirtemaet) --- */
+/* --- LYS (dagmodus) --- */
 @media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]) {
-    --bg: #faf6f0;
-    --flate: #fffdf9;
-    --tekst: #3b3530;        /* 11.2:1 AAA */
-    --dempet: #756a5f;       /* 4.9:1 AA */
-    --linje: #e5dccd;
-    --badge-bg: #ece5d8;
-    --badge-tekst: #5f574d;
-    --signal: #2c7a2c;       /* grønn mørknes for AA på papir */
-    --signal-skygge: #1d5a1d;
-    --aksent-1: #2c65a2;     /* 5.6:1 AA */
-    --aksent-2: #b23f4a;     /* 5.3:1 AA */
-    --konst: #8a6218;
-    --godkjent: #4e7d3d;     /* 4.8:1 AA */
-    --heat-0: #efe9dc; --heat-1: #d6e4c4; --heat-2: #adcf8f;
-    --heat-3: #7fae5f; --heat-4: #4e7d3d;
-    /* Modul C i dagmodus (guide v1 §07): L senkes til 48% så AA holder på papir. */
+  :root:not([data-theme='dark']) {
+    --bg: #f5f6f2;           /* grønnhvit */
+    --flate: #fcfdfa;
+    --tekst: #262d28;        /* 13.0:1 AAA */
+    --dempet: #5c6a60;       /* 5.3:1 AA */
+    --salvie: #2e6b4c;       /* mørknet, 5.8:1 AA */
+    --salvie-kontrast: #ffffff; /* 6.3:1 AA på CTA */
+    --salvie-skygge: #1e4632;
+    --linje: #dde3da;
+    --feil: #a34e57;
+    --heat-0: #e9ede4; --heat-1: #bacdbe; --heat-2: #8cac98;
+    --heat-3: #5d8c72; --heat-4: #2e6b4c;
     --hue-aksent: oklch(48% 0.17 var(--hue));
-    /* Kodeflate-variablene endres IKKE — den er ankeret. */
   }
 }
 
-/* Manuell overstyring (Done 11: reelt utfylt — samme verdier som media
-   queryen over; vinner uansett systempreferanse). */
-[data-theme="light"] {
-  --bg: #faf6f0;
-  --flate: #fffdf9;
-  --tekst: #3b3530;        /* 11.2:1 AAA */
-  --dempet: #756a5f;       /* 4.9:1 AA */
-  --linje: #e5dccd;
-  --badge-bg: #ece5d8;
-  --badge-tekst: #5f574d;
-  --signal: #2c7a2c;       /* grønn mørknes for AA på papir */
-  --signal-skygge: #1d5a1d;
-  --aksent-1: #2c65a2;     /* 5.6:1 AA */
-  --aksent-2: #b23f4a;     /* 5.3:1 AA */
-  --konst: #8a6218;
-  --godkjent: #4e7d3d;     /* 4.8:1 AA */
-  --heat-0: #efe9dc; --heat-1: #d6e4c4; --heat-2: #adcf8f;
-  --heat-3: #7fae5f; --heat-4: #4e7d3d;
-  /* Modul C i dagmodus (guide v1 §07): L senkes til 48% så AA holder på papir. */
+/* Manuell overstyring — samme verdier som media-queryen over. */
+[data-theme='light'] {
+  --bg: #f5f6f2;
+  --flate: #fcfdfa;
+  --tekst: #262d28;
+  --dempet: #5c6a60;
+  --salvie: #2e6b4c;
+  --salvie-kontrast: #ffffff;
+  --salvie-skygge: #1e4632;
+  --linje: #dde3da;
+  --feil: #a34e57;
+  --heat-0: #e9ede4; --heat-1: #bacdbe; --heat-2: #8cac98;
+  --heat-3: #5d8c72; --heat-4: #2e6b4c;
   --hue-aksent: oklch(48% 0.17 var(--hue));
-  /* Kodeflate-variablene endres IKKE — den er ankeret. */
 }
 
-/* --- REDUCED MOTION (ufravikelig) --- */
+/* --- REDUCED MOTION (ufravikelig): alt → 0 ms, dot og navn statiske --- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -132,16 +101,14 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  /* Tilstandsskifter beholdes som rene fargeskift.
-     Ticker og puls-dot rendres statiske. Markør: statisk blokk. */
 }
 
-/* --- MODUL A: trykk-tilstand (hele siden) --- */
+/* --- Trykk-tilstand (beholdt fra v1/v2: fysisk nedtrykk 2px) --- */
 .knapp {
-  box-shadow: 0 2px 0 var(--signal-skygge);
+  box-shadow: 0 2px 0 var(--salvie-skygge);
   transition: transform var(--dur-trykk), box-shadow var(--dur-trykk);
 }
 .knapp:active {
   transform: translateY(2px);
-  box-shadow: 0 0 0 var(--signal-skygge);
+  box-shadow: 0 0 0 var(--salvie-skygge);
 }

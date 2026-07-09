@@ -1,33 +1,31 @@
 /* ============================================================
-   Self-hostede fonter (Done 17) — alle SIL OFL 1.1, lisensfiler
-   ligger ved fontfilene i public/fonts/.
+   Self-hostede fonter (v3) — alle SIL OFL 1.1, lisensfiler ligger
+   ved fontfilene i public/fonts/.
 
-   - Anybody (Etcetera Type Co): variabel wdth 50–150 / wght 100–900,
-     subsettet til navneglyfer + sifre (9,7 kB) — KUN navnetrekk + badge-tall.
+   - Hanken Grotesk: variabel wght, overskrifter (700) og labels
+     (600 sperret). Subsettet latin + norsk (34,5 kB).
    - Atkinson Hyperlegible (Braille Institute): 400/700/400i,
-     subsettet til latin + latin-ext + typografisk tegnsett + piler.
-   - Cascadia Code (Microsoft): variabel wght 200–700, samme subset
-     + geometriske former (▪ ▮) for terminal/ticker.
+     all brødtekst.
+   - Anybody (Etcetera Type Co): KUN navnetrekket «stian.» i toppnav
+     og footer — subsettet til de seks glyfene (3,5 kB).
 
-   Subset-pipeline: fonttools/pyftsubset fra offisielle kilder
-   (google/fonts- og microsoft/cascadia-code-repoene).
-   TODO (perf-pass, Done 13): size-adjust-kalibrerte fallbacks for
-   CLS-fri lasting.
+   Subset-pipeline: fonttools fra offisielle kilder (google/fonts).
+   TODO (perf-pass): size-adjust-kalibrerte fallbacks mot CLS.
    ============================================================ */
+
+@font-face {
+  font-family: 'Hanken Grotesk';
+  src: url('/fonts/hanken-grotesk-vf.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
 
 @font-face {
   font-family: 'Anybody';
   src: url('/fonts/anybody-navnetrekk.woff2') format('woff2');
   font-weight: 100 900;
   font-stretch: 50% 150%;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Cascadia Code';
-  src: url('/fonts/cascadia-code-vf.woff2') format('woff2');
-  font-weight: 200 700;
   font-style: normal;
   font-display: swap;
 }

@@ -1,27 +1,25 @@
 ---
 import Side from '../layouts/Side.astro';
 import Hero from '../components/Hero.astro';
-import Ticker from '../components/Ticker.astro';
 import ProsjektKort from '../components/ProsjektKort.astro';
 import prosjekter from '../data/prosjekter.json';
 ---
 
 <Side
   title="Stian Glomsrød — utvikler og UX"
-  description="Personlig utviklerportefølje og sandbox. Et kjørende program, ikke en brosjyre."
+  description="Lærer på vei inn i utviklerrollen. Det som pågår akkurat nå, med beviset rett under."
 >
-  <Ticker slot="topp" />
   <Hero />
-  <section class="bevis" aria-labelledby="bevis-tittel">
-    <h2 class="bevis-kicker" id="bevis-tittel">UTVALGTE BEVIS</h2>
+  <section class="bevis-seksjon" aria-labelledby="bevis-tittel">
+    <h2 class="label" id="bevis-tittel">Utvalgte prosjekter</h2>
     <div class="bevis-grid">
       <ProsjektKort
-        tag="Fullstack AI-produkt"
+        tag="Prosjekt 2026 · i produksjon"
         tittel="Klar"
-        tekst="PWA for elever med eksekutive vansker. Masterprosjekt — i produksjon."
+        tekst="App som hjelper elever med eksekutive vansker å komme i gang. Masterprosjektet mitt — i daglig bruk."
         lenker={[
-          { href: '/prosjekter#klar', label: 'case', primaer: true },
-          { href: prosjekter.klar.demo, label: 'demo' },
+          { href: prosjekter.klar.demo, label: 'prøv demoen', primaer: true },
+          { href: '/prosjekter#klar', label: 'les historien' },
         ]}
       />
       <ProsjektKort
@@ -31,29 +29,24 @@ import prosjekter from '../data/prosjekter.json';
         lenker={[{ href: prosjekter.companion.repo, label: 'kildekode' }]}
       />
       <ProsjektKort
-        tag="Enablement og overlevering"
+        tag="Levert til ekte eier"
         tittel={prosjekter.lori.navn}
         tekst={prosjekter.lori.beskrivelse}
         lenker={[{ href: prosjekter.lori.url, label: 'nettstedet' }]}
       />
     </div>
-    <p class="bevis-mer">
+    <p class="mer">
       <a href="/prosjekter">alle prosjekter →</a>
     </p>
   </section>
 </Side>
 
 <style>
-  .bevis {
+  .bevis-seksjon {
     margin-top: var(--s-8);
   }
 
-  .bevis-kicker {
-    font-family: var(--font-mono);
-    font-size: var(--tekst-label);
-    letter-spacing: 0.12em;
-    color: var(--dempet);
-    font-weight: 400;
+  .bevis-seksjon h2 {
     margin: 0 0 var(--s-3);
   }
 
@@ -63,9 +56,8 @@ import prosjekter from '../data/prosjekter.json';
     gap: var(--s-3);
   }
 
-  .bevis-mer {
+  .mer {
     margin: var(--s-4) 0 0;
-    font-family: var(--font-mono);
-    font-size: 12.5px;
+    font-size: 14px;
   }
 </style>

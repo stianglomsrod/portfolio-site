@@ -45,10 +45,11 @@ const { tag, tittel, tekst, note, lenker = [], id } = Astro.props;
   }
 
   .tag {
-    font-family: var(--font-mono);
-    font-size: 10px;
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: 10.5px;
     letter-spacing: 0.1em;
-    color: var(--aksent-1);
+    color: var(--dempet);
     margin: 0;
     text-transform: uppercase;
   }
@@ -77,7 +78,7 @@ const { tag, tittel, tekst, note, lenker = [], id } = Astro.props;
     display: flex;
     gap: var(--s-4);
     margin: var(--s-1) 0 0;
-    font-family: var(--font-mono);
+    font-family: var(--font-hd);
     font-size: 12px;
     flex-wrap: wrap;
   }
@@ -87,6 +88,6 @@ const { tag, tittel, tekst, note, lenker = [], id } = Astro.props;
   }
 
   .lenker a.primaer {
-    color: var(--signal);
+    color: var(--salvie);
   }
 </style>

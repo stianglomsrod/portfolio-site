@@ -6,6 +6,22 @@
 
 ## Changelog
 
+### 2026-07-10 — Kant-flukt løst systemisk: border-box + kant-sjekk i QA
+- **Global `box-sizing: border-box`** i Base: rotårsaken til alle
+  «skjeve kanter» var content-box, der padded blokker (readme, moduler)
+  stakk forbi naboer med samme max-width. Nå ER oppgitt bredde
+  ytterkanten.
+- **Sandbox**: kortene og hue-modulen deler grid (to eksplisitte spor,
+  modulen spenner raden) — målt piksel-eksakt lik høyrekant. Merk:
+  auto-fit fungerte IKKE her (full-rad-elementet holdt et tomt tredje
+  spor i live). HueVelger har ikke lenger egen max-width; konteksten
+  bestemmer. Readme-blokka på how-i-work deler kant med flyt-nodene.
+- **Ny programmatisk vakt**: `_baseline/qa/kant-sjekk.mjs` måler alle 16
+  ruter og feiler hvis en blokk-flate verken har nabo til høyre eller
+  når sidens/containerens høyre kant. Inne i grids sjekkes hver rad
+  unntatt den siste (ufullstendig sisterad er normal brekking). Kjøres
+  sammen med axe før commit av UI-endringer.
+
 ### 2026-07-09 (natt, del 2) — Tospråklig side, tema-switch, Ordkryss i /sandbox
 - **Engelsk versjon av hele siden** under /en/ med engelske slugger
   (/en/projects, /en/journey, /en/how-i-work, /en/about, /en/colophon,
@@ -136,6 +152,12 @@
   bruk midlertidig klasse rundt endringen.
 - Ikke `scale()` på flater med tekst i hover (shimmer) — bruk translateY.
 - Flex-elementer som skal kunne krympe trenger `min-width: 0`.
+- Blokk-flater får ALDRI egen max-width i px når de står i en kolonne
+  med naboer — de fyller sporet sitt, og grid-en eier bredden. Kjør
+  `node _baseline/qa/kant-sjekk.mjs` etter layoutendringer.
+- auto-fit kollapser bare helt tomme spor: et element med
+  `grid-column: 1/-1` holder alle sporene i live. Bruk eksplisitt
+  spor-antall når grid-en har fullrads-elementer.
 - Salvie kun om det levende/handlekraftige. Ingen kode-estetikk.
 - Trykkflater min. 44px. Axe skal stå i 0 brudd på alle 7 ruter.
 - Etiketter i diagrammer står alltid vannrett; beslutninger = diamant med

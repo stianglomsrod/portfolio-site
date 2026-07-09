@@ -91,6 +91,15 @@ const side = 'https://stianglomsrod.no';
 </html>
 
 <style is:global>
+  /* Border-box overalt: oppgitt bredde ER ytterkanten, uansett padding.
+     Uten denne stakk padded blokker (readme, moduler) forbi naboene sine
+     selv med lik max-width — kilden til alle «skjeve kanter»-feilene. */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
   html,
   body {
     margin: 0;

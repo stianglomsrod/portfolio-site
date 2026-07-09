@@ -37,9 +37,11 @@ import HueVelger from '../../components/HueVelger.astro';
       </span>
       <span class="eks-cta">make a sheet <span class="pil" aria-hidden="true">→</span></span>
     </a>
-  </div>
 
-  <HueVelger lang="en" />
+    <div class="full-rad">
+      <HueVelger lang="en" />
+    </div>
+  </div>
 </Side>
 
 <style>
@@ -63,11 +65,22 @@ import HueVelger from '../../components/HueVelger.astro';
     max-width: 68ch;
   }
 
+  /* Delt spor-regel: se den norske tvillingen. Håndheves av kant-sjekk. */
   .eks-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 480px));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--s-3);
     margin-top: var(--s-5);
+  }
+
+  .full-rad {
+    grid-column: 1 / -1;
+  }
+
+  @media (max-width: 640px) {
+    .eks-grid {
+      grid-template-columns: 1fr;
+    }
   }
 
   .eksperiment {

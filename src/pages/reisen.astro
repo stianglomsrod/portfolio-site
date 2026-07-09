@@ -25,8 +25,8 @@ const aktivitet = commits
   .slice(0, 3);
 
 const milepaeler = [
-  { naar: 'nå', tekst: `I gang med ${now.fullstack}, og ${now.ki}.`, levende: true },
-  { naar: 'juni 2026', tekst: 'Leverte masteroppgaven — Klar i produksjon.' },
+  { naar: 'nå', tekst: `I gang med ${now.kurs} (${now.kursStatus}), og ${now.ki} med ${now.kiVerktoy}.`, levende: true },
+  { naar: 'juni 2026', tekst: 'Leverte masteroppgaven. Klar sto ferdig som fungerende prototype.' },
   { naar: 'underveis i masteren', tekst: 'Bygde pd-app, forløperen til Klar: 132 commits skrevet for hånd.' },
   { naar: '2024', tekst: 'Fullførte CS50x hos Harvard. Ordkryss som sluttprosjekt.' },
   { naar: '2018', tekst: 'Lektor på Kongeveien skole — tok programmeringen inn i klasserommet.' },
@@ -41,8 +41,8 @@ const milepaeler = [
   <p class="label kicker">Reisen</p>
   <h1>Reisen</h1>
   <p class="ingress">
-    Det som skjer nå, og veien hit. Aktiviteten under hentes fra GitHub og
-    oversettes til klartekst — påstand og kvittering i samme liste.
+    Det som skjer nå, og veien hit. Aktiviteten hentes fra GitHub og
+    oversettes til klartekst.
   </p>
 
   <section aria-labelledby="siste-tittel" class="blokk">
@@ -64,8 +64,8 @@ const milepaeler = [
       ))}
     </ul>
     <p class="fotnote">
-      Milepælene kurateres for hånd; aktiviteten hentes fra GitHub ved bygg med
-      statisk reserve — lista kan ikke bli stående og lyve.
+      Milepælene kurateres for hånd. Aktiviteten hentes fra GitHub når siden
+      bygges, med en statisk reserve i bunn.
     </p>
   </section>
 </Side>

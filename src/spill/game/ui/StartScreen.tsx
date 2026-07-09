@@ -92,7 +92,7 @@ export default function StartScreen({
         <p className={styles.tagline}>{TAGLINE[lang]}</p>
         <p className={styles.nowLinje}>
           {lang === "no" ? "nå: " : "now: "}
-          {now.fullstack} · {now.ki}
+          {now.kurs} ({now.kursStatus}) · {now.ki} med {now.kiVerktoy}
         </p>
         <dl className={styles.controls}>
           <div>

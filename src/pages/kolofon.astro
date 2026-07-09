@@ -10,17 +10,17 @@ import Side from '../layouts/Side.astro';
   title="Kolofon — Stian Glomsrød"
   description="Slik ble siden bygget: verktøy, tilgjengelighet, personvern og kvitteringer."
 >
-  <p class="kicker">KOLOFON</p>
-  <h1>Kolofon</h1>
+  <p class="kicker">Kolofon</p>
+  <h1>Slik ble siden til</h1>
   <p class="dempet">
-    Byggehistorie, fontlisenser og Lighthouse-kvitteringer kommer her når
-    siden nærmer seg release.
+    Byggehistorie, fontlisenser og Lighthouse-tall kommer her når siden
+    nærmer seg lansering.
   </p>
   <section id="tilgjengelighet" aria-labelledby="uu-tittel">
     <h2 id="uu-tittel">Tilgjengelighet</h2>
     <p class="dempet">
-      Målet er WCAG 2.1 AA. Erklæringen skrives når siden er komplett — med
-      testlogg, ikke bare påstander.
+      Målet er WCAG 2.1 AA. Erklæringen publiseres sammen med testloggen når
+      siden er komplett.
     </p>
   </section>
   <section id="personvern" aria-labelledby="pv-tittel">
@@ -36,8 +36,10 @@ import Side from '../layouts/Side.astro';
 <style>
   .kicker {
     font-family: var(--font-hd);
+    font-weight: 600;
     font-size: var(--tekst-label);
     letter-spacing: 0.12em;
+    text-transform: uppercase;
     color: var(--dempet);
     margin: var(--s-7) 0 var(--s-2);
   }

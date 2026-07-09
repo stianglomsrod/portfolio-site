@@ -4,6 +4,8 @@
    Navnetrekket «stian.» i Anybody er kinetisk ved hover/fokus (300 ms) —
    eneste sted den fonten finnes, sammen med footeren. */
 
+import Merke from './Merke.astro';
+
 const punkter = [
   { href: '/', label: 'hjem' },
   { href: '/prosjekter', label: 'prosjekter' },
@@ -18,9 +20,7 @@ const erAktiv = (href: string) => sti === (href === '/' ? '/' : href);
 ---
 
 <header class="topp">
-  <a class="merke" href="/" aria-label="stian glomsrød — til forsiden">
-    <span class="bokstav" style="--w: 100">s</span><span class="bokstav" style="--w: 104">t</span><span class="bokstav" style="--w: 98">i</span><span class="bokstav" style="--w: 106">a</span><span class="bokstav" style="--w: 100">n</span><span class="punktum">.</span>
-  </a>
+  <Merke storrelse={17} />
   <nav aria-label="Hovedmeny">
     <ul class="meny">
       {punkter.map((p) => (
@@ -52,32 +52,6 @@ const erAktiv = (href: string) => sti === (href === '/' ? '/' : href);
     margin: 0 auto;
     padding: var(--s-3) var(--s-6);
     border-bottom: 1px solid var(--linje);
-  }
-
-  .merke {
-    font-family: var(--font-navnetrekk);
-    font-weight: 800;
-    font-size: 17px;
-    color: var(--tekst);
-    text-decoration: none;
-    padding: var(--s-2) 0;
-    flex-shrink: 0;
-    text-transform: lowercase;
-  }
-
-  .bokstav {
-    display: inline-block;
-    font-stretch: calc(var(--w) * 1%);
-    transition: font-stretch var(--dur-kinetikk) var(--ease);
-  }
-
-  .merke:hover .bokstav,
-  .merke:focus-visible .bokstav {
-    font-stretch: 135%;
-  }
-
-  .punktum {
-    color: var(--salvie);
   }
 
   .meny {

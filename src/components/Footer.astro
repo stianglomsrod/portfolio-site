@@ -1,12 +1,11 @@
 ---
 import profil from '../data/profil.json';
+import Merke from './Merke.astro';
 ---
 
 <footer class="bunn">
   <div class="indre">
-    <a class="merke" href="/" aria-label="stian glomsrød — til forsiden"
-      >stian<span class="punktum">.</span></a
-    >
+    <Merke storrelse={15} />
     <p class="linje">
       Bygget i åpen dialog med Claude · ingen informasjonskapsler ·
       <a href="/kolofon">slik ble siden til</a> ·
@@ -32,19 +31,6 @@ import profil from '../data/profil.json';
     align-items: baseline;
     gap: var(--s-4);
     flex-wrap: wrap;
-  }
-
-  .merke {
-    font-family: var(--font-navnetrekk);
-    font-weight: 800;
-    font-size: 15px;
-    color: var(--tekst);
-    text-decoration: none;
-    text-transform: lowercase;
-  }
-
-  .punktum {
-    color: var(--salvie);
   }
 
   .linje {

@@ -27,12 +27,12 @@ const klarSteg = [
   {
     steg: 'resultat',
     tekst:
-      'Fungerende prototype i produksjon, evaluert med lærere. Designvitenskapelig utviklingsarbeid — ikke effektstudie; elever deltok kun i forløperprosjektet.',
+      'Fungerende prototype, evaluert med lærere. Designvitenskapelig utviklingsarbeid, ikke effektstudie — elever deltok kun i forløperprosjektet.',
   },
   {
     steg: 'læring',
     tekst:
-      'Prototype og produksjonssystem er to ulike ting. AI som produktvalg trenger et kontrollpunkt, ikke bare en modell. Ærlige avgrensninger er en styrke i møte med folk som kan faget.',
+      'Prototype og produksjonssystem er to ulike ting, og AI i produktet krever et menneskelig kontrollpunkt. Avgrensningene her står med vilje.',
   },
 ];
 
@@ -47,7 +47,7 @@ const klarBilder = [
   title="Prosjekter — Stian Glomsrød"
   description="Case: Klar, Companion, Lori Frisør og forløperne — problem, innsikt, valg, resultat, læring."
 >
-  <p class="kicker">PROSJEKTER</p>
+  <p class="kicker">Prosjekter</p>
   <h1>Prosjekter</h1>
   <p class="ingress">
     Samme arbeidsmåte går igjen i ganske ulike leveranser: et produkt, en
@@ -59,10 +59,11 @@ const klarBilder = [
   </p>
 
   <section class="hovedcase" id="klar" aria-labelledby="klar-tittel">
-    <p class="case-tag">HOVEDCASE · FULLSTACK AI-PRODUKT · 2026</p>
+    <p class="case-tag">Hovedcase · Masterprosjekt · 2026</p>
     <h2 id="klar-tittel">Klar</h2>
     <p class="case-ingress">
-      PWA for elever med eksekutive vansker. Masterprosjekt — i produksjon.
+      Digitalt hjelpemiddel for elever med eksekutive vansker, bygd med
+      participatory design som metode.
     </p>
     <dl class="steg-liste">
       {klarSteg.map((s) => (
@@ -73,10 +74,29 @@ const klarBilder = [
       ))}
     </dl>
     <div class="galleri">
-      {klarBilder.map((b) => (
-        <img src={b.fil} alt={b.alt} loading="lazy" width="1920" height="871" />
+      {klarBilder.map((b, i) => (
+        <button
+          type="button"
+          class="galleri-knapp"
+          data-bilde={i}
+          aria-label={`Vis større bilde: ${b.alt}`}
+        >
+          <img src={b.fil} alt={b.alt} loading="lazy" width="1920" height="871" />
+        </button>
       ))}
     </div>
+    <dialog id="lysboks" aria-label="Bildevisning">
+      <button type="button" class="lb-knapp lb-lukk" data-lukk aria-label="Lukk bildevisningen">✕</button>
+      <button type="button" class="lb-knapp lb-forrige" data-forrige aria-label="Forrige bilde">←</button>
+      <figure class="lb-figur">
+        <img id="lysboks-bilde" src="" alt="" />
+        <figcaption>
+          <span id="lysboks-tekst"></span>
+          <span id="lysboks-teller" class="lb-teller"></span>
+        </figcaption>
+      </figure>
+      <button type="button" class="lb-knapp lb-neste" data-neste aria-label="Neste bilde">→</button>
+    </dialog>
     <p class="case-lenker">
       <a href={prosjekter.klar.demo} class="primaer" rel="noreferrer noopener">demo →</a>
       <a href={prosjekter.klar.repo} rel="noreferrer noopener">kildekode →</a>
@@ -133,8 +153,10 @@ const klarBilder = [
 <style>
   .kicker {
     font-family: var(--font-hd);
+    font-weight: 600;
     font-size: var(--tekst-label);
     letter-spacing: 0.12em;
+    text-transform: uppercase;
     color: var(--dempet);
     margin: var(--s-7) 0 var(--s-2);
   }
@@ -175,6 +197,7 @@ const klarBilder = [
     font-weight: 600;
     font-size: 10.5px;
     letter-spacing: 0.1em;
+    text-transform: uppercase;
     color: var(--dempet);
     margin: 0 0 var(--s-2);
   }
@@ -233,11 +256,104 @@ const klarBilder = [
     margin-top: var(--s-4);
   }
 
+  .galleri-knapp {
+    all: unset;
+    cursor: zoom-in;
+    border-radius: var(--radius-sm);
+  }
+
+  .galleri-knapp:focus-visible {
+    outline: 2px solid var(--salvie);
+    outline-offset: 2px;
+  }
+
   .galleri img {
     width: 100%;
     height: auto;
+    display: block;
     border-radius: var(--radius-sm);
     border: 1px solid var(--linje);
+  }
+
+  /* Lysboks: native <dialog> gir fokusfelle og Esc-lukking gratis */
+  #lysboks {
+    background: var(--bg);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-lg);
+    padding: var(--s-5);
+    max-width: min(92vw, 1200px);
+    color: var(--tekst);
+  }
+
+  #lysboks::backdrop {
+    background: rgba(10, 13, 12, 0.82);
+  }
+
+  .lb-figur {
+    margin: 0;
+  }
+
+  #lysboks-bilde {
+    display: block;
+    max-width: 100%;
+    max-height: 74vh;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--linje);
+  }
+
+  .lb-figur figcaption {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--s-4);
+    margin-top: var(--s-3);
+    font-size: 14px;
+    color: var(--dempet);
+  }
+
+  .lb-teller {
+    flex-shrink: 0;
+  }
+
+  .lb-knapp {
+    all: unset;
+    position: absolute;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: var(--tekst);
+    background: var(--flate);
+    border: 1px solid var(--linje);
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  .lb-knapp:hover {
+    border-color: var(--dempet);
+  }
+
+  .lb-knapp:focus-visible {
+    outline: 2px solid var(--salvie);
+    outline-offset: 2px;
+  }
+
+  .lb-lukk {
+    top: var(--s-3);
+    right: var(--s-3);
+  }
+
+  .lb-forrige {
+    left: var(--s-3);
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .lb-neste {
+    right: var(--s-3);
+    top: 50%;
+    transform: translateY(-50%);
   }
 
   .case-lenker {
@@ -270,3 +386,51 @@ const klarBilder = [
     margin-top: var(--s-5);
   }
 </style>
+
+<script>
+  // Lysboks med frem/tilbake: <dialog> gir fokusfelle og Esc; piltaster
+  // og knapper blar med wrap-around.
+  const dialog = document.getElementById('lysboks') as HTMLDialogElement | null;
+  const bildeEl = document.getElementById('lysboks-bilde') as HTMLImageElement | null;
+  const tekstEl = document.getElementById('lysboks-tekst');
+  const tellerEl = document.getElementById('lysboks-teller');
+  const knapper = [...document.querySelectorAll<HTMLButtonElement>('.galleri-knapp')];
+  const bilder = knapper.map((k) => {
+    const img = k.querySelector('img');
+    return { src: img?.getAttribute('src') ?? '', alt: img?.alt ?? '' };
+  });
+
+  let aktiv = 0;
+
+  const vis = (indeks: number) => {
+    aktiv = (indeks + bilder.length) % bilder.length;
+    const b = bilder[aktiv];
+    if (bildeEl) {
+      bildeEl.src = b.src;
+      bildeEl.alt = b.alt;
+    }
+    if (tekstEl) tekstEl.textContent = b.alt;
+    if (tellerEl) tellerEl.textContent = `${aktiv + 1} av ${bilder.length}`;
+  };
+
+  knapper.forEach((k, i) =>
+    k.addEventListener('click', () => {
+      vis(i);
+      dialog?.showModal();
+    })
+  );
+
+  dialog?.querySelector('[data-lukk]')?.addEventListener('click', () => dialog.close());
+  dialog?.querySelector('[data-forrige]')?.addEventListener('click', () => vis(aktiv - 1));
+  dialog?.querySelector('[data-neste]')?.addEventListener('click', () => vis(aktiv + 1));
+
+  dialog?.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') vis(aktiv - 1);
+    if (e.key === 'ArrowRight') vis(aktiv + 1);
+  });
+
+  // Klikk på bakteppet lukker (klikk inne i dialogboksen treffer barn-elementer)
+  dialog?.addEventListener('click', (e) => {
+    if (e.target === dialog) dialog.close();
+  });
+</script>

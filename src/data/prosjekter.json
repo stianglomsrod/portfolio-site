@@ -19,7 +19,7 @@
   },
   "companion": {
     "navn": "Companion (nikkoprogging)",
-    "beskrivelse": "Nikkos idé, bygget med agentisk arbeidsflyt: lokal-first, dokumentert, langvarig.",
+    "beskrivelse": "Nikkos idé, bygd videre over lang tid med dokumentert arbeidsflyt.",
     "stack": "Flutter · Dart · Drift/SQLite · lokal-first · PROJECT_DNA, planer, epics og tester",
     "repo": "https://github.com/stianglomsrod/nikkoprogging"
   },

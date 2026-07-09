@@ -1,0 +1,70 @@
+---
+/* Navnetrekket «stian.» — eneste sted Anybody finnes. Kinetisk ved
+   hover/fokus (300 ms): bokstavene videt ut og får hver sin farge.
+   Boksen har fast bredde målt for utvidet tilstand, så navnet aldri
+   dytter på naboelementene. */
+
+interface Props {
+  storrelse?: number;
+}
+
+const { storrelse = 17 } = Astro.props;
+
+const bokstaver = [
+  { c: 's', w: 100, farge: '#8fc9a8' },
+  { c: 't', w: 104, farge: '#c9b08a' },
+  { c: 'i', w: 98, farge: '#8ab8c9' },
+  { c: 'a', w: 106, farge: '#c98a8f' },
+  { c: 'n', w: 100, farge: '#a5c98a' },
+];
+---
+
+<a
+  class="merke"
+  href="/"
+  aria-label="stian glomsrød — til forsiden"
+  style={`font-size: ${storrelse}px`}
+>
+  {bokstaver.map((b) => (
+    <span class="bokstav" style={`--w: ${b.w}; --hovc: ${b.farge}`}>{b.c}</span>
+  ))}<span class="punktum">.</span>
+</a>
+
+<style>
+  .merke {
+    font-family: var(--font-navnetrekk);
+    font-weight: 800;
+    color: var(--tekst);
+    text-decoration: none;
+    text-transform: lowercase;
+    display: inline-flex;
+    align-items: baseline;
+    width: 4.1em;
+    flex-shrink: 0;
+    padding: var(--s-2) 0;
+  }
+
+  .bokstav {
+    display: inline-block;
+    font-stretch: calc(var(--w) * 1%);
+    transition:
+      font-stretch var(--dur-kinetikk) var(--ease),
+      color var(--dur-kinetikk) var(--ease);
+  }
+
+  .merke:hover .bokstav,
+  .merke:focus-visible .bokstav {
+    font-stretch: 135%;
+    color: var(--hovc);
+  }
+
+  .punktum {
+    color: var(--salvie);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bokstav {
+      transition: none;
+    }
+  }
+</style>

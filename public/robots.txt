@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /sandbox/skamlos-pitch
+
+Sitemap: https://stianglomsrod.no/sitemap-index.xml

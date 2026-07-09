@@ -58,35 +58,37 @@ import HueVelger from '../components/HueVelger.astro';
     max-width: 480px;
     margin-top: var(--s-5);
     text-decoration: none;
-    transition: border-color var(--dur-mikro);
+    transition: border-color var(--dur-mikro), transform var(--dur-mikro) var(--ease);
   }
 
-  .eksperiment:hover {
+  .eksperiment:hover,
+  .eksperiment:focus-visible {
     border-color: var(--salvie);
+    transform: translateY(-2px) scale(1.015);
   }
 
   .eks-tag {
     font-family: var(--font-hd);
-    font-size: 12px;
+    font-size: 12.5px;
     letter-spacing: 0.1em;
     color: var(--hue-aksent);
   }
 
   .eks-tittel {
-    font-size: 18px;
+    font-size: 19px;
     font-weight: 700;
     color: var(--tekst);
   }
 
   .eks-tekst {
-    font-size: 14.5px;
+    font-size: 15.5px;
     line-height: 1.5;
     color: var(--dempet);
   }
 
   .eks-cta {
     font-family: var(--font-hd);
-    font-size: 13.5px;
+    font-size: 14.5px;
     color: var(--salvie);
   }
 

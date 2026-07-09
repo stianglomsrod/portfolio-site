@@ -15,11 +15,28 @@ interface Props {
 }
 
 const { tag, tittel, tekst, note, lenker = [], id } = Astro.props;
+
+/* Hele kortet er klikkbart (strukket lenke fra tittelen). Målet er
+   historien der den finnes (intern lenke), ellers første lenke —
+   kort med kun repo går rett til repoet. */
+const hoved = lenker.find((l) => !l.href.startsWith('http')) ?? lenker[0];
 ---
 
 <article class="kort" id={id}>
   <p class="tag">{tag}</p>
-  <h3 class="tittel">{tittel}</h3>
+  <h3 class="tittel">
+    {hoved ? (
+      <a
+        class="dekk"
+        href={hoved.href}
+        rel={hoved.href.startsWith('http') ? 'noreferrer noopener' : undefined}
+      >
+        {tittel}
+      </a>
+    ) : (
+      tittel
+    )}
+  </h3>
   <p class="tekst">{tekst}</p>
   {note && <p class="note">{note}</p>}
   {lenker.length > 0 && (
@@ -35,6 +52,7 @@ const { tag, tittel, tekst, note, lenker = [], id } = Astro.props;
 
 <style>
   .kort {
+    position: relative;
     background: var(--flate);
     border: 1px solid var(--linje);
     border-radius: var(--radius-md);
@@ -45,12 +63,25 @@ const { tag, tittel, tekst, note, lenker = [], id } = Astro.props;
     gap: var(--s-2);
     height: 100%;
     box-sizing: border-box;
+    transition: transform var(--dur-mikro) var(--ease), border-color var(--dur-mikro);
+  }
+
+  .kort:hover {
+    transform: translateY(-2px) scale(1.015);
+    border-color: var(--dempet);
+  }
+
+  /* Tastatur får samme signal som mus */
+  .kort:has(.dekk:focus-visible) {
+    outline: 2px solid var(--salvie);
+    outline-offset: 2px;
+    transform: translateY(-2px) scale(1.015);
   }
 
   .tag {
     font-family: var(--font-hd);
     font-weight: 600;
-    font-size: 12px;
+    font-size: 12.5px;
     letter-spacing: 0.1em;
     color: var(--dempet);
     margin: 0;
@@ -58,29 +89,57 @@ const { tag, tittel, tekst, note, lenker = [], id } = Astro.props;
   }
 
   .tittel {
-    font-size: 19px;
+    font-size: 20px;
     font-weight: 700;
-    color: var(--tekst);
     margin: 0;
   }
 
+  /* Strukket lenke: hele kortet klikker til hovedmålet */
+  .dekk {
+    color: var(--salvie);
+    text-decoration: none;
+  }
+
+  .dekk::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-md);
+  }
+
+  .dekk:focus-visible {
+    outline: none; /* rammen ligger på kortet via :has over */
+  }
+
+  .kort:hover .dekk {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .tittel:not(:has(.dekk)) {
+    color: var(--overskrift);
+  }
+
   .tekst {
-    font-size: 14.5px;
+    font-size: 15.5px;
     line-height: 1.55;
     color: var(--dempet);
     margin: 0;
   }
 
   .note {
-    font-size: 14.5px;
+    font-size: 15.5px;
     color: var(--tekst);
     margin: 0;
   }
 
   /* Lenkesonen er kortets egen fot: pinnes til bunn (kortet med mest
      tekst bestemmer høyden, lenkerader i samme rad ligger på linje) og
-     skilles visuelt med tonet bakgrunn kant til kant. */
+     skilles visuelt med tonet bakgrunn kant til kant. Ligger over den
+     strukne lenka, så hver lenke er klikkbar for seg. */
   .lenker {
+    position: relative;
+    z-index: 1;
     display: flex;
     gap: var(--s-4);
     margin: auto calc(-1 * var(--s-4)) calc(-1 * var(--s-4));
@@ -89,7 +148,7 @@ const { tag, tittel, tekst, note, lenker = [], id } = Astro.props;
     border-top: 1px solid var(--linje);
     border-radius: 0 0 var(--radius-md) var(--radius-md);
     font-family: var(--font-hd);
-    font-size: 13.5px;
+    font-size: 14.5px;
     flex-wrap: wrap;
   }
 

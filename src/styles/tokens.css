@@ -3,11 +3,12 @@
    Kanonisk kilde: docs/handoff/Endelig_Guide_v3.pdf (09.07.2026).
 
    HELE paletten er hue-drevet: hver farge er oklch med låst lysstyrke
-   og metning, og deler vinkelen --hue. Slideren i /sandbox roterer
-   dermed hele siden — og fordi L/C aldri endres, holder alle målte
-   kontraster uansett tone. Default 158 reproduserer guidens grønne
-   palett (kalibrert fra hex-verdiene). --hue er @property-registrert,
-   så rotasjonen animeres mykt.
+   og metning. Flater og tekst deler vinkelen --hue (grunnfarge);
+   aksentene (salvie, overskrifter, heatmap) deler --hue2 og følger
+   grunnfargen til man løsner dem i /sandbox. Fordi L/C aldri endres,
+   holder alle målte kontraster uansett tone. Default 158 reproduserer
+   guidens grønne palett (kalibrert fra hex-verdiene). Begge vinkler er
+   @property-registrert, så rotasjonen animeres mykt.
    ============================================================ */
 
 @property --hue {
@@ -16,12 +17,21 @@
   initial-value: 158;
 }
 
+@property --hue2 {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 158;
+}
+
 html {
-  transition: --hue 500ms cubic-bezier(0.2, 0, 0, 1);
+  transition:
+    --hue 500ms cubic-bezier(0.2, 0, 0, 1),
+    --hue2 500ms cubic-bezier(0.2, 0, 0, 1);
 }
 
 :root {
   --hue: 158;
+  --hue2: 158;
 
   /* --- MØRK (standard) --- */
   --bg: oklch(20.3% 0.009 var(--hue));
@@ -29,25 +39,25 @@ html {
   --flate-2: oklch(22% 0.01 var(--hue));       /* soner inni kort */
   --nav-bg: oklch(20.3% 0.009 var(--hue));
   --tekst: oklch(92.2% 0.013 var(--hue));      /* 14.3:1 AAA */
-  --overskrift: oklch(90% 0.05 var(--hue));    /* grønnere enn brødtekst */
+  --overskrift: oklch(90% 0.05 var(--hue2));   /* grønnere enn brødtekst */
   --dempet: oklch(70.2% 0.024 var(--hue));     /* 6.9:1 AA */
-  --salvie: oklch(78.7% 0.076 var(--hue));     /* 9.5:1 AAA — KUN levende/handlekraftig */
-  --salvie-kontrast: oklch(20.3% 0.009 var(--hue));
-  --salvie-skygge: oklch(48.8% 0.063 var(--hue));
+  --salvie: oklch(78.7% 0.076 var(--hue2));    /* 9.5:1 AAA — KUN levende/handlekraftig */
+  --salvie-kontrast: oklch(20.3% 0.009 var(--hue2));
+  --salvie-skygge: oklch(48.8% 0.063 var(--hue2));
   --linje: oklch(29.7% 0.019 var(--hue));      /* dekorativ */
   --feil: oklch(69.8% 0.077 calc(var(--hue) + 216)); /* varm rød ved hue 158 */
   --kort-skygge: none;
 
-  /* --- HEATMAP (nivå 0–4) --- */
+  /* --- HEATMAP (nivå 0–4; tomme dager følger flatene, aktive aksenten) --- */
   --heat-0: oklch(25.8% 0.016 var(--hue));
-  --heat-1: oklch(40.5% 0.034 var(--hue));
-  --heat-2: oklch(54.1% 0.049 var(--hue));
-  --heat-3: oklch(66.5% 0.063 var(--hue));
-  --heat-4: oklch(78.7% 0.076 var(--hue));
+  --heat-1: oklch(40.5% 0.034 var(--hue2));
+  --heat-2: oklch(54.1% 0.049 var(--hue2));
+  --heat-3: oklch(66.5% 0.063 var(--hue2));
+  --heat-4: oklch(78.7% 0.076 var(--hue2));
 
   /* --- SANDBOX-AKSENT (hue-modulen + 404-roboten) --- */
-  --hue-aksent: oklch(72% 0.17 var(--hue));
-  --hue-flate: oklch(26% 0.045 var(--hue));
+  --hue-aksent: oklch(72% 0.17 var(--hue2));
+  --hue-flate: oklch(26% 0.045 var(--hue2));
 
   /* --- TYPOGRAFI --- */
   --font-sans: 'Atkinson Hyperlegible', system-ui, sans-serif; /* brødtekst */
@@ -56,8 +66,8 @@ html {
   --font-mono: ui-monospace, Consolas, monospace; /* system — kun spill-fallback */
   --tekst-hero: clamp(30px, 5.2vw, 52px); /* den levende setningen, lh 1.18 */
   --tekst-tittel: 24px;
-  --tekst-broed: 16px;   /* 1.6 linjehøyde, maks 66ch */
-  --tekst-label: 12px;   /* Hanken 600, sperret */
+  --tekst-broed: 17px;   /* 1.6 linjehøyde, maks 66ch */
+  --tekst-label: 12.5px; /* Hanken 600, sperret */
 
   /* --- SPACING / RADIUS --- */
   --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px;
@@ -82,11 +92,11 @@ html {
     --flate-2: oklch(97.3% 0.008 var(--hue));
     --nav-bg: oklch(91% 0.016 var(--hue));       /* mørkere enn bg, skiller nav */
     --tekst: oklch(27.6% 0.013 var(--hue));      /* 12.9:1 AAA */
-    --overskrift: oklch(33% 0.06 var(--hue));
+    --overskrift: oklch(33% 0.06 var(--hue2));
     --dempet: oklch(47.9% 0.021 var(--hue));     /* 5.7:1 AA */
-    --salvie: oklch(47.8% 0.081 var(--hue));     /* 5.5:1 AA */
+    --salvie: oklch(47.8% 0.081 var(--hue2));    /* 5.5:1 AA */
     --salvie-kontrast: #ffffff;                  /* 6.3:1 AA på CTA */
-    --salvie-skygge: oklch(35.9% 0.058 var(--hue));
+    --salvie-skygge: oklch(35.9% 0.058 var(--hue2));
     --linje: oklch(86.7% 0.022 var(--hue));
     --feil: oklch(49.5% 0.113 calc(var(--hue) + 216)); /* L lav nok til AA på alle toner */
     --heat-0: oklch(90.2% 0.019 var(--hue));
@@ -95,7 +105,7 @@ html {
     --heat-3: oklch(59% 0.075 var(--hue));
     --heat-4: oklch(47.8% 0.081 var(--hue));
     --kort-skygge: 0 1px 2px rgba(35, 42, 37, 0.05), 0 6px 16px rgba(35, 42, 37, 0.05);
-    --hue-aksent: oklch(48% 0.17 var(--hue));
+    --hue-aksent: oklch(48% 0.17 var(--hue2));
   }
 }
 
@@ -106,20 +116,20 @@ html {
   --flate-2: oklch(97.3% 0.008 var(--hue));
   --nav-bg: oklch(91% 0.016 var(--hue));
   --tekst: oklch(27.6% 0.013 var(--hue));
-  --overskrift: oklch(33% 0.06 var(--hue));
+  --overskrift: oklch(33% 0.06 var(--hue2));
   --dempet: oklch(47.9% 0.021 var(--hue));
-  --salvie: oklch(47.8% 0.081 var(--hue));
+  --salvie: oklch(47.8% 0.081 var(--hue2));
   --salvie-kontrast: #ffffff;
-  --salvie-skygge: oklch(35.9% 0.058 var(--hue));
+  --salvie-skygge: oklch(35.9% 0.058 var(--hue2));
   --linje: oklch(86.7% 0.022 var(--hue));
   --feil: oklch(49.5% 0.113 calc(var(--hue) + 216)); /* L lav nok til AA på alle toner */
   --heat-0: oklch(90.2% 0.019 var(--hue));
-  --heat-1: oklch(81.8% 0.05 var(--hue));
-  --heat-2: oklch(70.2% 0.071 var(--hue));
-  --heat-3: oklch(59% 0.075 var(--hue));
-  --heat-4: oklch(47.8% 0.081 var(--hue));
+  --heat-1: oklch(81.8% 0.05 var(--hue2));
+  --heat-2: oklch(70.2% 0.071 var(--hue2));
+  --heat-3: oklch(59% 0.075 var(--hue2));
+  --heat-4: oklch(47.8% 0.081 var(--hue2));
   --kort-skygge: 0 1px 2px rgba(35, 42, 37, 0.05), 0 6px 16px rgba(35, 42, 37, 0.05);
-  --hue-aksent: oklch(48% 0.17 var(--hue));
+  --hue-aksent: oklch(48% 0.17 var(--hue2));
 }
 
 /* --- REDUCED MOTION (ufravikelig): alt → 0 ms, dot og navn statiske --- */

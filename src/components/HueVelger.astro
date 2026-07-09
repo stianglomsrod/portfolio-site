@@ -1,32 +1,58 @@
 ---
-/* Hue-parameter: én oklch-vinkel styrer hele sidens palett. L og C er låst
-   i tokens, så AA-kontrasten holder uansett tone. Persisteres i localStorage
-   'hue' (tall, clampes 0–360) — cookiefritt — og leses inn før first paint
-   på alle sider (Base.astro). */
+/* Hue-parametre: to oklch-vinkler styrer hele sidens palett. Grunnfarge
+   styrer flater/tekst, aksent styrer salvie/overskrifter/heatmap — og
+   følger grunnfargen til den løsnes. L og C er låst i tokens, så
+   AA-kontrasten holder uansett tone. Persisteres i localStorage
+   ('hue'/'hue2', cookiefritt) og leses inn før first paint på alle
+   sider (Base.astro). Tilbakestill-knappen tar deg til guidens grønne. */
 ---
 
 <div class="hue-modul">
   <div class="hue-topp">
     <span class="hue-label">MODUL C · HUE-PARAMETER</span>
-    <span class="hue-verdi" id="hue-verdi" aria-live="polite">--hue: 158</span>
   </div>
-  <input
-    type="range"
-    id="hue-slider"
-    min="0"
-    max="360"
-    step="1"
-    value="158"
-    aria-label="Roter fargetonen"
-  />
-  <div class="hue-chips" aria-hidden="true">
-    <span class="hue-chip aksent"></span>
-    <span class="hue-chip flate"></span>
+
+  <div class="hue-rad">
+    <label class="hue-navn" for="hue-slider">grunnfarge</label>
+    <input
+      type="range"
+      id="hue-slider"
+      min="0"
+      max="360"
+      step="1"
+      value="158"
+    />
+    <span class="hue-verdi" id="hue-verdi" aria-live="polite">158</span>
   </div>
+
+  <div class="hue-rad">
+    <label class="hue-navn" for="hue2-slider">aksent</label>
+    <input
+      type="range"
+      id="hue2-slider"
+      min="0"
+      max="360"
+      step="1"
+      value="158"
+    />
+    <span class="hue-verdi" id="hue2-verdi" aria-live="polite">158</span>
+  </div>
+
+  <div class="hue-bunn">
+    <div class="hue-chips" aria-hidden="true">
+      <span class="hue-chip aksent"></span>
+      <span class="hue-chip flate"></span>
+    </div>
+    <button type="button" id="hue-reset" class="hue-tilbakestill">
+      tilbakestill fargene
+    </button>
+  </div>
+
   <p class="hue-spec">
-    én <code>@property</code>-registrert oklch-vinkel · L/C låst så
+    to <code>@property</code>-registrerte oklch-vinkler · L/C låst så
     AA-kontrasten holder uansett tone · huskes i localStorage (cookiefritt)
-    og følger deg på hele siden
+    og følger deg på hele siden · aksenten følger grunnfargen til du løsner
+    den
   </p>
 </div>
 
@@ -42,31 +68,42 @@
   }
 
   .hue-topp {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: var(--s-2);
     margin-bottom: var(--s-3);
   }
 
   .hue-label {
     font-family: var(--font-hd);
-    font-size: 11.5px;
+    font-size: 12px;
     letter-spacing: 0.1em;
     color: var(--hue-aksent);
   }
 
+  .hue-rad {
+    display: grid;
+    grid-template-columns: 84px 1fr 36px;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  .hue-navn {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: 13.5px;
+    color: var(--dempet);
+  }
+
   .hue-verdi {
     font-family: var(--font-hd);
-    font-size: 13px;
+    font-size: 13.5px;
     color: var(--hue-aksent);
+    text-align: right;
   }
 
   input[type='range'] {
     width: 100%;
     accent-color: var(--hue-aksent);
     cursor: pointer;
-    min-height: 44px;
+    min-height: 40px;
     margin: 0;
   }
 
@@ -75,10 +112,17 @@
     outline-offset: 2px;
   }
 
+  .hue-bunn {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--s-3);
+    margin-top: var(--s-2);
+  }
+
   .hue-chips {
     display: flex;
     gap: var(--s-2);
-    margin-top: var(--s-2);
   }
 
   .hue-chip {
@@ -96,9 +140,32 @@
     background: var(--hue-flate);
   }
 
+  .hue-tilbakestill {
+    all: unset;
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--dempet);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: color var(--dur-mikro), border-color var(--dur-mikro);
+  }
+
+  .hue-tilbakestill:hover {
+    color: var(--tekst);
+    border-color: var(--dempet);
+  }
+
+  .hue-tilbakestill:focus-visible {
+    outline: 2px solid var(--hue-aksent);
+    outline-offset: 2px;
+  }
+
   .hue-spec {
     font-family: var(--font-hd);
-    font-size: 12.5px;
+    font-size: 13px;
     line-height: 1.7;
     color: var(--dempet);
     margin: var(--s-3) 0 0;
@@ -110,19 +177,54 @@
 </style>
 
 <script>
-  import { lesHue, settHue } from '../lib/hue';
+  import {
+    STANDARD_HUE,
+    lesHue,
+    lesHue2,
+    settHue,
+    settHue2,
+    tilbakestillHue,
+  } from '../lib/hue';
 
   const slider = document.getElementById('hue-slider') as HTMLInputElement | null;
+  const slider2 = document.getElementById('hue2-slider') as HTMLInputElement | null;
   const verdi = document.getElementById('hue-verdi');
+  const verdi2 = document.getElementById('hue2-verdi');
+  const reset = document.getElementById('hue-reset');
 
-  const oppdater = (h: number, lagre: boolean) => {
-    settHue(h, lagre);
+  const visGrunn = (h: number) => {
     if (slider) slider.value = String(h);
-    if (verdi) verdi.textContent = `--hue: ${h}`;
+    if (verdi) verdi.textContent = String(h);
   };
 
-  const lagret = lesHue();
-  if (lagret !== null) oppdater(lagret, false);
+  const visAksent = (h: number) => {
+    if (slider2) slider2.value = String(h);
+    if (verdi2) verdi2.textContent = String(h);
+  };
 
-  slider?.addEventListener('input', () => oppdater(Number(slider.value), true));
+  // Init fra lagrede verdier; aksent følger grunnfargen til den er løsnet
+  const lagret = lesHue();
+  const lagret2 = lesHue2();
+  if (lagret !== null) visGrunn(lagret);
+  visAksent(lagret2 ?? lagret ?? STANDARD_HUE);
+
+  slider?.addEventListener('input', () => {
+    const h = Number(slider.value);
+    settHue(h, true);
+    visGrunn(h);
+    // Følger aksenten med? Da skal slideren dens speile det.
+    if (lesHue2() === null) visAksent(h);
+  });
+
+  slider2?.addEventListener('input', () => {
+    const h = Number(slider2.value);
+    settHue2(h, true);
+    visAksent(h);
+  });
+
+  reset?.addEventListener('click', () => {
+    tilbakestillHue();
+    visGrunn(STANDARD_HUE);
+    visAksent(STANDARD_HUE);
+  });
 </script>

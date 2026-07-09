@@ -128,7 +128,9 @@ const ferskhet =
     display: flex;
     gap: 4px;
     width: max-content;
-    padding-top: 34px; /* plass til tooltipen over rutene */
+    /* luft rundt rutene så tooltip (over) og hover-outline (under/sider)
+       ikke klippes av scrollerens overflow */
+    padding: 34px 3px 3px;
   }
 
   .rute {

@@ -9,8 +9,8 @@ import Side from '../layouts/Side.astro';
 
 const readme = [
   { nokkel: 'goals:', verdi: 'definert og skrevet ned før hver økt' },
-  { nokkel: 'guardrails:', verdi: 'hva agenten ikke får gjøre — håndhevet av gates som kjører i bygget' },
-  { nokkel: 'human_review:', verdi: 'beslutninger, retning og stikkprøver — ingen gate passeres på autopilot' },
+  { nokkel: 'guardrails:', verdi: 'hva agenten ikke får gjøre, eksplisitt og håndhevbart' },
+  { nokkel: 'human_review:', verdi: 'beslutninger, retning og stikkprøver ligger hos et menneske' },
 ];
 
 interface Node {
@@ -24,33 +24,33 @@ const noder: Node[] = [
   {
     navn: 'Kontekst og krav',
     tekst:
-      'Mål, rammer og suksesskriterier skrives ned før noe bygges. Kravene kan endres underveis — men som en dokumentert beslutning, ikke i forbifarten.',
+      'Mål, rammer og suksesskriterier skrives ned før noe bygges. Kravene kan endres underveis, men da som en dokumentert beslutning.',
   },
   {
     navn: 'Verktøy',
     tekst:
-      'Egne skills til Claude for jobben som skal gjøres, tilpasset domenet produktet lever i — pluss gates som kjører automatisk: innholdssjekker, sikkerhetsregler, byggekrav.',
+      'Jeg lager egne skills til Claude for jobben som skal gjøres, tilpasset domenet produktet lever i. Hva verktøyet sjekker og håndhever, avhenger av konteksten.',
     betingelse: 'rigget',
   },
   {
     navn: 'Arbeidsløkka',
     tekst:
-      'Agenten bygger i små, avgrensede leveranser: forsøk, valider mot kriteriene og gatene, korriger. Rødt i en gate stopper løkka — den kan ikke overtales.',
+      'Agenten bygger i små, avgrensede leveranser: forsøk, valider mot kriteriene, korriger. Stopper valideringen arbeidet, går løkka en runde til.',
     betingelse: 'alt grønt',
-    retur: 'ikke grønt → korriger og kjør på nytt',
+    retur: 'ikke grønt: korriger og kjør på nytt',
   },
   {
     navn: 'Sjekkpunkt',
     tekst:
-      'Her sitter mennesket: retning, avveininger og stikkprøver av arbeidet. Ny innsikt kan bety at kravene må justeres — da går flyten tilbake, ikke videre.',
+      'Her sitter mennesket: retning, avveininger og stikkprøver. Ny innsikt kan bety at kravene må justeres. Da går flyten tilbake, ikke videre.',
     betingelse: 'godkjent',
-    retur: 'ny innsikt → kravene justeres, løkka kjøres på nytt',
+    retur: 'ny innsikt: kravene justeres, og løkka kjøres på nytt',
   },
   {
     navn: 'Overlevering',
     tekst:
-      'Tilstanden skrives ned: hva som er gjort, hva som fortsatt er rødt, og neste steg — slik at neste økt eller en helt ny agent kan ta over uten muntlig kontekst.',
-    retur: 'neste økt starter på kontekst — med full historikk',
+      'Tilstanden skrives ned: hva som er gjort, hva som gjenstår, og neste steg. Neste økt eller en helt ny agent kan ta over uten muntlig kontekst.',
+    retur: 'neste økt starter på kontekst, med full historikk',
   },
 ];
 ---
@@ -78,10 +78,12 @@ const noder: Node[] = [
   <section aria-labelledby="flyt-tittel">
     <h2 id="flyt-tittel">Flyten</h2>
     <p class="flyt-ingress">
-      Ikke en rett linje, men en løkke med betingelser: arbeidet går videre
-      når kriteriene er grønne, og tilbake når de ikke er det.
+      Arbeidet går videre når kriteriene er grønne, og tilbake når de ikke
+      er det.
     </p>
-    <ol class="flyt">
+    <div class="flyt-omraade">
+      <svg id="retur-svg" aria-hidden="true"></svg>
+      <ol class="flyt">
       {noder.map((n, i) => (
         <li class="node-rad">
           <div class="node">
@@ -106,7 +108,8 @@ const noder: Node[] = [
           )}
         </li>
       ))}
-    </ol>
+      </ol>
+    </div>
   </section>
 
   <section aria-labelledby="guardrails-tittel">
@@ -183,6 +186,28 @@ const noder: Node[] = [
     color: var(--dempet);
     max-width: 62ch;
     margin: 0 0 var(--s-4);
+  }
+
+  /* Området rundt flyten har et felt til høyre der returpilene tegnes */
+  .flyt-omraade {
+    position: relative;
+    max-width: 740px;
+    padding-right: 120px;
+  }
+
+  #retur-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: visible;
+  }
+
+  @media (max-width: 680px) {
+    .flyt-omraade {
+      padding-right: 0;
+    }
   }
 
   .flyt {
@@ -288,3 +313,75 @@ const noder: Node[] = [
     color: var(--tekst);
   }
 </style>
+
+<script>
+  /* Returpiler i flytskjemaet: tegnes fra kortenes faktiske posisjoner,
+     som logiske porter — betingelsen avgjør om flyten går videre (pilene
+     i midten) eller tilbake (pilene her). På smale skjermer bærer
+     returtekstene i kortene informasjonen alene. */
+  const omraade = document.querySelector<HTMLElement>('.flyt-omraade');
+  const svg = document.getElementById('retur-svg');
+  const noder = [...document.querySelectorAll<HTMLElement>('.flyt .node')];
+
+  const ruter = [
+    { fra: 2, til: 2, label: 'ikke grønt', bane: 0 },
+    { fra: 3, til: 0, label: 'krav justeres', bane: 1 },
+    { fra: 4, til: 0, label: 'neste økt', bane: 2 },
+  ];
+
+  const NS = 'http://www.w3.org/2000/svg';
+
+  function tegn() {
+    if (!omraade || !svg || noder.length < 5) return;
+    svg.replaceChildren();
+    if (omraade.clientWidth < 640) return;
+
+    const boks = omraade.getBoundingClientRect();
+
+    for (const rute of ruter) {
+      const fra = noder[rute.fra].getBoundingClientRect();
+      const til = noder[rute.til].getBoundingClientRect();
+
+      const startX = fra.right - boks.left;
+      const startY = fra.bottom - boks.top - 28;
+      const baneX = startX + 28 + rute.bane * 30;
+      const sluttY = til.top - boks.top + 26 + rute.bane * 14;
+      const sluttX = til.right - boks.left + 9;
+
+      const linje = document.createElementNS(NS, 'path');
+      linje.setAttribute(
+        'd',
+        `M ${startX} ${startY} H ${baneX} V ${sluttY} H ${sluttX}`
+      );
+      linje.setAttribute('fill', 'none');
+      linje.setAttribute('stroke-width', '1.5');
+      linje.setAttribute('stroke-dasharray', '5 4');
+      linje.style.stroke = 'var(--dempet)';
+      svg.appendChild(linje);
+
+      const pil = document.createElementNS(NS, 'path');
+      pil.setAttribute('d', `M ${sluttX} ${sluttY} l 8 -4.5 v 9 z`);
+      pil.style.fill = 'var(--dempet)';
+      svg.appendChild(pil);
+
+      const tekst = document.createElementNS(NS, 'text');
+      const midtY = (startY + sluttY) / 2;
+      tekst.setAttribute('x', String(baneX + 12));
+      tekst.setAttribute('y', String(midtY));
+      tekst.setAttribute('text-anchor', 'middle');
+      tekst.setAttribute(
+        'transform',
+        `rotate(-90 ${baneX + 12} ${midtY})`
+      );
+      tekst.textContent = rute.label;
+      tekst.style.fill = 'var(--salvie)';
+      tekst.style.font = "600 11.5px 'Hanken Grotesk', sans-serif";
+      tekst.style.letterSpacing = '0.05em';
+      svg.appendChild(tekst);
+    }
+  }
+
+  tegn();
+  if (omraade) new ResizeObserver(tegn).observe(omraade);
+  document.fonts?.ready.then(tegn);
+</script>

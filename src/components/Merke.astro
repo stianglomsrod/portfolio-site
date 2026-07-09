@@ -29,7 +29,7 @@ const bokstaver = [
 >
   {bokstaver.map((b) => (
     <span class="bokstav" data-merke-bokstav style={`--w: ${b.w}; --hovc: ${b.farge}`}>{b.c}</span>
-  ))}<span class="punktum" data-farge="#8fc9a8">.</span>
+  ))}<span class="punktum" data-hue="155">.</span>
 </a>
 
 <style>
@@ -75,30 +75,41 @@ const bokstaver = [
 </style>
 
 <script>
-  // Tilfeldig farge per bokstav ved hover — aldri lik naboenes forrige/
-  // nåværende farge (punktumet teller som salvie-nabo for n-en).
-  const PALETT = [
-    '#8fc9a8',
-    '#c9b08a',
-    '#8ab8c9',
-    '#c98a8f',
-    '#a5c98a',
-    '#c9a8c2',
-    '#9ac9c2',
-    '#d9c08a',
-  ];
+  // Helt tilfeldig fargetone per bokstav ved hover (hele fargehjulet),
+  // med nabo-regel som vinkelavstand: aldri nærmere enn 45° fra naboenes
+  // forrige/nåværende tone eller bokstavens egen forrige. Lysstyrken
+  // låses per tema så kontrasten mot bakgrunnen holder.
+  const MIN_AVSTAND = 45;
+
+  const hueAvstand = (a: number, b: number) => {
+    const d = Math.abs(a - b) % 360;
+    return Math.min(d, 360 - d);
+  };
+
+  const lystTema = () => {
+    const satt = document.documentElement.dataset.theme;
+    if (satt === 'light') return true;
+    if (satt === 'dark') return false;
+    return window.matchMedia('(prefers-color-scheme: light)').matches;
+  };
 
   document.querySelectorAll<HTMLElement>('[data-merke-bokstav]').forEach((bokstav) => {
     bokstav.addEventListener('mouseenter', () => {
-      const opptatt = [
-        bokstav.dataset.farge,
-        (bokstav.previousElementSibling as HTMLElement | null)?.dataset.farge,
-        (bokstav.nextElementSibling as HTMLElement | null)?.dataset.farge,
-      ];
-      const kandidater = PALETT.filter((f) => !opptatt.includes(f));
-      const farge = kandidater[Math.floor(Math.random() * kandidater.length)];
-      bokstav.dataset.farge = farge;
-      bokstav.style.color = farge;
+      const unngaa = [
+        bokstav.dataset.hue,
+        (bokstav.previousElementSibling as HTMLElement | null)?.dataset.hue,
+        (bokstav.nextElementSibling as HTMLElement | null)?.dataset.hue,
+      ]
+        .map(Number)
+        .filter(Number.isFinite);
+
+      let hue = Math.floor(Math.random() * 360);
+      for (let i = 0; i < 40 && unngaa.some((u) => hueAvstand(hue, u) < MIN_AVSTAND); i++) {
+        hue = Math.floor(Math.random() * 360);
+      }
+
+      bokstav.dataset.hue = String(hue);
+      bokstav.style.color = `oklch(${lystTema() ? '46%' : '74%'} 0.15 ${hue})`;
     });
 
     bokstav.addEventListener('mouseleave', () => {

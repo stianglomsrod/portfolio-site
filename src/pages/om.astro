@@ -36,16 +36,14 @@ import now from '../../now.json';
         <div><dt>svartid:</dt><dd>under et døgn</dd></div>
       </dl>
     </div>
-    <div class="portrett-ramme">
-      <img
-        class="portrett"
-        src="/bilder/stian-byste.jpg"
-        alt="Stian Glomsrød smiler mot kamera, i svart pikéskjorte og caps"
-        width="276"
-        height="320"
-        loading="eager"
-      />
-    </div>
+    <img
+      class="portrett"
+      src="/bilder/stian-byste.jpg"
+      alt="Stian Glomsrød smiler mot kamera, i svart pikéskjorte og caps"
+      width="245"
+      height="245"
+      loading="eager"
+    />
   </div>
 
   <section id="kontakt" aria-labelledby="kontakt-tittel">
@@ -126,30 +124,19 @@ import now from '../../now.json';
     color: var(--salvie);
   }
 
-  /* Byste til høyre, rammet som artefakt med mono-bildetekst */
-  .portrett-ramme {
-    margin: 0;
-    flex-shrink: 0;
-    width: 250px;
-    background: var(--flate);
-    border: 1px solid var(--linje);
-    border-radius: var(--radius-md);
-    overflow: hidden;
-  }
-
+  /* Sirkelbyste til høyre — utsnittet er sentrert på ansiktet */
   .portrett {
     display: block;
-    width: 100%;
-    height: auto;
+    width: 230px;
+    height: 230px;
+    border-radius: 50%;
+    border: 2px solid var(--linje);
+    flex-shrink: 0;
   }
 
   @media (max-width: 640px) {
     .topp {
       flex-direction: column-reverse;
-    }
-
-    .portrett-ramme {
-      width: min(100%, 300px);
     }
   }
 

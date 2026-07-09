@@ -1,16 +1,25 @@
 ---
 import profil from '../data/profil.json';
 import Merke from './Merke.astro';
+import { UI, type Spraak } from '../lib/i18n';
+
+interface Props {
+  lang?: Spraak;
+}
+
+const { lang = 'nb' } = Astro.props;
+const t = UI[lang];
+const kolofonSti = lang === 'nb' ? '/kolofon' : '/en/colophon';
 ---
 
 <footer class="bunn">
   <div class="indre">
-    <Merke storrelse={15} />
+    <Merke storrelse={15} ariaLabel={t.merkeAria} />
     <p class="linje">
-      Bygget i åpen dialog med Claude · ingen informasjonskapsler ·
-      <a href="/kolofon">slik ble siden til</a> ·
-      <a href="/kolofon#tilgjengelighet">tilgjengelighet</a> ·
-      <a href={`mailto:${profil.kontakt.epost}`}>e-post</a> ·
+      {t.bunnLinje}
+      <a href={kolofonSti}>{t.bunnKolofon}</a> ·
+      <a href={`${kolofonSti}#tilgjengelighet`}>{t.bunnUu}</a> ·
+      <a href={`mailto:${profil.kontakt.epost}`}>{t.bunnEpost}</a> ·
       <a href={profil.kontakt.github} rel="me">GitHub</a> ·
       <a href={profil.kontakt.linkedin} rel="me">LinkedIn</a>
     </p>

@@ -5,6 +5,27 @@
    AA-kontrasten holder uansett tone. Persisteres i localStorage
    ('hue'/'hue2', cookiefritt) og leses inn før first paint på alle
    sider (Base.astro). Tilbakestill-knappen tar deg til guidens grønne. */
+
+interface Props {
+  lang?: 'nb' | 'en';
+}
+
+const { lang = 'nb' } = Astro.props;
+
+const t =
+  lang === 'nb'
+    ? {
+        grunnfarge: 'grunnfarge',
+        aksent: 'aksent',
+        tilbakestill: 'tilbakestill fargene',
+        spec: 'to @property-registrerte oklch-vinkler · L/C låst så AA-kontrasten holder uansett tone · huskes i localStorage (cookiefritt) og følger deg på hele siden · aksenten følger grunnfargen til du løsner den',
+      }
+    : {
+        grunnfarge: 'base hue',
+        aksent: 'accent',
+        tilbakestill: 'reset the colours',
+        spec: 'two @property-registered oklch angles · L/C locked so AA contrast holds at any hue · remembered in localStorage (no cookies) and follows you across the site · the accent follows the base hue until you detach it',
+      };
 ---
 
 <div class="hue-modul">
@@ -13,7 +34,7 @@
   </div>
 
   <div class="hue-rad">
-    <label class="hue-navn" for="hue-slider">grunnfarge</label>
+    <label class="hue-navn" for="hue-slider">{t.grunnfarge}</label>
     <input
       type="range"
       id="hue-slider"
@@ -26,7 +47,7 @@
   </div>
 
   <div class="hue-rad">
-    <label class="hue-navn" for="hue2-slider">aksent</label>
+    <label class="hue-navn" for="hue2-slider">{t.aksent}</label>
     <input
       type="range"
       id="hue2-slider"
@@ -44,16 +65,11 @@
       <span class="hue-chip flate"></span>
     </div>
     <button type="button" id="hue-reset" class="hue-tilbakestill">
-      tilbakestill fargene
+      {t.tilbakestill}
     </button>
   </div>
 
-  <p class="hue-spec">
-    to <code>@property</code>-registrerte oklch-vinkler · L/C låst så
-    AA-kontrasten holder uansett tone · huskes i localStorage (cookiefritt)
-    og følger deg på hele siden · aksenten følger grunnfargen til du løsner
-    den
-  </p>
+  <p class="hue-spec">{t.spec}</p>
 </div>
 
 <style>

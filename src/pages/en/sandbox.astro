@@ -1,44 +1,45 @@
 ---
-import Side from '../layouts/Side.astro';
-import HueVelger from '../components/HueVelger.astro';
+import Side from '../../layouts/Side.astro';
+import HueVelger from '../../components/HueVelger.astro';
 
-/* Verkstedet. Hue-parameteren bor her (og på 404).
-   ENGELSK TVILLING: src/pages/en/sandbox.astro — endre begge. */
+/* The workshop. NORSK TVILLING: src/pages/sandbox.astro — endre begge. */
 ---
 
 <Side
+  lang="en"
   title="/sandbox — Stian Glomsrød"
-  description="Verkstedet: eksperimenter, verktøy og spillet «Skamløs pitch»."
+  description="The workshop: experiments, tools and the game “Shameless Pitch”."
 >
   <p class="kicker">/sandbox</p>
   <h1>Sandbox</h1>
   <p class="dempet">
-    Verkstedet mitt. Her dukker det opp alt fra ferdige til uferdige ting.
+    My workshop. Everything from finished to unfinished things shows up here.
   </p>
 
   <div class="eks-grid">
     <a class="eksperiment" href="/sandbox/skamlos-pitch">
-      <span class="eks-tag">Spill</span>
+      <span class="eks-tag">Game</span>
       <span class="eks-tittel">Skamløs Pitch: Kompetansebyen</span>
       <span class="eks-tekst">
-        Et lite topp-ned-RPG om å bygge kompetanse. Spillet leser de samme
-        datakildene som resten av siden.
+        A small top-down RPG about building competence. The game reads the
+        same data sources as the rest of the site. In Norwegian.
       </span>
-      <span class="eks-cta">spill <span class="pil" aria-hidden="true">→</span></span>
+      <span class="eks-cta">play <span class="pil" aria-hidden="true">→</span></span>
     </a>
 
-    <a class="eksperiment" href="/sandbox/ordkryss">
-      <span class="eks-tag">Verktøy</span>
-      <span class="eks-tittel">Ordkryss</span>
+    <a class="eksperiment" href="/en/sandbox/wordsearch">
+      <span class="eks-tag">Tool</span>
+      <span class="eks-tittel">Word search</span>
       <span class="eks-tekst">
-        Ordletingsark til utskrift, for lærere: tre retninger, bilder per
-        ord, fasit og bannordfilter. Bygget om fra CS50x-sluttprosjektet.
+        Printable word search sheets for teachers: three directions,
+        pictures per word, an answer key and a profanity filter. Rebuilt
+        from my CS50x final project.
       </span>
-      <span class="eks-cta">lag et ark <span class="pil" aria-hidden="true">→</span></span>
+      <span class="eks-cta">make a sheet <span class="pil" aria-hidden="true">→</span></span>
     </a>
   </div>
 
-  <HueVelger lang="nb" />
+  <HueVelger lang="en" />
 </Side>
 
 <style>

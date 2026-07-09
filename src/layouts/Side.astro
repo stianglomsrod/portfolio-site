@@ -2,23 +2,27 @@
 import Base from './Base.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import { motpart, UI, type Spraak } from '../lib/i18n';
 
 interface Props {
   title: string;
   description?: string;
+  lang?: Spraak;
 }
 
-const { title, description } = Astro.props;
+const { title, description, lang = 'nb' } = Astro.props;
+const alternativ = motpart(Astro.url.pathname, lang);
+const t = UI[lang];
 ---
 
-<Base title={title} description={description}>
-  <a class="hopp" href="#innhold">Hopp til innholdet</a>
+<Base title={title} description={description} lang={lang} alternativ={alternativ}>
+  <a class="hopp" href="#innhold">{t.hoppTil}</a>
   <slot name="topp" />
-  <Nav />
+  <Nav lang={lang} alternativ={alternativ} />
   <main id="innhold" class="ramme">
     <slot />
   </main>
-  <Footer />
+  <Footer lang={lang} />
 </Base>
 
 <style>

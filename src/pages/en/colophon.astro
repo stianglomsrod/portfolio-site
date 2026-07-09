@@ -1,0 +1,117 @@
+---
+import Side from '../../layouts/Side.astro';
+import profil from '../../data/profil.json';
+
+/* English colophon. NORSK TVILLING: src/pages/kolofon.astro — endre begge.
+   Ankeret #tilgjengelighet deles med footeren på begge språk. */
+
+const epost = profil.kontakt.epost;
+---
+
+<Side
+  lang="en"
+  title="Colophon — Stian Glomsrød"
+  description="How this site was built: tools, accessibility, privacy and receipts."
+>
+  <p class="kicker">Colophon</p>
+  <h1>How this site was made</h1>
+  <p class="dempet">
+    The site is built in open dialogue with Claude, and this page documents
+    how.
+  </p>
+
+  <section aria-labelledby="prosess-tittel">
+    <h2 id="prosess-tittel">The process</h2>
+    <p class="dempet">
+      I started by giving Claude Design good context, so I could iterate on
+      and focus the design guide. The third version stuck. I handed the guide
+      over to Claude Code, which worked with skills I have built for it:
+      /prd, /norwegian-software-guardrails and /secure-dev-guardrails.
+    </p>
+    <p class="dempet">
+      Before anything was built, we measured the old site: Lighthouse, an
+      accessibility check and screenshots at three screen widths. The numbers
+      live in the repo and become the baseline for comparison at launch.
+    </p>
+    <p class="dempet">
+      The building itself happens in sessions with Claude Code, in loops
+      against the done-criteria (see <a href="/en/how-i-work">how I work</a>).
+      Checks run automatically before every build, decisions are logged with
+      a date and a rollback command, and everything is verified in a running
+      preview before it enters the history. Along the way we changed design
+      direction completely. That sits in the log as a documented decision,
+      not as an overwrite.
+    </p>
+  </section>
+
+  <section aria-labelledby="stack-tittel">
+    <h2 id="stack-tittel">Stack and data</h2>
+    <p class="dempet">
+      Astro, with a small React island for the game in
+      <a href="/en/sandbox">/sandbox</a>, hosted on Vercel. The fonts Hanken
+      Grotesk, Atkinson Hyperlegible and Anybody are self-hosted and
+      subsetted, all under the SIL Open Font License. The live numbers on the
+      front page come from a data file in the repo and GitHub's API, with a
+      static reserve if the fetch fails.
+    </p>
+    <p class="dempet">
+      Lighthouse numbers and the full build history will be published here at
+      launch.
+    </p>
+  </section>
+
+  <section id="tilgjengelighet" aria-labelledby="uu-tittel">
+    <h2 id="uu-tittel">Accessibility</h2>
+    <p class="dempet">
+      The target is WCAG 2.1 AA. The statement will be published together
+      with the test log once the site is complete.
+    </p>
+  </section>
+  <section id="personvern" aria-labelledby="pv-tittel">
+    <h2 id="pv-tittel">Privacy</h2>
+    <p class="dempet">
+      The site sets no cookies and has no tracking or analytics. Your choices
+      for theme and colour hue are stored only locally in your own browser,
+      and never leave your machine.
+    </p>
+    <p class="dempet">
+      If you use the contact form, your name, email address and message are
+      forwarded to me as an email. Nothing is stored in any database. The
+      basis for the processing is that you chose to get in touch, and the
+      details are used only to reply to you.
+    </p>
+    <p class="dempet">
+      Two data processors are involved: Vercel hosts the site, and Resend
+      delivers the email from the form. Both process data within the EU/EEA.
+      If you want to see what I have, or have it deleted, just send an email
+      to <a href={`mailto:${epost}`}>{epost}</a>.
+    </p>
+  </section>
+</Side>
+
+<style>
+  .kicker {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: var(--tekst-label);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--dempet);
+    margin: var(--s-7) 0 var(--s-2);
+  }
+
+  h1 {
+    font-size: var(--tekst-tittel);
+    margin: 0 0 var(--s-3);
+  }
+
+  h2 {
+    font-size: 18px;
+    margin: var(--s-6) 0 var(--s-2);
+  }
+
+  .dempet {
+    color: var(--dempet);
+    max-width: 68ch;
+  }
+</style>

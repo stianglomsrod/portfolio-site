@@ -7,6 +7,12 @@ import { hentHeatmap, hentSisteCommits } from '../lib/github';
    Salvie-ordene er de levende (API-drevne). H1 = hele setningen — den ER
    semantisk. Ingen kode-estetikk. */
 
+interface Props {
+  lang?: 'nb' | 'en';
+}
+
+const { lang = 'nb' } = Astro.props;
+
 const heatmap = await hentHeatmap();
 const [sisteCommit] = await hentSisteCommits(1);
 
@@ -18,44 +24,87 @@ const sisteDager = heatmap
   : [];
 const maanedTotal = sisteDager.reduce((sum, d) => sum + d.antall, 0);
 const datoTekst = (iso: string) =>
-  new Date(iso).toLocaleDateString('nb-NO', { day: 'numeric', month: 'long' });
+  new Date(iso).toLocaleDateString(lang === 'nb' ? 'nb-NO' : 'en-GB', {
+    day: 'numeric',
+    month: 'long',
+  });
 
 const naa = Date.now();
 const sistAktiv = sisteCommit ? new Date(sisteCommit.tidspunkt).getTime() : 0;
 const dagerSiden = (naa - sistAktiv) / 86_400_000;
+
+/* Tekster per språk; de levende verdiene kommer fra now.json */
+const kursStatus = lang === 'nb' ? now.kursStatus : now.en.kursStatus;
+const soker = lang === 'nb' ? now.soker : now.en.soker;
+const notis = lang === 'nb' ? now.notis : now.en.notis;
+const t =
+  lang === 'nb'
+    ? {
+        label: 'Akkurat nå',
+        jobberMed: 'Jobber med',
+        i: 'i',
+        bidragMnd: (n: number) => `${n} bidrag siste måneden`,
+        bidragAar: (n: number) => `· ${n} siste år`,
+        srOppsummering: (mnd: number, aar: number) =>
+          `${mnd} bidrag siste måneden, ${aar} siste år.`,
+        tipTekst: (antall: number, dato: string) => `${antall} bidrag ${dato}`,
+        fallback: 'Aktivitetsmatrisen kobles på når GitHub-tokenet er satt.',
+        aktivIdag: 'aktiv i dag',
+        aktivUka: 'aktiv denne uka',
+        sokerLinje: 'Søker',
+        jobb: '-jobb —',
+        cta: 'ta kontakt',
+      }
+    : {
+        label: 'Right now',
+        jobberMed: 'Working through',
+        i: 'of',
+        bidragMnd: (n: number) => `${n} contributions in the last month`,
+        bidragAar: (n: number) => `· ${n} in the last year`,
+        srOppsummering: (mnd: number, aar: number) =>
+          `${mnd} contributions in the last month, ${aar} in the last year.`,
+        tipTekst: (antall: number, dato: string) =>
+          `${antall} contributions on ${dato}`,
+        fallback: 'The activity matrix connects once the GitHub token is set.',
+        aktivIdag: 'active today',
+        aktivUka: 'active this week',
+        sokerLinje: 'Looking for a',
+        jobb: ' role —',
+        cta: 'get in touch',
+      };
+
 const ferskhet =
-  dagerSiden < 1 ? 'aktiv i dag' : dagerSiden < 7 ? 'aktiv denne uka' : null;
+  dagerSiden < 1 ? t.aktivIdag : dagerSiden < 7 ? t.aktivUka : null;
 
 /* Notisen fra now.json går inn i selve setningen. «Fable 5» får
    levende-markering når det står i teksten. */
-const notisDeler = now.notis ? now.notis.split('Fable 5') : null;
+const notisDeler = notis ? notis.split('Fable 5') : null;
+const ctaHref = lang === 'nb' ? '/om#kontakt' : '/en/about#kontakt';
 ---
 
 <section class="hero" aria-labelledby="hero-h1">
-  <p class="label">Akkurat nå</p>
+  <p class="label">{t.label}</p>
 
   <h1 id="hero-h1" class="setning">
-    Jobber med {now.kursStatus} i <span class="levende">{now.kurs}</span>.
+    {t.jobberMed} {kursStatus} {t.i} <span class="levende">{now.kurs}</span>.
     {notisDeler && notisDeler.length === 2 && (
       <>
         {notisDeler[0]}<span class="levende">Fable 5</span>{notisDeler[1]}.
       </>
     )}
-    {notisDeler && notisDeler.length !== 2 && <>{now.notis}.</>}
+    {notisDeler && notisDeler.length !== 2 && <>{notis}.</>}
   </h1>
 
   <div class="bevis">
     {heatmap && (
       <>
-        <p class="sr-only">
-          {maanedTotal} bidrag siste måneden, {heatmap.totalt} siste år.
-        </p>
+        <p class="sr-only">{t.srOppsummering(maanedTotal, heatmap.totalt)}</p>
         <div class="matrise-scroller">
           <div class="matrise" aria-hidden="true">
             {sisteDager.map((dag) => (
               <span
                 class={`rute niv-${dag.nivaa}`}
-                data-tip={`${dag.antall} bidrag ${datoTekst(dag.dato)}`}
+                data-tip={t.tipTekst(dag.antall, datoTekst(dag.dato))}
               ></span>
             ))}
           </div>
@@ -65,13 +114,11 @@ const notisDeler = now.notis ? now.notis.split('Fable 5') : null;
     <p class="bevis-linje">
       {heatmap ? (
         <>
-          <span class="levende">{maanedTotal} bidrag siste måneden</span>
-          <span class="aarstall">· {heatmap.totalt} siste år</span>
+          <span class="levende">{t.bidragMnd(maanedTotal)}</span>
+          <span class="aarstall">{t.bidragAar(heatmap.totalt)}</span>
         </>
       ) : (
-        <span class="dempet">
-          Aktivitetsmatrisen kobles på når GitHub-tokenet er satt.
-        </span>
+        <span class="dempet">{t.fallback}</span>
       )}
       {ferskhet && (
         <span class="fersk">
@@ -83,8 +130,8 @@ const notisDeler = now.notis ? now.notis.split('Fable 5') : null;
   </div>
 
   <p class="cta-linje">
-    Søker {now.soker}-jobb —
-    <a class="cta knapp" href="/om#kontakt">ta kontakt</a>
+    {t.sokerLinje} {soker}{t.jobb}
+    <a class="cta knapp" href={ctaHref}>{t.cta}</a>
   </p>
 </section>
 

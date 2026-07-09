@@ -1,69 +1,69 @@
 ---
-import Side from '../layouts/Side.astro';
-import ProsjektKort from '../components/ProsjektKort.astro';
-import prosjekter from '../data/prosjekter.json';
+import Side from '../../layouts/Side.astro';
+import ProsjektKort from '../../components/ProsjektKort.astro';
+import prosjekter from '../../data/prosjekter.json';
 
-/* Case-format fra briefen: problem → innsikt → valg → resultat → læring.
-   Klar er hovedcase. Lori Frisør vises på plassholdernivå (= dagens
-   offentlige nivå: navn + stack + lenker, ingen skjermbilder) til skriftlig
-   godkjenning er arkivert (Done 19). Copy er lo-fi til endelig tekst. */
+/* English projects page. NORSK TVILLING: src/pages/prosjekter.astro —
+   endre begge. Sannhetsreglene gjelder på begge språk: Klar er en
+   fungerende prototype evaluert med lærere, ikke i produksjon. */
 
 const klarSteg = [
   {
     steg: 'problem',
     tekst:
-      'Lærere bruker kvelder på å oversette ukeplaner og beskjeder til noe elever med eksekutive vansker faktisk kan bruke. Verktøyene som finnes krever mer struktur enn skolehverdagen har.',
+      'Teachers spend evenings translating weekly plans and messages into something pupils with executive function challenges can actually use. The existing tools demand more structure than a school day has.',
   },
   {
-    steg: 'innsikt',
+    steg: 'insight',
     tekst:
-      'Fra deltakende design med lærere: lav terskel og tidssparing avgjør om noe blir brukt; hjelp må skje uten stigma; motivasjon må ikke bli press. Behovene ble kartlagt i workshops — lærerne var meddesignere.',
+      'From participatory design with teachers: low friction and time saved decide whether something gets used; help must come without stigma; motivation must not turn into pressure. The needs were mapped in workshops, with the teachers as co-designers.',
   },
   {
-    steg: 'valg',
+    steg: 'choice',
     tekst:
-      'Responsiv PWA (React, Next.js, TypeScript, Supabase/PostgreSQL) med rollebasert tilgang — lærer og elev på samme datalag. Smart Import: AI-assistert import av ukebrev med redigerbar forhåndsvisning, så et menneske alltid godkjenner før noe publiseres.',
+      'A responsive PWA (React, Next.js, TypeScript, Supabase/PostgreSQL) with role-based access, teacher and pupil on the same data layer. Smart Import: AI-assisted import of weekly letters with an editable preview, so a human always approves before anything is published.',
   },
   {
-    steg: 'resultat',
+    steg: 'result',
     tekst:
-      'Fungerende prototype, evaluert med lærere. Designvitenskapelig utviklingsarbeid, ikke effektstudie — elever deltok kun i forløperprosjektet.',
+      'A working prototype, evaluated with teachers. Design science research, not an effect study. Pupils only took part in the precursor project.',
   },
   {
-    steg: 'læring',
+    steg: 'learning',
     tekst:
-      'Prototype og produksjonssystem er to ulike ting, og AI i produktet krever et menneskelig kontrollpunkt. Avgrensningene her står med vilje.',
+      'A prototype and a production system are two different things, and AI in the product needs a human checkpoint. The boundaries here are deliberate.',
   },
 ];
 
 const klarBilder = [
-  { fil: '/bilder/klar/smart-import.png', alt: 'Skjermbilde av Smart Import i Klar: ukebrev er tolket til en redigerbar forhåndsvisning før publisering' },
-  { fil: '/bilder/klar/laererens-landingsside.png', alt: 'Skjermbilde av lærerens landingsside i Klar med oversikt over klasser og oppgaver' },
-  { fil: '/bilder/klar/elevens-landingsside.png', alt: 'Skjermbilde av elevens landingsside i Klar med dagens plan' },
+  { fil: '/bilder/klar/smart-import.png', alt: 'Screenshot of Smart Import in Klar: a weekly letter interpreted into an editable preview before publishing' },
+  { fil: '/bilder/klar/laererens-landingsside.png', alt: 'Screenshot of the teacher landing page in Klar with an overview of classes and tasks' },
+  { fil: '/bilder/klar/elevens-landingsside.png', alt: 'Screenshot of the pupil landing page in Klar with today’s plan' },
 ];
 ---
 
 <Side
-  title="Prosjekter — Stian Glomsrød"
-  description="Case: Klar, Companion, Lori Frisør og forløperne — problem, innsikt, valg, resultat, læring."
+  lang="en"
+  title="Projects — Stian Glomsrød"
+  description="Cases: Klar, Companion, Lori Frisør and their precursors — problem, insight, choice, result, learning."
 >
-  <p class="kicker">Prosjekter</p>
-  <h1>Prosjekter</h1>
+  <p class="kicker">Projects</p>
+  <h1>Projects</h1>
   <p class="ingress">
-    Samme arbeidsmåte går igjen i ganske ulike leveranser: et produkt, en
-    langvarig utviklingsflyt og en overlevering til en kunde.
+    The same way of working runs through quite different deliveries: a
+    product, a long-running development flow and a handover to a client.
   </p>
   <p class="format" aria-hidden="true">
-    problem <span>→</span> innsikt <span>→</span> valg <span>→</span> resultat
-    <span>→</span> læring
+    problem <span>→</span> insight <span>→</span> choice <span>→</span> result
+    <span>→</span> learning
   </p>
 
   <section class="hovedcase" id="klar" aria-labelledby="klar-tittel">
-    <p class="case-tag">Hovedcase · Masterprosjekt · 2026</p>
+    <p class="case-tag">Main case · Master's project · 2026</p>
     <h2 id="klar-tittel">Klar</h2>
     <p class="case-ingress">
-      Digitalt hjelpemiddel for elever med eksekutive vansker, bygd med
-      participatory design som metode.
+      A digital aid for pupils with executive function challenges, built with
+      participatory design as the method.
     </p>
     <dl class="steg-liste">
       {klarSteg.map((s) => (
@@ -79,15 +79,15 @@ const klarBilder = [
           type="button"
           class="galleri-knapp"
           data-bilde={i}
-          aria-label={`Vis større bilde: ${b.alt}`}
+          aria-label={`Show larger image: ${b.alt}`}
         >
           <img src={b.fil} alt={b.alt} loading="lazy" width="1920" height="871" />
         </button>
       ))}
     </div>
-    <dialog id="lysboks" aria-label="Bildevisning">
-      <button type="button" class="lb-knapp lb-lukk" data-lukk aria-label="Lukk bildevisningen">✕</button>
-      <button type="button" class="lb-knapp lb-forrige" data-forrige aria-label="Forrige bilde">←</button>
+    <dialog id="lysboks" aria-label="Image viewer">
+      <button type="button" class="lb-knapp lb-lukk" data-lukk aria-label="Close the image viewer">✕</button>
+      <button type="button" class="lb-knapp lb-forrige" data-forrige aria-label="Previous image">←</button>
       <figure class="lb-figur">
         <img id="lysboks-bilde" src="" alt="" />
         <figcaption>
@@ -95,10 +95,10 @@ const klarBilder = [
           <span id="lysboks-teller" class="lb-teller" aria-live="polite"></span>
         </figcaption>
       </figure>
-      <button type="button" class="lb-knapp lb-neste" data-neste aria-label="Neste bilde">→</button>
+      <button type="button" class="lb-knapp lb-neste" data-neste aria-label="Next image">→</button>
     </dialog>
     <p class="testbruker">
-      Demoen har innlogging. Ta kontakt, så gir jeg deg en testbruker.
+      The demo has a login. Get in touch and I will set you up with a test user.
     </p>
     <p class="case-lenker">
       <a href={prosjekter.klar.demo} class="primaer" rel="noreferrer noopener">demo <span class="pil" aria-hidden="true">→</span></a>
@@ -106,65 +106,66 @@ const klarBilder = [
     </p>
   </section>
 
-  <section class="andre" aria-label="Flere prosjekter">
+  <section class="andre" aria-label="More projects">
     <div class="kort-grid">
       <ProsjektKort
-        tag="Dokumentert utviklingsflyt"
+        tag="Documented development flow"
         tittel="Companion"
         tekst={prosjekter.companion.stack}
-        note={prosjekter.companion.beskrivelse}
+        note="Nikko's idea, built on over a long stretch of time with a documented workflow."
         lenker={[{ href: prosjekter.companion.repo, label: 'repo' }]}
       />
       <ProsjektKort
-        tag="Overlevert til eier"
+        tag="Handed over to its owner"
         tittel={prosjekter.lori.navn}
-        tekst={prosjekter.lori.stack}
-        note={prosjekter.lori.beskrivelse}
+        tekst="Astro · Keystatic (owner editing) · Vercel · handover documentation · chose to integrate Timma rather than rebuild booking"
+        note="A website a hair salon can run on its own after handover."
         lenker={[
-          { href: prosjekter.lori.url, label: 'nettstedet', primaer: true },
+          { href: prosjekter.lori.url, label: 'the site', primaer: true },
           { href: prosjekter.lori.repo, label: 'repo' },
         ]}
       />
       <ProsjektKort
-        tag="Forløperen til Klar"
+        tag="The precursor to Klar"
         tittel={prosjekter.pdApp.navn}
-        tekst={prosjekter.pdApp.beskrivelse}
-        note="132 commits skrevet for hånd, før agentiske verktøy — et ekte tidsdokument."
+        tekst="The precursor to Klar: a Vue frontend and Django backend, with future users as co-designers."
+        note="132 commits written by hand, before agentic tools. A genuine time capsule."
         lenker={[
           { href: prosjekter.pdApp.frontend, label: 'frontend' },
           { href: prosjekter.pdApp.backend, label: 'backend' },
         ]}
       />
       <ProsjektKort
-        tag="Grunnmuren"
+        tag="The foundation"
         tittel="CS50x + Ordkryss"
-        tekst={prosjekter.cs50x.beskrivelse}
-        note="Sluttprosjektet: Ordkryss, et ordletingsark som genereres og skrives ut. Et lite, ekte studentprosjekt der bugs og worst practices er ivaretatt."
+        tekst="Basic programming through Harvard's CS50x."
+        note="The final project: Ordkryss, a word search generator that prints. A small, honest student project with its bugs and worst practices preserved."
         lenker={[
-          { href: prosjekter.cs50x.sertifikat, label: 'sertifikat' },
-          { href: '/sandbox/ordkryss', label: 'verktøyet, nybygd' },
+          { href: prosjekter.cs50x.sertifikat, label: 'certificate' },
+          { href: '/en/sandbox/wordsearch', label: 'the rebuilt tool' },
         ]}
       />
       <ProsjektKort
-        tag="Bygget i åpen dialog med Claude"
-        tittel={prosjekter.denneSiden.navn}
-        tekst={prosjekter.denneSiden.beskrivelse}
+        tag="Built in open dialogue with Claude"
+        tittel="This site"
+        tekst="The portfolio you are reading: Astro with live data from now.json and GitHub, plus a game in /sandbox."
         lenker={[
           { href: prosjekter.denneSiden.repo, label: 'repo' },
-          { href: '/kolofon', label: 'slik ble siden til' },
+          { href: '/en/colophon', label: 'how it was made' },
         ]}
       />
       <ProsjektKort
-        tag="Fremtidig startup"
+        tag="Future startup"
         tittel={prosjekter.claudeFirst.navn}
-        tekst={prosjekter.claudeFirst.beskrivelse}
-        lenker={[{ href: prosjekter.claudeFirst.url, label: 'nettstedet' }]}
+        tekst="Landing page for a software studio in the planning stage: websites, apps and AI tools for small businesses."
+        lenker={[{ href: prosjekter.claudeFirst.url, label: 'the site' }]}
       />
     </div>
   </section>
 
   <p class="grense">
-    Eksemplene viser arbeidsmåte og tekniske vurderinger, i prototypeskala.
+    The examples show a way of working and technical judgement, at prototype
+    scale.
   </p>
 </Side>
 
@@ -201,8 +202,7 @@ const klarBilder = [
     color: var(--dempet);
   }
 
-  /* Fyller ramma — samme kant som kortgrid-en under, ingen sprikende
-     høyrekanter mellom seksjonene. Tekstbredden begrenses per avsnitt. */
+  /* Fyller ramma — samme kant som kortgrid-en under */
   .hovedcase {
     background: var(--flate);
     border: 1px solid var(--linje);
@@ -457,7 +457,7 @@ const klarBilder = [
       bildeEl.alt = b.alt;
     }
     if (tekstEl) tekstEl.textContent = b.alt;
-    if (tellerEl) tellerEl.textContent = `${aktiv + 1} av ${bilder.length}`;
+    if (tellerEl) tellerEl.textContent = `${aktiv + 1} of ${bilder.length}`;
   };
 
   knapper.forEach((k, i) =>
@@ -476,7 +476,6 @@ const klarBilder = [
     if (e.key === 'ArrowRight') vis(aktiv + 1);
   });
 
-  // Klikk på bakteppet lukker (klikk inne i dialogboksen treffer barn-elementer)
   dialog?.addEventListener('click', (e) => {
     if (e.target === dialog) dialog.close();
   });

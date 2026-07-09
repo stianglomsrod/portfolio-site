@@ -6,6 +6,27 @@
 
 ## Changelog
 
+### 2026-07-09 (natt, del 2) — Tospråklig side, tema-switch, Ordkryss i /sandbox
+- **Engelsk versjon av hele siden** under /en/ med engelske slugger
+  (/en/projects, /en/journey, /en/how-i-work, /en/about, /en/colophon,
+  /en/sandbox, /en/sandbox/wordsearch). Tvilling-kartet og delte
+  UI-tekster bor i `src/lib/i18n.ts`. REGEL: hver norsk side har en
+  engelsk tvilling — endrer du innhold på den ene, endre den andre
+  (kommentar øverst i hver tvilling sier hvor).
+- **Språkvelger** i nav: lenke til tvillingsiden (EN/NO) med hreflang;
+  URL-en er språkvalget, ingen JS-tilstand. `<html lang>` og
+  hreflang-alternates settes per side.
+- **Tema er nå en ekte switch** (role="switch", aria-checked, spor med
+  sol/måne og glidende kule) i stedet for tekstknapp.
+- **Ordkryss inn i /sandbox** som eget verktøy på begge språk:
+  kjerne i `src/lib/ordkryss-kjerne.ts`, UI i
+  `src/components/OrdkryssVerktoy.astro` (print-CSS skjuler nav/footer,
+  arket er alltid hvitt). Sandbox har nå kortgrid med spill + verktøy.
+  CS50x-kortet lenker til verktøyet i stedet for YouTube-demoen.
+- **UU**: lysboks-telleren fikk aria-live, relativ-tid følger sidens
+  språk, Kontaktskjema/HueVelger/Hero/Nav/Footer tar lang-prop, skjema-
+  meldinger følger `<html lang>`. Axe: 0 brudd på alle 16 ruter.
+
 ### 2026-07-09 (natt) — Mobilnav som rad, kolofon-tekst, Ordkryss v2
 - **Mobilnav**: menyen brekker til egen rad under merket/tema-knappen —
   alle seks punktene synlige, ingen hamburger (guiden) og ingen
@@ -100,6 +121,13 @@
   «ikke bare X, men Y», ikke aforismer, ikke konsulentspråk.
 - «digitalt læringsdesign». Tooling-arbeid (skills, persistent rules,
   loops) kommuniseres uten å si «ikke bare vibecoding».
+
+**Tospråklighet**
+- Norsk bor på rot, engelsk under /en/ med engelske slugger. Tvilling-
+  kartet er `RUTEKART` i src/lib/i18n.ts — nye sider registreres der.
+- Endrer du innhold i en side, endre den engelske/norske tvillingen.
+  Sannhets- og språkreglene gjelder begge språk (EN: klar engelsk uten
+  buzzwords, samme ærlighet om prototype-status).
 
 **Design/kode**
 - Fargetokens: kun oklch med LÅST L/C; toner styres av --hue (flater/

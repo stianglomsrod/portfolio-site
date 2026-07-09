@@ -6,13 +6,17 @@ interface Props {
   title: string;
   description?: string;
   noindex?: boolean;
+  lang?: 'nb' | 'en';
+  /** Sti til samme side på det andre språket (for hreflang) */
+  alternativ?: string;
 }
 
-const { title, description, noindex = false } = Astro.props;
+const { title, description, noindex = false, lang = 'nb', alternativ } = Astro.props;
+const side = 'https://stianglomsrod.no';
 ---
 
 <!doctype html>
-<html lang="nb">
+<html lang={lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -20,6 +24,20 @@ const { title, description, noindex = false } = Astro.props;
     <title>{title}</title>
     {description && <meta name="description" content={description} />}
     {noindex && <meta name="robots" content="noindex, nofollow" />}
+    {alternativ && (
+      <link
+        rel="alternate"
+        hreflang={lang === 'nb' ? 'en' : 'nb'}
+        href={`${side}${alternativ}`}
+      />
+    )}
+    {alternativ && (
+      <link
+        rel="alternate"
+        hreflang={lang}
+        href={`${side}${Astro.url.pathname}`}
+      />
+    )}
     <link
       rel="preload"
       href="/fonts/atkinson-hyperlegible-regular.woff2"

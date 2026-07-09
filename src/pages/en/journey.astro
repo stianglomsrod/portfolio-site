@@ -1,0 +1,141 @@
+---
+import Side from '../../layouts/Side.astro';
+import now from '../../data/now.json';
+import { hentSisteCommits } from '../../lib/github';
+
+/* English journey page. NORSK TVILLING: src/pages/reisen.astro —
+   endre begge. GitHub-aktivitet oversettes til klartekst, aldri hasher. */
+
+const commits = await hentSisteCommits(4);
+
+function klartekst(repo: string): string {
+  if (repo.includes('portfolio-site') || repo.includes('stianglomsrod-no'))
+    return 'Worked on this site';
+  if (repo.includes('klar')) return 'Kept working on Klar';
+  if (repo.includes('nikkoprogging')) return 'Tidied the Companion app';
+  if (repo.includes('pd-app')) return 'Touched the precursor to Klar';
+  if (repo.includes('lori')) return 'Followed up the Lori Frisør site';
+  return `Worked on ${repo.split('/')[1] ?? repo}`;
+}
+
+const aktivitet = commits
+  .map((c) => ({ tekst: klartekst(c.repo), tidspunkt: c.tidspunkt }))
+  .filter((rad, i, alle) => i === 0 || rad.tekst !== alle[i - 1].tekst)
+  .slice(0, 3);
+
+const milepaeler = [
+  { naar: 'now', tekst: `Working through ${now.en.kursStatus} of ${now.kurs}, and tidying old projects with ${now.kiVerktoy}.`, levende: true },
+  ...(now.en.notis ? [{ naar: now.en.notisNaar ?? 'now', tekst: now.en.notis, levende: true }] : []),
+  { naar: 'from August', tekst: 'Also becoming the ICT contact at Kongeveien school.' },
+  { naar: 'June 2026', tekst: 'Submitted the master’s thesis. Klar stood finished as a working prototype.' },
+  { naar: 'during the master’s', tekst: 'Built pd-app, the precursor to Klar: 132 commits written by hand.' },
+  { naar: '2024', tekst: 'Completed CS50x at Harvard. Ordkryss as the final project.' },
+  { naar: '2018', tekst: 'Teacher at Kongeveien school. Brought programming into the classroom.' },
+  { naar: '2007', tekst: 'Introduction to object-oriented programming in Java and game programming in Flash.' },
+];
+---
+
+<Side
+  lang="en"
+  title="Journey — Stian Glomsrød"
+  description="Curated milestones and live activity, in plain language."
+>
+  <p class="label kicker">Journey</p>
+  <h1>Journey</h1>
+  <p class="ingress">
+    What is happening now, and the road here. The activity is pulled from
+    GitHub and translated into plain language.
+  </p>
+
+  <section aria-labelledby="siste-tittel" class="blokk">
+    <h2 class="label" id="siste-tittel">Latest entries</h2>
+    <ul class="liste">
+      {aktivitet.map((rad) => (
+        <li>
+          <span class="tekst levende-rad">{rad.tekst}</span>
+          <span class="naar" data-tidspunkt={rad.tidspunkt} data-parens="nei">
+            {new Date(rad.tidspunkt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+          </span>
+        </li>
+      ))}
+      {milepaeler.map((m) => (
+        <li>
+          <span class:list={['tekst', { 'levende-rad': m.levende }]}>{m.tekst}</span>
+          <span class="naar">{m.naar}</span>
+        </li>
+      ))}
+    </ul>
+  </section>
+</Side>
+
+<style>
+  .kicker {
+    margin: var(--s-7) 0 var(--s-2);
+  }
+
+  h1 {
+    font-size: var(--tekst-tittel);
+    margin: 0 0 var(--s-3);
+  }
+
+  .ingress {
+    color: var(--dempet);
+    max-width: 66ch;
+    margin: 0;
+  }
+
+  /* Fyller ramma, samme kant som kortene på de andre sidene */
+  .blokk {
+    background: var(--flate);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--kort-skygge);
+    padding: var(--s-4) var(--s-5);
+    margin-top: var(--s-5);
+  }
+
+  .blokk h2 {
+    margin: 0 0 var(--s-2);
+  }
+
+  .liste {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .liste li {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--s-4);
+    padding: var(--s-3) 0;
+    border-bottom: 1px solid var(--linje);
+  }
+
+  .liste li:last-child {
+    border-bottom: none;
+  }
+
+  .tekst {
+    font-size: 17px;
+    line-height: 1.55;
+    max-width: 60ch;
+  }
+
+  .levende-rad {
+    color: var(--salvie);
+  }
+
+  .naar {
+    font-size: 15px;
+    color: var(--dempet);
+    flex-shrink: 0;
+  }
+</style>
+
+<script>
+  import { settRelativeTider } from '../../lib/relativ-tid';
+
+  settRelativeTider();
+</script>

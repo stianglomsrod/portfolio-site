@@ -1,0 +1,47 @@
+---
+import Side from '../../../layouts/Side.astro';
+import OrdkryssVerktoy from '../../../components/OrdkryssVerktoy.astro';
+
+/* Word search in the sandbox: printable worksheets for teachers.
+   NORSK TVILLING: src/pages/sandbox/ordkryss.astro — endre begge. */
+---
+
+<Side
+  lang="en"
+  title="Word search — printable worksheets"
+  description="Type the words of the week, pick directions, print. With pictures per word, an answer key and a profanity filter."
+>
+  <div class="ok-side-hode">
+    <p class="kicker">/sandbox · tool</p>
+    <h1>Word search</h1>
+    <p class="dempet">
+      Make printable word search sheets: type the words of the week, pick
+      directions and hit print. Started as my CS50x final project in 2024,
+      now rebuilt for colleagues who want to use it in the classroom.
+    </p>
+  </div>
+  <OrdkryssVerktoy lang="en" />
+</Side>
+
+<style>
+  .kicker {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: var(--tekst-label);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--hue-aksent);
+    margin: var(--s-7) 0 var(--s-2);
+  }
+
+  h1 {
+    font-size: var(--tekst-tittel);
+    margin: 0 0 var(--s-3);
+  }
+
+  .dempet {
+    color: var(--dempet);
+    max-width: 68ch;
+    margin: 0;
+  }
+</style>

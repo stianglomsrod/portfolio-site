@@ -11,6 +11,13 @@ export default defineConfig({
   site: 'https://stianglomsrod.no',
   output: 'static',
   adapter: vercel(),
+  // Norsk på rot, engelsk under /en/ (egne slugger; tvilling-kartet bor i
+  // src/lib/i18n.ts). hreflang settes per side i Base.astro.
+  i18n: {
+    defaultLocale: 'nb',
+    locales: ['nb', 'en'],
+    routing: { prefixDefaultLocale: false },
+  },
   integrations: [
     react(),
     sitemap({

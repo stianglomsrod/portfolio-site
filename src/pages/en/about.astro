@@ -1,0 +1,155 @@
+---
+import Side from '../../layouts/Side.astro';
+import Kontaktskjema from '../../components/Kontaktskjema.astro';
+import profil from '../../data/profil.json';
+import now from '../../data/now.json';
+
+/* English about page. NORSK TVILLING: src/pages/om.astro — endre begge. */
+---
+
+<Side
+  lang="en"
+  title="About and contact — Stian Glomsrød"
+  description="Who Stian is, what he is looking for, and how to get in touch."
+>
+  <p class="label kicker">About</p>
+  <h1>About me</h1>
+
+  <div class="topp">
+    <div class="bio">
+      <p class="lead">
+        Teacher with a master's in digital learning design (OsloMet, 2026).
+        Since 2022 I have worked steadily towards a career change into tech,
+        through studies, my own projects and agentic AI in daily use.
+      </p>
+      <p>
+        I love building my programming skills the old-fashioned way, while
+        also exploring how AI fits into development.
+      </p>
+      <p class="bio-detalj">
+        Everything on this page can be checked: the links go to code, demos
+        and certificates.
+      </p>
+      <dl class="fakta" translate="no">
+        <div><dt>place:</dt><dd>Halden, Norway</dd></div>
+        <div><dt>status:</dt><dd class="signal">looking for {now.en.soker}</dd></div>
+        <div><dt>reply time:</dt><dd>within a day</dd></div>
+      </dl>
+    </div>
+    <img
+      class="portrett"
+      src="/bilder/stian-byste.jpg"
+      alt="Stian Glomsrød smiling at the camera, in a black polo shirt and cap"
+      width="245"
+      height="245"
+      loading="eager"
+    />
+  </div>
+
+  <section id="kontakt" aria-labelledby="kontakt-tittel">
+    <h2 class="kontakt-tittel" id="kontakt-tittel">Get in touch</h2>
+    <p class="kontakt-ingress">
+      I reply within a day. The email goes to {profil.kontakt.epost}.
+    </p>
+    <Kontaktskjema lang="en" />
+  </section>
+</Side>
+
+<style>
+  .kicker {
+    font-family: var(--font-hd);
+    font-size: var(--tekst-label);
+    letter-spacing: 0.12em;
+    color: var(--dempet);
+    margin: var(--s-7) 0 var(--s-2);
+  }
+
+  h1 {
+    font-size: var(--tekst-tittel);
+    margin: 0 0 var(--s-4);
+  }
+
+  .topp {
+    display: flex;
+    gap: var(--s-6);
+    align-items: flex-start;
+    justify-content: space-between;
+    max-width: 780px;
+  }
+
+  .bio {
+    max-width: 52ch;
+  }
+
+  .bio p {
+    margin: 0 0 var(--s-3);
+    line-height: 1.6;
+  }
+
+  .lead {
+    font-size: 18px;
+  }
+
+  .bio-detalj {
+    color: var(--dempet);
+  }
+
+  .fakta {
+    margin: var(--s-4) 0 0;
+    font-family: var(--font-hd);
+    font-size: 12.5px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .fakta div {
+    display: flex;
+    gap: var(--s-2);
+  }
+
+  .fakta dt {
+    color: var(--dempet);
+    width: 84px;
+    flex-shrink: 0;
+  }
+
+  .fakta dd {
+    margin: 0;
+    color: var(--tekst);
+  }
+
+  .fakta .signal {
+    color: var(--salvie);
+  }
+
+  .portrett {
+    display: block;
+    width: 230px;
+    height: 230px;
+    border-radius: 50%;
+    border: 2px solid var(--linje);
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 640px) {
+    .topp {
+      flex-direction: column-reverse;
+    }
+
+    .portrett {
+      margin-inline: auto;
+    }
+  }
+
+  .kontakt-tittel {
+    font-size: 18px;
+    margin: var(--s-7) 0 var(--s-2);
+  }
+
+  .kontakt-ingress {
+    color: var(--dempet);
+    max-width: 68ch;
+    margin: 0 0 var(--s-4);
+  }
+</style>

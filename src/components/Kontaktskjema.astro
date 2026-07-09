@@ -3,26 +3,62 @@ import profil from '../data/profil.json';
 
 /* Kontaktskjema (Done 8): klarspråkvalidering med ikon (aldri farge alene),
    feil koblet via aria-describedby, honeypot + tidsstempel. JS sender som
-   JSON til /api/kontakt; uten JS står mailto-lenken under som fullverdig vei. */
+   JSON til /api/kontakt; uten JS står mailto-lenken under som fullverdig vei.
+   Skjermtekster følger sidens språk; JS-meldingene leser <html lang>. */
+
+interface Props {
+  lang?: 'nb' | 'en';
+}
+
+const { lang = 'nb' } = Astro.props;
+
+const t =
+  lang === 'nb'
+    ? {
+        kicker: 'Kontaktskjema',
+        navn: 'navn',
+        valgfri: '(valgfri)',
+        navnEks: 'Kari Nordmann',
+        epost: 'e-post',
+        epostEks: 'kari@nordmann.no',
+        melding: 'melding',
+        meldingEks: 'Hei Stian, vi ser etter …',
+        send: 'Send melding',
+        alternativ: 'Foretrekker du innboksen?',
+        gaarRettFram: 'går rett fram.',
+      }
+    : {
+        kicker: 'Contact form',
+        navn: 'name',
+        valgfri: '(optional)',
+        navnEks: 'Jane Doe',
+        epost: 'email',
+        epostEks: 'jane@doe.com',
+        melding: 'message',
+        meldingEks: 'Hi Stian, we are looking for …',
+        send: 'Send message',
+        alternativ: 'Prefer your inbox?',
+        gaarRettFram: 'goes straight through.',
+      };
 ---
 
 <form class="skjema" data-kontakt novalidate>
-  <p class="skjema-kicker">Kontaktskjema</p>
+  <p class="skjema-kicker">{t.kicker}</p>
 
   <div class="felt">
-    <label for="kontakt-navn">navn <span class="valgfri">(valgfri)</span></label>
+    <label for="kontakt-navn">{t.navn} <span class="valgfri">{t.valgfri}</span></label>
     <input
       id="kontakt-navn"
       name="navn"
       type="text"
       maxlength="100"
       autocomplete="name"
-      placeholder="Kari Nordmann"
+      placeholder={t.navnEks}
     />
   </div>
 
   <div class="felt">
-    <label for="kontakt-epost">e-post</label>
+    <label for="kontakt-epost">{t.epost}</label>
     <input
       id="kontakt-epost"
       name="epost"
@@ -31,13 +67,13 @@ import profil from '../data/profil.json';
       autocomplete="email"
       required
       aria-describedby="feil-epost"
-      placeholder="kari@nordmann.no"
+      placeholder={t.epostEks}
     />
     <p class="feilmelding" id="feil-epost" hidden></p>
   </div>
 
   <div class="felt">
-    <label for="kontakt-melding">melding</label>
+    <label for="kontakt-melding">{t.melding}</label>
     <textarea
       id="kontakt-melding"
       name="melding"
@@ -45,7 +81,7 @@ import profil from '../data/profil.json';
       maxlength="5000"
       required
       aria-describedby="feil-melding"
-      placeholder="Hei Stian, vi ser etter …"></textarea>
+      placeholder={t.meldingEks}></textarea>
     <p class="feilmelding" id="feil-melding" hidden></p>
   </div>
 
@@ -60,14 +96,14 @@ import profil from '../data/profil.json';
     />
   </div>
 
-  <button type="submit" class="send knapp">Send melding</button>
+  <button type="submit" class="send knapp">{t.send}</button>
 
   <p class="status" data-status aria-live="polite"></p>
 
   <p class="alternativ">
-    Foretrekker du innboksen?
-    <a href={`mailto:${profil.kontakt.epost}`}>{profil.kontakt.epost}</a> går
-    rett fram.
+    {t.alternativ}
+    <a href={`mailto:${profil.kontakt.epost}`}>{profil.kontakt.epost}</a>
+    {t.gaarRettFram}
   </p>
 </form>
 
@@ -203,6 +239,34 @@ import profil from '../data/profil.json';
 <script>
   const skjema = document.querySelector<HTMLFormElement>('[data-kontakt]');
 
+  // JS-meldingene følger sidens språk (html lang settes per side)
+  const paaEngelsk = document.documentElement.lang === 'en';
+  const M = paaEngelsk
+    ? {
+        epostMangler: 'The email address is missing.',
+        epostUgyldig: 'The email address needs a valid domain, like jane@doe.com.',
+        meldingTom: 'The message is empty.',
+        sender: 'sending …',
+        sendt: 'Message sent. I reply within a day.',
+        ikkeKonfigurert:
+          'The form is not connected to email delivery yet. Use the address below; it goes straight through.',
+        forMange: 'Too many attempts in a short time. Wait a few minutes and try again.',
+        noeGaltFeil: 'Something went wrong. Try again, or use the email address below.',
+        ikkeKontakt: 'Could not reach the server. Try again, or use the email address below.',
+      }
+    : {
+        epostMangler: 'E-postadressen mangler.',
+        epostUgyldig: 'E-postadressen mangler et gyldig domene — f.eks. kari@nordmann.no.',
+        meldingTom: 'Meldingen er tom.',
+        sender: 'sender …',
+        sendt: 'Meldingen er sendt. Jeg svarer innen et døgn.',
+        ikkeKonfigurert:
+          'Skjemaet er ikke koblet til e-postutsending ennå — bruk adressen under, den går rett fram.',
+        forMange: 'For mange forsøk på kort tid. Vent noen minutter og prøv igjen.',
+        noeGaltFeil: 'Noe gikk galt. Prøv igjen — eller bruk e-postadressen under.',
+        ikkeKontakt: 'Fikk ikke kontakt med serveren. Prøv igjen — eller bruk e-postadressen under.',
+      };
+
   if (skjema) {
     const lastet = Date.now();
     const status = skjema.querySelector<HTMLElement>('[data-status]')!;
@@ -238,16 +302,16 @@ import profil from '../data/profil.json';
       // Klarspråkvalidering klient-side — serveren validerer uansett på nytt.
       let harFeil = false;
       if (!epost) {
-        visFeil('kontakt-epost', 'E-postadressen mangler.');
+        visFeil('kontakt-epost', M.epostMangler);
         harFeil = true;
       } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(epost)) {
-        visFeil('kontakt-epost', 'E-postadressen mangler et gyldig domene — f.eks. kari@nordmann.no.');
+        visFeil('kontakt-epost', M.epostUgyldig);
         harFeil = true;
       } else {
         visFeil('kontakt-epost', null);
       }
       if (!melding) {
-        visFeil('kontakt-melding', 'Meldingen er tom.');
+        visFeil('kontakt-melding', M.meldingTom);
         harFeil = true;
       } else {
         visFeil('kontakt-melding', null);
@@ -259,7 +323,7 @@ import profil from '../data/profil.json';
       }
 
       knapp.disabled = true;
-      status.textContent = 'sender …';
+      status.textContent = M.sender;
 
       try {
         const res = await fetch('/api/kontakt', {
@@ -273,13 +337,12 @@ import profil from '../data/profil.json';
           skjema.querySelectorAll('.felt, .send, .skjema-kicker').forEach((el) => {
             (el as HTMLElement).hidden = true;
           });
-          status.textContent = 'Meldingen er sendt. Jeg svarer innen et døgn.';
+          status.textContent = M.sendt;
         } else if (data.grunn === 'ikke-konfigurert') {
-          status.textContent =
-            'Skjemaet er ikke koblet til e-postutsending ennå — bruk adressen under, den går rett fram.';
+          status.textContent = M.ikkeKonfigurert;
           knapp.disabled = false;
         } else if (res.status === 429) {
-          status.textContent = 'For mange forsøk på kort tid. Vent noen minutter og prøv igjen.';
+          status.textContent = M.forMange;
           knapp.disabled = false;
         } else if (data.feil) {
           if (data.feil.epost) visFeil('kontakt-epost', data.feil.epost);
@@ -287,11 +350,11 @@ import profil from '../data/profil.json';
           status.textContent = '';
           knapp.disabled = false;
         } else {
-          status.textContent = 'Noe gikk galt. Prøv igjen — eller bruk e-postadressen under.';
+          status.textContent = M.noeGaltFeil;
           knapp.disabled = false;
         }
       } catch {
-        status.textContent = 'Fikk ikke kontakt med serveren. Prøv igjen — eller bruk e-postadressen under.';
+        status.textContent = M.ikkeKontakt;
         knapp.disabled = false;
       }
     });

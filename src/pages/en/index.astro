@@ -1,0 +1,92 @@
+---
+import Side from '../../layouts/Side.astro';
+import Hero from '../../components/Hero.astro';
+import ProsjektKort from '../../components/ProsjektKort.astro';
+import prosjekter from '../../data/prosjekter.json';
+
+/* English front page. NORSK TVILLING: src/pages/index.astro — endre begge. */
+---
+
+<Side
+  lang="en"
+  title="Stian Glomsrød — developer and UX"
+  description="Teacher on his way into the developer role. This is happening right now."
+>
+  <Hero lang="en" />
+  <section class="bevis-seksjon" aria-labelledby="bevis-tittel">
+    <h2 class="label" id="bevis-tittel">Selected projects</h2>
+    <div class="bevis-grid">
+      <ProsjektKort
+        tag="Master's project · 2026"
+        tittel="Klar"
+        tekst="A digital aid for pupils with executive function challenges, built with participatory design as the method."
+        note="The demo has a login. Get in touch and I will set you up with a test user."
+        lenker={[
+          { href: prosjekter.klar.demo, label: 'try the demo', primaer: true },
+          { href: '/en/projects#klar', label: 'read the story' },
+        ]}
+      />
+      <ProsjektKort
+        tag="Documented development flow"
+        tittel="Companion"
+        tekst="Nikko's idea, built on over a long stretch of time with a documented workflow."
+        lenker={[{ href: prosjekter.companion.repo, label: 'repo' }]}
+      />
+      <ProsjektKort
+        tag="Handed over to its owner"
+        tittel={prosjekter.lori.navn}
+        tekst="A website a hair salon can run on its own after handover."
+        lenker={[{ href: prosjekter.lori.url, label: 'the site' }]}
+      />
+      <ProsjektKort
+        tag="Built in open dialogue with Claude"
+        tittel="This site"
+        tekst="The portfolio you are reading: Astro with live data from now.json and GitHub, plus a game in /sandbox."
+        lenker={[
+          { href: prosjekter.denneSiden.repo, label: 'repo' },
+          { href: '/en/colophon', label: 'how it was made' },
+        ]}
+      />
+      <ProsjektKort
+        tag="Future startup"
+        tittel={prosjekter.claudeFirst.navn}
+        tekst="Landing page for a software studio in the planning stage: websites, apps and AI tools for small businesses."
+        lenker={[{ href: prosjekter.claudeFirst.url, label: 'the site' }]}
+      />
+    </div>
+    <p class="mer">
+      <a href="/en/projects">all projects <span class="pil" aria-hidden="true">→</span></a>
+    </p>
+  </section>
+</Side>
+
+<style>
+  .bevis-seksjon {
+    margin-top: var(--s-8);
+  }
+
+  .bevis-seksjon h2 {
+    margin: 0 0 var(--s-3);
+  }
+
+  .bevis-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--s-3);
+  }
+
+  .mer {
+    margin: var(--s-4) 0 0;
+    font-size: 15px;
+  }
+
+  .pil {
+    display: inline-block;
+    transition: transform var(--dur-mikro) var(--ease);
+  }
+
+  .mer a:hover .pil,
+  .mer a:focus-visible .pil {
+    transform: translateX(3px);
+  }
+</style>

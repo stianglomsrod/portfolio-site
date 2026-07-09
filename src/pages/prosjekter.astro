@@ -97,9 +97,12 @@ const klarBilder = [
       </figure>
       <button type="button" class="lb-knapp lb-neste" data-neste aria-label="Neste bilde">→</button>
     </dialog>
+    <p class="testbruker">
+      Demoen har innlogging. Ta kontakt, så gir jeg deg en testbruker.
+    </p>
     <p class="case-lenker">
       <a href={prosjekter.klar.demo} class="primaer" rel="noreferrer noopener">demo →</a>
-      <a href={prosjekter.klar.repo} rel="noreferrer noopener">kildekode →</a>
+      <a href={prosjekter.klar.repo} rel="noreferrer noopener">repo →</a>
     </p>
   </section>
 
@@ -110,7 +113,7 @@ const klarBilder = [
         tittel="Companion"
         tekst={prosjekter.companion.stack}
         note={prosjekter.companion.beskrivelse}
-        lenker={[{ href: prosjekter.companion.repo, label: 'kildekode' }]}
+        lenker={[{ href: prosjekter.companion.repo, label: 'repo' }]}
       />
       <ProsjektKort
         tag="Enablement og overlevering"
@@ -119,7 +122,7 @@ const klarBilder = [
         note={prosjekter.lori.beskrivelse}
         lenker={[
           { href: prosjekter.lori.url, label: 'nettstedet', primaer: true },
-          { href: prosjekter.lori.repo, label: 'kildekode' },
+          { href: prosjekter.lori.repo, label: 'repo' },
         ]}
       />
       <ProsjektKort
@@ -147,7 +150,7 @@ const klarBilder = [
         tittel={prosjekter.denneSiden.navn}
         tekst={prosjekter.denneSiden.beskrivelse}
         lenker={[
-          { href: prosjekter.denneSiden.repo, label: 'kildekode' },
+          { href: prosjekter.denneSiden.repo, label: 'repo' },
           { href: '/kolofon', label: 'slik ble siden til' },
         ]}
       />
@@ -202,6 +205,7 @@ const klarBilder = [
     background: var(--flate);
     border: 1px solid var(--linje);
     border-radius: var(--radius-lg);
+    box-shadow: var(--kort-skygge);
     padding: var(--s-5);
     margin-top: var(--s-6);
     max-width: 760px;
@@ -371,10 +375,16 @@ const klarBilder = [
     transform: translateY(-50%);
   }
 
+  .testbruker {
+    font-size: 14px;
+    color: var(--tekst);
+    margin: var(--s-4) 0 0;
+  }
+
   .case-lenker {
     display: flex;
     gap: var(--s-4);
-    margin: var(--s-4) 0 0;
+    margin: var(--s-2) 0 0;
     font-family: var(--font-hd);
     font-size: 14px;
   }

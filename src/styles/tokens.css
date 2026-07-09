@@ -24,6 +24,7 @@
   --salvie-skygge: #3f6b53;  /* trykk-skygge under CTA */
   --linje: #263029;          /* dekorativ */
   --feil: #c98a8f;           /* varm rød, 6.5:1 */
+  --kort-skygge: none;       /* kort-elevasjon (kun lys modus) */
 
   /* --- HEATMAP (nivå 0–4, mørk rampe #1c2622 → #8fc9a8) --- */
   --heat-0: #1c2622; --heat-1: #394f43; --heat-2: #567865;
@@ -62,34 +63,37 @@
 /* --- LYS (dagmodus) --- */
 @media (prefers-color-scheme: light) {
   :root:not([data-theme='dark']) {
-    --bg: #f5f6f2;           /* grønnhvit */
-    --flate: #fcfdfa;
-    --tekst: #262d28;        /* 13.0:1 AAA */
-    --dempet: #5c6a60;       /* 5.3:1 AA */
-    --salvie: #2e6b4c;       /* mørknet, 5.8:1 AA */
+    --bg: #edf1ea;           /* grønntonet, dypere enn hvit så kort pop-er */
+    --flate: #ffffff;        /* rene hvite kort — tydelig over bakgrunnen */
+    --tekst: #232a25;        /* 12.9:1 AAA */
+    --dempet: #556158;       /* 5.7:1 AA */
+    --salvie: #2e6b4c;       /* 5.5:1 AA */
     --salvie-kontrast: #ffffff; /* 6.3:1 AA på CTA */
     --salvie-skygge: #1e4632;
-    --linje: #dde3da;
-    --feil: #a34e57;
-    --heat-0: #e9ede4; --heat-1: #bacdbe; --heat-2: #8cac98;
-    --heat-3: #5d8c72; --heat-4: #2e6b4c;
+    --linje: #ccd7c9;        /* grønntonet, synlig kant på hvitt */
+    --feil: #a34e57;         /* 5.6:1 AA */
+    /* Heatmap-rampen løftet så tomme dager leser som et grønntonet rutenett */
+    --heat-0: #d8e2d6; --heat-1: #aecdb2; --heat-2: #7eac89;
+    --heat-3: #548b6d; --heat-4: #2e6b4c;
+    --kort-skygge: 0 1px 2px rgba(35, 42, 37, 0.05), 0 6px 16px rgba(35, 42, 37, 0.05);
     --hue-aksent: oklch(48% 0.17 var(--hue));
   }
 }
 
 /* Manuell overstyring — samme verdier som media-queryen over. */
 [data-theme='light'] {
-  --bg: #f5f6f2;
-  --flate: #fcfdfa;
-  --tekst: #262d28;
-  --dempet: #5c6a60;
+  --bg: #edf1ea;
+  --flate: #ffffff;
+  --tekst: #232a25;
+  --dempet: #556158;
   --salvie: #2e6b4c;
   --salvie-kontrast: #ffffff;
   --salvie-skygge: #1e4632;
-  --linje: #dde3da;
+  --linje: #ccd7c9;
   --feil: #a34e57;
-  --heat-0: #e9ede4; --heat-1: #bacdbe; --heat-2: #8cac98;
-  --heat-3: #5d8c72; --heat-4: #2e6b4c;
+  --heat-0: #d8e2d6; --heat-1: #aecdb2; --heat-2: #7eac89;
+  --heat-3: #548b6d; --heat-4: #2e6b4c;
+  --kort-skygge: 0 1px 2px rgba(35, 42, 37, 0.05), 0 6px 16px rgba(35, 42, 37, 0.05);
   --hue-aksent: oklch(48% 0.17 var(--hue));
 }
 

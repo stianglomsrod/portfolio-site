@@ -17,6 +17,7 @@ import prosjekter from '../data/prosjekter.json';
         tag="Masterprosjekt · 2026"
         tittel="Klar"
         tekst="Digitalt hjelpemiddel for elever med eksekutive vansker, bygd med participatory design som metode."
+        note="Demoen har innlogging. Ta kontakt, så gir jeg deg en testbruker."
         lenker={[
           { href: prosjekter.klar.demo, label: 'prøv demoen', primaer: true },
           { href: '/prosjekter#klar', label: 'les historien' },
@@ -26,7 +27,7 @@ import prosjekter from '../data/prosjekter.json';
         tag="Dokumentert utviklingsflyt"
         tittel="Companion"
         tekst={prosjekter.companion.beskrivelse}
-        lenker={[{ href: prosjekter.companion.repo, label: 'kildekode' }]}
+        lenker={[{ href: prosjekter.companion.repo, label: 'repo' }]}
       />
       <ProsjektKort
         tag="Levert til ekte eier"
@@ -39,7 +40,7 @@ import prosjekter from '../data/prosjekter.json';
         tittel={prosjekter.denneSiden.navn}
         tekst={prosjekter.denneSiden.beskrivelse}
         lenker={[
-          { href: prosjekter.denneSiden.repo, label: 'kildekode' },
+          { href: prosjekter.denneSiden.repo, label: 'repo' },
           { href: '/kolofon', label: 'slik ble siden til' },
         ]}
       />

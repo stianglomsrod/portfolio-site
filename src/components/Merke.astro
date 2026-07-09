@@ -16,15 +16,16 @@ const bokstaver = [
   { c: 's', w: 100, farge: '#8fc9a8' },
   { c: 't', w: 104, farge: '#c9b08a' },
   { c: 'i', w: 98, farge: '#8ab8c9' },
-  { c: 'a', w: 106, farge: '#c98a8f' },
-  { c: 'n', w: 100, farge: '#a5c98a' },
+  { c: 'g', w: 104, farge: '#c98a8f' },
+  { c: 'l', w: 100, farge: '#a5c98a' },
+  { c: 'o', w: 104, farge: '#8fc9a8' },
 ];
 ---
 
 <a
   class="merke"
   href="/"
-  aria-label="stian glomsrød — til forsiden"
+  aria-label="Stian Glomsrød — til forsiden"
   style={`font-size: ${storrelse}px`}
 >
   {bokstaver.map((b) => (
@@ -41,7 +42,7 @@ const bokstaver = [
     text-transform: lowercase;
     display: inline-flex;
     align-items: baseline;
-    width: 4.1em;
+    width: 4.9em;
     flex-shrink: 0;
     padding: var(--s-2) 0;
   }

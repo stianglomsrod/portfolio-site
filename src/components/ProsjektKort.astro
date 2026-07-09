@@ -38,10 +38,13 @@ const { tag, tittel, tekst, note, lenker = [], id } = Astro.props;
     background: var(--flate);
     border: 1px solid var(--linje);
     border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
     padding: var(--s-4);
     display: flex;
     flex-direction: column;
     gap: var(--s-2);
+    height: 100%;
+    box-sizing: border-box;
   }
 
   .tag {
@@ -74,10 +77,13 @@ const { tag, tittel, tekst, note, lenker = [], id } = Astro.props;
     margin: 0;
   }
 
+  /* Lenkeraden pinnes til bunn: kortet med mest tekst bestemmer høyden,
+     og alle lenkerader i samme rad ligger på linje. */
   .lenker {
     display: flex;
     gap: var(--s-4);
-    margin: var(--s-1) 0 0;
+    margin-top: auto;
+    padding-top: var(--s-3);
     font-family: var(--font-hd);
     font-size: 13.5px;
     flex-wrap: wrap;

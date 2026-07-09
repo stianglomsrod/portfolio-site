@@ -2,25 +2,56 @@
 import Side from '../layouts/Side.astro';
 
 /* README-format fra briefen: goals, guardrails, human_review — pluss
-   arbeidsflyten migrert fra dagens side. Copy er lo-fi til endelig tekst. */
+   flyten som flytskjema. Mønsteret er hentet fra styringsdokumentene i
+   Klar (PROJECT_DNA, HANDOVER_STATE) og Companion (PLAN_AGENT_SLICES,
+   handover-rapporter): små leveranser, harde gates, dokumentert
+   overlevering. Copy er lo-fi til endelig tekst. */
 
 const readme = [
   { nokkel: 'goals:', verdi: 'definert og skrevet ned før hver økt' },
-  { nokkel: 'guardrails:', verdi: 'hva agenten ikke får gjøre, eksplisitt' },
-  { nokkel: 'human_review:', verdi: 'alle diffs leses av et menneske' },
+  { nokkel: 'guardrails:', verdi: 'hva agenten ikke får gjøre — håndhevet av gates som kjører i bygget' },
+  { nokkel: 'human_review:', verdi: 'beslutninger, retning og stikkprøver — ingen gate passeres på autopilot' },
 ];
 
-const steg = [
-  { nr: '01', navn: 'Kontekst', tekst: 'Jeg starter med mål, rammer, kilder og hva som faktisk teller som ferdig.' },
-  { nr: '02', navn: 'Krav', tekst: 'Jeg bryter oppgaven ned i små, reviewbare steg med tydelige akseptansekriterier.' },
-  { nr: '03', navn: 'Verktøy', tekst: 'Jeg lager egne skills til Claude for jobben som skal gjøres, tilpasset domenet produktet lever i. Verktøyet rigges før arbeidet starter.' },
-  { nr: '04', navn: 'Loops', tekst: 'Med suksesskriteriene på plass kjører jeg arbeidet i løkker: forsøk, sjekk mot kriteriene, korriger, gjenta til alt passerer.' },
-  { nr: '05', navn: 'Menneskelig gjennomgang', tekst: 'Alt modellen foreslår er et utkast jeg leser, vurderer og tar stilling til før det går videre.' },
-  { nr: '06', navn: 'Korreksjon', tekst: 'Jeg tester antagelser, retter feil, strammer scope og følger opp avvik.' },
-  { nr: '07', navn: 'QA', tekst: 'Sjekklister for påstander, teknisk risiko og dokumentasjon før noe markeres som klart.' },
-  { nr: '08', navn: 'Dokumentasjon', tekst: 'Beslutninger, avgrensninger og usikkerheter logges underveis.' },
-  { nr: '09', navn: 'Overlevering', tekst: 'Handoff skrevet slik at andre kan ta arbeidet videre uten muntlig kontekst.' },
-  { nr: '10', navn: 'Kontrollpunkter', tekst: 'Påstander skal ha dekning, private data skal ligge der de hører hjemme, og ingenting er «ferdig» før det er verifisert.' },
+interface Node {
+  navn: string;
+  tekst: string;
+  betingelse?: string; // label på pila VIDERE til neste node
+  retur?: string; // løkke/retur-vei ut av noden
+}
+
+const noder: Node[] = [
+  {
+    navn: 'Kontekst og krav',
+    tekst:
+      'Mål, rammer og suksesskriterier skrives ned før noe bygges. Kravene kan endres underveis — men som en dokumentert beslutning, ikke i forbifarten.',
+  },
+  {
+    navn: 'Verktøy',
+    tekst:
+      'Egne skills til Claude for jobben som skal gjøres, tilpasset domenet produktet lever i — pluss gates som kjører automatisk: innholdssjekker, sikkerhetsregler, byggekrav.',
+    betingelse: 'rigget',
+  },
+  {
+    navn: 'Arbeidsløkka',
+    tekst:
+      'Agenten bygger i små, avgrensede leveranser: forsøk, valider mot kriteriene og gatene, korriger. Rødt i en gate stopper løkka — den kan ikke overtales.',
+    betingelse: 'alt grønt',
+    retur: 'ikke grønt → korriger og kjør på nytt',
+  },
+  {
+    navn: 'Sjekkpunkt',
+    tekst:
+      'Her sitter mennesket: retning, avveininger og stikkprøver av arbeidet. Ny innsikt kan bety at kravene må justeres — da går flyten tilbake, ikke videre.',
+    betingelse: 'godkjent',
+    retur: 'ny innsikt → kravene justeres, løkka kjøres på nytt',
+  },
+  {
+    navn: 'Overlevering',
+    tekst:
+      'Tilstanden skrives ned: hva som er gjort, hva som fortsatt er rødt, og neste steg — slik at neste økt eller en helt ny agent kan ta over uten muntlig kontekst.',
+    retur: 'neste økt starter på kontekst — med full historikk',
+  },
 ];
 ---
 
@@ -45,13 +76,34 @@ const steg = [
   </div>
 
   <section aria-labelledby="flyt-tittel">
-    <h2 id="flyt-tittel">Flyten, steg for steg</h2>
+    <h2 id="flyt-tittel">Flyten</h2>
+    <p class="flyt-ingress">
+      Ikke en rett linje, men en løkke med betingelser: arbeidet går videre
+      når kriteriene er grønne, og tilbake når de ikke er det.
+    </p>
     <ol class="flyt">
-      {steg.map((s) => (
-        <li>
-          <span class="nr" aria-hidden="true">{s.nr}</span>
-          <span class="navn">{s.navn}</span>
-          <span class="tekst">{s.tekst}</span>
+      {noder.map((n, i) => (
+        <li class="node-rad">
+          <div class="node">
+            <span class="node-nr" aria-hidden="true">{i + 1}</span>
+            <div class="node-innhold">
+              <h3>{n.navn}</h3>
+              <p>{n.tekst}</p>
+              {n.retur && (
+                <p class="retur">
+                  <span class="retur-pil" aria-hidden="true">↺</span>
+                  {n.retur}
+                </p>
+              )}
+            </div>
+          </div>
+          {i < noder.length - 1 && (
+            <div class="kobling" aria-hidden="true">
+              {n.betingelse && <span class="kobling-label">{n.betingelse}</span>}
+              <span class="kobling-linje"></span>
+              <span class="kobling-pil">▼</span>
+            </div>
+          )}
         </li>
       ))}
     </ol>
@@ -127,53 +179,107 @@ const steg = [
     color: var(--tekst);
   }
 
+  .flyt-ingress {
+    color: var(--dempet);
+    max-width: 62ch;
+    margin: 0 0 var(--s-4);
+  }
+
   .flyt {
     list-style: none;
     margin: 0;
     padding: 0;
-    max-width: 680px;
+    max-width: 620px;
+  }
+
+  .node-rad {
     display: flex;
     flex-direction: column;
   }
 
-  .flyt li {
-    display: grid;
-    grid-template-columns: 32px 200px 1fr;
-    gap: var(--s-3);
-    padding: var(--s-3) 0;
-    border-bottom: 1px solid var(--linje);
-    align-items: baseline;
+  .node {
+    display: flex;
+    gap: var(--s-4);
+    background: var(--flate);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    padding: var(--s-4) var(--s-5);
   }
 
-  .flyt li:last-child {
-    border-bottom: none;
-  }
-
-  .nr {
+  .node-nr {
     font-family: var(--font-hd);
-    font-size: 11px;
-    color: var(--salvie);
-  }
-
-  .navn {
     font-weight: 700;
-    font-size: 14.5px;
-  }
-
-  .tekst {
-    font-size: 14px;
-    line-height: 1.55;
+    font-size: 13px;
     color: var(--dempet);
+    border: 1px solid var(--linje);
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
   }
 
-  @media (max-width: 680px) {
-    .flyt li {
-      grid-template-columns: 32px 1fr;
-    }
+  .node-innhold h3 {
+    font-size: 16px;
+    margin: 0 0 var(--s-1);
+  }
 
-    .flyt .tekst {
-      grid-column: 2;
-    }
+  .node-innhold p {
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--dempet);
+    margin: 0;
+    max-width: 56ch;
+  }
+
+  /* Retur-/løkkeveier: betinget vei UT av noden, tilbake i flyten */
+  .retur {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s-2);
+    margin-top: var(--s-3) !important;
+    padding-top: var(--s-3);
+    border-top: 1px dashed var(--linje);
+    font-size: 13.5px;
+    color: var(--tekst) !important;
+  }
+
+  .retur-pil {
+    color: var(--salvie);
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+
+  /* Kobling mellom noder: linje + pil, med betingelsen som label */
+  .kobling {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2px 0;
+  }
+
+  .kobling-label {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: 11.5px;
+    letter-spacing: 0.06em;
+    color: var(--salvie);
+    padding: 2px 0;
+  }
+
+  .kobling-linje {
+    width: 2px;
+    height: 14px;
+    background: var(--linje);
+  }
+
+  .kobling-pil {
+    color: var(--linje);
+    font-size: 10px;
+    line-height: 1;
   }
 
   .broedtekst {

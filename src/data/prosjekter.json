@@ -1,7 +1,7 @@
 {
   "cs50x": {
     "navn": "CS50x",
-    "beskrivelse": "Harvards CS50x — grunnleggende programmering.",
+    "beskrivelse": "Grunnleggende programmering hos Harvards CS50x.",
     "sertifikat": "https://cs50.harvard.edu/certificates/0e9210d1-86f5-445a-b4d6-46fad1a5fd45",
     "ordkryssDemo": "https://youtu.be/tI5fU1aAAvI"
   },
@@ -13,7 +13,7 @@
   },
   "pdApp": {
     "navn": "pd-app",
-    "beskrivelse": "Forløperen til Klar — Vue-frontend og Django-backend, med fremtidige brukere som meddesignere.",
+    "beskrivelse": "Forløperen til Klar: Vue-frontend og Django-backend, med fremtidige brukere som meddesignere.",
     "frontend": "https://github.com/stianglomsrod/pd-app-frontend",
     "backend": "https://github.com/stianglomsrod/pd-app-backend"
   },

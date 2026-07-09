@@ -6,6 +6,27 @@
 
 ## Changelog
 
+### 2026-07-09 (natt) — Mobilnav som rad, kolofon-tekst, Ordkryss v2
+- **Mobilnav**: menyen brekker til egen rad under merket/tema-knappen —
+  alle seks punktene synlige, ingen hamburger (guiden) og ingen
+  halvskjult horisontal scroll. Portrettet på /om sentreres på mobil.
+- **Kolofon/Prosessen** omskrevet etter Stians diktat: Claude Design
+  fikk god kontekst for å iterere designguiden; guiden ble overlevert
+  Claude Code som jobbet med skills Stian har laget (/prd,
+  /norwegian-software-guardrails, /secure-dev-guardrails).
+- **CS50x-kortet**: «… et lite, ekte studentprosjekt der bugs og worst
+  practices er ivaretatt.» Tankestreker fjernet i prosjekter.json og
+  om-ingressen.
+- **Ordkryss v2 bygget** i `C:\Users\x_ray\kode 2026\Claude\cs50x final
+  project` (ikke git-repo): nytt ordletingsark-verktøy for lærere i ren
+  vanilla JS (index.html + ordkryss.css + ordkryss.js). Vannrett/
+  loddrett/diagonal innsetting med kryssing, bilde per ord (valgfritt,
+  også «bare bilder»-modus), utskrift + fasit-utskrift, bannordfilter
+  på input OG hele rutenettet i alle leseretninger (norsk, engelsk,
+  svensk/dansk, tysk, spansk, fransk), utkast i localStorage. 34
+  Node-tester grønne (plassering alle retninger, skann alle retninger,
+  100 rene stress-genereringer). Originalfilene står som tidsdokument.
+
 ### 2026-07-09 (kveld) — UX-opprydding: scroll, hover, mobil/UU
 - **Scroll-glitchen fikset** (blanke felt og klippet hero under scroll):
   den permanente `transition: --hue/--hue2` på `html` holdt hele siden i
@@ -57,7 +78,7 @@
 | --- | --- | --- |
 | Release-gate ikke kjørt på ekte preview | Venter på Vercel-prosjekt fra v3 + env-vars (GITHUB_TOKEN, RESEND_API_KEY) + Resend-DNS (Stians hånd) | Lighthouse ≥95 alle ruter + manuell gjennomspilling på preview-URL, så domene-flipp |
 | Kontaktskjema svarer 503 uten RESEND_API_KEY | Villet fail-closed til nøkkelen er satt | Sett env-var i Vercel |
-| Mobilmeny = horisontal scroll med maskekant | Guiden sier ingen hamburger; 375px gir ~160px synlig meny | Vurder kompaktere labels eller to rader ved < 400px |
+| Ordkryss v2 er ikke deployet og ikke i git | Bygget lokalt i cs50x-mappa; porteføljens ordkryssDemo-lenke peker fortsatt på YouTube-videoen | git init + deploy (f.eks. Vercel/Pages), så oppdatere prosjekter.json |
 | mp3-diett for spilllyd | ffmpeg mangler på maskinen | Komprimer når ffmpeg finnes |
 | size-adjust-fallbacks for fonter | Ikke prioritert | Reduserer CLS ved font-swap |
 | OG-delingsbilde | Tilbudt, ubesvart | Lag hvis ønsket |

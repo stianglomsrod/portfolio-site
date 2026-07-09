@@ -19,8 +19,8 @@ import now from '../data/now.json';
     <div class="bio">
       <p class="lead">
         Lektor med master i digitalt læringsdesign (OsloMet, 2026). Siden 2022
-        har jeg jobbet aktivt mot et karrierebytte til tech-bransjen —
-        gjennom studier, egne prosjekter og agentisk KI i daglig bruk.
+        har jeg jobbet aktivt mot et karrierebytte til tech-bransjen, gjennom
+        studier, egne prosjekter og agentisk KI i daglig bruk.
       </p>
       <p>
         Jeg elsker å utvikle programmeringsferdighetene på gamlemåten,
@@ -136,6 +136,12 @@ import now from '../data/now.json';
   @media (max-width: 640px) {
     .topp {
       flex-direction: column-reverse;
+    }
+
+    /* Sentrert sirkelportrett når teksten stables under (vanlig
+       profil-mønster på smale skjermer) */
+    .portrett {
+      margin-inline: auto;
     }
   }
 

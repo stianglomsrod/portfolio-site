@@ -25,6 +25,10 @@ const sistAktiv = sisteCommit ? new Date(sisteCommit.tidspunkt).getTime() : 0;
 const dagerSiden = (naa - sistAktiv) / 86_400_000;
 const ferskhet =
   dagerSiden < 1 ? 'aktiv i dag' : dagerSiden < 7 ? 'aktiv denne uka' : null;
+
+/* Notisen fra now.json går inn i selve setningen. «Fable 5» får
+   levende-markering når det står i teksten. */
+const notisDeler = now.notis ? now.notis.split('Fable 5') : null;
 ---
 
 <section class="hero" aria-labelledby="hero-h1">
@@ -33,6 +37,12 @@ const ferskhet =
   <h1 id="hero-h1" class="setning">
     Tar {now.kursStatus} i <span class="levende">{now.kurs}</span>, og
     {now.ki} med <span class="levende">{now.kiVerktoy}</span>.
+    {notisDeler && notisDeler.length === 2 && (
+      <>
+        {notisDeler[0]}<span class="levende">Fable 5</span>{notisDeler[1]}.
+      </>
+    )}
+    {notisDeler && notisDeler.length !== 2 && <>{now.notis}.</>}
   </h1>
 
   <div class="bevis">
@@ -73,8 +83,6 @@ const ferskhet =
     </p>
   </div>
 
-  {now.notis && <p class="notis">{now.notis}</p>}
-
   <p class="cta-linje">
     Søker {now.soker}-jobb —
     <a class="cta knapp" href="/om#kontakt">ta kontakt</a>
@@ -98,7 +106,7 @@ const ferskhet =
     line-height: 1.18;
     letter-spacing: -0.01em;
     color: var(--tekst);
-    max-width: 18ch;
+    max-width: 24ch;
   }
 
   /* Salvie kun om det levende: API-drevne ord, puls, CTA, aktivitet */
@@ -230,14 +238,6 @@ const ferskhet =
     .puls-dot {
       animation: none;
     }
-  }
-
-  /* Liten fersk statuslinje fra now.json — fjernes ved å slette feltet */
-  .notis {
-    margin: calc(-1 * var(--s-3)) 0 0;
-    font-size: 15.5px;
-    color: var(--dempet);
-    max-width: 56ch;
   }
 
   .cta-linje {

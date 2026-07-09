@@ -125,6 +125,12 @@ const t =
         </button>
       </div>
 
+      <div class="ok-sticky-print">
+        <button type="button" id="ok-skriv-ut-sticky" class="ok-sticky-knapp" title="Skriv ut arket (Ctrl+P)" aria-label="{t.skrivUt}">
+          🖨
+        </button>
+      </div>
+
       <div class="ok-ark" id="ok-ark">
         <div class="ok-ark-hode">
           <h3 id="ok-overskrift">{t.standardTittel}</h3>
@@ -333,6 +339,47 @@ const t =
     gap: 10px;
     flex-wrap: wrap;
     margin-bottom: var(--s-3);
+  }
+
+  /* Sticky print-knapp: alltid tilgjengelig når arket vises */
+  .ok-sticky-print {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 100;
+    display: none;
+    pointer-events: none;
+  }
+
+  .ok-sticky-print[data-synlig] {
+    display: flex;
+    pointer-events: auto;
+  }
+
+  .ok-sticky-knapp {
+    all: unset;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    font-size: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 160ms var(--ease), box-shadow 160ms var(--ease);
+  }
+
+  .ok-sticky-knapp:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+  }
+
+  .ok-sticky-knapp:focus-visible {
+    outline: 2px solid var(--tekst);
+    outline-offset: 2px;
   }
 
   /* Arket: alltid hvitt med svart skrift — forhåndsvisningen ER utskriften */
@@ -790,6 +837,10 @@ const t =
       el('ok-overskrift').textContent =
         el<HTMLInputElement>('ok-tittel').value.trim() || rot.dataset.standardtittel || '';
 
+      // Vis sticky print-knapp når arket er klart
+      const stickyPrint = document.querySelector('.ok-sticky-print');
+      if (stickyPrint) stickyPrint.setAttribute('data-synlig', '');
+
       const fasitCeller = new Set<string>();
       plasseringer.forEach((p) => p.celler.forEach(([r, k]) => fasitCeller.add(`${r},${k}`)));
 
@@ -848,10 +899,13 @@ const t =
       rot.classList.toggle('fasit-paa', fasitSynlig);
     });
 
-    el('ok-skriv-ut').addEventListener('click', () => {
+    const skrivUt = () => {
       rot.classList.remove('print-fasit');
       window.print();
-    });
+    };
+
+    el('ok-skriv-ut').addEventListener('click', skrivUt);
+    el('ok-skriv-ut-sticky').addEventListener('click', skrivUt);
 
     el('ok-skriv-ut-fasit').addEventListener('click', () => {
       rot.classList.add('print-fasit');

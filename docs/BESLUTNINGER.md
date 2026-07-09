@@ -30,6 +30,33 @@ med commit-hash og reverseringskommando, og push til GitHub.
 - **Reversering:** `git remote remove origin` + slett GitHub-repoet; dagens side
   er uberørt uansett.
 
+## 2026-07-09 · HELOMVENDING: Endelig Guide v3 erstatter v1/v2 som kanonisk
+
+- **Hva:** Stian leverte «Endelig Guide v3» (grunnlag 6d «Åpningstider», PDF i
+  docs/handoff/) og besluttet omstart av designet. v3 fjerner all kode-estetikk
+  (terminaler, kodeblokker, mono-labels), innfører varm grønnsvart palett med
+  salvie som eneste meningsbærende farge, Hanken Grotesk + Atkinson, og hero
+  som én levende klartekst-setning med aktivitetsmatrisen som bevis.
+  Strategi valgt av Stian: **re-skin** — funksjonslaget (GitHub-lib,
+  kontakt-API, spillport, tema, fallbacks) beholdes; flatene bygges om.
+- **Konsekvens:** PRD-ens Done 2–6 (kodeblokk-hero, Node-REPL, ticker) er
+  utdatert inntil overleveringspakka revideres; v1 §09 (harde krav/sjekkliste)
+  arves. Ticker, STIAN(1)-manside og korrektur-stempel utgår.
+- **Reversering:** `git revert` av spec-commiten + tokens-/flate-commitene på
+  v3-grenen; v2-designet ligger komplett i historikken t.o.m. 7d58d89.
+
+## 2026-07-09 · Arbeidet flyttet til portfolio-site (gren v3)
+
+- **Hva:** Stian besluttet at byggingen skal skje i
+  github.com/stianglomsrod/portfolio-site (gren `v3`; `main` = dagens
+  live-side, urørt til release). Reverserer «nytt repo»-beslutningen fra
+  08.07. Repoet stianglomsrod-no arkiveres (read-only) etter flytting —
+  også Stians valg.
+- **Begrunnelse:** Én kodebase og én historikk for siden hans; grenen bærer
+  hele v2-historikken videre så ingenting går tapt.
+- **Reversering:** `git push -d origin v3` + av-arkivering av
+  stianglomsrod-no på GitHub (begge reversible).
+
 ## 2026-07-08 · Guardrails-port kjørt på nytt ved onboarding
 
 - **Hva:** `norwegian-software-guardrails` kjørt; PRD-ens påstand om 🟢 GRØNT

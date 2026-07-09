@@ -8,17 +8,25 @@ program, ikke en brosjyre». Bygges med goal-loop i Claude Code.
 `docs/handoff/PRD-stianglomsrod-no-v2.md` er `/goal`. Done-kriteriene 1–22 er
 suksesskriteriene; goalen er ikke oppfylt før alle passerer.
 
-## Kildeprioritet ved konflikt
+## Kildeprioritet ved konflikt (revidert 09.07.2026)
 
-**PRD > tokens.css > Endelig Guide v2 > Endelig Guide v1 > README** (alle i `docs/handoff/`).
+**Endelig Guide v3 («Åpningstider», PDF i docs/handoff/) er kanonisk for alt
+design** og erstatter Guide v1/v2 og PRD-ens estetikk-punkter. Fra v1 arves
+KUN harde krav og sjekklista (§09). PRD-en gjelder fortsatt for funksjonelle
+krav (datakilder, sikkerhet, spill, gate) — men hero-/terminal-/tickerpunktene
+(Done 2–6) er utdaterte til overleveringspakka er revidert (guiden: «neste:
+oppdatere overleveringspakka»).
 
-## Tre overstyringer (PRD-en overstyrer guidene)
+v3s kjerneprinsipper: klartekst aldri kostyme (ingen terminaler, kodeblokker,
+mono-labels) · påstand + kvittering · salvie kun om levende/handlekraftig ·
+lekenhet i detaljene. Hero = én levende setning fra now.json + GitHub med
+aktivitetsmatrisen som bevis under.
 
-1. Hero-kommentarene er `// WIP:` (ikke `// TODO:`) og rendres fra `now.json`
-   i låst format `// WIP: <verdi>`.
-2. Terminalen går via Node-REPL: `$ node` → `> jobb` → `Promise { <pending> }` → `>▮`.
-3. Navnetrekket slutter med blinkende blokkmarkør ▮ (ikke grønt punktum), og
-   tickeren skal ha pausekontroll (≥ 44 px, `aria-pressed`).
+## Repo (revidert 09.07.2026)
+
+Arbeidet ligger på gren **v3** i github.com/stianglomsrod/portfolio-site.
+`main` der er dagens live-side (stianglomsrod.no) og røres ikke før release.
+Det tidligere repoet stianglomsrod-no er arkivert (historikk t.o.m. flyttingen).
 
 ## Invarianter (gjelder hver iterasjon)
 

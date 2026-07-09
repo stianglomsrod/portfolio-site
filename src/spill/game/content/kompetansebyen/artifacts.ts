@@ -35,7 +35,7 @@ export const artifacts: Artifact[] = [
     id: "master-oslomet",
     title: { no: "Mastergrad — OsloMet", en: "Master's degree — OsloMet" },
     description: {
-      no: "Master i digital læringsdesign (MAIKT), OsloMet.",
+      no: "Master i digitalt læringsdesign (MAIKT), OsloMet.",
       en: "Master in digital learning design (MAIKT), OsloMet.",
     },
     kind: "cert",

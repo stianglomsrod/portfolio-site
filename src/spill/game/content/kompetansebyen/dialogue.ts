@@ -107,7 +107,7 @@ export const dialogue: Record<string, DialogueTree> = {
   "oslomet-board": [
     {
       text: {
-        no: "Master i digital læringsdesign. Kjernen: design SAMMEN med folk, ikke FOR dem.",
+        no: "Master i digitalt læringsdesign. Kjernen: design SAMMEN med folk, ikke FOR dem.",
         en: "Master in digital learning design. The core: design WITH people, not FOR them.",
       },
     },

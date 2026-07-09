@@ -105,7 +105,7 @@ export const quests: Quest[] = [
       en: "Talk to the supervisor about the master's thesis.",
     },
     intro: {
-      no: "Master i digital læringsdesign. Nå: fra forløper til Klar, sammen med lærerne.",
+      no: "Master i digitalt læringsdesign. Nå: fra forløper til Klar, sammen med lærerne.",
       en: "Master in digital learning design. Now: from precursor to Klar, together with the teachers.",
     },
     requires: { allQuests: ["pd-app-bygg"] },

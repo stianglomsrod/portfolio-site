@@ -99,7 +99,7 @@
 | --- | --- | --- |
 | Release-gate ikke kjørt på ekte preview | Venter på Vercel-prosjekt fra v3 + env-vars (GITHUB_TOKEN, RESEND_API_KEY) + Resend-DNS (Stians hånd) | Lighthouse ≥95 alle ruter + manuell gjennomspilling på preview-URL, så domene-flipp |
 | Kontaktskjema svarer 503 uten RESEND_API_KEY | Villet fail-closed til nøkkelen er satt | Sett env-var i Vercel |
-| Ordkryss v2 er ikke deployet og ikke i git | Bygget lokalt i cs50x-mappa; porteføljens ordkryssDemo-lenke peker fortsatt på YouTube-videoen | git init + deploy (f.eks. Vercel/Pages), så oppdatere prosjekter.json |
+| Ordkryss finnes i to utgaver | Siten har den levende (/sandbox/ordkryss, kjerne i src/lib); den frittstående i cs50x-mappa har Node-testene og er ikke i git | Hold kjernene i synk ved endring; vurder å flytte testene inn i repoet |
 | mp3-diett for spilllyd | ffmpeg mangler på maskinen | Komprimer når ffmpeg finnes |
 | size-adjust-fallbacks for fonter | Ikke prioritert | Reduserer CLS ved font-swap |
 | OG-delingsbilde | Tilbudt, ubesvart | Lag hvis ønsket |

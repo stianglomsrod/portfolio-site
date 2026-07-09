@@ -14,7 +14,7 @@ const kolofonSti = lang === 'nb' ? '/kolofon' : '/en/colophon';
 
 <footer class="bunn">
   <div class="indre">
-    <Merke storrelse={15} ariaLabel={t.merkeAria} />
+    <Merke storrelse={15} ariaLabel={t.merkeAria} href={lang === 'nb' ? '/' : '/en/'} />
     <p class="linje">
       {t.bunnLinje}
       <a href={kolofonSti}>{t.bunnKolofon}</a> ·

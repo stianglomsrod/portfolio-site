@@ -9,9 +9,14 @@
 interface Props {
   storrelse?: number;
   ariaLabel?: string;
+  href?: string;
 }
 
-const { storrelse = 17, ariaLabel = 'Stian Glomsrød, til forsiden' } = Astro.props;
+const {
+  storrelse = 17,
+  ariaLabel = 'Stian Glomsrød, til forsiden',
+  href = '/',
+} = Astro.props;
 
 /* «sti» er fet (800), «glo» er lettere (400) — men begge i Anybody, så begge
    har bredde-aksen og vokser likt på hover. */
@@ -27,7 +32,7 @@ const bokstaver = [
 
 <a
   class="merke"
-  href="/"
+  href={href}
   aria-label={ariaLabel}
   style={`font-size: ${storrelse}px`}
 >

@@ -25,7 +25,7 @@ const erAktiv = (href: string) => {
 
 <header class="topp" id="side-topp">
   <div class="topp-indre">
-    <Merke storrelse={17} ariaLabel={t.merkeAria} />
+    <Merke storrelse={17} ariaLabel={t.merkeAria} href={lang === 'nb' ? '/' : '/en/'} />
     <nav aria-label={t.hovedmeny}>
       <ul class="meny">
         {t.meny.map((p) => (

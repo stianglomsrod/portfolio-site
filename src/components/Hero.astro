@@ -21,9 +21,8 @@ const ferskhet =
   <p class="label">Akkurat nå</p>
 
   <h1 id="hero-h1" class="setning">
-    Tar <span class="levende">{now.kurs}</span>
-    <span class="status">({now.kursStatus})</span>, og {now.ki} med
-    <span class="levende">{now.kiVerktoy}</span>.
+    Tar {now.kursStatus} i <span class="levende">{now.kurs}</span>, og
+    {now.ki} med <span class="levende">{now.kiVerktoy}</span>.
   </h1>
 
   <div class="bevis">
@@ -92,12 +91,6 @@ const ferskhet =
   /* Salvie kun om det levende: API-drevne ord, puls, CTA, aktivitet */
   .levende {
     color: var(--salvie);
-  }
-
-  .status {
-    color: var(--dempet);
-    font-weight: 600;
-    font-size: 0.62em;
   }
 
   .dempet {

@@ -1,9 +1,11 @@
 ---
 import Side from '../layouts/Side.astro';
+import profil from '../data/profil.json';
 
-/* Skjelett: hvordan siden ble bygget (agentisk arbeidsflyt, baseline-tall
-   fra docs/innsikt/), tilgjengelighetserklæring og personvern (Done 17).
-   Ankrene #tilgjengelighet og #personvern brukes fra footeren. */
+/* Kolofon: hvordan siden ble bygget, tilgjengelighet og personvern
+   (Done 17). Ankrene #tilgjengelighet og #personvern brukes fra footeren. */
+
+const epost = profil.kontakt.epost;
 ---
 
 <Side
@@ -67,9 +69,21 @@ import Side from '../layouts/Side.astro';
   <section id="personvern" aria-labelledby="pv-tittel">
     <h2 id="pv-tittel">Personvern</h2>
     <p class="dempet">
-      Ingen cookies, ingen sporing, ingenting lagres. Full personverntekst
-      (inkl. behandlingsgrunnlag for kontaktskjemaet og databehandlere)
-      kommer med skjemaet.
+      Siden setter ingen informasjonskapsler og har ingen sporing eller
+      analyse. Valgene dine for tema og fargetone lagres bare lokalt i din
+      egen nettleser, og forlater aldri maskinen.
+    </p>
+    <p class="dempet">
+      Bruker du kontaktskjemaet, sendes navnet, e-postadressen og meldingen
+      din videre til meg som en e-post. Ingenting lagres i noen database.
+      Grunnlaget for behandlingen er at du selv tar kontakt, og opplysningene
+      brukes bare til å svare deg.
+    </p>
+    <p class="dempet">
+      To databehandlere er involvert: Vercel drifter siden, og Resend leverer
+      e-posten fra skjemaet. Begge behandler data innenfor EU/EØS. Vil du se
+      hva jeg har, eller få det slettet, er det bare å sende en e-post til
+      <a href={`mailto:${epost}`}>{epost}</a>.
     </p>
   </section>
 </Side>

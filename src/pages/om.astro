@@ -33,23 +33,19 @@ import now from '../../now.json';
       <dl class="fakta" translate="no">
         <div><dt>sted:</dt><dd>Halden / remote</dd></div>
         <div><dt>status:</dt><dd class="signal">søker {now.soker}</dd></div>
-        <div><dt>svartid:</dt><dd>&lt; 24t</dd></div>
+        <div><dt>svartid:</dt><dd>under et døgn</dd></div>
       </dl>
     </div>
-    <figure class="portrett-ramme">
+    <div class="portrett-ramme">
       <img
         class="portrett"
         src="/bilder/stian-byste.jpg"
         alt="Stian Glomsrød smiler mot kamera, i svart pikéskjorte og caps"
-        width="360"
-        height="380"
+        width="276"
+        height="320"
         loading="eager"
       />
-      <figcaption>
-        <span class="fig-markoer" aria-hidden="true"></span>
-        stian.png · ekte foto, ingen filter
-      </figcaption>
-    </figure>
+    </div>
   </div>
 
   <section id="kontakt" aria-labelledby="kontakt-tittel">
@@ -145,24 +141,6 @@ import now from '../../now.json';
     display: block;
     width: 100%;
     height: auto;
-  }
-
-  figcaption {
-    display: flex;
-    align-items: center;
-    gap: var(--s-2);
-    font-family: var(--font-hd);
-    font-size: 10.5px;
-    color: var(--dempet);
-    padding: var(--s-2) var(--s-3);
-    border-top: 1px solid var(--linje);
-  }
-
-  .fig-markoer {
-    width: 7px;
-    height: 13px;
-    background: var(--salvie);
-    flex-shrink: 0;
   }
 
   @media (max-width: 640px) {

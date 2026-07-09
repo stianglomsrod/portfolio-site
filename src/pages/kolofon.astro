@@ -13,9 +13,50 @@ import Side from '../layouts/Side.astro';
   <p class="kicker">Kolofon</p>
   <h1>Slik ble siden til</h1>
   <p class="dempet">
-    Byggehistorie, fontlisenser og Lighthouse-tall kommer her når siden
-    nærmer seg lansering.
+    Siden er bygget i åpen dialog med Claude, og denne siden dokumenterer
+    hvordan.
   </p>
+
+  <section aria-labelledby="prosess-tittel">
+    <h2 id="prosess-tittel">Prosessen</h2>
+    <p class="dempet">
+      Designet kom først. Jeg brukte Claude til å utforske stilretninger og
+      lande en styling guide. Den tredje versjonen ble stående. Sammen med en
+      kreativ brief, en kravspesifikasjon med verifiserbare ferdig-kriterier
+      og egne skills for norsk compliance og sikker utvikling utgjorde den
+      startpakken for byggingen.
+    </p>
+    <p class="dempet">
+      Før noe ble bygget, målte vi den gamle siden: Lighthouse,
+      tilgjengelighetssjekk og skjermbilder på tre skjermbredder. Tallene
+      ligger i repoet og blir sammenlikningsgrunnlaget ved lansering.
+    </p>
+    <p class="dempet">
+      Selve byggingen skjer i økter med Claude Code, i løkker mot
+      ferdig-kriteriene (se <a href="/slik-jobber-jeg">slik jobber jeg</a>).
+      Sjekker kjører automatisk før hvert bygg, beslutninger logges med dato
+      og reverseringskommando, og alt verifiseres i kjørende forhåndsvisning
+      før det havner i historikken. Underveis byttet vi designretning helt.
+      Det ligger som en dokumentert beslutning i loggen, ikke som en
+      overskriving.
+    </p>
+  </section>
+
+  <section aria-labelledby="stack-tittel">
+    <h2 id="stack-tittel">Stack og data</h2>
+    <p class="dempet">
+      Astro, med et lite React-innslag for spillet i
+      <a href="/sandbox">/sandbox</a>, hostet på Vercel. Fontene Hanken
+      Grotesk, Atkinson Hyperlegible og Anybody er self-hostet og subsettet,
+      alle under SIL Open Font License. De levende tallene på forsiden kommer
+      fra en datafil i repoet og GitHubs API, med en statisk reserve hvis
+      hentingen svikter.
+    </p>
+    <p class="dempet">
+      Lighthouse-tall og full byggehistorie publiseres her ved lansering.
+    </p>
+  </section>
+
   <section id="tilgjengelighet" aria-labelledby="uu-tittel">
     <h2 id="uu-tittel">Tilgjengelighet</h2>
     <p class="dempet">

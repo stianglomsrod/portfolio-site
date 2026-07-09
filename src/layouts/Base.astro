@@ -42,13 +42,19 @@ const { title, description, noindex = false } = Astro.props;
       crossorigin
     />
     <script is:inline>
-      /* Tema før first paint: manuell overstyring i localStorage vinner,
-         ellers følges prefers-color-scheme via CSS. Cookiefritt. */
+      /* Tema og hue før first paint: manuelle valg i localStorage vinner,
+         ellers følges prefers-color-scheme via CSS. Cookiefritt. Hue-verdien
+         (fra slideren i /sandbox) følger deg på hele siden. */
       (() => {
         try {
           const t = localStorage.getItem('data-theme');
           if (t === 'light' || t === 'dark') {
             document.documentElement.dataset.theme = t;
+          }
+          const h = localStorage.getItem('hue');
+          if (h !== null) {
+            const n = Math.min(360, Math.max(0, Math.round(Number(h)) || 0));
+            document.documentElement.style.setProperty('--hue', String(n));
           }
         } catch {}
       })();

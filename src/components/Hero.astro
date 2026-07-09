@@ -10,6 +10,16 @@ import { hentHeatmap, hentSisteCommits } from '../lib/github';
 const heatmap = await hentHeatmap();
 const [sisteCommit] = await hentSisteCommits(1);
 
+/* Matrisen viser siste 30 dager (året ble for glissent); summen oppgir
+   begge tidsrom. Tooltip per dag er ren CSS (matrisen er dekorativ —
+   skjermlesere får tallene i klartekst). */
+const sisteDager = heatmap
+  ? heatmap.uker.flatMap((u) => u.dager).slice(-30)
+  : [];
+const maanedTotal = sisteDager.reduce((sum, d) => sum + d.antall, 0);
+const datoTekst = (iso: string) =>
+  new Date(iso).toLocaleDateString('nb-NO', { day: 'numeric', month: 'long' });
+
 const naa = Date.now();
 const sistAktiv = sisteCommit ? new Date(sisteCommit.tidspunkt).getTime() : 0;
 const dagerSiden = (naa - sistAktiv) / 86_400_000;
@@ -28,15 +38,16 @@ const ferskhet =
   <div class="bevis">
     {heatmap && (
       <>
-        <p class="sr-only">{heatmap.totalt} bidrag siste år.</p>
+        <p class="sr-only">
+          {maanedTotal} bidrag siste måneden, {heatmap.totalt} siste år.
+        </p>
         <div class="matrise-scroller">
           <div class="matrise" aria-hidden="true">
-            {heatmap.uker.map((uke) => (
-              <div class="uke">
-                {uke.dager.map((dag) => (
-                  <span class={`rute niv-${dag.nivaa}`}></span>
-                ))}
-              </div>
+            {sisteDager.map((dag) => (
+              <span
+                class={`rute niv-${dag.nivaa}`}
+                data-tip={`${dag.antall} bidrag ${datoTekst(dag.dato)}`}
+              ></span>
             ))}
           </div>
         </div>
@@ -44,7 +55,10 @@ const ferskhet =
     )}
     <p class="bevis-linje">
       {heatmap ? (
-        <span class="levende">{heatmap.totalt} bidrag siste år</span>
+        <>
+          <span class="levende">{maanedTotal} bidrag siste måneden</span>
+          <span class="aarstall">· {heatmap.totalt} siste år</span>
+        </>
       ) : (
         <span class="dempet">
           Aktivitetsmatrisen kobles på når GitHub-tokenet er satt.
@@ -112,21 +126,57 @@ const ferskhet =
 
   .matrise {
     display: flex;
-    gap: 3px;
+    gap: 4px;
     width: max-content;
-  }
-
-  .uke {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
+    padding-top: 34px; /* plass til tooltipen over rutene */
   }
 
   .rute {
-    width: 11px;
-    height: 11px;
-    border-radius: 2.5px;
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
     display: block;
+    position: relative;
+  }
+
+  .rute:hover {
+    outline: 1px solid var(--dempet);
+    outline-offset: 1px;
+  }
+
+  .rute:hover::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--flate);
+    color: var(--tekst);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    padding: 4px 9px;
+    font-size: 12.5px;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .matrise .rute:first-child:hover::after,
+  .matrise .rute:nth-child(2):hover::after {
+    left: 0;
+    transform: none;
+  }
+
+  .matrise .rute:last-child:hover::after,
+  .matrise .rute:nth-last-child(2):hover::after {
+    left: auto;
+    right: 0;
+    transform: none;
+  }
+
+  .aarstall {
+    color: var(--dempet);
+    font-size: 14px;
   }
 
   .niv-0 { background: var(--heat-0); }

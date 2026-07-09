@@ -23,7 +23,11 @@
   initial-value: 158;
 }
 
-html {
+/* Transitionen ligger KUN på en midlertidig klasse (settes av hue.ts
+   rundt slider/tilbakestill). En permanent transition på rot-elementet
+   holdt hele siden i animasjonsberedskap og ga compositing-glitcher
+   ved scroll (blanke felt, klippet tekst). */
+html.hue-glir {
   transition:
     --hue 500ms cubic-bezier(0.2, 0, 0, 1),
     --hue2 500ms cubic-bezier(0.2, 0, 0, 1);

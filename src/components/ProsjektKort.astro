@@ -63,11 +63,12 @@ const hoved = lenker.find((l) => !l.href.startsWith('http')) ?? lenker[0];
     gap: var(--s-2);
     height: 100%;
     box-sizing: border-box;
-    transition: transform var(--dur-mikro) var(--ease), border-color var(--dur-mikro);
+    /* Rolig løft uten scale: skalering ga tekst-shimmer under overgangen */
+    transition: transform 160ms var(--ease), border-color 160ms;
   }
 
   .kort:hover {
-    transform: translateY(-2px) scale(1.015);
+    transform: translateY(-3px);
     border-color: var(--dempet);
   }
 
@@ -75,7 +76,7 @@ const hoved = lenker.find((l) => !l.href.startsWith('http')) ?? lenker[0];
   .kort:has(.dekk:focus-visible) {
     outline: 2px solid var(--salvie);
     outline-offset: 2px;
-    transform: translateY(-2px) scale(1.015);
+    transform: translateY(-3px);
   }
 
   .tag {

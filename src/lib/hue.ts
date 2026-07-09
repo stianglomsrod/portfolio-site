@@ -22,6 +22,19 @@ function les(nokkel: string): number | null {
   }
 }
 
+/* Myk rotasjon uten permanent rot-transition: klassen med transitionen
+   settes på før endringen og fjernes når den har fått gli ferdig.
+   Gjentatte kall (slider-drag) forlenger vinduet. */
+let glirTimer: ReturnType<typeof setTimeout> | undefined;
+
+function gliMykt(): void {
+  document.documentElement.classList.add('hue-glir');
+  clearTimeout(glirTimer);
+  glirTimer = setTimeout(() => {
+    document.documentElement.classList.remove('hue-glir');
+  }, 650);
+}
+
 export function lesHue(): number | null {
   return les(NOKKEL);
 }
@@ -32,6 +45,7 @@ export function lesHue2(): number | null {
 
 export function settHue(verdi: number, lagre: boolean): void {
   const h = clampHue(verdi);
+  gliMykt();
   document.documentElement.style.setProperty('--hue', String(h));
   // Aksenten følger med til den har egen lagret verdi
   if (lesHue2() === null) {
@@ -46,6 +60,7 @@ export function settHue(verdi: number, lagre: boolean): void {
 
 export function settHue2(verdi: number, lagre: boolean): void {
   const h = clampHue(verdi);
+  gliMykt();
   document.documentElement.style.setProperty('--hue2', String(h));
   if (lagre) {
     try {
@@ -62,14 +77,23 @@ export function tilbakestillHue(): void {
   } catch {}
   // Fjern inline-verdiene så stylesheet-defaulten (158) tar over; @property
   // gjør at også dette animeres mykt.
+  gliMykt();
   document.documentElement.style.removeProperty('--hue');
   document.documentElement.style.removeProperty('--hue2');
 }
 
-/** Brukes av 404: arv lagrede verdier uten å vise kontroller. */
+/** Brukes av 404: arv lagrede verdier uten å vise kontroller.
+    Settes direkte (uten glid) — dette er sidelast, ikke en endring. */
 export function arvHue(): void {
   const lagret = lesHue();
-  if (lagret !== null) settHue(lagret, false);
+  if (lagret !== null) {
+    document.documentElement.style.setProperty('--hue', String(lagret));
+    if (lesHue2() === null) {
+      document.documentElement.style.setProperty('--hue2', String(lagret));
+    }
+  }
   const lagret2 = lesHue2();
-  if (lagret2 !== null) settHue2(lagret2, false);
+  if (lagret2 !== null) {
+    document.documentElement.style.setProperty('--hue2', String(lagret2));
+  }
 }

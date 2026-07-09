@@ -103,7 +103,7 @@
     width: 100%;
     accent-color: var(--hue-aksent);
     cursor: pointer;
-    min-height: 40px;
+    min-height: 44px; /* WCAG-målstørrelse */
     margin: 0;
   }
 
@@ -149,6 +149,10 @@
     border: 1px solid var(--linje);
     border-radius: var(--radius-sm);
     padding: 8px 12px;
+    min-height: 44px; /* WCAG-målstørrelse */
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
     cursor: pointer;
     transition: color var(--dur-mikro), border-color var(--dur-mikro);
   }

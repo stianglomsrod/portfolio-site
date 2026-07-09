@@ -59,6 +59,9 @@ const erAktiv = (href: string) => sti === (href === '/' ? '/' : href);
     background: var(--nav-bg);
     border-bottom: 1px solid var(--linje);
     transition: transform var(--dur-panel) var(--ease);
+    /* Eget compositor-lag: uten dette kunne skjul/vis-transformen gi
+       blanke felt og klippet innhold under scroll (Chromium) */
+    will-change: transform;
   }
 
   .topp[data-skjult] {
@@ -79,6 +82,13 @@ const erAktiv = (href: string) => sti === (href === '/' ? '/' : href);
     width: 100%;
   }
 
+  /* Flex-elementet må få lov til å krympe, ellers presser menyen raden
+     utover skjermen på mobil i stedet for å scrolle internt */
+  .topp-indre nav {
+    min-width: 0;
+    flex: 1;
+  }
+
   .meny {
     display: flex;
     gap: var(--s-1);
@@ -94,7 +104,9 @@ const erAktiv = (href: string) => sti === (href === '/' ? '/' : href);
     font-size: 14px;
     color: var(--dempet);
     text-decoration: none;
-    padding: 10px;
+    padding: 12px 10px;
+    min-height: 44px; /* WCAG-målstørrelse på berøringsskjerm */
+    box-sizing: border-box;
     border-radius: var(--radius-sm);
     display: inline-flex;
     align-items: center;
@@ -195,8 +207,9 @@ const erAktiv = (href: string) => sti === (href === '/' ? '/' : href);
 
   oppdater();
 
-  // Auto-hide: skjul ved scroll ned, vis ved scroll opp. Terskel på 10px
-  // ignorerer småbevegelser; nær toppen er raden alltid synlig.
+  // Auto-hide: skjul ved scroll ned, vis ved scroll opp. Slår først inn
+  // godt under heltene på toppen (y > 160), og hysteresen på 16px hindrer
+  // flimring ved småbevegelser.
   const topp = document.getElementById('side-topp');
   let forrigeY = window.scrollY;
   let ventet = false;
@@ -209,16 +222,16 @@ const erAktiv = (href: string) => sti === (href === '/' ? '/' : href);
       requestAnimationFrame(() => {
         const y = window.scrollY;
         const delta = y - forrigeY;
-        if (y < 80) {
+        if (y < 160) {
           topp?.removeAttribute('data-skjult');
-        } else if (delta > 10) {
+          forrigeY = y;
+        } else if (delta > 16) {
           topp?.setAttribute('data-skjult', '');
           forrigeY = y;
-        } else if (delta < -10) {
+        } else if (delta < -16) {
           topp?.removeAttribute('data-skjult');
           forrigeY = y;
         }
-        if (Math.abs(delta) > 10) forrigeY = y;
         ventet = false;
       });
     },

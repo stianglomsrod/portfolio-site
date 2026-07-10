@@ -19,7 +19,8 @@
   900/SWR) så matrisen og «aktiv i dag» alltid er ferske. github.ts
   leser tokenet ved kall-tid (process.env i runtime) og events-cachen
   fikk 5 min TTL (varme lambdaer gjenbrukte ellers svaret evig).
-  Live heatmap i prod krever GITHUB_TOKEN som Vercel-env (Stians hånd).
+  GITHUB_TOKEN er SATT som Vercel-env (production, kryptert) og
+  verifisert live: «7 bidrag 10. juli» i tooltip samme kveld.
 - **Flytskjemaet på /slik-jobber-jeg får plass i én viewport** (~785px):
   hvert steg er nå en vannrett rad — node | arm | diamant | nei-piller —
   i grid med delte spor. Returlinjene rutes fortsatt i høyrefeltet;
@@ -28,6 +29,10 @@
   kant-sjekken holder.
 - **Ordkryss-tekstene strippet for historie**: «skriv inn ordene elevene
   skal finne», ingen CS50x-omtale på siden eller kortene (begge språk).
+- **Vercel ryddet**: portfolio-site-v3 og vgx-pitch er koblet FRA repoet
+  (git disconnect) — hver push bygger nå kun prod-prosjektet
+  «stianglomsrod», og commit-statusen på GitHub blir grønn. Spillet
+  verifisert i prod med Playwright: ekte teksturer, 0 konsollfeil.
 - QA: bygg grønt, axe 0/16, kant-sjekk 0/16.
 
 ### 2026-07-10 (natt) — Ordkryss-wizard, smooth nav-scroll, v3 til produksjon

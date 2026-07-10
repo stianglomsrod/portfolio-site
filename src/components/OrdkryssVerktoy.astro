@@ -495,18 +495,24 @@ const t =
       margin: 14mm;
     }
 
+    /* Lys utskrift uansett tema: color-scheme dark får ellers Chrome til
+       å male hele arket mørkt i print */
+    html,
     body {
-      background: #fff;
+      color-scheme: light;
+      background: #fff !important;
       color: #000;
     }
 
+    /* Skjul alt UI-krom — men ALDRI .ramme (main): den er arkets
+       forelder, og skjules den, printes en tom side */
     .topp,
     .bunn,
     .hopp,
     .ok-panel,
     .ok-handlinger,
     .ok-side-hode,
-    .ramme {
+    .ok-sticky-print {
       display: none !important;
     }
 
@@ -514,6 +520,7 @@ const t =
       padding: 0;
       max-width: none;
       min-height: 0;
+      background: #fff;
     }
 
     .ok-oppsett {

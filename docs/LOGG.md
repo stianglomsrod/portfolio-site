@@ -34,6 +34,14 @@
   Pila i «native-jobb →» droppes på mobil (den peker på knappen når de
   deler linje på desktop; på mobil brakk knappen ned og pila pekte ut i
   lufta), og knappen står som egen blokk med luft (margin s-4).
+- **Navnetrekket lever på touch også**: dra fingeren bortover «stiglo»
+  («strumming») for samme kinetikk som hover — bokstaven under fingeren
+  vides ut og farges med naboregelen. En drag (>10px vannrett) svelger
+  det påfølgende klikket, så lenka navigerer bare ved tapp; vertikal
+  sveip scroller som normalt (touch-action: pan-y). Ankomstbølge én gang
+  per merke per sidelast (IntersectionObserver, terskel 0.6) viser at
+  navnet er levende — helt av ved prefers-reduced-motion. Hover, strum
+  og bølge deler tenn/slukk-logikken.
 - QA: bygg grønt, axe 0/18, kant-sjekk 0/18, desktop-regresjon og
   reduced-motion verifisert programmatisk.
 

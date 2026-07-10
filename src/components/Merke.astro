@@ -2,9 +2,12 @@
 /* Navnetrekket «stiglo» — eneste sted Anybody finnes. Kinetisk per
    bokstav (300 ms): bokstaven under pekeren vides ut alene og får en
    tilfeldig farge som aldri er lik naboenes forrige/nåværende.
-   Tastaturfokus på lenka gir hele ordet den faste paletten. Boksen har
-   fast bredde målt for utvidet tilstand, så navnet aldri dytter på
-   naboelementene. */
+   På berøringsskjerm: dra fingeren bortover navnet («strumming») for
+   samme effekt — en drag er ikke et tapp, så lenka navigerer fortsatt.
+   En ankomstbølge (én gang per merke per sidelast, av ved reduced
+   motion) viser at navnet lever. Tastaturfokus på lenka gir hele ordet
+   den faste paletten. Boksen har fast bredde målt for utvidet tilstand,
+   så navnet aldri dytter på naboelementene. */
 
 interface Props {
   storrelse?: number;
@@ -52,6 +55,10 @@ const bokstaver = [
     width: 4.6em;
     flex-shrink: 0;
     padding: var(--s-2) 0;
+    /* Vertikal sveip scroller som normalt; horisontal drag over merket
+       er strumming (håndteres i scriptet) */
+    touch-action: pan-y;
+    -webkit-tap-highlight-color: transparent;
   }
 
   /* Driver akslene direkte (mer pålitelig enn font-stretch %): «sti» er
@@ -64,7 +71,8 @@ const bokstaver = [
       color var(--dur-kinetikk) var(--ease);
   }
 
-  .bokstav:hover {
+  .bokstav:hover,
+  .bokstav.tent {
     font-variation-settings: 'wght' var(--vekt), 'wdth' 145;
   }
 
@@ -81,10 +89,11 @@ const bokstaver = [
 </style>
 
 <script>
-  // Helt tilfeldig fargetone per bokstav ved hover (hele fargehjulet),
-  // med nabo-regel som vinkelavstand: aldri nærmere enn 45° fra naboenes
+  // Helt tilfeldig fargetone per bokstav (hele fargehjulet), med
+  // nabo-regel som vinkelavstand: aldri nærmere enn 45° fra naboenes
   // forrige/nåværende tone eller bokstavens egen forrige. Lysstyrken
-  // låses per tema så kontrasten mot bakgrunnen holder.
+  // låses per tema så kontrasten mot bakgrunnen holder. Samme kinetikk
+  // driver hover (mus), strumming (finger) og ankomstbølgen.
   const MIN_AVSTAND = 45;
 
   const hueAvstand = (a: number, b: number) => {
@@ -99,27 +108,105 @@ const bokstaver = [
     return window.matchMedia('(prefers-color-scheme: light)').matches;
   };
 
+  const tenn = (bokstav: HTMLElement) => {
+    const unngaa = [
+      bokstav.dataset.hue,
+      (bokstav.previousElementSibling as HTMLElement | null)?.dataset.hue,
+      (bokstav.nextElementSibling as HTMLElement | null)?.dataset.hue,
+    ]
+      .map(Number)
+      .filter(Number.isFinite);
+
+    let hue = Math.floor(Math.random() * 360);
+    for (let i = 0; i < 40 && unngaa.some((u) => hueAvstand(hue, u) < MIN_AVSTAND); i++) {
+      hue = Math.floor(Math.random() * 360);
+    }
+
+    bokstav.dataset.hue = String(hue);
+    bokstav.style.color = `oklch(${lystTema() ? '46%' : '74%'} 0.15 ${hue})`;
+    bokstav.classList.add('tent');
+  };
+
+  const slukk = (bokstav: HTMLElement) => {
+    bokstav.style.color = '';
+    bokstav.classList.remove('tent');
+  };
+
   document.querySelectorAll<HTMLElement>('[data-merke-bokstav]').forEach((bokstav) => {
-    bokstav.addEventListener('mouseenter', () => {
-      const unngaa = [
-        bokstav.dataset.hue,
-        (bokstav.previousElementSibling as HTMLElement | null)?.dataset.hue,
-        (bokstav.nextElementSibling as HTMLElement | null)?.dataset.hue,
-      ]
-        .map(Number)
-        .filter(Number.isFinite);
+    bokstav.addEventListener('mouseenter', () => tenn(bokstav));
+    bokstav.addEventListener('mouseleave', () => slukk(bokstav));
+  });
 
-      let hue = Math.floor(Math.random() * 360);
-      for (let i = 0; i < 40 && unngaa.some((u) => hueAvstand(hue, u) < MIN_AVSTAND); i++) {
-        hue = Math.floor(Math.random() * 360);
-      }
+  // Strumming: dra fingeren bortover navnet — bokstaven under fingeren
+  // tennes, forrige slukkes. En drag (>10px vannrett) er ikke et tapp,
+  // så det påfølgende klikket svelges og lenka navigerer bare ved tapp.
+  document.querySelectorAll<HTMLElement>('.merke').forEach((merke) => {
+    let aktiv: HTMLElement | null = null;
+    let startX = 0;
+    let dratt = false;
 
-      bokstav.dataset.hue = String(hue);
-      bokstav.style.color = `oklch(${lystTema() ? '46%' : '74%'} 0.15 ${hue})`;
+    merke.addEventListener('pointerdown', (e) => {
+      if (e.pointerType !== 'touch') return;
+      startX = e.clientX;
+      dratt = false;
     });
 
-    bokstav.addEventListener('mouseleave', () => {
-      bokstav.style.color = '';
+    merke.addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'touch') return;
+      if (Math.abs(e.clientX - startX) > 10) dratt = true;
+      const under = document
+        .elementFromPoint(e.clientX, e.clientY)
+        ?.closest?.('[data-merke-bokstav]') as HTMLElement | null;
+      if (under !== aktiv) {
+        if (aktiv) slukk(aktiv);
+        aktiv = under && merke.contains(under) ? under : null;
+        if (aktiv) tenn(aktiv);
+      }
+    });
+
+    const slutt = () => {
+      if (aktiv) {
+        slukk(aktiv);
+        aktiv = null;
+      }
+    };
+    merke.addEventListener('pointerup', slutt);
+    merke.addEventListener('pointercancel', slutt);
+
+    merke.addEventListener('click', (e) => {
+      if (dratt) {
+        e.preventDefault();
+        dratt = false;
+      }
     });
   });
+
+  // Ankomstbølge: én gang per merke per sidelast, når merket er godt
+  // synlig — viser at navnet lever (og at det tåler å bli tatt på).
+  // Ren dekorasjon, så reduced motion skrur den helt av.
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const boelge = (merke: HTMLElement) => {
+      const bokstaver = merke.querySelectorAll<HTMLElement>('[data-merke-bokstav]');
+      bokstaver.forEach((b, i) => {
+        setTimeout(() => {
+          tenn(b);
+          setTimeout(() => slukk(b), 380);
+        }, 350 + i * 75);
+      });
+    };
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            boelge(e.target as HTMLElement);
+            io.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.6 }
+    );
+
+    document.querySelectorAll<HTMLElement>('.merke').forEach((m) => io.observe(m));
+  }
 </script>

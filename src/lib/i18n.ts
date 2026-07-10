@@ -14,6 +14,7 @@ export const RUTEKART: Record<string, string> = {
   '/reisen': '/en/journey',
   '/sandbox': '/en/sandbox',
   '/sandbox/ordkryss': '/en/sandbox/wordsearch',
+  '/sandbox/silhuett': '/en/sandbox/word-shapes',
   '/slik-jobber-jeg': '/en/how-i-work',
   '/om': '/en/about',
   '/kolofon': '/en/colophon',

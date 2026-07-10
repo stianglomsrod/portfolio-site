@@ -37,6 +37,16 @@ import HueVelger from '../components/HueVelger.astro';
       <span class="eks-cta">lag et ark <span class="pil" aria-hidden="true">→</span></span>
     </a>
 
+    <a class="eksperiment" href="/sandbox/silhuett">
+      <span class="eks-tag">Verktøy</span>
+      <span class="eks-tittel">Silhuetter</span>
+      <span class="eks-tekst">
+        Skriveark til utskrift: elevene fyller bokstavene inn i ordets
+        silhuett. Valgfritt bilde og ordbank.
+      </span>
+      <span class="eks-cta">lag et ark <span class="pil" aria-hidden="true">→</span></span>
+    </a>
+
     <div class="full-rad">
       <HueVelger lang="nb" />
     </div>
@@ -64,14 +74,14 @@ import HueVelger from '../components/HueVelger.astro';
     max-width: 68ch;
   }
 
-  /* Delt spor-regel: to spor som kortene fyller helt, og modulen spenner
+  /* Delt spor-regel: tre spor som kortene fyller helt, og modulen spenner
      hele raden — alle høyrekanter deler dermed samme kant. (auto-fit
-     fungerte ikke her: raden med full-rad-elementet holdt et tredje spor
-     i live, så kortene stoppet på to tredjedeler.) Håndheves av
+     fungerte ikke her: raden med full-rad-elementet holdt et tomt spor
+     i live, så kortene stoppet før kanten.) Håndheves av
      _baseline/qa/kant-sjekk.mjs. */
   .eks-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--s-3);
     margin-top: var(--s-5);
   }
@@ -80,7 +90,7 @@ import HueVelger from '../components/HueVelger.astro';
     grid-column: 1 / -1;
   }
 
-  @media (max-width: 640px) {
+  @media (max-width: 900px) {
     .eks-grid {
       grid-template-columns: 1fr;
     }

@@ -1,0 +1,47 @@
+---
+import Side from '../../layouts/Side.astro';
+import SilhuettVerktoy from '../../components/SilhuettVerktoy.astro';
+
+/* Silhuetter i sandbox: skriveark der elevene fyller bokstavene inn i
+   ordets silhuett. ENGELSK TVILLING: src/pages/en/sandbox/word-shapes.astro
+   — endre begge. */
+---
+
+<Side
+  title="Silhuetter — lag skriveark til utskrift"
+  description="Skriv inn ordene elevene skal øve på, legg gjerne til bilder, og skriv ut ark der bokstavene fylles inn i silhuettene."
+>
+  <div class="si-side-hode">
+    <p class="kicker">/sandbox · verktøy</p>
+    <h1>Silhuetter</h1>
+    <p class="dempet">
+      Lag skriveark til utskrift: skriv inn ordene elevene skal øve på, og
+      arket viser silhuetten av hvert ord — høye, lave og dype bokser som
+      bokstavene fylles inn i. Bilde per ord er valgfritt.
+    </p>
+  </div>
+  <SilhuettVerktoy lang="nb" />
+</Side>
+
+<style>
+  .kicker {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: var(--tekst-label);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--hue-aksent);
+    margin: var(--s-7) 0 var(--s-2);
+  }
+
+  h1 {
+    font-size: var(--tekst-tittel);
+    margin: 0 0 var(--s-3);
+  }
+
+  .dempet {
+    color: var(--dempet);
+    max-width: 68ch;
+    margin: 0;
+  }
+</style>

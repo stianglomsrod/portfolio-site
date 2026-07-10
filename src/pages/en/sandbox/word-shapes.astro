@@ -1,0 +1,48 @@
+---
+import Side from '../../../layouts/Side.astro';
+import SilhuettVerktoy from '../../../components/SilhuettVerktoy.astro';
+
+/* Word shapes in the sandbox: writing sheets where pupils fill the
+   letters into the word's silhouette. NORSK TVILLING:
+   src/pages/sandbox/silhuett.astro — endre begge. */
+---
+
+<Side
+  lang="en"
+  title="Word shapes — printable writing sheets"
+  description="Type the words the pupils should practise, add pictures if you like, and print sheets where the letters go into the shapes."
+>
+  <div class="si-side-hode">
+    <p class="kicker">/sandbox · tool</p>
+    <h1>Word shapes</h1>
+    <p class="dempet">
+      Make printable writing sheets: type the words the pupils should
+      practise, and the sheet shows each word's silhouette — tall, small and
+      deep boxes for the letters to go into. A picture per word is optional.
+    </p>
+  </div>
+  <SilhuettVerktoy lang="en" />
+</Side>
+
+<style>
+  .kicker {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: var(--tekst-label);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--hue-aksent);
+    margin: var(--s-7) 0 var(--s-2);
+  }
+
+  h1 {
+    font-size: var(--tekst-tittel);
+    margin: 0 0 var(--s-3);
+  }
+
+  .dempet {
+    color: var(--dempet);
+    max-width: 68ch;
+    margin: 0;
+  }
+</style>

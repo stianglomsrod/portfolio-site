@@ -1,0 +1,812 @@
+---
+/* Silhuett-verktøyet: skriveark der elevene fyller bokstavene inn i
+   ordets silhuett (høye, lave og dype bokser), med valgfritt bilde per
+   ord. Samme lest som Ordkryss: oppsett i venstremargen, hvitt ark til
+   høyre — arket ER utskriften. Bokstavlogikken bor i src/lib/silhuett.ts;
+   bannordfilteret deles med Ordkryss (src/lib/ordkryss-kjerne.ts). */
+
+interface Props {
+  lang?: 'nb' | 'en';
+}
+
+const { lang = 'nb' } = Astro.props;
+
+const t =
+  lang === 'nb'
+    ? {
+        tittelFelt: 'Tittel på arket',
+        tittelEks: 'Skriv tittelen her',
+        ordNavn: 'Ordene elevene skal skrive',
+        ordEks: 'skriv et ord',
+        leggTil: '+ Legg til ord',
+        bildeHint: 'Bilde ved ordet er valgfritt og blir med på utskriften.',
+        visOrdbank: 'Vis ordbank øverst på arket',
+        lag: 'Lag skriveark',
+        skrivUt: 'Skriv ut',
+        instruks: 'Skriv ordene så pent du kan i silhuettene.',
+        ordbank: 'Ordbank',
+        navnLinje: 'Navn: ____________________   Dato: ____________',
+        standardTittel: 'Silhuetter',
+      }
+    : {
+        tittelFelt: 'Sheet title',
+        tittelEks: 'Type the title here',
+        ordNavn: 'Words for the pupils to write',
+        ordEks: 'type a word',
+        leggTil: '+ Add word',
+        bildeHint: 'A picture per word is optional and prints with the sheet.',
+        visOrdbank: 'Show a word bank at the top of the sheet',
+        lag: 'Create writing sheet',
+        skrivUt: 'Print',
+        instruks: 'Write the words as neatly as you can in the shapes.',
+        ordbank: 'Word bank',
+        navnLinje: 'Name: ____________________   Date: ____________',
+        standardTittel: 'Word shapes',
+      };
+---
+
+<div class="si-verktoy" data-lang={lang} data-standardtittel={t.standardTittel}>
+  <div class="si-oppsett">
+    <section class="si-panel" aria-labelledby="si-panel-tittel">
+      <h2 id="si-panel-tittel" class="sr-only">{lang === 'nb' ? 'Oppsett' : 'Setup'}</h2>
+
+      <label class="si-felt">
+        <span class="si-felt-navn">{t.tittelFelt}</span>
+        <input type="text" id="si-tittel" placeholder={t.tittelEks} maxlength="60" />
+      </label>
+
+      <div class="si-felt">
+        <span class="si-felt-navn" id="si-ord-navn">{t.ordNavn}</span>
+        <ul id="si-ord-liste" aria-labelledby="si-ord-navn"></ul>
+        <button type="button" id="si-legg-til" class="si-sekundaer">{t.leggTil}</button>
+        <p class="si-hint">{t.bildeHint}</p>
+      </div>
+
+      <label class="si-valg">
+        <input type="checkbox" id="si-vis-ordbank" checked />
+        {t.visOrdbank}
+      </label>
+
+      <button type="button" id="si-lag" class="knapp si-primaer">{t.lag}</button>
+      <p id="si-status" class="si-status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="si-visning" id="si-ark-seksjon" hidden aria-labelledby="si-visning-tittel">
+      <h2 id="si-visning-tittel" class="sr-only">
+        {lang === 'nb' ? 'Forhåndsvisning' : 'Preview'}
+      </h2>
+      <div class="si-handlinger">
+        <button type="button" id="si-skriv-ut" class="knapp si-primaer">{t.skrivUt}</button>
+      </div>
+
+      <div class="si-sticky-print">
+        <button type="button" id="si-skriv-ut-sticky" class="si-sticky-knapp" title="Skriv ut arket (Ctrl+P)" aria-label={t.skrivUt}>
+          🖨
+        </button>
+      </div>
+
+      <div class="si-ark" id="si-ark">
+        <h3 id="si-overskrift">{t.standardTittel}</h3>
+        <p class="si-instruks">{t.instruks}</p>
+        <p class="si-navn-linje">{t.navnLinje}</p>
+        <div class="si-bank" id="si-bank" hidden>
+          <p class="si-bank-navn">{t.ordbank}</p>
+          <p class="si-bank-ord" id="si-bank-ord"></p>
+        </div>
+        <ul id="si-rader" class="si-rader"></ul>
+      </div>
+    </section>
+  </div>
+</div>
+
+<style is:global>
+  /* Skjerm: verktøyet følger sidens tokens; arket er alltid hvit «papir». */
+  .si-oppsett {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: var(--s-5);
+    align-items: start;
+    margin-top: var(--s-4);
+  }
+
+  @media (max-width: 900px) {
+    .si-oppsett {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .si-panel {
+    background: var(--flate);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: var(--s-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .si-felt {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .si-felt-navn {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--tekst);
+  }
+
+  .si-panel input[type='text'] {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    padding: 9px 10px;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--tekst);
+    min-height: 44px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .si-valg {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    min-height: 32px;
+    color: var(--tekst);
+  }
+
+  .si-valg input {
+    width: 19px;
+    height: 19px;
+    accent-color: var(--salvie);
+    flex-shrink: 0;
+  }
+
+  .si-hint {
+    margin: 2px 0 0;
+    font-size: 13.5px;
+    color: var(--dempet);
+  }
+
+  #si-ord-liste {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .si-ord-rad {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .si-ord-rad input[type='text'] {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .si-ord-rad.upassende input[type='text'] {
+    border-color: var(--feil);
+  }
+
+  .si-ikonknapp {
+    font: inherit;
+    min-width: 44px;
+    min-height: 44px;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--tekst);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    flex-shrink: 0;
+  }
+
+  .si-ikonknapp:hover {
+    border-color: var(--salvie);
+  }
+
+  .si-mini-bilde {
+    width: 36px;
+    height: 36px;
+    object-fit: cover;
+    border-radius: 6px;
+  }
+
+  /* Fjern-bilde-badgen — samme mønster som i Ordkryss */
+  .si-bilde-holder {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+  }
+
+  .si-fjern-bilde {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid var(--linje);
+    border-radius: 50%;
+    background: var(--flate-2);
+    color: var(--tekst);
+    font: 700 11px var(--font-hd);
+    line-height: 1;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    z-index: 1;
+  }
+
+  .si-fjern-bilde:hover {
+    color: var(--feil);
+    border-color: var(--feil);
+  }
+
+  .si-fjern-bilde:focus-visible {
+    outline: 2px solid var(--salvie);
+    outline-offset: 1px;
+  }
+
+  .si-primaer {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 700;
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    border: none;
+    border-radius: 9px;
+    padding: 11px 20px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .si-primaer:hover {
+    filter: brightness(1.06);
+  }
+
+  .si-sekundaer {
+    font-family: var(--font-sans);
+    font-size: 14.5px;
+    font-weight: 600;
+    background: var(--bg);
+    color: var(--tekst);
+    border: 1px solid var(--linje);
+    border-radius: 9px;
+    padding: 10px 16px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .si-sekundaer:hover {
+    border-color: var(--salvie);
+  }
+
+  .si-sekundaer:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  .si-status {
+    margin: 0;
+    font-size: 14.5px;
+    color: var(--dempet);
+    min-height: 1.4em;
+  }
+
+  .si-status.feil {
+    color: var(--feil);
+  }
+
+  .si-handlinger {
+    display: flex;
+    gap: var(--s-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--s-3);
+  }
+
+  /* Flytende print-knapp når arket er langt */
+  .si-sticky-print {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 15;
+  }
+
+  .si-sticky-knapp {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 1px solid var(--linje);
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: var(--kort-skygge);
+    display: grid;
+    place-items: center;
+  }
+
+  .si-sticky-knapp:hover {
+    filter: brightness(1.06);
+  }
+
+  /* ---- Arket: alltid hvitt papir, uavhengig av tema ---- */
+  .si-ark {
+    --si-x: 26px; /* x-høyden */
+    --si-topp: 13px; /* over x-høyden (høye bokstaver) */
+    --si-bunn: 13px; /* under grunnlinja (dype bokstaver) */
+    --si-bredde: 28px;
+    --si-strek: 2px;
+    background: #fff;
+    color: #111;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: 28px 32px;
+    max-width: 660px;
+  }
+
+  #si-overskrift {
+    margin: 0 0 4px;
+    font-size: 24px;
+    color: #111;
+  }
+
+  .si-instruks {
+    margin: 0 0 6px;
+    font-size: 14.5px;
+    color: #333;
+  }
+
+  .si-navn-linje {
+    margin: 0 0 16px;
+    font-size: 13.5px;
+    color: #333;
+  }
+
+  .si-bank {
+    border: 2px solid #333;
+    border-radius: 6px;
+    padding: 8px 14px;
+    margin-bottom: 18px;
+    text-align: center;
+  }
+
+  .si-bank-navn {
+    margin: 0;
+    font-weight: 700;
+    font-size: 14.5px;
+    text-decoration: underline;
+    color: #111;
+  }
+
+  .si-bank-ord {
+    margin: 2px 0 0;
+    font-size: 15px;
+    color: #111;
+  }
+
+  .si-rader {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .si-rad {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .si-rad-bilde {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border: 1px solid #333;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  /* Silhuetten: boksene deler grunnlinje — høye rager opp, dype henger
+     under. Naboer deler kantstrek (negativ margin). */
+  .si-ord {
+    display: flex;
+    align-items: flex-start;
+    min-height: calc(var(--si-topp) + var(--si-x) + var(--si-bunn));
+    flex-wrap: wrap;
+  }
+
+  .si-boks {
+    box-sizing: border-box;
+    width: var(--si-bredde);
+    height: var(--si-x);
+    margin-top: var(--si-topp);
+    border: var(--si-strek) solid #333;
+    background: #fff;
+    flex-shrink: 0;
+  }
+
+  .si-boks + .si-boks {
+    margin-left: calc(-1 * var(--si-strek));
+  }
+
+  .si-boks.hoy {
+    margin-top: 0;
+    height: calc(var(--si-topp) + var(--si-x));
+  }
+
+  .si-boks.dyp {
+    height: calc(var(--si-x) + var(--si-bunn));
+  }
+
+  /* ---- Utskrift: kun arket, alltid lyst ---- */
+  @media print {
+    @page {
+      margin: 14mm;
+    }
+
+    /* Lys utskrift uansett tema: color-scheme dark får ellers Chrome til
+       å male hele arket mørkt i print */
+    html,
+    body {
+      color-scheme: light;
+      background: #fff !important;
+      color: #000;
+    }
+
+    /* Skjul alt UI-krom — men ALDRI .ramme (main): den er arkets
+       forelder, og skjules den, printes en tom side */
+    .topp,
+    .bunn,
+    .hopp,
+    .si-panel,
+    .si-handlinger,
+    .si-side-hode,
+    .si-sticky-print {
+      display: none !important;
+    }
+
+    .ramme {
+      padding: 0;
+      max-width: none;
+      min-height: 0;
+      background: #fff;
+    }
+
+    .si-oppsett {
+      display: block;
+      margin: 0;
+    }
+
+    .si-ark {
+      --si-x: 9mm;
+      --si-topp: 4.5mm;
+      --si-bunn: 4.5mm;
+      --si-bredde: 9.5mm;
+      --si-strek: 0.5mm;
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 0;
+      max-width: none;
+    }
+
+    .si-rader {
+      gap: 9mm;
+    }
+
+    .si-rad {
+      gap: 8mm;
+      break-inside: avoid;
+    }
+
+    .si-rad-bilde {
+      width: 20mm;
+      height: 20mm;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+
+    .si-bank {
+      margin-bottom: 8mm;
+    }
+  }
+</style>
+
+<script>
+  import { bokstavBokser } from '../lib/silhuett';
+  import { normaliserOrd, ordErUpassende } from '../lib/ordkryss-kjerne';
+
+  const rot = document.querySelector<HTMLElement>('.si-verktoy');
+  if (rot) {
+    const lang = (rot.dataset.lang ?? 'nb') as 'nb' | 'en';
+    const standardTittel = rot.dataset.standardtittel ?? 'Silhuetter';
+    const LAGRINGSNOKKEL = `silhuett-${lang}`;
+    const MAKS_ORD = 10;
+
+    const M =
+      lang === 'nb'
+        ? {
+            minstEttOrd: 'Skriv inn minst ett ord først.',
+            upassende: (o: string) =>
+              `«${o}» passer ikke på et skoleark. Bytt ut ordet, så lager vi arket.`,
+            klart: (antall: number) => `Arket er klart: ${antall} ord.`,
+            ordAria: (i: number) => `Ord ${i}`,
+            byttBilde: (i: number) => `Bytt bilde for ord ${i}`,
+            leggBilde: (i: number) => `Legg til bilde for ord ${i}`,
+            fjernBilde: (i: number) => `Fjern bildet for ord ${i}`,
+            fjernOrd: (i: number) => `Fjern ord ${i}`,
+            ordEks: 'skriv et ord',
+          }
+        : {
+            minstEttOrd: 'Type at least one word first.',
+            upassende: (o: string) =>
+              `“${o}” does not belong on a school sheet. Swap the word and we will make the sheet.`,
+            klart: (antall: number) => `The sheet is ready: ${antall} words.`,
+            ordAria: (i: number) => `Word ${i}`,
+            byttBilde: (i: number) => `Change picture for word ${i}`,
+            leggBilde: (i: number) => `Add picture for word ${i}`,
+            fjernBilde: (i: number) => `Remove the picture for word ${i}`,
+            fjernOrd: (i: number) => `Remove word ${i}`,
+            ordEks: 'type a word',
+          };
+
+    interface OrdRad {
+      id: number;
+      tekst: string;
+      bilde: string | null;
+    }
+
+    let ordListe: OrdRad[] = [];
+    let nesteId = 1;
+
+    const el = <T extends HTMLElement = HTMLElement>(id: string): T =>
+      document.getElementById(id) as T;
+
+    function lagreUtkast() {
+      try {
+        localStorage.setItem(
+          LAGRINGSNOKKEL,
+          JSON.stringify({
+            tittel: el<HTMLInputElement>('si-tittel').value,
+            visOrdbank: el<HTMLInputElement>('si-vis-ordbank').checked,
+            ord: ordListe.map((o) => o.tekst),
+          })
+        );
+      } catch {}
+    }
+
+    function lastUtkast(): boolean {
+      try {
+        const raa = localStorage.getItem(LAGRINGSNOKKEL);
+        if (!raa) return false;
+        const u = JSON.parse(raa);
+        el<HTMLInputElement>('si-tittel').value = u.tittel ?? '';
+        el<HTMLInputElement>('si-vis-ordbank').checked = u.visOrdbank !== false;
+        // Tåler utkast fra andre versjoner: strenger eller {tekst, bilde}
+        (u.ord ?? []).forEach((o: unknown) => {
+          const tekst =
+            typeof o === 'string'
+              ? o
+              : typeof (o as Record<string, unknown>)?.tekst === 'string'
+                ? ((o as Record<string, unknown>).tekst as string)
+                : '';
+          ordListe.push({ id: nesteId++, tekst, bilde: null });
+        });
+        return ordListe.length > 0;
+      } catch {
+        return false;
+      }
+    }
+
+    function leggTilOrd(tekst = '') {
+      if (ordListe.length >= MAKS_ORD) return;
+      ordListe.push({ id: nesteId++, tekst, bilde: null });
+      tegnOrdListe();
+    }
+
+    function tegnOrdListe() {
+      const liste = el('si-ord-liste');
+      liste.replaceChildren();
+
+      ordListe.forEach((ord, indeks) => {
+        const rad = document.createElement('li');
+        rad.className = 'si-ord-rad';
+
+        const felt = document.createElement('input');
+        felt.type = 'text';
+        felt.value = ord.tekst.slice(0, 18);
+        felt.maxLength = 18;
+        felt.setAttribute('aria-label', M.ordAria(indeks + 1));
+        felt.placeholder = M.ordEks;
+        felt.addEventListener('input', () => {
+          ord.tekst = felt.value;
+          const stygt = ordErUpassende(felt.value);
+          rad.classList.toggle('upassende', stygt);
+          felt.setAttribute('aria-invalid', stygt ? 'true' : 'false');
+          lagreUtkast();
+        });
+        if (ordErUpassende(ord.tekst)) rad.classList.add('upassende');
+
+        const bildeKnapp = document.createElement('button');
+        bildeKnapp.type = 'button';
+        bildeKnapp.className = 'si-ikonknapp';
+        bildeKnapp.setAttribute(
+          'aria-label',
+          ord.bilde ? M.byttBilde(indeks + 1) : M.leggBilde(indeks + 1)
+        );
+
+        if (ord.bilde) {
+          const mini = document.createElement('img');
+          mini.src = ord.bilde;
+          mini.alt = '';
+          mini.className = 'si-mini-bilde';
+          bildeKnapp.appendChild(mini);
+        } else {
+          bildeKnapp.textContent = '🖼';
+        }
+
+        const filFelt = document.createElement('input');
+        filFelt.type = 'file';
+        filFelt.accept = 'image/*';
+        filFelt.hidden = true;
+        filFelt.addEventListener('change', () => {
+          const fil = filFelt.files?.[0];
+          if (!fil) return;
+          const leser = new FileReader();
+          leser.onload = () => {
+            ord.bilde = String(leser.result);
+            tegnOrdListe();
+          };
+          leser.readAsDataURL(fil);
+        });
+        bildeKnapp.addEventListener('click', () => filFelt.click());
+
+        // Bildet kan fjernes for seg (uten å slette ordet)
+        const bildeHolder = document.createElement('span');
+        bildeHolder.className = 'si-bilde-holder';
+        bildeHolder.appendChild(bildeKnapp);
+        if (ord.bilde) {
+          const fjernBilde = document.createElement('button');
+          fjernBilde.type = 'button';
+          fjernBilde.className = 'si-fjern-bilde';
+          fjernBilde.textContent = '✕';
+          fjernBilde.setAttribute('aria-label', M.fjernBilde(indeks + 1));
+          fjernBilde.addEventListener('click', () => {
+            ord.bilde = null;
+            tegnOrdListe();
+            lagreUtkast();
+          });
+          bildeHolder.appendChild(fjernBilde);
+        }
+
+        const fjern = document.createElement('button');
+        fjern.type = 'button';
+        fjern.className = 'si-ikonknapp';
+        fjern.textContent = '✕';
+        fjern.setAttribute('aria-label', M.fjernOrd(indeks + 1));
+        fjern.addEventListener('click', () => {
+          ordListe = ordListe.filter((o) => o.id !== ord.id);
+          if (ordListe.length === 0) leggTilOrd();
+          tegnOrdListe();
+          lagreUtkast();
+        });
+
+        rad.append(felt, bildeHolder, filFelt, fjern);
+        liste.appendChild(rad);
+      });
+
+      el<HTMLButtonElement>('si-legg-til').disabled = ordListe.length >= MAKS_ORD;
+    }
+
+    function siStatus(tekst: string, erFeil = false) {
+      const status = el('si-status');
+      status.textContent = tekst;
+      status.classList.toggle('feil', erFeil);
+    }
+
+    function generer() {
+      const rene = ordListe
+        .map((o) => ({ ...o, tekst: o.tekst.trim() }))
+        .filter((o) => o.tekst.length > 0);
+
+      if (rene.length === 0) {
+        siStatus(M.minstEttOrd, true);
+        return;
+      }
+
+      for (const o of rene) {
+        if (ordErUpassende(o.tekst)) {
+          siStatus(M.upassende(o.tekst), true);
+          return;
+        }
+      }
+
+      // Overskrift og ordbank
+      el('si-overskrift').textContent =
+        el<HTMLInputElement>('si-tittel').value.trim() || standardTittel;
+
+      const visBank = el<HTMLInputElement>('si-vis-ordbank').checked;
+      const bank = el('si-bank');
+      bank.hidden = !visBank;
+      if (visBank) {
+        el('si-bank-ord').textContent = rene
+          .map((o) => normaliserOrd(o.tekst).toLowerCase())
+          .join('  –  ');
+      }
+
+      // Radene: bilde (om det finnes) + silhuettboksene
+      const rader = el('si-rader');
+      rader.replaceChildren();
+      rene.forEach((o) => {
+        const rad = document.createElement('li');
+        rad.className = 'si-rad';
+
+        if (o.bilde) {
+          const bilde = document.createElement('img');
+          bilde.src = o.bilde;
+          bilde.alt = '';
+          bilde.className = 'si-rad-bilde';
+          rad.appendChild(bilde);
+        }
+
+        const ordEl = document.createElement('span');
+        ordEl.className = 'si-ord';
+        ordEl.setAttribute('aria-label', normaliserOrd(o.tekst).toLowerCase());
+        bokstavBokser(o.tekst).forEach((boks) => {
+          const b = document.createElement('span');
+          b.className = `si-boks ${boks.type}`;
+          ordEl.appendChild(b);
+        });
+        rad.appendChild(ordEl);
+        rader.appendChild(rad);
+      });
+
+      el('si-ark-seksjon').removeAttribute('hidden');
+      siStatus(M.klart(rene.length));
+      lagreUtkast();
+    }
+
+    // Init
+    if (!lastUtkast()) {
+      leggTilOrd();
+      leggTilOrd();
+      leggTilOrd();
+    }
+    tegnOrdListe();
+
+    ['si-tittel', 'si-vis-ordbank'].forEach((id) =>
+      el(id).addEventListener('change', lagreUtkast)
+    );
+
+    el('si-legg-til').addEventListener('click', () => {
+      leggTilOrd();
+      lagreUtkast();
+    });
+
+    el('si-lag').addEventListener('click', generer);
+
+    const skrivUt = () => window.print();
+    el('si-skriv-ut').addEventListener('click', skrivUt);
+    el('si-skriv-ut-sticky').addEventListener('click', skrivUt);
+  }
+</script>

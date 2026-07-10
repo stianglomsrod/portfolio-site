@@ -6,6 +6,24 @@
 
 ## Changelog
 
+### 2026-07-10 (ettermiddag) — Nytt lærerverktøy: Silhuetter
+- **Silhuetter** (/sandbox/silhuett, EN: /en/sandbox/word-shapes):
+  skriveark der elevene fyller bokstavene inn i ordets silhuett — høye
+  bokser (b d f h k l t å + store bokstaver via senking), dype (g j p q
+  y) og lave (resten). Bokstavlogikken bor i `src/lib/silhuett.ts`;
+  bannordfilter og normalisering deles med Ordkryss. Panel-layout,
+  bilde per ord (med fjern-badge), valgfri ordbank på arket, utkast i
+  localStorage (uten bilder, som Ordkryss), print-CSS etter
+  print-reglene (color-scheme light, aldri skjul .ramme,
+  break-inside: avoid per rad). Verifisert: klassifisering programmatisk
+  (blåmeis/gråmåke/pjokk), Playwright-PDF i mørkt tema = rent hvitt ark
+  i sjangeren.
+- **Sandbox-grid er nå tre spor** (spill + to verktøy + modul på full
+  rad); bryter til én kolonne under 900px. QA-vaktene kjenner de to nye
+  rutene — axe og kant-sjekk går nå over 18 ruter.
+- **Vercel-kvote**: v3-branchen synces IKKE lenger ved push (Stians
+  valg) — halverer deploy-forbruket som traff rate-limiten i natt.
+
 ### 2026-07-10 (natt, del 4) — Punchliste 3: Ordkryss-panel tilbake, ekte flytskjema
 - **Ordkryss er tilbake til panel-layouten** (oppsett i venstremargen +
   ark til høyre) — Stian foretrakk den over wizard-stegene. Hentet fra

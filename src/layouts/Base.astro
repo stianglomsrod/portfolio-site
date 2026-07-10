@@ -65,6 +65,9 @@ const side = 'https://stianglomsrod.no';
          (hue) og aksent (hue2) fra sliderne i /sandbox følger deg på hele
          siden; aksenten følger grunnfargen til den er løsnet. */
       (() => {
+        // JS-flagg før first paint: hamburgermenyen og scroll-avsløringen
+        // finnes bare med JS — uten JS vises full meny og alt innhold.
+        document.documentElement.classList.add('har-js');
         try {
           const t = localStorage.getItem('data-theme');
           if (t === 'light' || t === 'dark') {
@@ -87,6 +90,10 @@ const side = 'https://stianglomsrod.no';
   </head>
   <body>
     <slot />
+    <script>
+      import { startAvslor } from '../lib/avslor';
+      startAvslor();
+    </script>
   </body>
 </html>
 
@@ -155,5 +162,29 @@ const side = 'https://stianglomsrod.no';
     clip-path: inset(50%);
     white-space: nowrap;
     border: 0;
+  }
+
+  /* Scroll-avsløring (styres av src/lib/avslor.ts): kun opacity/transform,
+     aldri layout. Klassene finnes bare med JS, og aldri ved
+     prefers-reduced-motion. Utskrift viser alltid alt. */
+  .avslor {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  .avslor.vist {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 480ms var(--ease),
+      transform 480ms var(--ease);
+  }
+
+  @media print {
+    .avslor {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+    }
   }
 </style>

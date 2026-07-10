@@ -170,6 +170,13 @@ const t =
     flex-shrink: 0;
   }
 
+  /* Beroringsskjerm: hele valg-etiketten skal vaere et trygt maal */
+  @media (pointer: coarse) {
+    .si-valg {
+      min-height: 44px;
+    }
+  }
+
   .si-hint {
     margin: 2px 0 0;
     font-size: 13.5px;

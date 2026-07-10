@@ -47,4 +47,14 @@ const kolofonSti = lang === 'nb' ? '/kolofon' : '/en/colophon';
     font-size: 15px;
     color: var(--dempet);
   }
+
+  /* Berøringsskjerm: footer-lenkene var 18px høye — utvid trykkflaten
+     uten å endre utseendet */
+  @media (pointer: coarse) {
+    .linje a {
+      display: inline-block;
+      padding: 10px 3px;
+      margin: -8px -1px;
+    }
+  }
 </style>

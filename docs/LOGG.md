@@ -6,6 +6,47 @@
 
 ## Changelog
 
+### 2026-07-10 (kveld) — Hamburgermeny på mobil, scroll-avsløring, trykkflater
+- **Hamburgermeny på mobil** (≤680px, kun med JS): den synlige to-raders
+  menyen kostet 166px = 20 % av førstevisningen på 375×812 — nå er
+  topplinja 53px med «Meny»-knapp (ikon + tekstetikett, NN/g: ikon+tekst
+  slår ikon alene) som åpner nedtrekksliste med 48px-rader.
+  Disclosure-mønsteret: aria-expanded/aria-controls, lukk ved lenkevalg,
+  Escape (fokus tilbake til knappen), tapp utenfor og scroll. Desktop er
+  urørt (NN/g: aldri hamburger der), og UTEN JS vises full meny også på
+  mobil (`html.har-js`-flagg settes i Base før first paint).
+- **Scroll-avsløring** (`src/lib/avslor.ts` + CSS i Base): innhold under
+  folden glir inn første gang det synes — kun opacity/transform (ingen
+  CLS), førstevisningen røres aldri (ingen LCP-straff), én gang per
+  sidelast, stagger 70ms (maks 3 trinn), prefers-reduced-motion → helt
+  av, print viser alltid alt, og tastaturfokus inn i uavslørt element
+  avslører det straks. Løvverk-filter så kort animerer for seg og
+  seksjonen rundt ikke dobbelt-animerer.
+- **Trykkflater på berøringsskjerm** (pointer: coarse): kortfot-lenkene
+  («repo →», var 23px) og footer-lenkene (18px) har fått utvidet
+  trykkflate uten visuell endring; valg-etikettene i Ordkryss/Silhuetter
+  har min-height 44px.
+- Mobil-audit (Playwright 375×812, alle 9 nb-ruter): ingen horisontal
+  overflow noe sted; målingene ligger til grunn for punktene over.
+- QA: bygg grønt, axe 0/18, kant-sjekk 0/18, desktop-regresjon og
+  reduced-motion verifisert programmatisk.
+
+### 2026-07-10 (kveld) — QA: mobil-gjennomspilling av Skamløs Pitch
+- **Full touch-gjennomspilling** av spillet i emulert mobil (Playwright,
+  ekte touch-events): hele kjeden fullført på 375×812; nøkkelskjermer
+  også testet på 360×640, 430×932 og liggende 812×375/932×430. Rapport:
+  `docs/innsikt/SPILL-MOBIL-RAPPORT.md`, skjermbilder i
+  `docs/innsikt/spill-mobil/` (61 stk). Kun rapport — ingenting fikset.
+- Hovedfunn: liggende format er ubrukelig (mobil-CSS-en er portet på
+  bredde ≤680px, liggende telefoner er bredere); E-knappen tapper gjennom
+  og auto-løser 5 av 6 valg-minispill (ghost click); endgame-kortet og
+  belønningsbanneret er sperret inne i/klippes av spillramma; global
+  h2-farge lekker inn og gjør «Søknadspakke levert» nesten uleselig.
+  Positivt: kjeden er fullførbar med touch, save/Fortsett, språkbytte,
+  mute og låste dører virker; ingen JS-feil.
+- Testskriptene ligger gitignored i `_baseline/qa/mobil-*.mjs` og kan
+  kjøres om igjen mot dev-serveren (port 4322).
+
 ### 2026-07-10 (ettermiddag) — Nytt lærerverktøy: Silhuetter
 - **Silhuetter** (/sandbox/silhuett, EN: /en/sandbox/word-shapes):
   skriveark der elevene fyller bokstavene inn i ordets silhuett — høye

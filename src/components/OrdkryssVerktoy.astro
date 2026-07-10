@@ -235,6 +235,13 @@ const t =
     accent-color: var(--salvie);
   }
 
+  /* Beroringsskjerm: hele valg-etiketten skal vaere et trygt maal */
+  @media (pointer: coarse) {
+    .ok-valg {
+      min-height: 44px;
+    }
+  }
+
   .ok-hint {
     margin: 2px 0 0;
     font-size: 13.5px;

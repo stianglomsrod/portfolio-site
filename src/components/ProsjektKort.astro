@@ -160,6 +160,15 @@ const hoved = lenker.find((l) => !l.href.startsWith('http')) ?? lenker[0];
     text-decoration: none;
   }
 
+  /* Berøringsskjerm: fot-lenkene («repo →») var 23px høye — utvid
+     trykkflaten uten å endre utseendet */
+  @media (pointer: coarse) {
+    .lenker a {
+      padding: 11px 6px;
+      margin: -9px -4px;
+    }
+  }
+
   .lenker a:hover,
   .lenker a:focus-visible {
     text-decoration: underline;

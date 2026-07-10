@@ -1,7 +1,10 @@
 ---
-/* Nav v3: synlig rad på alle flater, ingen hamburger. Aktiv side = salvie-dot.
-   «/sandbox» beholder skråstreken — lekeplassens eneste tekniske blunk.
-   Tema er en ekte switch (role="switch"), språkvelgeren er en lenke til
+/* Nav v3: synlig rad på desktop (NN/g: aldri hamburger der). På mobil
+   kostet den synlige menyen 20 % av førstevisningen, så der er den en
+   hamburger MED tekstetikett («Meny» — ikon+tekst slår ikon alene) som
+   åpner en nedtrekksliste. Uten JS vises full meny også på mobil.
+   Aktiv side = salvie-dot. «/sandbox» beholder skråstreken. Tema er en
+   ekte switch (role="switch"), språkvelgeren er en lenke til
    tvillingsiden på det andre språket (URL-en er språkvalget). */
 
 import Merke from './Merke.astro';
@@ -26,7 +29,7 @@ const erAktiv = (href: string) => {
 <header class="topp" id="side-topp">
   <div class="topp-indre">
     <Merke storrelse={17} ariaLabel={t.merkeAria} href={lang === 'nb' ? '/' : '/en/'} />
-    <nav aria-label={t.hovedmeny}>
+    <nav aria-label={t.hovedmeny} id="hovedmeny">
       <ul class="meny">
         {t.meny.map((p) => (
           <li>
@@ -43,6 +46,18 @@ const erAktiv = (href: string) => {
       </ul>
     </nav>
     <div class="brytere">
+      <button
+        type="button"
+        id="meny-knapp"
+        class="meny-knapp"
+        aria-expanded="false"
+        aria-controls="hovedmeny"
+      >
+        <svg class="meny-ikon" viewBox="0 0 16 14" width="16" height="14" aria-hidden="true">
+          <path d="M1 1h14M1 7h14M1 13h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+        {lang === 'nb' ? 'Meny' : 'Menu'}
+      </button>
       <a
         class="spraak"
         href={alternativ}
@@ -165,6 +180,39 @@ const erAktiv = (href: string) => {
     flex-shrink: 0;
   }
 
+  /* Hamburgeren finnes bare på mobil MED js — ellers vises full meny */
+  .meny-knapp {
+    all: unset;
+    display: none;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    color: var(--tekst);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    padding: 0 12px;
+    min-height: 44px;
+    box-sizing: border-box;
+    cursor: pointer;
+  }
+
+  .meny-knapp:focus-visible {
+    outline: 2px solid var(--salvie);
+    outline-offset: 2px;
+  }
+
+  .meny-ikon {
+    flex-shrink: 0;
+  }
+
+  /* Åpen tilstand: midterste strek tones ut (rolig, ingen kryss-morphing) */
+  .meny-knapp[aria-expanded='true'] {
+    border-color: var(--salvie);
+  }
+
   .spraak {
     font-family: var(--font-hd);
     font-weight: 600;
@@ -250,9 +298,8 @@ const erAktiv = (href: string) => {
     transform: translateX(28px);
   }
 
-  /* Mobil: menyen brekker til egen rad så alle seks punktene er synlige.
-     Synlig navigasjon slår både hamburger (skjuler alt) og horisontal
-     scroll (viser 1–2 punkter av gangen). */
+  /* Mobil UTEN js: menyen brekker til egen rad så alle seks punktene er
+     synlige — ingen hamburger å trykke på uten script. */
   @media (max-width: 680px) {
     .topp {
       padding: var(--s-1) var(--s-4);
@@ -271,6 +318,42 @@ const erAktiv = (href: string) => {
       flex-wrap: wrap;
       overflow-x: visible;
       justify-content: flex-start;
+    }
+
+    /* Mobil MED js: én rolig topplinje — menyen bor bak «Meny»-knappen
+       som en nedtrekksliste under linja. Sparer ~100px av førstevisningen
+       (menyradene kostet 20 % av skjermen). */
+    :global(html.har-js) .meny-knapp {
+      display: inline-flex;
+    }
+
+    :global(html.har-js) .topp-indre nav {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      order: initial;
+      flex-basis: auto;
+      background: var(--nav-bg);
+      border-bottom: 1px solid var(--linje);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
+      padding: var(--s-2) var(--s-4) var(--s-3);
+      display: none;
+    }
+
+    :global(html.har-js) .topp-indre nav[data-apen] {
+      display: block;
+    }
+
+    :global(html.har-js) .meny {
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    :global(html.har-js) .punkt {
+      width: 100%;
+      min-height: 48px;
+      padding: 12px 12px;
     }
   }
 </style>
@@ -301,6 +384,52 @@ const erAktiv = (href: string) => {
   });
 
   oppdater();
+
+  // Hamburgermeny (mobil): disclosure-mønsteret — åpne/lukk med knappen,
+  // lukk ved lenkevalg, Escape (fokus tilbake til knappen), tapp utenfor
+  // eller scroll. Ikke modal: resten av siden er fortsatt tilgjengelig.
+  const menyKnapp = document.getElementById('meny-knapp');
+  const hovedmeny = document.getElementById('hovedmeny');
+
+  if (menyKnapp && hovedmeny) {
+    const settApen = (apen: boolean) => {
+      menyKnapp.setAttribute('aria-expanded', String(apen));
+      if (apen) {
+        hovedmeny.setAttribute('data-apen', '');
+      } else {
+        hovedmeny.removeAttribute('data-apen');
+      }
+    };
+
+    const erApen = () => menyKnapp.getAttribute('aria-expanded') === 'true';
+
+    menyKnapp.addEventListener('click', () => settApen(!erApen()));
+
+    hovedmeny.addEventListener('click', (e) => {
+      if ((e.target as HTMLElement).closest('a')) settApen(false);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && erApen()) {
+        settApen(false);
+        menyKnapp.focus();
+      }
+    });
+
+    document.addEventListener('pointerdown', (e) => {
+      if (
+        erApen() &&
+        !hovedmeny.contains(e.target as Node) &&
+        !menyKnapp.contains(e.target as Node)
+      ) {
+        settApen(false);
+      }
+    });
+
+    window.addEventListener('scroll', () => {
+      if (erApen()) settApen(false);
+    }, { passive: true });
+  }
 
   // Auto-hide: naven følger scrollen piksel for piksel — glir ut i takt med
   // innholdet ved scroll ned, og tilbake i samme takt ved scroll opp. Når

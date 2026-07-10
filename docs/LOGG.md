@@ -12,6 +12,13 @@
   full tekst) og tema-switchen bor nederst i nedtrekkslista, bak en
   skillelinje. To tema-switcher (topplinje desktop + mobilmeny) deler
   tilstand via [data-tema-toggle] og holdes i synk. Desktop uendret.
+- **Verktøyradene i menyen er nå entydige** (Stians funn: tema-switchen
+  uten synlig etikett leste seg som om den hørte til «Norsk versjon»):
+  språket er en lenke med pil og ENDONYM («English»/«Norsk» — W3C-praksis,
+  aldri flagg: flagg er land, ikke språk; Facebook endte på ren tekst
+  etter brukertesting), og temaet er en merket switch («Mørkt tema»/«Dark
+  theme») der hele raden er knappen. CSS-felle: .tema sin all:unset lå
+  senere i kaskaden og nullet width — løst med .tema.meny-tema.
 - **Headeren er en hevet flate tintet med AKSENTEN** (Material 3-
   prinsippet: tonal forskjell viser hvor flater begynner/slutter, og
   hevede flater tintes med primærfargen): --nav-bg er nå

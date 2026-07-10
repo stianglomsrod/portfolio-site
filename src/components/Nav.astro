@@ -44,23 +44,28 @@ const erAktiv = (href: string) => {
           </li>
         ))}
       </ul>
-      <!-- Mobil: språk og tema bor i menyen (vises kun i nedtrekkslista) -->
+      <!-- Mobil: språk og tema bor i menyen som to selvstendige rader —
+           språket som lenke med pil (navigasjon, endonym per W3C-praksis),
+           temaet som switch med synlig etikett så det aldri leses som om
+           switchen hører til språket -->
       <div class="meny-verktoy">
         <a
           class="meny-spraak"
           href={alternativ}
           hreflang={lang === 'nb' ? 'en' : 'nb'}
           aria-label={t.spraakAria}
-          >{lang === 'nb' ? 'English version' : 'Norsk versjon'}</a
+          >{lang === 'nb' ? 'English' : 'Norsk'}
+          <span class="meny-pil" aria-hidden="true">→</span></a
         >
         <button
           type="button"
-          class="tema"
+          class="tema meny-tema"
           data-tema-toggle
           role="switch"
           aria-checked="true"
           aria-label={t.temaAria}
         >
+          <span class="meny-tema-tekst">{lang === 'nb' ? 'Mørkt tema' : 'Dark theme'}</span>
           <span class="tema-spor" aria-hidden="true">
             <span class="tema-ikon sol">☀</span>
             <span class="tema-ikon maane">☾</span>
@@ -217,16 +222,51 @@ const erAktiv = (href: string) => {
     color: var(--dempet);
     text-decoration: none;
     padding: 12px 12px;
-    min-height: 44px;
+    min-height: 48px;
+    width: 100%;
     box-sizing: border-box;
     border-radius: var(--radius-sm);
-    display: inline-flex;
+    display: flex;
     align-items: center;
+    gap: 6px;
   }
 
   .meny-spraak:hover {
     color: var(--tekst);
     background: var(--flate);
+  }
+
+  .meny-pil {
+    color: var(--salvie);
+  }
+
+  /* Tema-raden i menyen: synlig etikett + switch på samme rad — hele
+     raden er knappen */
+  /* .tema.meny-tema slår .tema sin all:unset i kaskaden */
+  .tema.meny-tema {
+    display: flex;
+    width: 100%;
+    box-sizing: border-box;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2px 12px;
+    min-height: 48px;
+    border-radius: var(--radius-sm);
+  }
+
+  .tema.meny-tema:hover {
+    background: var(--flate);
+  }
+
+  .meny-tema-tekst {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--dempet);
+  }
+
+  .meny-tema:hover .meny-tema-tekst {
+    color: var(--tekst);
   }
 
   /* Hamburgeren finnes bare på mobil MED js — ellers vises full meny */
@@ -383,12 +423,9 @@ const erAktiv = (href: string) => {
     }
 
     :global(html.har-js) .meny-verktoy {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: var(--s-3);
+      display: block;
       margin-top: var(--s-2);
-      padding: var(--s-1) 0 0;
+      padding-top: var(--s-1);
       border-top: 1px solid var(--linje);
     }
 

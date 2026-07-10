@@ -283,6 +283,44 @@ const t =
     border-radius: 6px;
   }
 
+  /* Fjern-bilde-badgen henger på hjørnet av miniatyren, så det er
+     entydig at den fjerner BILDET (ikke ordet). 24px = WCAG 2.2-minimum
+     for sekundære mål; hovedhandlingene i raden holder 44px. */
+  .ok-bilde-holder {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+  }
+
+  .ok-fjern-bilde {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid var(--linje);
+    border-radius: 50%;
+    background: var(--flate-2);
+    color: var(--tekst);
+    font: 700 11px var(--font-hd);
+    line-height: 1;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    z-index: 1;
+  }
+
+  .ok-fjern-bilde:hover {
+    color: var(--feil);
+    border-color: var(--feil);
+  }
+
+  .ok-fjern-bilde:focus-visible {
+    outline: 2px solid var(--salvie);
+    outline-offset: 1px;
+  }
+
   .ok-primaer {
     font-family: var(--font-sans);
     font-size: 15px;
@@ -607,6 +645,7 @@ const t =
             ordAria: (i: number) => `Ord ${i}`,
             byttBilde: (i: number) => `Bytt bilde for ord ${i}`,
             leggBilde: (i: number) => `Legg til bilde for ord ${i}`,
+            fjernBilde: (i: number) => `Fjern bildet for ord ${i}`,
             fjernOrd: (i: number) => `Fjern ord ${i}`,
             ordEks: 'skriv et ord',
           }
@@ -625,6 +664,7 @@ const t =
             ordAria: (i: number) => `Word ${i}`,
             byttBilde: (i: number) => `Change picture for word ${i}`,
             leggBilde: (i: number) => `Add picture for word ${i}`,
+            fjernBilde: (i: number) => `Remove the picture for word ${i}`,
             fjernOrd: (i: number) => `Remove word ${i}`,
             ordEks: 'type a word',
           };
@@ -768,6 +808,25 @@ const t =
         });
         bildeKnapp.addEventListener('click', () => filFelt.click());
 
+        // Bildet kan fjernes for seg (uten å slette ordet): badge på
+        // hjørnet av miniatyren, kun når ordet har bilde
+        const bildeHolder = document.createElement('span');
+        bildeHolder.className = 'ok-bilde-holder';
+        bildeHolder.appendChild(bildeKnapp);
+        if (ord.bilde) {
+          const fjernBilde = document.createElement('button');
+          fjernBilde.type = 'button';
+          fjernBilde.className = 'ok-fjern-bilde';
+          fjernBilde.textContent = '✕';
+          fjernBilde.setAttribute('aria-label', M.fjernBilde(indeks + 1));
+          fjernBilde.addEventListener('click', () => {
+            ord.bilde = null;
+            tegnOrdListe();
+            lagreUtkast();
+          });
+          bildeHolder.appendChild(fjernBilde);
+        }
+
         const fjern = document.createElement('button');
         fjern.type = 'button';
         fjern.className = 'ok-ikonknapp';
@@ -780,7 +839,7 @@ const t =
           lagreUtkast();
         });
 
-        rad.append(felt, bildeKnapp, filFelt, fjern);
+        rad.append(felt, bildeHolder, filFelt, fjern);
         liste.appendChild(rad);
       });
 

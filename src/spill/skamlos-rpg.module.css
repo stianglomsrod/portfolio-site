@@ -1399,30 +1399,67 @@
   }
 }
 
-/* Smale skjermer: startkortet klippes ikke lenger av 3/2-ramma —
-   overlayet blir scrollbart og kortet kompakteres. */
+/* Smale skjermer: startskjermen løftes UT av den lille 3/2-ramma og
+   dekker hele viewporten (fixed) — hele kortet, inkludert Spill-knappen,
+   er synlig og skjermen scroller ved behov (liggende telefon). */
 @media (max-width: 680px) {
   .startScreen {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
     overflow-y: auto;
-    place-items: start center;
-    padding: 10px;
+    place-items: center;
+    padding: 14px 10px calc(14px + env(safe-area-inset-bottom));
   }
 
   .startCard {
     margin: 4px 0 10px;
-    padding: 12px 14px 16px;
+    padding: 14px 14px 18px;
   }
 
   .startTitle {
-    font-size: 1.02rem;
+    font-size: 1.1rem;
+    /* symmetrisk klaring så tittelen aldri havner under språk-chipen */
+    padding-inline: 48px;
   }
 
   .tagline {
-    font-size: 0.78rem;
+    font-size: 0.8rem;
   }
 
   .controls {
-    font-size: 0.72rem;
+    font-size: 0.74rem;
+  }
+
+  /* HUD-en løftes ut av ramma til den ledige plassen over spillet —
+     det lille kartet skal ikke dekkes av chips */
+  .hudTop {
+    position: fixed;
+    top: max(8px, env(safe-area-inset-top));
+    left: 8px;
+    right: 8px;
+    padding: 0;
+    z-index: 35;
+  }
+
+  /* Hint-banneret får brekke og ligger i den tomme sonen nederst */
+  .controlsBanner {
+    position: fixed;
+    top: auto;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    white-space: normal;
+    text-align: center;
+    border-radius: 14px;
+    max-width: 92%;
+    z-index: 35;
+  }
+
+  /* Menyer, paneler og minispill bruker hele skjermen — ikke 3/2-ramma */
+  .panelBackdrop,
+  .modalBackdrop,
+  .menuBackdrop {
+    position: fixed;
+    z-index: 45;
   }
 }
 /* [data-touch] settes av samme deteksjon som VirtualPad

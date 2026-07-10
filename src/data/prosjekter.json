@@ -37,7 +37,7 @@
   },
   "claudeFirst": {
     "navn": "claude-first",
-    "beskrivelse": "Landingsside for et softwarestudio under planlegging: nettsider, apper og KI-verktøy for små virksomheter.",
+    "beskrivelse": "Landingsside for et softwarestudio under planlegging: nettsider, apper og KI-verktøy for små og mellomstore bedrifter.",
     "url": "https://claude-first-taupe.vercel.app/"
   }
 }

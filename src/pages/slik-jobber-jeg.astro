@@ -52,7 +52,7 @@ const readme = [
       <ol class="flyt">
         <li class="node-rad">
           <div class="steg">
-            <div class="node" data-node="0">
+            <div class="node eier-menneske" data-node="0">
               <span class="node-nr" aria-hidden="true">1</span>
               <div class="node-innhold">
                 <h3>Kontekst og krav</h3>
@@ -72,7 +72,7 @@ const readme = [
 
         <li class="node-rad">
           <div class="steg">
-            <div class="node" data-node="1">
+            <div class="node eier-agent" data-node="1">
               <span class="node-nr" aria-hidden="true">2</span>
               <div class="node-innhold">
                 <h3>Verktøy</h3>
@@ -94,7 +94,7 @@ const readme = [
 
         <li class="node-rad">
           <div class="steg har-gate">
-            <div class="node" data-node="2">
+            <div class="node eier-agent" data-node="2">
               <span class="node-nr" aria-hidden="true">3</span>
               <div class="node-innhold">
                 <h3>Arbeidsløkka</h3>
@@ -130,7 +130,7 @@ const readme = [
 
         <li class="node-rad">
           <div class="steg har-gate">
-            <div class="node" data-node="3">
+            <div class="node eier-menneske" data-node="3">
               <span class="node-nr" aria-hidden="true">4</span>
               <div class="node-innhold">
                 <h3>Sjekkpunkt</h3>
@@ -195,6 +195,8 @@ const readme = [
       <span><i class="strek hel"></i> videre</span>
       <span><i class="strek stiplet"></i> tilbake for å rette</span>
       <span><i class="strek prikket"></i> ny økt</span>
+      <span><i class="eier-chip menneske"></i> mennesket eier</span>
+      <span><i class="eier-chip agent"></i> agenten jobber</span>
     </p>
   </section>
 
@@ -279,6 +281,13 @@ const readme = [
     color: var(--tekst);
   }
 
+  /* Agent-tonen er hue-forskjøvet fra aksenten (+80) så den skiller seg
+     fra salvie i BEGGE temaer og roterer med paletten. Kun dekor (kant og
+     aria-hidden tall) — ikke brødtekst, så L/C-kravet gjelder ikke her. */
+  section {
+    --eier-agent: oklch(58% 0.11 calc(var(--hue2) + 80));
+  }
+
   .flyt-ingress {
     color: var(--dempet);
     max-width: 62ch;
@@ -336,9 +345,36 @@ const readme = [
     gap: var(--s-3);
     background: var(--flate);
     border: 1px solid var(--linje);
+    border-left-width: 3px;
     border-radius: var(--radius-md);
     box-shadow: var(--kort-skygge);
     padding: var(--s-3) var(--s-4);
+  }
+
+  /* Rader uten beslutning lar noden fylle ut til diamant-sporet, så
+     høyresiden ikke står tom */
+  .steg:not(.har-gate) .node {
+    grid-column: 1 / 4;
+  }
+
+  /* Eierfarger — sidens poeng er at hvert steg har en eier:
+     salvie = mennesket (handlekraft), aksent = agenten/verktøyet */
+  .node.eier-menneske {
+    border-left-color: var(--salvie);
+  }
+
+  .node.eier-menneske .node-nr {
+    color: var(--salvie);
+    border-color: var(--salvie);
+  }
+
+  .node.eier-agent {
+    border-left-color: var(--eier-agent);
+  }
+
+  .node.eier-agent .node-nr {
+    color: var(--eier-agent);
+    border-color: var(--eier-agent);
   }
 
   .node-nr {
@@ -481,7 +517,7 @@ const readme = [
   .pill-tag {
     font-weight: 700;
     font-size: 12px;
-    color: var(--dempet);
+    color: var(--feil);
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
@@ -532,6 +568,23 @@ const readme = [
 
   .strek.prikket {
     border-top-style: dotted;
+  }
+
+  .eier-chip {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+
+  .eier-chip.menneske {
+    background: var(--salvie);
+  }
+
+  .eier-chip.agent {
+    background: var(--eier-agent);
   }
 
   @media (max-width: 680px) {

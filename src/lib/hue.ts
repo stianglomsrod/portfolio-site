@@ -1,6 +1,8 @@
 /* Hue-parametre: klient-hjelper for sliderne (/sandbox) og 404. Grunnfarge
    ('hue') styrer flater og tekst, aksent ('hue2') styrer salvie/overskrifter/
-   heatmap. Aksenten følger grunnfargen til den er løsnet (egen lagret verdi).
+   heatmap. Koblingen er en avstandsmodell: grunnfargen flytter ALLTID hele
+   paletten — har du valgt en egen aksent, beholdes vinkel-avstanden mellom
+   dem (wrappes rundt fargehjulet). Aksent-slideren justerer bare avstanden.
    Verdier clampes alltid 0–360; innlesing ved sidelast skjer i Base.astro. */
 
 const NOKKEL = 'hue';
@@ -43,13 +45,39 @@ export function lesHue2(): number | null {
   return les(NOKKEL2);
 }
 
+/** Gjeldende grunnfarge slik den faktisk står (inline-var > lagret > standard). */
+export function gjeldendeHue(): number {
+  const inline = document.documentElement.style.getPropertyValue('--hue');
+  if (inline !== '') return clampHue(inline);
+  return lesHue() ?? STANDARD_HUE;
+}
+
+/** Gjeldende aksent (inline-var > lagret > følger grunnfargen). */
+export function gjeldendeHue2(): number {
+  const inline = document.documentElement.style.getPropertyValue('--hue2');
+  if (inline !== '') return clampHue(inline);
+  return lesHue2() ?? gjeldendeHue();
+}
+
+const rundtHjulet = (h: number) => ((h % 360) + 360) % 360;
+
 export function settHue(verdi: number, lagre: boolean): void {
   const h = clampHue(verdi);
+  const delta = h - gjeldendeHue();
   gliMykt();
   document.documentElement.style.setProperty('--hue', String(h));
-  // Aksenten følger med til den har egen lagret verdi
+  // Aksenten følger alltid med: uten egen verdi speiler den grunnfargen,
+  // med egen verdi flyttes den like langt (avstanden bevares rundt hjulet).
   if (lesHue2() === null) {
     document.documentElement.style.setProperty('--hue2', String(h));
+  } else if (delta !== 0) {
+    const nyAksent = rundtHjulet(gjeldendeHue2() + delta);
+    document.documentElement.style.setProperty('--hue2', String(nyAksent));
+    if (lagre) {
+      try {
+        localStorage.setItem(NOKKEL2, String(nyAksent));
+      } catch {}
+    }
   }
   if (lagre) {
     try {

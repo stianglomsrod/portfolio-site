@@ -17,14 +17,14 @@ const t =
     ? {
         grunnfarge: 'grunnfarge',
         aksent: 'aksent',
-        tilbakestill: 'tilbakestill fargene',
-        spec: 'to @property-registrerte oklch-vinkler · L/C låst så AA-kontrasten holder uansett tone · huskes i localStorage (cookiefritt) og følger deg på hele siden · aksenten følger grunnfargen til du løsner den',
+        tilbakestill: 'fabrikkinnstillinger',
+        spec: 'to @property-registrerte oklch-vinkler · L/C låst så AA-kontrasten holder uansett tone · huskes i localStorage (cookiefritt) og følger deg på hele siden · grunnfargen flytter hele paletten; aksenten justerer avstanden mellom dem',
       }
     : {
         grunnfarge: 'base hue',
         aksent: 'accent',
-        tilbakestill: 'reset the colours',
-        spec: 'two @property-registered oklch angles · L/C locked so AA contrast holds at any hue · remembered in localStorage (no cookies) and follows you across the site · the accent follows the base hue until you detach it',
+        tilbakestill: 'factory settings',
+        spec: 'two @property-registered oklch angles · L/C locked so AA contrast holds at any hue · remembered in localStorage (no cookies) and follows you across the site · the base hue moves the whole palette; the accent adjusts the distance between them',
       };
 ---
 
@@ -43,7 +43,7 @@ const t =
       step="1"
       value="158"
     />
-    <span class="hue-verdi" id="hue-verdi" aria-live="polite">158</span>
+    <span class="hue-verdi" id="hue-verdi" aria-live="polite">#…</span>
   </div>
 
   <div class="hue-rad">
@@ -56,8 +56,9 @@ const t =
       step="1"
       value="158"
     />
-    <span class="hue-verdi" id="hue2-verdi" aria-live="polite">158</span>
+    <span class="hue-verdi" id="hue2-verdi" aria-live="polite">#…</span>
   </div>
+
 
   <div class="hue-bunn">
     <div class="hue-chips" aria-hidden="true">
@@ -96,10 +97,11 @@ const t =
 
   .hue-rad {
     display: grid;
-    grid-template-columns: 84px 1fr 36px;
+    grid-template-columns: 84px 1fr 72px;
     align-items: center;
     gap: var(--s-2);
   }
+
 
   .hue-navn {
     font-family: var(--font-hd);
@@ -201,6 +203,7 @@ const t =
     STANDARD_HUE,
     lesHue,
     lesHue2,
+    gjeldendeHue2,
     settHue,
     settHue2,
     tilbakestillHue,
@@ -211,40 +214,85 @@ const t =
   const verdi = document.getElementById('hue-verdi');
   const verdi2 = document.getElementById('hue2-verdi');
   const reset = document.getElementById('hue-reset');
+  const chipFlate = document.querySelector<HTMLElement>('.hue-chip.flate');
+  const chipAksent = document.querySelector<HTMLElement>('.hue-chip.aksent');
+
+  /* Hex-visning: chipene VISER fargene, så vi leser dem derfra via canvas
+     (computed-strengen kan være oklch() — piksellesing er eneste trygge
+     vei til hex). Fargene glir i 650ms (.hue-glir), så vi oppdaterer både
+     underveis og en gang til når gliden er ferdig. */
+  const lerret = document.createElement('canvas');
+  lerret.width = lerret.height = 1;
+  const ctx = lerret.getContext('2d', { willReadFrequently: true });
+
+  const tilHex = (cssFarge: string): string => {
+    if (!ctx) return '';
+    ctx.fillStyle = '#000000';
+    ctx.fillStyle = cssFarge;
+    ctx.fillRect(0, 0, 1, 1);
+    const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
+    return (
+      '#' +
+      [r, g, b].map((v) => v.toString(16).padStart(2, '0')).join('').toUpperCase()
+    );
+  };
+
+  let hexEtterGlid: ReturnType<typeof setTimeout> | undefined;
+
+  const lesHexNaa = () => {
+    if (verdi && chipFlate)
+      verdi.textContent = tilHex(getComputedStyle(chipFlate).backgroundColor);
+    if (verdi2 && chipAksent)
+      verdi2.textContent = tilHex(getComputedStyle(chipAksent).backgroundColor);
+  };
+
+  const oppdaterHex = () => {
+    lesHexNaa();
+    clearTimeout(hexEtterGlid);
+    hexEtterGlid = setTimeout(lesHexNaa, 720);
+  };
 
   const visGrunn = (h: number) => {
     if (slider) slider.value = String(h);
-    if (verdi) verdi.textContent = String(h);
   };
 
   const visAksent = (h: number) => {
     if (slider2) slider2.value = String(h);
-    if (verdi2) verdi2.textContent = String(h);
   };
 
-  // Init fra lagrede verdier; aksent følger grunnfargen til den er løsnet
+  // Init fra lagrede verdier; aksenten står der paletten faktisk står
   const lagret = lesHue();
   const lagret2 = lesHue2();
   if (lagret !== null) visGrunn(lagret);
   visAksent(lagret2 ?? lagret ?? STANDARD_HUE);
+  oppdaterHex();
 
   slider?.addEventListener('input', () => {
     const h = Number(slider.value);
     settHue(h, true);
     visGrunn(h);
-    // Følger aksenten med? Da skal slideren dens speile det.
-    if (lesHue2() === null) visAksent(h);
+    // Aksenten følger alltid med (speiling eller bevart avstand)
+    visAksent(gjeldendeHue2());
+    oppdaterHex();
   });
 
   slider2?.addEventListener('input', () => {
     const h = Number(slider2.value);
     settHue2(h, true);
     visAksent(h);
+    oppdaterHex();
   });
 
   reset?.addEventListener('click', () => {
     tilbakestillHue();
     visGrunn(STANDARD_HUE);
     visAksent(STANDARD_HUE);
+    oppdaterHex();
+  });
+
+  // Hex-verdiene avhenger av temaets L/C — oppdater ved temabytte
+  new MutationObserver(oppdaterHex).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
   });
 </script>

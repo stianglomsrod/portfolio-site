@@ -6,6 +6,35 @@
 
 ## Changelog
 
+### 2026-07-10 (natt, del 3) — Punchliste 2: spill-mobil, hue-avstand, flyt-farger
+- **Spillet er mobilvennlig**: på ≤680px løftes overlays UT av den lille
+  3/2-ramma med position: fixed — startskjermen dekker hele viewporten
+  (hele kortet + Spill-knappen synlig), HUD-chipsene ligger i den ledige
+  sonen OVER spillet (kartet dekkes ikke), hint-banneret brekker nederst,
+  og meny/paneler/minispill bruker hele skjermen. VirtualPad (D-pad + E)
+  fantes fra før. Verifisert med Playwright 375×812 (start, i spill,
+  meny) — 0 konsollfeil. MERK: preview-verktøyets screenshot er upålitelig
+  ved emulert mobil — bruk Playwright for mobil-visuelt.
+- **Hue-koblingen er en avstandsmodell**: grunnfargen flytter ALLTID hele
+  paletten; har du valgt egen aksent, bevares vinkel-avstanden (wrappes
+  rundt hjulet). Verdiene vises som hex (canvas-piksellesing av chipene —
+  computed er oklch-strenger; leses på nytt etter 650ms-gliden). Knappen
+  heter «fabrikkinnstillinger».
+- **Flyten fargekodet etter eierskap** (sidens poeng): salvie = mennesket
+  (steg 1+4), egen agent-tone oklch(58% 0.11 hue2+80) = agenten (steg
+  2+3, blå ved standard — hue-aksent var for lik salvie i lyst tema),
+  NEI-tags i --feil. Statement-rader (1/2/5) spenner til diamant-sporet
+  så høyresiden ikke gaper. Tegnforklaringen fikk eier-chips.
+- **Tekstvask**: navnetrekket er «stiglo» (uten punktum), hero-CTA bruker
+  → i stedet for tankestrek, footer sier bare «Ingen informasjonskapsler»,
+  «Bygd med Claude Design og Claude Code» erstatter «åpen dialog» overalt,
+  claude-first-kortet sier «små og mellomstore bedrifter», Ordkryss-intro
+  uten «ukas ord». Alt på begge språk.
+- **DNS-avklaring**: Webhuset-DNS-en peker allerede riktig til Vercel
+  (A 216.198.79.1 + www-CNAME til vercel-dns). Prosjektvalget styres i
+  Vercel, ikke DNS. Resend-records skal inn i Webhuset senere.
+- QA: bygg grønt, axe 0/16, kant-sjekk 0/16, mobil-Playwright grønn.
+
 ### 2026-07-10 (natt, del 2) — Stians punchliste etter prod-lansering
 - **Spillet i produksjon var grønn rutenett-grafikk** (Phasers
   mangler-tekstur): Phaser 3.9 laster bilder som XHR → blob-URL, og

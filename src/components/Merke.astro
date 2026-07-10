@@ -1,5 +1,5 @@
 ---
-/* Navnetrekket «stiglo.» — eneste sted Anybody finnes. Kinetisk per
+/* Navnetrekket «stiglo» — eneste sted Anybody finnes. Kinetisk per
    bokstav (300 ms): bokstaven under pekeren vides ut alene og får en
    tilfeldig farge som aldri er lik naboenes forrige/nåværende.
    Tastaturfokus på lenka gir hele ordet den faste paletten. Boksen har
@@ -38,7 +38,7 @@ const bokstaver = [
 >
   {bokstaver.map((b) => (
     <span class="bokstav" data-merke-bokstav style={`--w: ${b.w}; --vekt: ${b.vekt}; --hovc: ${b.farge}`}>{b.c}</span>
-  ))}<span class="punktum" data-hue="158">.</span>
+  ))}
 </a>
 
 <style>
@@ -49,7 +49,7 @@ const bokstaver = [
     text-transform: lowercase;
     display: inline-flex;
     align-items: baseline;
-    width: 4.9em;
+    width: 4.6em;
     flex-shrink: 0;
     padding: var(--s-2) 0;
   }
@@ -71,10 +71,6 @@ const bokstaver = [
   .merke:focus-visible .bokstav {
     font-variation-settings: 'wght' var(--vekt), 'wdth' 145;
     color: var(--hovc);
-  }
-
-  .punktum {
-    color: var(--salvie);
   }
 
   @media (prefers-reduced-motion: reduce) {

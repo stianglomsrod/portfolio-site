@@ -41,7 +41,7 @@ html.hue-glir {
   --bg: oklch(20.3% 0.009 var(--hue));
   --flate: oklch(24% 0.012 var(--hue));
   --flate-2: oklch(22% 0.01 var(--hue));       /* soner inni kort */
-  --nav-bg: oklch(20.3% 0.009 var(--hue));
+  --nav-bg: oklch(22.5% 0.028 var(--hue2)); /* hevet flate tintet med aksenten (Modul C) */
   --tekst: oklch(92.2% 0.013 var(--hue));      /* 14.3:1 AAA */
   --overskrift: oklch(90% 0.05 var(--hue2));   /* grønnere enn brødtekst */
   --dempet: oklch(70.2% 0.024 var(--hue));     /* 6.9:1 AA */
@@ -94,7 +94,7 @@ html.hue-glir {
     --bg: oklch(95.3% 0.01 var(--hue));         /* tonet, dypere enn hvit */
     --flate: #ffffff;                            /* rene hvite kort */
     --flate-2: oklch(97.3% 0.008 var(--hue));
-    --nav-bg: oklch(91% 0.016 var(--hue));       /* mørkere enn bg, skiller nav */
+    --nav-bg: oklch(90% 0.032 var(--hue2));      /* hevet flate tintet med aksenten (Modul C) */
     --tekst: oklch(27.6% 0.013 var(--hue));      /* 12.9:1 AAA */
     --overskrift: oklch(33% 0.06 var(--hue2));
     --dempet: oklch(47.9% 0.021 var(--hue));     /* 5.7:1 AA */
@@ -118,7 +118,7 @@ html.hue-glir {
   --bg: oklch(95.3% 0.01 var(--hue));
   --flate: #ffffff;
   --flate-2: oklch(97.3% 0.008 var(--hue));
-  --nav-bg: oklch(91% 0.016 var(--hue));
+  --nav-bg: oklch(90% 0.032 var(--hue2));
   --tekst: oklch(27.6% 0.013 var(--hue));
   --overskrift: oklch(33% 0.06 var(--hue2));
   --dempet: oklch(47.9% 0.021 var(--hue));

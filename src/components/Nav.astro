@@ -44,20 +44,32 @@ const erAktiv = (href: string) => {
           </li>
         ))}
       </ul>
+      <!-- Mobil: språk og tema bor i menyen (vises kun i nedtrekkslista) -->
+      <div class="meny-verktoy">
+        <a
+          class="meny-spraak"
+          href={alternativ}
+          hreflang={lang === 'nb' ? 'en' : 'nb'}
+          aria-label={t.spraakAria}
+          >{lang === 'nb' ? 'English version' : 'Norsk versjon'}</a
+        >
+        <button
+          type="button"
+          class="tema"
+          data-tema-toggle
+          role="switch"
+          aria-checked="true"
+          aria-label={t.temaAria}
+        >
+          <span class="tema-spor" aria-hidden="true">
+            <span class="tema-ikon sol">☀</span>
+            <span class="tema-ikon maane">☾</span>
+            <span class="tema-kule"></span>
+          </span>
+        </button>
+      </div>
     </nav>
     <div class="brytere">
-      <button
-        type="button"
-        id="meny-knapp"
-        class="meny-knapp"
-        aria-expanded="false"
-        aria-controls="hovedmeny"
-      >
-        <svg class="meny-ikon" viewBox="0 0 16 14" width="16" height="14" aria-hidden="true">
-          <path d="M1 1h14M1 7h14M1 13h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-        </svg>
-        {lang === 'nb' ? 'Meny' : 'Menu'}
-      </button>
       <a
         class="spraak"
         href={alternativ}
@@ -69,6 +81,7 @@ const erAktiv = (href: string) => {
         type="button"
         id="tema-toggle"
         class="tema"
+        data-tema-toggle
         role="switch"
         aria-checked="true"
         aria-label={t.temaAria}
@@ -78,6 +91,18 @@ const erAktiv = (href: string) => {
           <span class="tema-ikon maane">☾</span>
           <span class="tema-kule"></span>
         </span>
+      </button>
+      <button
+        type="button"
+        id="meny-knapp"
+        class="meny-knapp"
+        aria-expanded="false"
+        aria-controls="hovedmeny"
+      >
+        <svg class="meny-ikon" viewBox="0 0 16 14" width="16" height="14" aria-hidden="true">
+          <path d="M1 1h14M1 7h14M1 13h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+        {lang === 'nb' ? 'Meny' : 'Menu'}
       </button>
     </div>
   </div>
@@ -178,6 +203,30 @@ const erAktiv = (href: string) => {
     align-items: center;
     gap: var(--s-2);
     flex-shrink: 0;
+  }
+
+  /* Verktøyraden i menyen finnes bare i mobil-nedtrekkslista */
+  .meny-verktoy {
+    display: none;
+  }
+
+  .meny-spraak {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--dempet);
+    text-decoration: none;
+    padding: 12px 12px;
+    min-height: 44px;
+    box-sizing: border-box;
+    border-radius: var(--radius-sm);
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .meny-spraak:hover {
+    color: var(--tekst);
+    background: var(--flate);
   }
 
   /* Hamburgeren finnes bare på mobil MED js — ellers vises full meny */
@@ -327,6 +376,22 @@ const erAktiv = (href: string) => {
       display: inline-flex;
     }
 
+    /* Språk og tema flytter inn i menyen — topplinja er merke + Meny */
+    :global(html.har-js) .brytere .spraak,
+    :global(html.har-js) .brytere .tema {
+      display: none;
+    }
+
+    :global(html.har-js) .meny-verktoy {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--s-3);
+      margin-top: var(--s-2);
+      padding: var(--s-1) 0 0;
+      border-top: 1px solid var(--linje);
+    }
+
     :global(html.har-js) .topp-indre nav {
       position: absolute;
       top: 100%;
@@ -361,8 +426,9 @@ const erAktiv = (href: string) => {
 <script>
   // Tema-switch: manuelt valg persisteres i localStorage 'data-theme'
   // (cookiefritt). Uten valg følges prefers-color-scheme via CSS.
-  // aria-checked = «mørkt tema på».
-  const knapp = document.getElementById('tema-toggle');
+  // aria-checked = «mørkt tema på». To switcher (topplinje + mobilmeny)
+  // deler tilstand og holdes i synk.
+  const temaKnapper = [...document.querySelectorAll<HTMLElement>('[data-tema-toggle]')];
 
   const effektivt = (): 'dark' | 'light' => {
     const satt = document.documentElement.dataset.theme;
@@ -371,17 +437,20 @@ const erAktiv = (href: string) => {
   };
 
   const oppdater = () => {
-    knapp?.setAttribute('aria-checked', effektivt() === 'dark' ? 'true' : 'false');
+    const verdi = effektivt() === 'dark' ? 'true' : 'false';
+    temaKnapper.forEach((k) => k.setAttribute('aria-checked', verdi));
   };
 
-  knapp?.addEventListener('click', () => {
-    const ny = effektivt() === 'dark' ? 'light' : 'dark';
-    document.documentElement.dataset.theme = ny;
-    try {
-      localStorage.setItem('data-theme', ny);
-    } catch {}
-    oppdater();
-  });
+  temaKnapper.forEach((knapp) =>
+    knapp.addEventListener('click', () => {
+      const ny = effektivt() === 'dark' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = ny;
+      try {
+        localStorage.setItem('data-theme', ny);
+      } catch {}
+      oppdater();
+    })
+  );
 
   oppdater();
 

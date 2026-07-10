@@ -6,7 +6,20 @@
 
 ## Changelog
 
-### 2026-07-10 (kveld) — Hamburgermeny på mobil, scroll-avsløring, trykkflater
+### 2026-07-10 (sen kveld) — Nav-finpuss: hamburger til høyre, verktøy i menyen, aksent-tintet header
+- **Hamburgeren står ytterst til høyre** (konvensjonen), og på mobil er
+  topplinja nå bare merke + Meny: språkvelgeren («English version» med
+  full tekst) og tema-switchen bor nederst i nedtrekkslista, bak en
+  skillelinje. To tema-switcher (topplinje desktop + mobilmeny) deler
+  tilstand via [data-tema-toggle] og holdes i synk. Desktop uendret.
+- **Headeren er en hevet flate tintet med AKSENTEN** (Material 3-
+  prinsippet: tonal forskjell viser hvor flater begynner/slutter, og
+  hevede flater tintes med primærfargen): --nav-bg er nå
+  oklch(22.5% 0.028 var(--hue2)) mørk / oklch(90% 0.032 var(--hue2))
+  lys — synlig men nøktern, og følger aksent-slideren i Modul C live.
+  L holdt nær de gamle verdiene så kontrasten står (axe 0/18).
+
+
 - **Hamburgermeny på mobil** (≤680px, kun med JS): den synlige to-raders
   menyen kostet 166px = 20 % av førstevisningen på 375×812 — nå er
   topplinja 53px med «Meny»-knapp (ikon + tekstetikett, NN/g: ikon+tekst

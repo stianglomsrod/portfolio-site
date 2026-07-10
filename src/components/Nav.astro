@@ -116,7 +116,12 @@ const erAktiv = (href: string) => {
 <style>
   /* Auto-hide: sticky rad som glir med scrollen piksel for piksel (som om
      den lå i dokumentet) og snapper mykt helt inn/ut når scrollen stopper.
-     Skjules aldri mens noe i den har fokus (tastatur). */
+     Skjules aldri mens noe i den har fokus (tastatur).
+
+     Flate-språket: øverst på siden er headeren USYNLIG (smelter inn i
+     heroen) — ved scroll materialiserer den seg som tintet glass
+     (gjennomskinnelig aksent + backdrop-blur) med myk skygge i stedet
+     for hard kantlinje. Fallback uten backdrop-filter: opak tint. */
   .topp {
     position: sticky;
     top: 0;
@@ -127,10 +132,30 @@ const erAktiv = (href: string) => {
     gap: var(--s-4);
     padding: var(--s-3) var(--s-6);
     background: var(--nav-bg);
-    border-bottom: 1px solid var(--linje);
+    border-bottom: 1px solid color-mix(in oklab, var(--linje) 65%, transparent);
+    box-shadow: var(--nav-skygge);
+    transition:
+      background-color 280ms var(--ease),
+      border-color 280ms var(--ease),
+      box-shadow 280ms var(--ease);
     /* Eget compositor-lag: uten dette kunne skjul/vis-transformen gi
        blanke felt og klippet innhold under scroll (Chromium) */
     will-change: transform;
+  }
+
+  @supports (backdrop-filter: blur(1px)) {
+    .topp {
+      background: color-mix(in oklab, var(--nav-bg) 78%, transparent);
+      -webkit-backdrop-filter: blur(14px) saturate(1.4);
+      backdrop-filter: blur(14px) saturate(1.4);
+    }
+  }
+
+  /* Øverst på siden: ingen plate — headeren ER siden */
+  .topp[data-oppe] {
+    background: transparent;
+    border-bottom-color: transparent;
+    box-shadow: none;
   }
 
   /* Transition kun når vi snapper (scroll i ro) — under aktiv scroll styrer
@@ -437,10 +462,20 @@ const erAktiv = (href: string) => {
       order: initial;
       flex-basis: auto;
       background: var(--nav-bg);
-      border-bottom: 1px solid var(--linje);
-      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
+      border-bottom: 1px solid color-mix(in oklab, var(--linje) 65%, transparent);
+      box-shadow: var(--nav-skygge);
       padding: var(--s-2) var(--s-4) var(--s-3);
       display: none;
+    }
+
+    /* Nedtrekkslista er samme glass som headeren, men tettere (tekst
+       skal være trygg å lese over hva som helst) */
+    @supports (backdrop-filter: blur(1px)) {
+      :global(html.har-js) .topp-indre nav {
+        background: color-mix(in oklab, var(--nav-bg) 92%, transparent);
+        -webkit-backdrop-filter: blur(18px) saturate(1.4);
+        backdrop-filter: blur(18px) saturate(1.4);
+      }
     }
 
     :global(html.har-js) .topp-indre nav[data-apen] {
@@ -500,10 +535,14 @@ const erAktiv = (href: string) => {
   if (menyKnapp && hovedmeny) {
     const settApen = (apen: boolean) => {
       menyKnapp.setAttribute('aria-expanded', String(apen));
+      const topp = document.getElementById('side-topp');
       if (apen) {
         hovedmeny.setAttribute('data-apen', '');
+        // Åpen meny trenger flaten sin — også øverst på siden
+        topp?.removeAttribute('data-oppe');
       } else {
         hovedmeny.removeAttribute('data-apen');
+        if (window.scrollY < 24) topp?.setAttribute('data-oppe', '');
       }
     };
 
@@ -543,6 +582,9 @@ const erAktiv = (href: string) => {
   // helt ut (aldri halvveis). Ingen terskel-hopp.
   const topp = document.getElementById('side-topp');
   if (topp) {
+    // Starttilstand: usynlig plate hvis vi står øverst
+    if (window.scrollY < 24) topp.setAttribute('data-oppe', '');
+
     let forrigeY = window.scrollY;
     let offset = 0; // 0 = helt synlig, navH = helt skjult
     let ventet = false;
@@ -576,6 +618,12 @@ const erAktiv = (href: string) => {
           const delta = y - forrigeY;
           forrigeY = y;
           if (delta !== 0) sisteRetning = delta > 0 ? 1 : -1;
+          // Materialtilstanden: usynlig øverst, tintet glass ved scroll
+          if (y < 24) {
+            topp.setAttribute('data-oppe', '');
+          } else {
+            topp.removeAttribute('data-oppe');
+          }
           const navH = topp.offsetHeight;
           // Øverst på siden er naven alltid helt synlig
           const maks = Math.max(0, Math.min(navH, y));

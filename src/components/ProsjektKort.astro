@@ -63,13 +63,15 @@ const hoved = lenker.find((l) => !l.href.startsWith('http')) ?? lenker[0];
     gap: var(--s-2);
     height: 100%;
     box-sizing: border-box;
-    /* Rolig løft uten scale: skalering ga tekst-shimmer under overgangen */
-    transition: transform 160ms var(--ease), border-color 160ms;
+    /* Rolig løft uten scale: skalering ga tekst-shimmer under overgangen.
+       Skyggen dypnes i takt med løftet (samme flate-språk som headeren) */
+    transition: transform 160ms var(--ease), border-color 160ms, box-shadow 160ms var(--ease);
   }
 
   .kort:hover {
     transform: translateY(-3px);
     border-color: var(--dempet);
+    box-shadow: var(--kort-skygge-hover);
   }
 
   /* Tastatur får samme signal som mus */

@@ -50,7 +50,9 @@ html.hue-glir {
   --salvie-skygge: oklch(48.8% 0.063 var(--hue2));
   --linje: oklch(29.7% 0.019 var(--hue));      /* dekorativ */
   --feil: oklch(69.8% 0.077 calc(var(--hue) + 216)); /* varm rød ved hue 158 */
-  --kort-skygge: none;
+  --kort-skygge: 0 1px 2px rgba(0, 0, 0, 0.25), 0 8px 24px -10px rgba(0, 0, 0, 0.4);
+  --kort-skygge-hover: 0 2px 4px rgba(0, 0, 0, 0.3), 0 14px 34px -10px rgba(0, 0, 0, 0.5);
+  --nav-skygge: 0 8px 28px -12px rgba(0, 0, 0, 0.55);
 
   /* --- HEATMAP (nivå 0–4; tomme dager følger flatene, aktive aksenten) --- */
   --heat-0: oklch(25.8% 0.016 var(--hue));
@@ -108,7 +110,9 @@ html.hue-glir {
     --heat-2: oklch(70.2% 0.071 var(--hue));
     --heat-3: oklch(59% 0.075 var(--hue));
     --heat-4: oklch(47.8% 0.081 var(--hue));
-    --kort-skygge: 0 1px 2px rgba(35, 42, 37, 0.05), 0 6px 16px rgba(35, 42, 37, 0.05);
+    --kort-skygge: 0 1px 2px rgba(35, 42, 37, 0.06), 0 10px 28px -12px rgba(35, 42, 37, 0.16);
+    --kort-skygge-hover: 0 2px 4px rgba(35, 42, 37, 0.08), 0 16px 38px -12px rgba(35, 42, 37, 0.22);
+    --nav-skygge: 0 8px 28px -14px rgba(35, 42, 37, 0.35);
     --hue-aksent: oklch(48% 0.17 var(--hue2));
   }
 }
@@ -132,7 +136,9 @@ html.hue-glir {
   --heat-2: oklch(70.2% 0.071 var(--hue2));
   --heat-3: oklch(59% 0.075 var(--hue2));
   --heat-4: oklch(47.8% 0.081 var(--hue2));
-  --kort-skygge: 0 1px 2px rgba(35, 42, 37, 0.05), 0 6px 16px rgba(35, 42, 37, 0.05);
+  --kort-skygge: 0 1px 2px rgba(35, 42, 37, 0.06), 0 10px 28px -12px rgba(35, 42, 37, 0.16);
+  --kort-skygge-hover: 0 2px 4px rgba(35, 42, 37, 0.08), 0 16px 38px -12px rgba(35, 42, 37, 0.22);
+  --nav-skygge: 0 8px 28px -14px rgba(35, 42, 37, 0.35);
   --hue-aksent: oklch(48% 0.17 var(--hue2));
 }
 

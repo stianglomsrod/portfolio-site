@@ -37,7 +37,24 @@
 - Skjermbilder oppdatert i `docs/innsikt/spill-mobil/`; addendum i
   `docs/innsikt/SPILL-MOBIL-RAPPORT.md`. Ikke committet.
 
-### 2026-07-10 (sen kveld) — Nav-finpuss: hamburger til høyre, verktøy i menyen, aksent-tintet header
+### 2026-07-10 (natt mot 11.) — Glass-header og lagdelte skygger
+- **Headeren er tintet glass med scroll-tilstand** (Stians funn: den
+  opake tint-platen ble brå): øverst på siden er headeren HELT
+  transparent (ingen plate — headeren er siden), og ved scroll (y ≥ 24)
+  materialiserer den seg som gjennomskinnelig aksent-tint
+  (color-mix 78 % + backdrop-blur 14px saturate 1.4) med myk --nav-skygge
+  i stedet for hard kantlinje. Overgangen glir 280ms. Fallback uten
+  backdrop-filter: opak tint. Nedtrekkslista er samme glass, tettere
+  (92 %). Åpen meny tvinger materialtilstanden også øverst.
+- **Lagdelte skygger som felles flate-språk**: --kort-skygge er nå
+  ambient + key i BEGGE temaer (mørk hadde none), med
+  --kort-skygge-hover som dypnes i takt med kortenes løft (.kort og
+  .eksperiment, begge språk). Kantlinjer består for struktur i mørkt.
+- QA: Playwright-skjermbilder av topp/scrollet i lys standard, lys
+  rosa-palett (hue 340) og mørk — glasset følger paletten. Bygg grønt,
+  axe 0/18, kant-sjekk 0/18.
+
+
 - **Hamburgeren står ytterst til høyre** (konvensjonen), og på mobil er
   topplinja nå bare merke + Meny: språkvelgeren («English version» med
   full tekst) og tema-switchen bor nederst i nedtrekkslista, bak en

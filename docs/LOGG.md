@@ -6,6 +6,31 @@
 
 ## Changelog
 
+### 2026-07-10 (natt) — Ordkryss-wizard, smooth nav-scroll, v3 til produksjon
+- **Ordkryss er nå en wizard i fire steg** (tittel → ord → innstillinger →
+  forhåndsvisning) med Forrige/Neste. Bilde per ord er en 48px-knapp i
+  selve ordraden (klikk = legg til/bytt, FileReader → data-URL, blir med
+  på utskriften). Ordlista tåler utkast fra eldre versjoner med andre
+  feltnavn (alt som ikke er streng behandles som tomt) — gamle utkast i
+  localStorage krasjet ellers hele skriptet.
+- **Nav-auto-hide bygget om fra terskel til proporsjonal glidning**:
+  naven følger scrollen piksel for piksel (som om den lå i dokumentet)
+  og snapper mykt helt inn/ut i brukerens siste scrollretning når
+  scrollen stopper (140ms ro). Transition ligger kun på snapp-klassen
+  `.glir` — under aktiv scroll setter JS transformen direkte, ellers
+  blir det gummistrikk-lag. Fokus i naven overstyrer alltid skjuling.
+  Det gamle «ett tick ingenting, to tick hopp»-mønsteret er borte.
+- **v3 er produksjonsgrenen**: main på GitHub = v3-koden. Den gamle
+  Next.js-siten (2e07486, siste deployede) er bevart som branch
+  `legacy-nextjs` på GitHub — ikke slett den.
+- **Vercel**: repoet er koblet til TRE prosjekter (stianglomsrod = prod
+  med domenet, portfolio-site-v3, vgx-pitch). Prod-prosjektet sto med
+  Framework Preset = Next.js og avviste Astro-bygget i stillhet — flippet
+  til Astro med `vercel project update stianglomsrod --framework astro`
+  (godkjent av Stian; reverseres med `--framework nextjs`).
+- QA før push: bygg grønt, axe 0 brudd på 16 ruter, kant-sjekk 0 avvik,
+  wizard testet ende-til-ende i preview.
+
 ### 2026-07-10 — Kant-flukt løst systemisk: border-box + kant-sjekk i QA
 - **Global `box-sizing: border-box`** i Base: rotårsaken til alle
   «skjeve kanter» var content-box, der padded blokker (readme, moduler)
@@ -113,7 +138,7 @@
 
 | Hva | Hvorfor det ligger | Neste steg |
 | --- | --- | --- |
-| Release-gate ikke kjørt på ekte preview | Venter på Vercel-prosjekt fra v3 + env-vars (GITHUB_TOKEN, RESEND_API_KEY) + Resend-DNS (Stians hånd) | Lighthouse ≥95 alle ruter + manuell gjennomspilling på preview-URL, så domene-flipp |
+| Release-gate ikke fullført mot produksjon | v3 gikk til prod 2026-07-10 før Lighthouse-gate; env-vars (GITHUB_TOKEN, RESEND_API_KEY) + Resend-DNS gjenstår (Stians hånd) | Lighthouse ≥95 alle ruter mot stianglomsrod.no + manuell gjennomspilling |
 | Kontaktskjema svarer 503 uten RESEND_API_KEY | Villet fail-closed til nøkkelen er satt | Sett env-var i Vercel |
 | Ordkryss finnes i to utgaver | Siten har den levende (/sandbox/ordkryss, kjerne i src/lib); den frittstående i cs50x-mappa har Node-testene og er ikke i git | Hold kjernene i synk ved endring; vurder å flytte testene inn i repoet |
 | mp3-diett for spilllyd | ffmpeg mangler på maskinen | Komprimer når ffmpeg finnes |

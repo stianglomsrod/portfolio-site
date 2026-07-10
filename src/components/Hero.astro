@@ -52,7 +52,7 @@ const t =
         aktivIdag: 'aktiv i dag',
         aktivUka: 'aktiv denne uka',
         sokerLinje: 'Søker',
-        jobb: '-jobb →',
+        jobb: '-jobb',
         cta: 'ta kontakt',
       }
     : {
@@ -69,7 +69,7 @@ const t =
         aktivIdag: 'active today',
         aktivUka: 'active this week',
         sokerLinje: 'Looking for a',
-        jobb: ' role →',
+        jobb: ' role',
         cta: 'get in touch',
       };
 
@@ -130,7 +130,7 @@ const ctaHref = lang === 'nb' ? '/om#kontakt' : '/en/about#kontakt';
   </div>
 
   <p class="cta-linje">
-    {t.sokerLinje} {soker}{t.jobb}
+    {t.sokerLinje} {soker}{t.jobb}<span class="cta-pil" aria-hidden="true"> →</span>
     <a class="cta knapp" href={ctaHref}>{t.cta}</a>
   </p>
 </section>
@@ -305,5 +305,31 @@ const ctaHref = lang === 'nb' ? '/om#kontakt' : '/en/about#kontakt';
   .cta:focus-visible {
     outline: 2px solid var(--tekst);
     outline-offset: 2px;
+  }
+
+  /* Mobil: heroen eier hele første skjermbilde — CTA-en nederst som
+     naturlig endepunkt, og «Utvalgte prosjekter» først ved scroll.
+     Pila droppes: den peker på knappen når de deler linje (desktop),
+     men på mobil brekker knappen ned og pila pekte ut i lufta. */
+  @media (max-width: 680px) {
+    .hero {
+      min-height: calc(100svh - 96px);
+      padding-bottom: var(--s-5);
+    }
+
+    .cta-linje {
+      margin-top: auto;
+    }
+
+    .cta-pil {
+      display: none;
+    }
+
+    .cta {
+      display: block;
+      width: fit-content;
+      margin: var(--s-4) 0 0;
+      padding: 12px 26px;
+    }
   }
 </style>

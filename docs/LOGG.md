@@ -28,6 +28,12 @@
   har min-height 44px.
 - Mobil-audit (Playwright 375×812, alle 9 nb-ruter): ingen horisontal
   overflow noe sted; målingene ligger til grunn for punktene over.
+- **Mobil-hero eier første skjermbilde**: min-height 100svh minus
+  topplinja, CTA-en ankret nederst (margin-top: auto) — «Utvalgte
+  prosjekter» synes først ved scroll (målt: starter 833px på 812-skjerm).
+  Pila i «native-jobb →» droppes på mobil (den peker på knappen når de
+  deler linje på desktop; på mobil brakk knappen ned og pila pekte ut i
+  lufta), og knappen står som egen blokk med luft (margin s-4).
 - QA: bygg grønt, axe 0/18, kant-sjekk 0/18, desktop-regresjon og
   reduced-motion verifisert programmatisk.
 

@@ -5,6 +5,11 @@ import ProsjektKort from '../../components/ProsjektKort.astro';
 import prosjekter from '../../data/prosjekter.json';
 
 /* English front page. NORSK TVILLING: src/pages/index.astro — endre begge. */
+export const prerender = false;
+Astro.response.headers.set(
+  'Cache-Control',
+  'public, s-maxage=900, stale-while-revalidate=86400'
+);
 ---
 
 <Side

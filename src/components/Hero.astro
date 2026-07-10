@@ -170,28 +170,19 @@ const ctaHref = lang === 'nb' ? '/om#kontakt' : '/en/about#kontakt';
     gap: var(--s-3);
   }
 
-  .matrise-scroller {
-    overflow-x: auto;
-  }
-
-  @media (max-width: 680px) {
-    .matrise-scroller {
-      mask-image: linear-gradient(90deg, #000 calc(100% - 16px), transparent);
-    }
-  }
-
+  /* Ingen scroll: rutene skalerer med plassen i stedet (aldri scrollbar).
+     minmax(0, 18px) gir 18px-ruter når det er plass og jevnt krympende
+     ruter når det ikke er det. */
   .matrise {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(30, minmax(0, 18px));
     gap: 4px;
-    width: max-content;
-    /* luft rundt rutene så tooltip (over) og hover-outline (under/sider)
-       ikke klippes av scrollerens overflow */
-    padding: 34px 3px 3px;
+    padding: 3px;
   }
 
   .rute {
-    width: 18px;
-    height: 18px;
+    width: auto;
+    aspect-ratio: 1;
     border-radius: 4px;
     display: block;
     position: relative;

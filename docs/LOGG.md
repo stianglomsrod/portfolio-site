@@ -6,6 +6,30 @@
 
 ## Changelog
 
+### 2026-07-10 (natt, del 2) — Stians punchliste etter prod-lansering
+- **Spillet i produksjon var grønn rutenett-grafikk** (Phasers
+  mangler-tekstur): Phaser 3.9 laster bilder som XHR → blob-URL, og
+  CSP-en manglet `blob:` i img-src. I dev er det ingen CSP — derfor
+  virket alt lokalt. Fikset i vercel.json (`img-src 'self' data: blob:`).
+  LÆRDOM: nye browser-APIer i prod-problemer? Sjekk CSP-en først.
+- **Hero-matrisen har aldri mer scrollbar**: rutene ligger i grid
+  `repeat(30, minmax(0, 18px))` og krymper med plassen i stedet for å
+  scrolle (7,4px på mobil, 18px på desktop).
+- **Forsidene rendres per forespørsel** (`prerender = false` + s-maxage
+  900/SWR) så matrisen og «aktiv i dag» alltid er ferske. github.ts
+  leser tokenet ved kall-tid (process.env i runtime) og events-cachen
+  fikk 5 min TTL (varme lambdaer gjenbrukte ellers svaret evig).
+  Live heatmap i prod krever GITHUB_TOKEN som Vercel-env (Stians hånd).
+- **Flytskjemaet på /slik-jobber-jeg får plass i én viewport** (~785px):
+  hvert steg er nå en vannrett rad — node | arm | diamant | nei-piller —
+  i grid med delte spor. Returlinjene rutes fortsatt i høyrefeltet;
+  rute a går inn nederst i node 3 ('bunn'-inngang). Readme-bredden er
+  bundet til samme formel som flyten (`min(940px, 100% - 120px)`) så
+  kant-sjekken holder.
+- **Ordkryss-tekstene strippet for historie**: «skriv inn ordene elevene
+  skal finne», ingen CS50x-omtale på siden eller kortene (begge språk).
+- QA: bygg grønt, axe 0/16, kant-sjekk 0/16.
+
 ### 2026-07-10 (natt) — Ordkryss-wizard, smooth nav-scroll, v3 til produksjon
 - **Ordkryss er nå en wizard i fire steg** (tittel → ord → innstillinger →
   forhåndsvisning) med Forrige/Neste. Bilde per ord er en 48px-knapp i

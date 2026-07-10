@@ -3,6 +3,15 @@ import Side from '../layouts/Side.astro';
 import Hero from '../components/Hero.astro';
 import ProsjektKort from '../components/ProsjektKort.astro';
 import prosjekter from '../data/prosjekter.json';
+
+/* Rendres per forespørsel så matrisen og «aktiv i dag» alltid er ferske.
+   Edge-cachen (15 min + stale-while-revalidate) tar trafikken — GitHub
+   treffes bare når cachen er utløpt. ENGELSK TVILLING: en/index.astro. */
+export const prerender = false;
+Astro.response.headers.set(
+  'Cache-Control',
+  'public, s-maxage=900, stale-while-revalidate=86400'
+);
 ---
 
 <Side

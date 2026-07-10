@@ -1,8 +1,8 @@
-/* GitHub-henting ved byggetid (Done 6–7). Kjøres kun server-side —
+/* GitHub-henting server-side (Done 6–7). Forsidene rendres on-demand
+   (prerender = false) så matrisen og «aktiv i dag» alltid er ferske;
+   edge-cachen (s-maxage i index-sidene) tar støyten for trafikken.
    GITHUB_TOKEN (uten PUBLIC_-prefiks) når aldri klienten. Feiler alltid
-   trygt til statisk snapshot: siden kan ikke bli stale eller knekke bygget.
-   «Cache» for statisk output er selve byggeartefakten; hver deploy
-   re-henter. */
+   trygt til statisk snapshot: siden kan ikke knekke på GitHub-nedetid. */
 
 import fallback from '../data/github-fallback.json';
 
@@ -28,28 +28,45 @@ export interface Heatmap {
 
 const BRUKER = 'stianglomsrod';
 
+/* Tokenet leses ved kall-tid (ikke modul-last): i serverless-runtime er det
+   process.env som gjelder, ved bygg er det import.meta.env. */
+function lesToken(): string | undefined {
+  return (
+    (typeof process !== 'undefined' ? process.env.GITHUB_TOKEN : undefined) ??
+    import.meta.env.GITHUB_TOKEN
+  );
+}
+
 function apiHeaders(): Record<string, string> {
   const headers: Record<string, string> = {
     Accept: 'application/vnd.github+json',
     'User-Agent': 'stianglomsrod-no-build',
   };
-  const token = import.meta.env.GITHUB_TOKEN;
+  const token = lesToken();
   if (token) headers.Authorization = `Bearer ${token}`;
   return headers;
 }
 
-/* Events deles mellom ticker og feed innenfor samme bygg. */
-let eventsPromise: Promise<any[]> | null = null;
+/* Events deles mellom ticker og feed, med TTL: varme serverless-instanser
+   lever lenge, og uten utløp ville module-cachen servert samme svar evig. */
+const EVENTS_TTL_MS = 5 * 60_000;
+let eventsCache: { promise: Promise<any[]>; hentet: number } | null = null;
 
 function hentEvents(): Promise<any[]> {
-  eventsPromise ??= fetch(`https://api.github.com/users/${BRUKER}/events?per_page=100`, {
-    headers: apiHeaders(),
-    signal: AbortSignal.timeout(5000),
-  }).then((res) => {
-    if (!res.ok) throw new Error(`events: ${res.status}`);
-    return res.json();
-  });
-  return eventsPromise;
+  const naa = Date.now();
+  if (!eventsCache || naa - eventsCache.hentet > EVENTS_TTL_MS) {
+    eventsCache = {
+      hentet: naa,
+      promise: fetch(`https://api.github.com/users/${BRUKER}/events?per_page=100`, {
+        headers: apiHeaders(),
+        signal: AbortSignal.timeout(5000),
+      }).then((res) => {
+        if (!res.ok) throw new Error(`events: ${res.status}`);
+        return res.json();
+      }),
+    };
+  }
+  return eventsCache.promise;
 }
 
 function kortMelding(melding: string): string {
@@ -103,7 +120,7 @@ const NIVAA: Record<string, 0 | 1 | 2 | 3 | 4> = {
    (PRD). Uten token eller ved feil: fallback-snapshot; null → komponenten
    viser en stille plassholder i stedet for matrisen. */
 export async function hentHeatmap(): Promise<Heatmap | null> {
-  const token = import.meta.env.GITHUB_TOKEN;
+  const token = lesToken();
   if (token) {
     try {
       const res = await fetch('https://api.github.com/graphql', {

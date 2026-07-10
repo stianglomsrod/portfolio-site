@@ -8,10 +8,13 @@ import Side from '../layouts/Side.astro';
    overlevering.
 
    Flytskjemaet følger etablert symbolspråk (ISO 5807-tradisjonen):
-   prosess = rektangel, beslutning = diamant med alle utganger merket,
-   ja fortsetter nedover, nei går ut til høyre. Strektypen skiller
-   funksjon: heltrukket = fremover, stiplet = tilbake for å rette,
-   prikket = ny syklus. Etiketter står alltid vannrett (lesbarhet). */
+   aktivitet = rektangel som munner ut i sin betingelse (diamant) på
+   ryggraden. JA fortsetter nedover fra diamantens bunn; NEI går ut av
+   en sidespiss, og pila føres helt fram til steget flyten går tilbake
+   til (høyre- og venstrefelt). Strektypen skiller funksjon: heltrukket
+   = fremover, stiplet = tilbake for å rette, prikket = ny syklus.
+   Etiketter står alltid vannrett (lesbarhet). ENGELSK TVILLING:
+   src/pages/en/how-i-work.astro — endre begge. */
 
 const readme = [
   { nokkel: 'goals:', verdi: 'definert og skrevet ned før hver økt' },
@@ -51,17 +54,15 @@ const readme = [
       <svg id="retur-svg" aria-hidden="true"></svg>
       <ol class="flyt">
         <li class="node-rad">
-          <div class="steg">
-            <div class="node eier-menneske" data-node="0">
-              <span class="node-nr" aria-hidden="true">1</span>
-              <div class="node-innhold">
-                <h3>Kontekst og krav</h3>
-                <p>
-                  Mål, rammer og suksesskriterier skrives ned før noe bygges.
-                  Kravene kan endres underveis, men da som en dokumentert
-                  beslutning.
-                </p>
-              </div>
+          <div class="node eier-menneske" data-node="0">
+            <span class="node-nr" aria-hidden="true">1</span>
+            <div class="node-innhold">
+              <h3>Kontekst og krav</h3>
+              <p>
+                Mål, rammer og suksesskriterier skrives ned før noe bygges.
+                Kravene kan endres underveis, men da som en dokumentert
+                beslutning.
+              </p>
             </div>
           </div>
           <div class="kobling" aria-hidden="true">
@@ -71,18 +72,16 @@ const readme = [
         </li>
 
         <li class="node-rad">
-          <div class="steg">
-            <div class="node eier-agent" data-node="1">
-              <span class="node-nr" aria-hidden="true">2</span>
-              <div class="node-innhold">
-                <h3>Verktøy</h3>
-                <p>
-                  Jeg lager egne skills til Claude for jobben og domenet
-                  produktet lever i, og varige regler agentene må følge, for
-                  eksempel for dokumentasjon og designprinsipper. Hva som
-                  sjekkes og håndheves, avhenger av konteksten.
-                </p>
-              </div>
+          <div class="node eier-agent" data-node="1">
+            <span class="node-nr" aria-hidden="true">2</span>
+            <div class="node-innhold">
+              <h3>Verktøy</h3>
+              <p>
+                Jeg lager egne skills til Claude for jobben og domenet
+                produktet lever i, og varige regler agentene må følge, for
+                eksempel for dokumentasjon og designprinsipper. Hva som
+                sjekkes og håndheves, avhenger av konteksten.
+              </p>
             </div>
           </div>
           <div class="kobling" aria-hidden="true">
@@ -93,28 +92,29 @@ const readme = [
         </li>
 
         <li class="node-rad">
-          <div class="steg har-gate">
-            <div class="node eier-agent" data-node="2">
-              <span class="node-nr" aria-hidden="true">3</span>
-              <div class="node-innhold">
-                <h3>Arbeidsløkka</h3>
-                <p>
-                  Agenten bygger i små, avgrensede leveranser: forsøk, valider
-                  mot kriteriene, korriger.
-                </p>
-              </div>
+          <div class="node eier-agent" data-node="2">
+            <span class="node-nr" aria-hidden="true">3</span>
+            <div class="node-innhold">
+              <h3>Arbeidsløkka</h3>
+              <p>
+                Agenten bygger i små, avgrensede leveranser: forsøk, valider
+                mot kriteriene, korriger.
+              </p>
             </div>
-            <div class="gate-arm" aria-hidden="true">
-              <span class="arm-linje"></span>
-              <span class="arm-pil">▶</span>
-            </div>
+          </div>
+          <div class="kobling kort" aria-hidden="true">
+            <span class="kobling-linje"></span>
+            <span class="kobling-pil">▼</span>
+          </div>
+          <div class="gate-rad">
+            <div class="gate-side venstre"></div>
             <div class="gate">
               <svg class="gate-form" viewBox="0 0 176 62" aria-hidden="true">
                 <polygon points="88,1 175,31 88,61 1,31" />
               </svg>
               <span class="gate-tekst">alt grønt?</span>
             </div>
-            <div class="gate-nei">
+            <div class="gate-side hoyre">
               <span class="retur-pill" data-rute="a">
                 <b class="pill-tag">nei</b> korriger og kjør på nytt
                 <span class="pill-maal">↺ 3</span>
@@ -129,20 +129,26 @@ const readme = [
         </li>
 
         <li class="node-rad">
-          <div class="steg har-gate">
-            <div class="node eier-menneske" data-node="3">
-              <span class="node-nr" aria-hidden="true">4</span>
-              <div class="node-innhold">
-                <h3>Sjekkpunkt</h3>
-                <p>
-                  Her sitter mennesket: retning, avveininger og stikkprøver.
-                  Ny innsikt sender flyten tilbake, ikke videre.
-                </p>
-              </div>
+          <div class="node eier-menneske" data-node="3">
+            <span class="node-nr" aria-hidden="true">4</span>
+            <div class="node-innhold">
+              <h3>Sjekkpunkt</h3>
+              <p>
+                Her sitter mennesket: retning, avveininger og stikkprøver.
+                Ny innsikt sender flyten tilbake, ikke videre.
+              </p>
             </div>
-            <div class="gate-arm" aria-hidden="true">
-              <span class="arm-linje"></span>
-              <span class="arm-pil">▶</span>
+          </div>
+          <div class="kobling kort" aria-hidden="true">
+            <span class="kobling-linje"></span>
+            <span class="kobling-pil">▼</span>
+          </div>
+          <div class="gate-rad">
+            <div class="gate-side venstre">
+              <span class="retur-pill" data-rute="c">
+                <b class="pill-tag">nei</b> verktøyet forbedres
+                <span class="pill-maal">→ 2</span>
+              </span>
             </div>
             <div class="gate">
               <svg class="gate-form" viewBox="0 0 176 62" aria-hidden="true">
@@ -150,14 +156,10 @@ const readme = [
               </svg>
               <span class="gate-tekst">godkjent?</span>
             </div>
-            <div class="gate-nei">
+            <div class="gate-side hoyre">
               <span class="retur-pill" data-rute="b">
                 <b class="pill-tag">nei</b> kravene justeres
                 <span class="pill-maal">→ 1</span>
-              </span>
-              <span class="retur-pill" data-rute="c">
-                <b class="pill-tag">nei</b> verktøyet forbedres
-                <span class="pill-maal">→ 2</span>
               </span>
             </div>
           </div>
@@ -169,24 +171,22 @@ const readme = [
         </li>
 
         <li class="node-rad">
-          <div class="steg">
-            <div class="node" data-node="4">
-              <span class="node-nr" aria-hidden="true">5</span>
-              <div class="node-innhold">
-                <h3>Overlevering</h3>
-                <p>
-                  Tilstanden skrives ned: hva som er gjort, hva som gjenstår,
-                  og neste steg. Neste økt eller en helt ny agent kan ta over
-                  uten muntlig kontekst.
-                </p>
-              </div>
+          <div class="node" data-node="4">
+            <span class="node-nr" aria-hidden="true">5</span>
+            <div class="node-innhold">
+              <h3>Overlevering</h3>
+              <p>
+                Tilstanden skrives ned: hva som er gjort, hva som gjenstår,
+                og neste steg. Neste økt eller en helt ny agent kan ta over
+                uten muntlig kontekst.
+              </p>
             </div>
-            <div class="syklus-plass">
-              <span class="retur-pill syklus-pill" data-rute="d">
-                <b class="pill-tag">⟲</b> neste økt, med full historikk
-                <span class="pill-maal">→ 1</span>
-              </span>
-            </div>
+          </div>
+          <div class="syklus-rad">
+            <span class="retur-pill syklus-pill" data-rute="d">
+              <b class="pill-tag syklus-tag">⟲</b> neste økt, med full historikk
+              <span class="pill-maal">→ 1</span>
+            </span>
           </div>
         </li>
       </ol>
@@ -249,15 +249,9 @@ const readme = [
     border-radius: var(--radius-md);
     padding: var(--s-4);
     margin-top: var(--s-4);
-    /* Deler høyrekant med flyt-radene under: samme 120px-felt for
-       returlinjene trekkes fra her (håndheves av kant-sjekk) */
-    max-width: min(940px, calc(100% - 120px));
-  }
-
-  @media (max-width: 680px) {
-    .readme {
-      max-width: 100%;
-    }
+    /* Deler høyrekant med flyt-kolonnen under (100px venstrefelt + 620px
+       ryggrad) — håndheves av kant-sjekk */
+    max-width: 720px;
   }
 
   .readme-rad {
@@ -281,6 +275,12 @@ const readme = [
     color: var(--tekst);
   }
 
+  .flyt-ingress {
+    color: var(--dempet);
+    max-width: 62ch;
+    margin: 0 0 var(--s-4);
+  }
+
   /* Agent-tonen er hue-forskjøvet fra aksenten (+80) så den skiller seg
      fra salvie i BEGGE temaer og roterer med paletten. Kun dekor (kant og
      aria-hidden tall) — ikke brødtekst, så L/C-kravet gjelder ikke her. */
@@ -288,19 +288,12 @@ const readme = [
     --eier-agent: oklch(58% 0.11 calc(var(--hue2) + 80));
   }
 
-  .flyt-ingress {
-    color: var(--dempet);
-    max-width: 62ch;
-    margin: 0 0 var(--s-4);
-  }
-
-  /* Én flate: hvert steg er en vannrett rad (node → diamant → nei-piller),
-     så hele flyten får plass i én viewport. Returlinjene rutes i eget felt
-     til høyre. */
+  /* Klassisk flytskjema: én ryggrad ovenfra og ned, beslutningsdiamantene
+     PÅ ryggraden. Returlinjene rutes i felt på begge sider — symmetrisk. */
   .flyt-omraade {
     position: relative;
-    max-width: 1060px;
-    padding-right: 120px;
+    max-width: 820px;
+    padding-inline: 100px;
   }
 
   #retur-svg {
@@ -314,7 +307,11 @@ const readme = [
 
   @media (max-width: 680px) {
     .flyt-omraade {
-      padding-right: 0;
+      padding-inline: 0;
+    }
+
+    .readme {
+      max-width: 100%;
     }
   }
 
@@ -322,7 +319,7 @@ const readme = [
     list-style: none;
     margin: 0;
     padding: 0;
-    max-width: 940px;
+    max-width: 620px;
   }
 
   .node-rad {
@@ -330,17 +327,7 @@ const readme = [
     flex-direction: column;
   }
 
-  /* Steg-raden: node | arm | diamant | nei-piller. Rader uten gate bruker
-     samme spor så nodene får identisk bredde og venstre flukt. */
-  .steg {
-    display: grid;
-    grid-template-columns: minmax(0, 480px) 26px 150px minmax(0, 1fr);
-    align-items: center;
-    gap: 0 var(--s-2);
-  }
-
   .node {
-    grid-column: 1;
     display: flex;
     gap: var(--s-3);
     background: var(--flate);
@@ -351,14 +338,8 @@ const readme = [
     padding: var(--s-3) var(--s-4);
   }
 
-  /* Rader uten beslutning lar noden fylle ut til diamant-sporet, så
-     høyresiden ikke står tom */
-  .steg:not(.har-gate) .node {
-    grid-column: 1 / 4;
-  }
-
   /* Eierfarger — sidens poeng er at hvert steg har en eier:
-     salvie = mennesket (handlekraft), aksent = agenten/verktøyet */
+     salvie = mennesket (handlekraft), agent-tonen = agenten/verktøyet */
   .node.eier-menneske {
     border-left-color: var(--salvie);
   }
@@ -403,17 +384,16 @@ const readme = [
     line-height: 1.55;
     color: var(--dempet);
     margin: 0;
-    max-width: 58ch;
+    max-width: 60ch;
   }
 
-  /* Kobling mellom stegene: heltrukket = flyten fremover. Sentreres under
-     node-sporet (ikke hele raden). */
+  /* Kobling på ryggraden: heltrukket = flyten fremover. JA-etiketten
+     hører til diamantens bunnspiss — utgangen den beskriver. */
   .kobling {
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 2px 0;
-    width: min(100%, 480px);
   }
 
   .kobling-label {
@@ -427,8 +407,12 @@ const readme = [
 
   .kobling-linje {
     width: 2px;
-    height: 9px;
+    height: 10px;
     background: var(--linje);
+  }
+
+  .kobling.kort .kobling-linje {
+    height: 7px;
   }
 
   .kobling-pil {
@@ -437,32 +421,19 @@ const readme = [
     line-height: 1;
   }
 
-  /* Armen fra noden inn i diamanten: heltrukket, vannrett */
-  .gate-arm {
-    grid-column: 2;
-    display: flex;
+  /* Beslutningsraden: diamanten på ryggraden, NEI-etikettene ved
+     sidespissene sine — pilene tegnes videre fra dem til målsteget. */
+  .gate-rad {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
+    gap: var(--s-2);
   }
 
-  .arm-linje {
-    flex: 1;
-    height: 2px;
-    background: var(--linje);
-  }
-
-  .arm-pil {
-    color: var(--linje);
-    font-size: 9px;
-    line-height: 1;
-    margin-left: -1px;
-  }
-
-  /* Beslutningsport: diamant (ISO-konvensjon) med spørsmålet inni.
-     Ja fortsetter nedover fra raden, nei går ut til høyre som merket pille. */
   .gate {
     position: relative;
-    grid-column: 3;
-    width: 150px;
+    grid-column: 2;
+    width: 158px;
     height: 56px;
     display: grid;
     place-items: center;
@@ -489,17 +460,23 @@ const readme = [
     color: var(--tekst);
   }
 
-  .gate-nei {
-    grid-column: 4;
+  .gate-side {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-    padding-left: var(--s-2);
+    align-items: center;
   }
 
-  /* Retur-piller: vannrette etiketter som også er startpunktet for
-     returlinjene. Kantstilen speiler linjespråket (stiplet/prikket). */
+  .gate-side.venstre {
+    grid-column: 1;
+    justify-content: flex-end;
+  }
+
+  .gate-side.hoyre {
+    grid-column: 3;
+    justify-content: flex-start;
+  }
+
+  /* Retur-etiketter: vannrette, sitter PÅ linja si (stiplet kant =
+     samme språk som linja) */
   .retur-pill {
     display: inline-flex;
     align-items: baseline;
@@ -522,28 +499,36 @@ const readme = [
     letter-spacing: 0.05em;
   }
 
+  /* Målnummeret (→ 1) er redundant når pilene tegnes — vises kun på
+     smale skjermer der linjefeltet ikke finnes */
   .pill-maal {
+    display: none;
     font-weight: 600;
     color: var(--salvie);
   }
 
-  /* Syklus-pillen står ved siden av overleveringsnoden (siste rad) */
-  .syklus-plass {
-    grid-column: 3 / 5;
-    justify-self: start;
-    padding-left: var(--s-2);
+  @media (max-width: 680px) {
+    .pill-maal {
+      display: inline;
+    }
+  }
+
+  .syklus-rad {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: var(--s-3);
   }
 
   .syklus-pill {
     border-style: dotted;
   }
 
-  .syklus-pill .pill-tag {
+  .syklus-tag {
     text-transform: none;
     color: var(--salvie);
   }
 
-  /* Tegnforklaring: linjetypene betyr noe, så de forklares */
+  /* Tegnforklaring: linjetyper og eierfarger betyr noe, så de forklares */
   .tegnforklaring {
     display: flex;
     gap: var(--s-5);
@@ -588,43 +573,38 @@ const readme = [
   }
 
   @media (max-width: 680px) {
-    /* På smale skjermer stables stegene igjen: pillene bærer informasjonen
-       alene (→ 1 osv.), og linjefeltet til høyre finnes ikke */
+    /* På smale skjermer bærer etikettene informasjonen alene (→ 1 osv.),
+       og linjefeltene finnes ikke */
     .tegnforklaring {
       display: none;
     }
 
-    .steg {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+    .gate-rad {
+      grid-template-columns: auto;
+      justify-items: center;
       gap: var(--s-2);
     }
 
-    .node {
-      width: 100%;
-      box-sizing: border-box;
+    .gate {
+      grid-column: 1;
     }
 
-    .gate-arm {
+    .gate-side.venstre,
+    .gate-side.hoyre {
+      grid-column: 1;
+      justify-content: center;
+    }
+
+    .gate-side:empty {
       display: none;
-    }
-
-    .gate-nei {
-      align-items: center;
-      padding-left: 0;
     }
 
     .retur-pill {
       white-space: normal;
     }
 
-    .syklus-plass {
-      padding-left: 0;
-    }
-
-    .kobling {
-      width: 100%;
+    .syklus-rad {
+      justify-content: center;
     }
   }
 
@@ -636,11 +616,12 @@ const readme = [
 </style>
 
 <script>
-  /* Returlinjene tegnes fra pillene (etikettene) til målnodene, rutet i
-     eget felt til høyre. Strektypen skiller funksjon: stiplet = tilbake
-     for å rette, prikket = ny økt. Etikettene er HTML (alltid vannrette);
-     SVG-en har bare linjer og pilhoder. På smale skjermer tegnes ingenting
-     — pillene oppgir målet selv (→ 1). */
+  /* Returlinjene tegnes som ekte flytskjema-piler: fra diamantens
+     sidespiss, gjennom etiketten sin, ut i sidefeltet og helt fram til
+     steget flyten går tilbake til (pilhode inn i noden). Stiplet =
+     tilbake for å rette, prikket = ny økt. Etikettene er HTML (alltid
+     vannrette); SVG-en har bare linjer og pilhoder. På smale skjermer
+     tegnes ingenting — etikettene oppgir målet selv (→ 1). */
   const omraade = document.querySelector<HTMLElement>('.flyt-omraade');
   const svg = document.getElementById('retur-svg');
   const noder = [...document.querySelectorAll<HTMLElement>('.flyt .node')];
@@ -648,65 +629,92 @@ const readme = [
   interface Rute {
     pill: string;
     til: number; // data-node på målet
-    bane: number; // parallell bane i høyrefeltet (0 = innerst)
+    side: 'hoyre' | 'venstre'; // hvilken sidespiss/felt ruta bruker
+    bane: number; // parallell bane i feltet (0 = innerst)
     inngang: number | 'bunn'; // px fra målnodens topp; 'bunn' = nederst
     prikket?: boolean;
   }
 
   const ruter: Rute[] = [
-    { pill: 'a', til: 2, bane: 0, inngang: 'bunn' },
-    { pill: 'c', til: 1, bane: 1, inngang: 26 },
-    { pill: 'b', til: 0, bane: 2, inngang: 26 },
-    { pill: 'd', til: 0, bane: 3, inngang: 46, prikket: true },
+    { pill: 'a', til: 2, side: 'hoyre', bane: 0, inngang: 'bunn' },
+    { pill: 'b', til: 0, side: 'hoyre', bane: 1, inngang: 26 },
+    { pill: 'd', til: 0, side: 'hoyre', bane: 2, inngang: 48, prikket: true },
+    { pill: 'c', til: 1, side: 'venstre', bane: 0, inngang: 30 },
   ];
 
   const NS = 'http://www.w3.org/2000/svg';
 
+  function strek(d: string, prikket: boolean, svgEl: Element) {
+    const linje = document.createElementNS(NS, 'path');
+    linje.setAttribute('d', d);
+    linje.setAttribute('fill', 'none');
+    linje.setAttribute('stroke-width', '1.5');
+    linje.setAttribute('stroke-dasharray', prikket ? '2 5' : '6 5');
+    linje.setAttribute('stroke-linecap', 'round');
+    linje.style.stroke = 'var(--dempet)';
+    svgEl.appendChild(linje);
+  }
+
   function tegn() {
     if (!omraade || !svg || noder.length < 5) return;
     svg.replaceChildren();
-    if (omraade.clientWidth < 760) return;
+    if (omraade.clientWidth < 640) return;
 
     const boks = omraade.getBoundingClientRect();
-    /* Banefeltet ligger til høyre for ALT i radene (noder og piller) */
-    const alleBokser = [
-      ...noder,
-      ...omraade.querySelectorAll<HTMLElement>('[data-rute]'),
-    ];
-    const kolonneHoyre = Math.max(
-      ...alleBokser.map((n) => n.getBoundingClientRect().right)
-    );
+    const flyt = omraade.querySelector<HTMLElement>('.flyt');
+    if (!flyt) return;
+    const flytBoks = flyt.getBoundingClientRect();
+    const hoyreKant = flytBoks.right - boks.left;
+    const venstreKant = flytBoks.left - boks.left;
 
     for (const rute of ruter) {
       const pill = omraade.querySelector<HTMLElement>(`[data-rute="${rute.pill}"]`);
       if (!pill) continue;
-      const fra = pill.getBoundingClientRect();
+      const p = pill.getBoundingClientRect();
       const til = noder[rute.til].getBoundingClientRect();
+      const y = p.top + p.height / 2 - boks.top;
+      const inngang = rute.inngang === 'bunn' ? til.height - 16 : rute.inngang;
+      const maalY = til.top - boks.top + inngang;
+      const prikket = !!rute.prikket;
 
-      const startX = fra.right - boks.left + 4;
-      const startY = fra.top + fra.height / 2 - boks.top;
-      const baneX = kolonneHoyre - boks.left + 20 + rute.bane * 24;
-      const inngang =
-        rute.inngang === 'bunn' ? til.height - 14 : rute.inngang;
-      const sluttY = til.top - boks.top + inngang;
-      const sluttX = til.right - boks.left + 9;
+      /* Stubb fra diamantens sidespiss inn i etiketten, så pila leses
+         som én sammenhengende utgang. Syklus-etiketten (d) har ingen
+         diamant — pila starter i etiketten. */
+      const gate = pill.closest('.gate-rad')?.querySelector('.gate');
+      if (gate) {
+        const g = gate.getBoundingClientRect();
+        if (rute.side === 'hoyre') {
+          strek(`M ${g.right - boks.left - 2} ${y} H ${p.left - boks.left}`, prikket, svg);
+        } else {
+          strek(`M ${g.left - boks.left + 2} ${y} H ${p.right - boks.left}`, prikket, svg);
+        }
+      }
 
-      const linje = document.createElementNS(NS, 'path');
-      linje.setAttribute(
-        'd',
-        `M ${startX} ${startY} H ${baneX} V ${sluttY} H ${sluttX}`
-      );
-      linje.setAttribute('fill', 'none');
-      linje.setAttribute('stroke-width', '1.5');
-      linje.setAttribute('stroke-dasharray', rute.prikket ? '2 5' : '6 5');
-      linje.setAttribute('stroke-linecap', 'round');
-      linje.style.stroke = 'var(--dempet)';
-      svg.appendChild(linje);
-
-      const pilhode = document.createElementNS(NS, 'path');
-      pilhode.setAttribute('d', `M ${sluttX} ${sluttY} l 8 -4.5 v 9 z`);
-      pilhode.style.fill = 'var(--dempet)';
-      svg.appendChild(pilhode);
+      if (rute.side === 'hoyre') {
+        const baneX = hoyreKant + 22 + rute.bane * 26;
+        const sluttX = hoyreKant + 9;
+        strek(
+          `M ${p.right - boks.left + 4} ${y} H ${baneX} V ${maalY} H ${sluttX}`,
+          prikket,
+          svg
+        );
+        const pilhode = document.createElementNS(NS, 'path');
+        pilhode.setAttribute('d', `M ${sluttX} ${maalY} l 8 -4.5 v 9 z`);
+        pilhode.style.fill = 'var(--dempet)';
+        svg.appendChild(pilhode);
+      } else {
+        const baneX = venstreKant - 22 - rute.bane * 26;
+        const sluttX = venstreKant - 9;
+        strek(
+          `M ${p.left - boks.left - 4} ${y} H ${baneX} V ${maalY} H ${sluttX}`,
+          prikket,
+          svg
+        );
+        const pilhode = document.createElementNS(NS, 'path');
+        pilhode.setAttribute('d', `M ${sluttX} ${maalY} l -8 -4.5 v 9 z`);
+        pilhode.style.fill = 'var(--dempet)';
+        svg.appendChild(pilhode);
+      }
     }
   }
 

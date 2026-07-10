@@ -128,9 +128,12 @@ const hoved = lenker.find((l) => !l.href.startsWith('http')) ?? lenker[0];
     margin: 0;
   }
 
+  /* Bifagsrolle: notatet skal ikke konkurrere med brødteksten —
+     dempet og i kursiv */
   .note {
-    font-size: 15.5px;
-    color: var(--tekst);
+    font-size: 14.5px;
+    font-style: italic;
+    color: var(--dempet);
     margin: 0;
   }
 

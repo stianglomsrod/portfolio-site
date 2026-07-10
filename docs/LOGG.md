@@ -6,6 +6,29 @@
 
 ## Changelog
 
+### 2026-07-10 (natt, del 4) — Punchliste 3: Ordkryss-panel tilbake, ekte flytskjema
+- **Ordkryss er tilbake til panel-layouten** (oppsett i venstremargen +
+  ark til høyre) — Stian foretrakk den over wizard-stegene. Hentet fra
+  git (a28b93b) med to påplussinger: plassholderen er «Skriv tittelen
+  her» (ikke «Ukas ord»), og lastUtkast tåler utkast fra andre versjoner
+  (strenger ELLER {tekst, bilde}-objekter). Wizard-koden er forkastet.
+- **Flytskjemaet er nå et ekte flytskjema** (runde 3): aktivitetene
+  munner ut i betingelsen sin PÅ ryggraden, JA fortsetter nedover fra
+  diamantbunnen, og NEI-pilene tegnes helt fram til målsteget — «alt
+  grønt?»-nei looper til steg 3 (høyre), «godkjent?»-nei går til steg 1
+  (høyre) og steg 2 (VENSTRE felt — symmetri), prikket syklus til steg 1.
+  Stubb fra diamantspiss gjennom etiketten gjør pilene sammenhengende.
+  «→ 1»-målnumrene i pillene vises kun på mobil (der linjene ikke tegnes).
+  Eierfargene og tegnforklaringen består. Høyde ~895px.
+- **Kort-notater dempet**: .note i ProsjektKort og .testbruker på
+  /prosjekter er nå kursiv + dempet (bifagsrolle, ikke konkurrent til
+  brødteksten).
+- **Hue-koblingen re-verifisert** etter Stians rapport: avstandsmodellen
+  er korrekt i koden (aksent først → grunn etterpå bevarer avstanden,
+  også over reload og rundt hjulet) — det han så var prod FØR nattens
+  deploy.
+- QA: bygg grønt, axe 0/16, kant-sjekk 0/16.
+
 ### 2026-07-10 (natt, del 3) — Punchliste 2: spill-mobil, hue-avstand, flyt-farger
 - **Spillet er mobilvennlig**: på ≤680px løftes overlays UT av den lille
   3/2-ramma med position: fixed — startskjermen dekker hele viewporten

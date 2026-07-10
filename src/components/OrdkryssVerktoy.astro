@@ -21,6 +21,9 @@ const t =
         bildeHint: 'Bilde ved ordet er valgfritt og blir med på utskriften.',
         rutenett: 'Rutenett',
         smaatrinn: '(småtrinn)',
+        bokstaver: 'Bokstaver',
+        valgStore: 'STORE (ABC)',
+        valgSmaa: 'små (abc)',
         retninger: 'Retninger',
         vannrett: 'vannrett →',
         loddrett: 'loddrett ↓',
@@ -45,6 +48,9 @@ const t =
         bildeHint: 'A picture per word is optional and prints with the sheet.',
         rutenett: 'Grid',
         smaatrinn: '(early years)',
+        bokstaver: 'Letters',
+        valgStore: 'UPPERCASE (ABC)',
+        valgSmaa: 'lowercase (abc)',
         retninger: 'Directions',
         vannrett: 'horizontal →',
         loddrett: 'vertical ↓',
@@ -87,6 +93,14 @@ const t =
             <option value="10">10 × 10</option>
             <option value="12" selected>12 × 12</option>
             <option value="15">15 × 15</option>
+          </select>
+        </label>
+
+        <label class="ok-felt">
+          <span class="ok-felt-navn">{t.bokstaver}</span>
+          <select id="ok-bokstaver">
+            <option value="store" selected>{t.valgStore}</option>
+            <option value="smaa">{t.valgSmaa}</option>
           </select>
         </label>
 
@@ -696,6 +710,7 @@ const t =
             storrelse: el<HTMLSelectElement>('ok-storrelse').value,
             retninger: lesRetninger(),
             bildemodus: el<HTMLInputElement>('ok-bildemodus').checked,
+            bokstaver: el<HTMLSelectElement>('ok-bokstaver').value,
             ord: ordListe.map((o) => o.tekst),
           })
         );
@@ -715,6 +730,9 @@ const t =
           el<HTMLInputElement>('ok-ret-diagonal').checked = !!u.retninger.diagonal;
         }
         el<HTMLInputElement>('ok-bildemodus').checked = !!u.bildemodus;
+        if (u.bokstaver === 'smaa' || u.bokstaver === 'store') {
+          el<HTMLSelectElement>('ok-bokstaver').value = u.bokstaver;
+        }
         // Tåler utkast fra andre versjoner: ord kan være strenger eller
         // objekter ({tekst, bilde}) — alt annet behandles som tomt.
         (u.ord ?? []).forEach((o: unknown) => {
@@ -904,6 +922,13 @@ const t =
       lagreUtkast();
     }
 
+    /* Safeguard for bokstav-valget: ALT på arket går gjennom denne, så
+       arket blir konsekvent uansett hvordan læreren tastet ordene. */
+    const visTekst = (s: string) =>
+      el<HTMLSelectElement>('ok-bokstaver').value === 'smaa'
+        ? s.toLowerCase()
+        : s.toUpperCase();
+
     function tegnArk() {
       if (!sisteResultat) return;
       const { rutenett, plasseringer } = sisteResultat;
@@ -927,7 +952,7 @@ const t =
         const rad = document.createElement('tr');
         for (let k = 0; k < n; k++) {
           const celle = document.createElement('td');
-          celle.textContent = rutenett[r][k];
+          celle.textContent = visTekst(rutenett[r][k]);
           if (fasitCeller.has(`${r},${k}`)) celle.classList.add('del-av-ord');
           rad.appendChild(celle);
         }
@@ -950,7 +975,7 @@ const t =
           }
           if (!bildemodus || !o.bilde) {
             const tekst = document.createElement('span');
-            tekst.textContent = normaliserOrd(o.tekst);
+            tekst.textContent = visTekst(normaliserOrd(o.tekst));
             punkt.appendChild(tekst);
           }
           bank.appendChild(punkt);
@@ -991,7 +1016,7 @@ const t =
       rot.classList.remove('print-fasit');
     });
 
-    ['ok-tittel', 'ok-storrelse', 'ok-bildemodus', 'ok-ret-vannrett', 'ok-ret-loddrett', 'ok-ret-diagonal'].forEach(
+    ['ok-tittel', 'ok-storrelse', 'ok-bildemodus', 'ok-bokstaver', 'ok-ret-vannrett', 'ok-ret-loddrett', 'ok-ret-diagonal'].forEach(
       (id) => el(id).addEventListener('change', lagreUtkast)
     );
     el('ok-tittel').addEventListener('input', () => {
@@ -1002,6 +1027,11 @@ const t =
       lagreUtkast();
     });
     el('ok-bildemodus').addEventListener('change', () => {
+      if (sisteResultat) tegnArk();
+    });
+
+    // Bytte av store/små bokstaver slår rett gjennom på et ferdig ark
+    el('ok-bokstaver').addEventListener('change', () => {
       if (sisteResultat) tegnArk();
     });
 

@@ -56,9 +56,13 @@ const bokstaver = [
     flex-shrink: 0;
     padding: var(--s-2) 0;
     /* Vertikal sveip scroller som normalt; horisontal drag over merket
-       er strumming (håndteres i scriptet) */
+       er strumming (håndteres i scriptet). Selection/callout skrus av så
+       Android ikke kaprer gesten til tekstmarkering eller lenke-meny. */
     touch-action: pan-y;
     -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
   }
 
   /* Driver akslene direkte (mer pålitelig enn font-stretch %): «sti» er
@@ -138,46 +142,75 @@ const bokstaver = [
   });
 
   // Strumming: dra fingeren bortover navnet — bokstaven under fingeren
-  // tennes, forrige slukkes. En drag (>10px vannrett) er ikke et tapp,
-  // så det påfølgende klikket svelges og lenka navigerer bare ved tapp.
+  // tennes, forrige slukkes. Rå touch-events, ikke pointer-events:
+  // Chrome på Android kan sluke pointermove-strømmen på lenker (gest-
+  // arbitrering mot scroll/selection/long-press) selv med pan-y. Første
+  // bevegelse avgjør: mer vertikal → scrollen får gesten; mer horisontal
+  // → preventDefault og strumming. En drag er ikke et tapp, så det
+  // påfølgende klikket svelges og lenka navigerer bare ved tapp.
   document.querySelectorAll<HTMLElement>('.merke').forEach((merke) => {
     let aktiv: HTMLElement | null = null;
     let startX = 0;
+    let startY = 0;
+    let strummer = false;
     let dratt = false;
 
-    merke.addEventListener('pointerdown', (e) => {
-      if (e.pointerType !== 'touch') return;
-      startX = e.clientX;
-      dratt = false;
-    });
+    merke.addEventListener(
+      'touchstart',
+      (e) => {
+        const t = e.touches[0];
+        startX = t.clientX;
+        startY = t.clientY;
+        strummer = false;
+        dratt = false;
+      },
+      { passive: true }
+    );
 
-    merke.addEventListener('pointermove', (e) => {
-      if (e.pointerType !== 'touch') return;
-      if (Math.abs(e.clientX - startX) > 10) dratt = true;
-      const under = document
-        .elementFromPoint(e.clientX, e.clientY)
-        ?.closest?.('[data-merke-bokstav]') as HTMLElement | null;
-      if (under !== aktiv) {
-        if (aktiv) slukk(aktiv);
-        aktiv = under && merke.contains(under) ? under : null;
-        if (aktiv) tenn(aktiv);
-      }
-    });
+    merke.addEventListener(
+      'touchmove',
+      (e) => {
+        const t = e.touches[0];
+        if (!strummer) {
+          const dx = Math.abs(t.clientX - startX);
+          const dy = Math.abs(t.clientY - startY);
+          if (dx < 6 && dy < 6) return; // uavklart ennå
+          if (dx <= dy) return; // vertikal intensjon → scroll
+          strummer = true;
+          dratt = true;
+        }
+        e.preventDefault(); // gesten er vår: ingen scroll/selection/long-press
+        const under = document
+          .elementFromPoint(t.clientX, t.clientY)
+          ?.closest?.('[data-merke-bokstav]') as HTMLElement | null;
+        if (under !== aktiv) {
+          if (aktiv) slukk(aktiv);
+          aktiv = under && merke.contains(under) ? under : null;
+          if (aktiv) tenn(aktiv);
+        }
+      },
+      { passive: false }
+    );
 
     const slutt = () => {
       if (aktiv) {
         slukk(aktiv);
         aktiv = null;
       }
+      strummer = false;
     };
-    merke.addEventListener('pointerup', slutt);
-    merke.addEventListener('pointercancel', slutt);
+    merke.addEventListener('touchend', slutt, { passive: true });
+    merke.addEventListener('touchcancel', slutt, { passive: true });
 
     merke.addEventListener('click', (e) => {
       if (dratt) {
         e.preventDefault();
         dratt = false;
       }
+    });
+
+    merke.addEventListener('contextmenu', (e) => {
+      if (strummer) e.preventDefault();
     });
   });
 

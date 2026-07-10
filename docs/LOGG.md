@@ -38,7 +38,12 @@
   («strumming») for samme kinetikk som hover — bokstaven under fingeren
   vides ut og farges med naboregelen. En drag (>10px vannrett) svelger
   det påfølgende klikket, så lenka navigerer bare ved tapp; vertikal
-  sveip scroller som normalt (touch-action: pan-y). Ankomstbølge én gang
+  sveip scroller som normalt (touch-action: pan-y). RETTELSE samme
+  kveld: pointer-events byttet til rå touch-events med preventDefault
+  når horisontal intensjon er avklart — Chrome på Android sluker
+  pointermove på lenker (gest-arbitrering) selv med pan-y, så strum
+  virket i emulator men ikke på ekte telefon. user-select/touch-callout
+  av på merket så selection/lenke-meny ikke kaprer gesten. Ankomstbølge én gang
   per merke per sidelast (IntersectionObserver, terskel 0.6) viser at
   navnet er levende — helt av ved prefers-reduced-motion. Hover, strum
   og bølge deler tenn/slukk-logikken.

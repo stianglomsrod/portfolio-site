@@ -1,6 +1,7 @@
 ---
 /* Ordkryss-verktøyet: ordletingsark til utskrift, for lærere. Skjermsiden
    følger sidens tokens; selve arket er alltid hvitt (det ER utskriften).
+   Wizard-layout: ett steg om gangen med Previous/Next.
    Kjernen bor i src/lib/ordkryss-kjerne.ts; en frittstående kopi med
    Node-tester ligger i «cs50x final project»-mappa. */
 
@@ -18,7 +19,9 @@ const t =
         ordNavn: 'Ordene elevene skal finne',
         ordEks: 'skriv et ord',
         leggTil: '+ Legg til ord',
-        bildeHint: 'Bilde ved ordet er valgfritt og blir med på utskriften.',
+        leggTilBilde: 'Legg til bilde',
+        byttBilde: 'Bytt bilde',
+        bildeHint: 'Bilde ved ordet er valgfritt og blir med på utskriften. Klikk bildet for å endre.',
         rutenett: 'Rutenett',
         smaatrinn: '(småtrinn)',
         retninger: 'Retninger',
@@ -30,13 +33,20 @@ const t =
         skrivUt: 'Skriv ut',
         skrivUtFasit: 'Skriv ut fasit',
         visFasit: 'Vis fasit her',
-        navnLinje: 'Navn: ____________________   Dato: ____________',
+        navnLinje: 'Navn: ____________________   Dato: ____________',
         finnOrdene: 'Finn disse ordene:',
         rutenettAria: 'Ordletingsrutenett',
         fasit: 'FASIT',
         standardTittel: 'Ordkryss',
         personvern:
           'Ingenting lagres på nett; ordene blir kun i din egen nettleser.',
+        steg1Tittel: 'Tittel på arket',
+        steg2Tittel: 'Ordene som skal finnes',
+        steg3Tittel: 'Innstillinger',
+        steg4Tittel: 'Forhåndsvisning',
+        forrige: '← Forrige',
+        neste: 'Neste →',
+        lagOgSe: 'Lag og se',
       }
     : {
         tittelFelt: 'Sheet title',
@@ -44,7 +54,9 @@ const t =
         ordNavn: 'Words for the pupils to find',
         ordEks: 'type a word',
         leggTil: '+ Add word',
-        bildeHint: 'A picture per word is optional and prints with the sheet.',
+        leggTilBilde: 'Add picture',
+        byttBilde: 'Change picture',
+        bildeHint: 'A picture per word is optional and prints with the sheet. Click to change.',
         rutenett: 'Grid',
         smaatrinn: '(early years)',
         retninger: 'Directions',
@@ -56,43 +68,77 @@ const t =
         skrivUt: 'Print',
         skrivUtFasit: 'Print answer key',
         visFasit: 'Show answers here',
-        navnLinje: 'Name: ____________________   Date: ____________',
+        navnLinje: 'Name: ____________________   Date: ____________',
         finnOrdene: 'Find these words:',
         rutenettAria: 'Word search grid',
         fasit: 'KEY',
         standardTittel: 'Word search',
         personvern:
           'Nothing is stored online; your words stay in your own browser.',
+        steg1Tittel: 'Sheet title',
+        steg2Tittel: 'Words to find',
+        steg3Tittel: 'Settings',
+        steg4Tittel: 'Preview',
+        forrige: '← Back',
+        neste: 'Next →',
+        lagOgSe: 'Create & view',
       };
 ---
 
 <div class="ok-verktoy" data-lang={lang} data-standardtittel={t.standardTittel}>
-  <div class="ok-oppsett">
-    <section class="ok-panel" aria-labelledby="ok-panel-tittel">
-      <h2 id="ok-panel-tittel" class="sr-only">{lang === 'nb' ? 'Oppsett' : 'Setup'}</h2>
-
-      <label class="ok-felt">
-        <span class="ok-felt-navn">{t.tittelFelt}</span>
-        <input type="text" id="ok-tittel" placeholder={t.tittelEks} maxlength="60" />
-      </label>
-
-      <div class="ok-felt">
-        <span class="ok-felt-navn" id="ok-ord-navn">{t.ordNavn}</span>
-        <ul id="ok-ord-liste" aria-labelledby="ok-ord-navn"></ul>
-        <button type="button" id="ok-legg-til" class="ok-sekundaer">{t.leggTil}</button>
-        <p class="ok-hint">{t.bildeHint}</p>
+  <div class="ok-wizard">
+    <!-- Trinn 1: Tittel -->
+    <section class="ok-steg" data-steg="1" aria-labelledby="ok-steg1-tittel">
+      <div class="ok-steg-hode">
+        <h2 id="ok-steg1-tittel" class="ok-steg-tittel">{t.steg1Tittel}</h2>
+        <p class="ok-steg-nr">1 / 4</p>
       </div>
-
-      <div class="ok-felt-rad">
+      <div class="ok-steg-innhold">
         <label class="ok-felt">
-          <span class="ok-felt-navn">{t.rutenett}</span>
-          <select id="ok-storrelse">
-            <option value="8">8 × 8 {t.smaatrinn}</option>
-            <option value="10">10 × 10</option>
-            <option value="12" selected>12 × 12</option>
-            <option value="15">15 × 15</option>
-          </select>
+          <span class="ok-felt-navn">{t.tittelFelt}</span>
+          <input type="text" id="ok-tittel" placeholder={t.tittelEks} maxlength="60" />
         </label>
+      </div>
+      <div class="ok-steg-knapper">
+        <button type="button" class="ok-neste-steg ok-primaer" data-neste="2">{t.neste}</button>
+      </div>
+    </section>
+
+    <!-- Trinn 2: Ordene -->
+    <section class="ok-steg" data-steg="2" aria-labelledby="ok-steg2-tittel" hidden>
+      <div class="ok-steg-hode">
+        <h2 id="ok-steg2-tittel" class="ok-steg-tittel">{t.steg2Tittel}</h2>
+        <p class="ok-steg-nr">2 / 4</p>
+      </div>
+      <div class="ok-steg-innhold">
+        <p class="ok-steg-hint">{t.bildeHint}</p>
+        <ul id="ok-ord-liste" class="ok-ord-liste-wizard"></ul>
+        <button type="button" id="ok-legg-til" class="ok-sekundaer ok-blokk">{t.leggTil}</button>
+      </div>
+      <div class="ok-steg-knapper">
+        <button type="button" class="ok-forrige-steg ok-sekundaer" data-forrige="1">{t.forrige}</button>
+        <button type="button" class="ok-neste-steg ok-primaer" data-neste="3">{t.neste}</button>
+      </div>
+    </section>
+
+    <!-- Trinn 3: Innstillinger -->
+    <section class="ok-steg" data-steg="3" aria-labelledby="ok-steg3-tittel" hidden>
+      <div class="ok-steg-hode">
+        <h2 id="ok-steg3-tittel" class="ok-steg-tittel">{t.steg3Tittel}</h2>
+        <p class="ok-steg-nr">3 / 4</p>
+      </div>
+      <div class="ok-steg-innhold">
+        <div class="ok-felt">
+          <label class="ok-felt">
+            <span class="ok-felt-navn">{t.rutenett}</span>
+            <select id="ok-storrelse">
+              <option value="8">8 × 8 {t.smaatrinn}</option>
+              <option value="10">10 × 10</option>
+              <option value="12" selected>12 × 12</option>
+              <option value="15">15 × 15</option>
+            </select>
+          </label>
+        </div>
 
         <fieldset class="ok-felt">
           <legend class="ok-felt-navn">{t.retninger}</legend>
@@ -100,78 +146,265 @@ const t =
           <label class="ok-valg"><input type="checkbox" id="ok-ret-loddrett" checked /> {t.loddrett}</label>
           <label class="ok-valg"><input type="checkbox" id="ok-ret-diagonal" /> {t.diagonalt}</label>
         </fieldset>
+
+        <label class="ok-valg ok-blokk">
+          <input type="checkbox" id="ok-bildemodus" />
+          {t.bildemodus}
+        </label>
       </div>
-
-      <label class="ok-valg ok-blokk">
-        <input type="checkbox" id="ok-bildemodus" />
-        {t.bildemodus}
-      </label>
-
-      <button type="button" id="ok-lag" class="knapp ok-primaer">{t.lag}</button>
+      <div class="ok-steg-knapper">
+        <button type="button" class="ok-forrige-steg ok-sekundaer" data-forrige="2">{t.forrige}</button>
+        <button type="button" id="ok-lag" class="ok-neste-steg ok-primaer" data-neste="4">{t.lagOgSe}</button>
+      </div>
       <p id="ok-status" class="ok-status" role="status" aria-live="polite"></p>
-
-      <p class="ok-hint">{t.personvern}</p>
     </section>
 
-    <section class="ok-visning" id="ok-ark-seksjon" hidden aria-labelledby="ok-visning-tittel">
-      <h2 id="ok-visning-tittel" class="sr-only">
-        {lang === 'nb' ? 'Forhåndsvisning' : 'Preview'}
-      </h2>
-      <div class="ok-handlinger">
-        <button type="button" id="ok-skriv-ut" class="knapp ok-primaer">{t.skrivUt}</button>
-        <button type="button" id="ok-skriv-ut-fasit" class="ok-sekundaer">{t.skrivUtFasit}</button>
-        <button type="button" id="ok-fasit-toggle" class="ok-sekundaer" aria-pressed="false">
-          {t.visFasit}
-        </button>
+    <!-- Trinn 4: Forhåndsvisning -->
+    <section class="ok-steg" data-steg="4" aria-labelledby="ok-steg4-tittel" hidden>
+      <div class="ok-steg-hode">
+        <h2 id="ok-steg4-tittel" class="ok-steg-tittel">{t.steg4Tittel}</h2>
+        <p class="ok-steg-nr">4 / 4</p>
       </div>
-
-      <div class="ok-sticky-print">
-        <button type="button" id="ok-skriv-ut-sticky" class="ok-sticky-knapp" title="Skriv ut arket (Ctrl+P)" aria-label="{t.skrivUt}">
-          🖨
-        </button>
+      <div class="ok-steg-innhold ok-ark-container">
+        <div class="ok-handlinger">
+          <button type="button" id="ok-skriv-ut" class="knapp ok-primaer">{t.skrivUt}</button>
+          <button type="button" id="ok-skriv-ut-fasit" class="ok-sekundaer">{t.skrivUtFasit}</button>
+          <button type="button" id="ok-fasit-toggle" class="ok-sekundaer" aria-pressed="false">
+            {t.visFasit}
+          </button>
+        </div>
+        <div class="ok-ark" id="ok-ark">
+          <div class="ok-ark-hode">
+            <h3 id="ok-overskrift">{t.standardTittel}</h3>
+            <span class="ok-fasit-merke" aria-hidden="true">{t.fasit}</span>
+          </div>
+          <p class="ok-navn-linje">{t.navnLinje}</p>
+          <table id="ok-rutenett" aria-label={t.rutenettAria}></table>
+          <div class="ok-ordbank-ramme">
+            <p class="ok-ordbank-navn">{t.finnOrdene}</p>
+            <ul id="ok-ordbank"></ul>
+          </div>
+        </div>
       </div>
-
-      <div class="ok-ark" id="ok-ark">
-        <div class="ok-ark-hode">
-          <h3 id="ok-overskrift">{t.standardTittel}</h3>
-          <span class="ok-fasit-merke" aria-hidden="true">{t.fasit}</span>
-        </div>
-        <p class="ok-navn-linje">{t.navnLinje}</p>
-        <table id="ok-rutenett" aria-label={t.rutenettAria}></table>
-        <div class="ok-ordbank-ramme">
-          <p class="ok-ordbank-navn">{t.finnOrdene}</p>
-          <ul id="ok-ordbank"></ul>
-        </div>
+      <div class="ok-steg-knapper">
+        <button type="button" class="ok-forrige-steg ok-sekundaer" data-forrige="3">{t.forrige}</button>
       </div>
     </section>
+  </div>
+
+  <div class="ok-sticky-print">
+    <button type="button" id="ok-skriv-ut-sticky" class="ok-sticky-knapp" title="Skriv ut arket (Ctrl+P)" aria-label="{t.skrivUt}">
+      🖨
+    </button>
   </div>
 </div>
 
 <style is:global>
-  /* Skjerm: verktøyet følger sidens tokens; arket er alltid hvit «papir». */
-  .ok-oppsett {
+  /* Wizard-layout: ett steg om gangen */
+  .ok-wizard {
     display: grid;
-    grid-template-columns: 360px 1fr;
-    gap: var(--s-5);
-    align-items: start;
-    margin-top: var(--s-4);
+    gap: var(--s-4);
   }
 
-  @media (max-width: 900px) {
-    .ok-oppsett {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .ok-panel {
+  .ok-steg {
     background: var(--flate);
     border: 1px solid var(--linje);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-lg);
     box-shadow: var(--kort-skygge);
-    padding: var(--s-4);
+    padding: var(--s-5);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--s-4);
+  }
+
+  .ok-steg[hidden] {
+    display: none;
+  }
+
+  .ok-steg-hode {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-3);
+  }
+
+  .ok-steg-tittel {
+    font-size: 22px;
+    margin: 0;
+    color: var(--tekst);
+  }
+
+  .ok-steg-nr {
+    font-size: 14px;
+    color: var(--dempet);
+    margin: 0;
+    flex-shrink: 0;
+  }
+
+  .ok-steg-innhold {
     display: flex;
     flex-direction: column;
-    gap: var(--s-4);
+    gap: var(--s-3);
+  }
+
+  .ok-steg-hint {
+    font-size: 14px;
+    color: var(--dempet);
+    margin: 0;
+  }
+
+  /* Ord-liste med bilder i wizard */
+  .ok-ord-liste-wizard {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+  }
+
+  .ok-ord-rad-wizard {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    align-items: center;
+    gap: var(--s-2);
+    padding: var(--s-2);
+    background: var(--bg);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+  }
+
+  .ok-ord-rad-wizard.upassende {
+    border-color: var(--feil);
+  }
+
+  .ok-ord-bilde-knapp {
+    all: unset;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-sm);
+    border: 2px solid var(--linje);
+    background: var(--flate);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: border-color 160ms, background 160ms;
+  }
+
+  .ok-ord-bilde-knapp:hover {
+    border-color: var(--salvie);
+    background: rgba(127, 166, 143, 0.1);
+  }
+
+  .ok-ord-bilde-knapp:focus-visible {
+    outline: 2px solid var(--salvie);
+    outline-offset: 2px;
+  }
+
+  .ok-ord-bilde-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+
+  .ok-ord-input {
+    width: 100%;
+    min-width: 0;
+    background: var(--bg);
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 8px 10px;
+    font-family: var(--font-sans);
+    font-size: 16px;
+    color: var(--tekst);
+  }
+
+  .ok-ord-input:focus-visible {
+    outline: 2px solid var(--salvie);
+    outline-offset: -2px;
+    border-color: var(--salvie);
+  }
+
+  .ok-ord-rad-wizard.upassende .ok-ord-input {
+    border-color: var(--feil);
+  }
+
+  .ok-slett-ord-knapp {
+    all: unset;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--tekst);
+    font-weight: bold;
+    font-size: 18px;
+    transition: color 160ms;
+  }
+
+  .ok-slett-ord-knapp:hover {
+    color: var(--feil);
+  }
+
+  .ok-slett-ord-knapp:focus-visible {
+    outline: 2px solid var(--salvie);
+    border-radius: 4px;
+  }
+
+  /* Steg-knapper */
+  .ok-steg-knapper {
+    display: flex;
+    gap: var(--s-2);
+    justify-content: space-between;
+  }
+
+  .ok-forrige-steg,
+  .ok-neste-steg {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 700;
+    padding: 11px 20px;
+    min-height: 44px;
+    border-radius: 9px;
+    cursor: pointer;
+    border: none;
+    transition: all 160ms;
+  }
+
+  .ok-forrige-steg {
+    background: var(--flate);
+    color: var(--tekst);
+    border: 1px solid var(--linje);
+  }
+
+  .ok-forrige-steg:hover {
+    border-color: var(--salvie);
+  }
+
+  .ok-neste-steg {
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+  }
+
+  .ok-neste-steg:hover {
+    filter: brightness(1.08);
+  }
+
+  .ok-neste-steg:focus-visible,
+  .ok-forrige-steg:focus-visible {
+    outline: 2px solid var(--salvie);
+    outline-offset: 2px;
+  }
+
+  /* Forhåndsvisning */
+  .ok-ark-container {
+    overflow-y: auto;
+    max-height: 600px;
   }
 
   .ok-felt {
@@ -184,12 +417,6 @@ const t =
     min-width: 0;
   }
 
-  .ok-felt-rad {
-    display: flex;
-    gap: var(--s-4);
-    flex-wrap: wrap;
-  }
-
   .ok-felt-navn {
     font-family: var(--font-hd);
     font-weight: 600;
@@ -197,8 +424,8 @@ const t =
     color: var(--tekst);
   }
 
-  .ok-panel input[type='text'],
-  .ok-panel select {
+  .ok-felt input[type='text'],
+  .ok-felt select {
     font-family: var(--font-sans);
     font-size: 16px;
     padding: 9px 10px;
@@ -226,100 +453,9 @@ const t =
     accent-color: var(--salvie);
   }
 
-  .ok-hint {
-    margin: 2px 0 0;
-    font-size: 13.5px;
-    color: var(--dempet);
-  }
-
-  #ok-ord-liste {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .ok-ord-rad {
-    display: flex;
-    gap: 6px;
-    align-items: center;
-  }
-
-  .ok-ord-rad input[type='text'] {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .ok-ord-rad.upassende input[type='text'] {
-    border-color: var(--feil);
-  }
-
-  .ok-ikonknapp {
-    font: inherit;
-    min-width: 44px;
-    min-height: 44px;
-    border: 1px solid var(--linje);
-    border-radius: var(--radius-sm);
-    background: var(--bg);
-    color: var(--tekst);
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2px;
-    flex-shrink: 0;
-  }
-
-  .ok-ikonknapp:hover {
-    border-color: var(--salvie);
-  }
-
-  .ok-mini-bilde {
-    width: 36px;
-    height: 36px;
-    object-fit: cover;
-    border-radius: 6px;
-  }
-
-  .ok-primaer {
-    font-family: var(--font-sans);
-    font-size: 15px;
-    font-weight: 700;
-    background: var(--salvie);
-    color: var(--salvie-kontrast);
-    border: none;
-    border-radius: 9px;
-    padding: 11px 20px;
-    min-height: 44px;
-    cursor: pointer;
-  }
-
-  .ok-primaer:hover {
-    filter: brightness(1.08);
-  }
-
-  .ok-sekundaer {
-    font-family: var(--font-hd);
-    font-weight: 600;
-    font-size: 14px;
-    background: var(--flate);
-    color: var(--tekst);
-    border: 1px solid var(--linje);
-    border-radius: var(--radius-sm);
-    padding: 10px 14px;
-    min-height: 44px;
-    cursor: pointer;
-  }
-
-  .ok-sekundaer:hover {
-    border-color: var(--salvie);
-  }
-
-  .ok-sekundaer[aria-pressed='true'] {
-    border-color: var(--salvie);
-    color: var(--salvie);
+  .ok-blokk {
+    display: block;
+    width: 100%;
   }
 
   .ok-status {
@@ -338,59 +474,15 @@ const t =
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
-    margin-bottom: var(--s-3);
   }
 
-  /* Sticky print-knapp: alltid tilgjengelig når arket vises */
-  .ok-sticky-print {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    z-index: 100;
-    display: none;
-    pointer-events: none;
-  }
-
-  .ok-sticky-print[data-synlig] {
-    display: flex;
-    pointer-events: auto;
-  }
-
-  .ok-sticky-knapp {
-    all: unset;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: var(--salvie);
-    color: var(--salvie-kontrast);
-    font-size: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    transition: transform 160ms var(--ease), box-shadow 160ms var(--ease);
-  }
-
-  .ok-sticky-knapp:hover {
-    transform: scale(1.1);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
-  }
-
-  .ok-sticky-knapp:focus-visible {
-    outline: 2px solid var(--tekst);
-    outline-offset: 2px;
-  }
-
-  /* Arket: alltid hvitt med svart skrift — forhåndsvisningen ER utskriften */
+  /* Arket */
   .ok-ark {
     background: #fff;
     color: #26241f;
     border: 1px solid var(--linje);
     border-radius: var(--radius-md);
-    box-shadow: var(--kort-skygge);
     padding: var(--s-6);
-    max-width: 760px;
   }
 
   .ok-ark-hode {
@@ -489,7 +581,92 @@ const t =
     border: 1px solid #d8d4c8;
   }
 
-  /* Utskrift: bare arket. Sidens nav/footer og panelet skjules. */
+  /* Sticky print-knapp */
+  .ok-sticky-print {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 100;
+    display: none;
+    pointer-events: none;
+  }
+
+  .ok-sticky-print[data-synlig] {
+    display: flex;
+    pointer-events: auto;
+  }
+
+  .ok-sticky-knapp {
+    all: unset;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    font-size: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 160ms var(--ease), box-shadow 160ms var(--ease);
+  }
+
+  .ok-sticky-knapp:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+  }
+
+  .ok-sticky-knapp:focus-visible {
+    outline: 2px solid var(--tekst);
+    outline-offset: 2px;
+  }
+
+  .ok-primaer {
+    all: unset;
+    box-sizing: border-box;
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 700;
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    border-radius: 9px;
+    padding: 11px 20px;
+    min-height: 44px;
+    cursor: pointer;
+    display: inline-block;
+  }
+
+  .ok-primaer:hover {
+    filter: brightness(1.08);
+  }
+
+  .ok-sekundaer {
+    all: unset;
+    box-sizing: border-box;
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: 14px;
+    background: var(--flate);
+    color: var(--tekst);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    min-height: 44px;
+    cursor: pointer;
+    display: inline-block;
+  }
+
+  .ok-sekundaer:hover {
+    border-color: var(--salvie);
+  }
+
+  .ok-sekundaer[aria-pressed='true'] {
+    border-color: var(--salvie);
+    color: var(--salvie);
+  }
+
+  /* Print */
   @media print {
     @page {
       margin: 14mm;
@@ -503,22 +680,10 @@ const t =
     .topp,
     .bunn,
     .hopp,
-    .ok-panel,
-    .ok-handlinger,
-    .ok-side-hode,
+    .ok-wizard,
+    .ok-sticky-print,
     .ramme {
       display: none !important;
-    }
-
-    .ramme {
-      padding: 0;
-      max-width: none;
-      min-height: 0;
-    }
-
-    .ok-oppsett {
-      display: block;
-      margin: 0;
     }
 
     .ok-ark {
@@ -526,7 +691,6 @@ const t =
       box-shadow: none;
       border-radius: 0;
       padding: 0;
-      max-width: none;
     }
 
     #ok-rutenett {
@@ -546,7 +710,6 @@ const t =
       height: 16mm;
     }
 
-    /* Vanlig utskrift er ren selv om skjerm-fasiten står på */
     .ok-verktoy:not(.print-fasit) #ok-rutenett td.del-av-ord {
       background: #fff !important;
     }
@@ -598,26 +761,26 @@ const t =
             klart: (antall: number, n: number) =>
               `Arket er klart: ${antall} ord i ${n}×${n} ruter.`,
             ordAria: (i: number) => `Ord ${i}`,
-            byttBilde: (i: number) => `Bytt bilde for ord ${i}`,
             leggBilde: (i: number) => `Legg til bilde for ord ${i}`,
+            byttBilde: (i: number) => `Bytt bilde for ord ${i}`,
             fjernOrd: (i: number) => `Fjern ord ${i}`,
             ordEks: 'skriv et ord',
           }
         : {
             minstEttOrd: 'Type at least one word first.',
             upassende: (o: string) =>
-              `“${o}” does not belong on a school sheet. Swap the word and we will make the sheet.`,
-            forKort: (o: string) => `“${o}” needs at least two letters.`,
-            duplikat: (o: string) => `“${o}” appears twice in the list.`,
+              `"${o}" does not belong on a school sheet. Swap the word and we will make the sheet.`,
+            forKort: (o: string) => `"${o}" needs at least two letters.`,
+            duplikat: (o: string) => `"${o}" appears twice in the list.`,
             ingenRetning: 'Pick at least one direction.',
             forLangt: (o: string) =>
-              `“${o}” is longer than the grid. Pick a larger grid or a shorter word.`,
+              `"${o}" is longer than the grid. Pick a larger grid or a shorter word.`,
             ikkePlass: 'Could not fit all the words. Try a larger grid or fewer words.',
             klart: (antall: number, n: number) =>
               `The sheet is ready: ${antall} words in a ${n}×${n} grid.`,
             ordAria: (i: number) => `Word ${i}`,
-            byttBilde: (i: number) => `Change picture for word ${i}`,
             leggBilde: (i: number) => `Add picture for word ${i}`,
+            byttBilde: (i: number) => `Change picture for word ${i}`,
             fjernOrd: (i: number) => `Remove word ${i}`,
             ordEks: 'type a word',
           };
@@ -635,6 +798,7 @@ const t =
       plasseringer: { ord: string; celler: [number, number][] }[];
     } | null = null;
     let fasitSynlig = false;
+    let aktivtSteg = 1;
 
     const el = <T extends HTMLElement = HTMLElement>(id: string) =>
       document.getElementById(id) as T;
@@ -654,7 +818,7 @@ const t =
             storrelse: el<HTMLSelectElement>('ok-storrelse').value,
             retninger: lesRetninger(),
             bildemodus: el<HTMLInputElement>('ok-bildemodus').checked,
-            ord: ordListe.map((o) => o.tekst),
+            ord: ordListe.map((o) => ({ tekst: o.tekst, bilde: o.bilde })),
           })
         );
       } catch {}
@@ -673,9 +837,16 @@ const t =
           el<HTMLInputElement>('ok-ret-diagonal').checked = !!u.retninger.diagonal;
         }
         el<HTMLInputElement>('ok-bildemodus').checked = !!u.bildemodus;
-        (u.ord ?? []).forEach((tekst: string) =>
-          ordListe.push({ id: nesteId++, tekst, bilde: null })
-        );
+        // Tåler utkast fra eldre versjoner med andre feltnavn: alt som ikke
+        // er en streng behandles som tomt/uten bilde.
+        (u.ord ?? []).forEach((o: unknown) => {
+          const rad = (o ?? {}) as Record<string, unknown>;
+          ordListe.push({
+            id: nesteId++,
+            tekst: typeof rad.tekst === 'string' ? rad.tekst : '',
+            bilde: typeof rad.bilde === 'string' ? rad.bilde : null,
+          });
+        });
         return ordListe.length > 0;
       } catch {
         return false;
@@ -692,43 +863,24 @@ const t =
       const liste = el('ok-ord-liste');
       liste.replaceChildren();
 
-      // Ordene kan ikke være lengre enn rutenettet
       const storrelse = Number(el<HTMLSelectElement>('ok-storrelse').value);
       const maxOrdLengde = Math.min(storrelse, 20);
 
       ordListe.forEach((ord, indeks) => {
         const rad = document.createElement('li');
-        rad.className = 'ok-ord-rad';
-
-        const felt = document.createElement('input');
-        felt.type = 'text';
-        felt.value = ord.tekst.slice(0, maxOrdLengde);
-        felt.maxLength = maxOrdLengde;
-        felt.setAttribute('aria-label', M.ordAria(indeks + 1));
-        felt.placeholder = M.ordEks;
-        felt.addEventListener('input', () => {
-          ord.tekst = felt.value;
-          const stygt = ordErUpassende(felt.value);
-          rad.classList.toggle('upassende', stygt);
-          felt.setAttribute('aria-invalid', stygt ? 'true' : 'false');
-          lagreUtkast();
-        });
-        if (ordErUpassende(ord.tekst)) rad.classList.add('upassende');
+        rad.className = 'ok-ord-rad-wizard';
 
         const bildeKnapp = document.createElement('button');
         bildeKnapp.type = 'button';
-        bildeKnapp.className = 'ok-ikonknapp';
-        bildeKnapp.setAttribute(
-          'aria-label',
-          ord.bilde ? M.byttBilde(indeks + 1) : M.leggBilde(indeks + 1)
-        );
+        bildeKnapp.className = 'ok-ord-bilde-knapp';
+        bildeKnapp.setAttribute('aria-label', ord.bilde ? M.byttBilde(indeks + 1) : M.leggBilde(indeks + 1));
 
         if (ord.bilde) {
-          const mini = document.createElement('img');
-          mini.src = ord.bilde;
-          mini.alt = '';
-          mini.className = 'ok-mini-bilde';
-          bildeKnapp.appendChild(mini);
+          const bilde = document.createElement('img');
+          bilde.src = ord.bilde;
+          bilde.alt = '';
+          bilde.className = 'ok-ord-bilde-img';
+          bildeKnapp.appendChild(bilde);
         } else {
           bildeKnapp.textContent = '🖼';
         }
@@ -744,16 +896,33 @@ const t =
           leser.onload = () => {
             ord.bilde = String(leser.result);
             tegnOrdListe();
+            lagreUtkast();
           };
           leser.readAsDataURL(fil);
         });
         bildeKnapp.addEventListener('click', () => filFelt.click());
 
+        const felt = document.createElement('input');
+        felt.type = 'text';
+        felt.className = 'ok-ord-input';
+        felt.value = ord.tekst.slice(0, maxOrdLengde);
+        felt.maxLength = maxOrdLengde;
+        felt.setAttribute('aria-label', M.ordAria(indeks + 1));
+        felt.placeholder = M.ordEks;
+        felt.addEventListener('input', () => {
+          ord.tekst = felt.value;
+          const stygt = ordErUpassende(felt.value);
+          rad.classList.toggle('upassende', stygt);
+          felt.setAttribute('aria-invalid', stygt ? 'true' : 'false');
+          lagreUtkast();
+        });
+        if (ordErUpassende(ord.tekst)) rad.classList.add('upassende');
+
         const fjern = document.createElement('button');
         fjern.type = 'button';
-        fjern.className = 'ok-ikonknapp';
         fjern.textContent = '✕';
         fjern.setAttribute('aria-label', M.fjernOrd(indeks + 1));
+        fjern.className = 'ok-slett-ord-knapp';
         fjern.addEventListener('click', () => {
           ordListe = ordListe.filter((o) => o.id !== ord.id);
           if (ordListe.length === 0) leggTilOrd();
@@ -761,7 +930,7 @@ const t =
           lagreUtkast();
         });
 
-        rad.append(felt, bildeKnapp, filFelt, fjern);
+        rad.append(bildeKnapp, felt, fjern);
         liste.appendChild(rad);
       });
 
@@ -827,8 +996,7 @@ const t =
       rot.classList.remove('fasit-paa');
       tegnArk();
       siStatus(M.klart(normaliserte.length, storrelse));
-      el('ok-ark-seksjon').hidden = false;
-      lagreUtkast();
+      gaaSteg(4);
     }
 
     function tegnArk() {
@@ -884,23 +1052,36 @@ const t =
         });
     }
 
-    el('ok-lag').addEventListener('click', generer);
-
-    el('ok-legg-til').addEventListener('click', () => {
-      leggTilOrd();
-      const felter = document.querySelectorAll<HTMLInputElement>(
-        '#ok-ord-liste input[type="text"]'
-      );
-      felter[felter.length - 1]?.focus();
+    function gaaSteg(steg: number) {
+      if (steg < 1 || steg > 4) return;
+      aktivtSteg = steg;
+      document.querySelectorAll('.ok-steg').forEach((s) => {
+        s.setAttribute('hidden', '');
+      });
+      document.querySelector(`[data-steg="${steg}"]`)?.removeAttribute('hidden');
       lagreUtkast();
+    }
+
+    // Steg-navigasjon
+    document.querySelectorAll('.ok-neste-steg').forEach((knapp) => {
+      knapp.addEventListener('click', () => {
+        const nesteSteg = Number(knapp.getAttribute('data-neste'));
+        if (nesteSteg === 4 && knapp.id === 'ok-lag') {
+          generer();
+        } else {
+          gaaSteg(nesteSteg);
+        }
+      });
     });
 
-    el('ok-fasit-toggle').addEventListener('click', () => {
-      fasitSynlig = !fasitSynlig;
-      el('ok-fasit-toggle').setAttribute('aria-pressed', String(fasitSynlig));
-      rot.classList.toggle('fasit-paa', fasitSynlig);
+    document.querySelectorAll('.ok-forrige-steg').forEach((knapp) => {
+      knapp.addEventListener('click', () => {
+        const forrigeSteg = Number(knapp.getAttribute('data-forrige'));
+        gaaSteg(forrigeSteg);
+      });
     });
 
+    // Print-knapper
     const skrivUt = () => {
       rot.classList.remove('print-fasit');
       window.print();
@@ -918,23 +1099,34 @@ const t =
       rot.classList.remove('print-fasit');
     });
 
-    ['ok-tittel', 'ok-storrelse', 'ok-bildemodus', 'ok-ret-vannrett', 'ok-ret-loddrett', 'ok-ret-diagonal'].forEach(
-      (id) => el(id).addEventListener('change', lagreUtkast)
-    );
-    el('ok-tittel').addEventListener('input', () => {
-      if (sisteResultat) {
-        el('ok-overskrift').textContent =
-          el<HTMLInputElement>('ok-tittel').value.trim() || rot.dataset.standardtittel || '';
-      }
-      lagreUtkast();
-    });
-    el('ok-bildemodus').addEventListener('change', () => {
-      if (sisteResultat) tegnArk();
+    el('ok-fasit-toggle').addEventListener('click', () => {
+      fasitSynlig = !fasitSynlig;
+      el('ok-fasit-toggle').setAttribute('aria-pressed', String(fasitSynlig));
+      rot.classList.toggle('fasit-paa', fasitSynlig);
     });
 
     el('ok-storrelse').addEventListener('change', () => {
       tegnOrdListe();
       lagreUtkast();
+    });
+
+    el('ok-legg-til').addEventListener('click', () => {
+      leggTilOrd();
+      const felter = document.querySelectorAll<HTMLInputElement>(
+        '#ok-ord-liste input[type="text"]'
+      );
+      felter[felter.length - 1]?.focus();
+      lagreUtkast();
+    });
+
+    ['ok-tittel', 'ok-bildemodus', 'ok-ret-vannrett', 'ok-ret-loddrett', 'ok-ret-diagonal'].forEach(
+      (id) => el(id).addEventListener('change', lagreUtkast)
+    );
+
+    el('ok-tittel').addEventListener('input', lagreUtkast);
+
+    el('ok-bildemodus').addEventListener('change', () => {
+      if (sisteResultat) tegnArk();
     });
 
     if (!lastUtkast()) {

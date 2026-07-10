@@ -69,8 +69,9 @@ const erAktiv = (href: string) => {
 </header>
 
 <style>
-  /* Auto-hide: sticky rad som glir vekk ved scroll ned og tilbake ved
-     scroll opp. Skjules aldri mens noe i den har fokus (tastatur). */
+  /* Auto-hide: sticky rad som glir med scrollen piksel for piksel (som om
+     den lå i dokumentet) og snapper mykt helt inn/ut når scrollen stopper.
+     Skjules aldri mens noe i den har fokus (tastatur). */
   .topp {
     position: sticky;
     top: 0;
@@ -82,18 +83,19 @@ const erAktiv = (href: string) => {
     padding: var(--s-3) var(--s-6);
     background: var(--nav-bg);
     border-bottom: 1px solid var(--linje);
-    transition: transform var(--dur-panel) var(--ease);
     /* Eget compositor-lag: uten dette kunne skjul/vis-transformen gi
        blanke felt og klippet innhold under scroll (Chromium) */
     will-change: transform;
   }
 
-  .topp[data-skjult] {
-    transform: translateY(-100%);
+  /* Transition kun når vi snapper (scroll i ro) — under aktiv scroll styrer
+     JS transformen direkte, og en transition ville gitt gummistrikk-lag */
+  .topp.glir {
+    transition: transform 220ms var(--ease);
   }
 
   .topp:focus-within {
-    transform: none;
+    transform: none !important;
   }
 
   .topp-indre {
@@ -300,34 +302,55 @@ const erAktiv = (href: string) => {
 
   oppdater();
 
-  // Auto-hide: skjul ved scroll ned, vis ved scroll opp. Slår først inn
-  // godt under heltene på toppen (y > 160), og hysteresen på 16px hindrer
-  // flimring ved småbevegelser.
+  // Auto-hide: naven følger scrollen piksel for piksel — glir ut i takt med
+  // innholdet ved scroll ned, og tilbake i samme takt ved scroll opp. Når
+  // scrollen har stått stille et øyeblikk, snapper den mykt helt inn eller
+  // helt ut (aldri halvveis). Ingen terskel-hopp.
   const topp = document.getElementById('side-topp');
-  let forrigeY = window.scrollY;
-  let ventet = false;
+  if (topp) {
+    let forrigeY = window.scrollY;
+    let offset = 0; // 0 = helt synlig, navH = helt skjult
+    let ventet = false;
+    let snappTimer: ReturnType<typeof setTimeout> | undefined;
 
-  window.addEventListener(
-    'scroll',
-    () => {
-      if (ventet) return;
-      ventet = true;
-      requestAnimationFrame(() => {
-        const y = window.scrollY;
-        const delta = y - forrigeY;
-        if (y < 160) {
-          topp?.removeAttribute('data-skjult');
+    const settTransform = () => {
+      topp.style.transform = offset === 0 ? '' : `translateY(${-offset}px)`;
+    };
+
+    let sisteRetning = 0; // -1 = opp, 1 = ned
+
+    const snapp = () => {
+      const navH = topp.offsetHeight;
+      if (offset === 0 || offset === navH) return;
+      // Fullfør i samme retning som brukeren sist scrollet: opp = vis naven
+      offset = sisteRetning < 0 ? 0 : navH;
+      topp.classList.add('glir');
+      settTransform();
+      setTimeout(() => topp.classList.remove('glir'), 260);
+    };
+
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (snappTimer) clearTimeout(snappTimer);
+        snappTimer = setTimeout(snapp, 140);
+        if (ventet) return;
+        ventet = true;
+        requestAnimationFrame(() => {
+          const y = window.scrollY;
+          const delta = y - forrigeY;
           forrigeY = y;
-        } else if (delta > 16) {
-          topp?.setAttribute('data-skjult', '');
-          forrigeY = y;
-        } else if (delta < -16) {
-          topp?.removeAttribute('data-skjult');
-          forrigeY = y;
-        }
-        ventet = false;
-      });
-    },
-    { passive: true }
-  );
+          if (delta !== 0) sisteRetning = delta > 0 ? 1 : -1;
+          const navH = topp.offsetHeight;
+          // Øverst på siden er naven alltid helt synlig
+          const maks = Math.max(0, Math.min(navH, y));
+          offset = Math.max(0, Math.min(maks, offset + delta));
+          topp.classList.remove('glir');
+          settTransform();
+          ventet = false;
+        });
+      },
+      { passive: true }
+    );
+  }
 </script>

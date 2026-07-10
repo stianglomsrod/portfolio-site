@@ -413,8 +413,9 @@ const erAktiv = (href: string) => {
   }
 
   /* Mobil UTEN js: menyen brekker til egen rad så alle seks punktene er
-     synlige — ingen hamburger å trykke på uten script. */
-  @media (max-width: 680px) {
+     synlige — ingen hamburger å trykke på uten script. Terskelen er 800:
+     under ~790px klippes rad-menyen usynlig (om meg forsvant på 690). */
+  @media (max-width: 800px) {
     .topp {
       padding: var(--s-1) var(--s-4);
     }

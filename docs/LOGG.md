@@ -37,7 +37,23 @@
 - Skjermbilder oppdatert i `docs/innsikt/spill-mobil/`; addendum i
   `docs/innsikt/SPILL-MOBIL-RAPPORT.md`. Ikke committet.
 
-### 2026-07-10 (natt mot 11.) — Glass-header og lagdelte skygger
+### 2026-07-11 — UX-QA av header/meny/scroll + terskel-fiks
+- **Playwright-gjennomgang** av hele header-maskineriet: tilstandsmaskinen
+  (transparent topp → glass ved scroll → auto-hide → glass tilbake ved
+  scroll opp → transparent på topp) er korrekt i alle overganger; åpen
+  meny materialiserer flaten også øverst og lukkes ved scroll;
+  avsløringen etterlater 0 skjulte elementer etter full gjennomscroll;
+  fokusrekkefølgen er skip-link → merke → menypunkter, og tastaturfokus
+  henter tilbake auto-skjult nav.
+- **FUNN FIKSET: usynlig meny-klipping i 681–790px-sonen** — rad-menyen
+  hadde intern horisontal overflow (83px på 690: «om meg» helt borte,
+  «slik jobber jeg» halvklippet) uten synlig scrollbar. Hamburger-
+  terskelen er flyttet 680 → 800; verifisert 0 overflow på 690/768/810/
+  1024. Liggende telefon (812×375) får dermed fortsatt rad-nav — bevisst
+  (812 > 800, og raden får plass der).
+- QA: bygg grønt, axe 0/18, kant-sjekk 0/18.
+
+
 - **Headeren er tintet glass med scroll-tilstand** (Stians funn: den
   opake tint-platen ble brå): øverst på siden er headeren HELT
   transparent (ingen plate — headeren er siden), og ved scroll (y ≥ 24)

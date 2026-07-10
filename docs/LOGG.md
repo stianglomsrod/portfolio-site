@@ -28,6 +28,12 @@
   også over reload og rundt hjulet) — det han så var prod FØR nattens
   deploy.
 - QA: bygg grønt, axe 0/16, kant-sjekk 0/16.
+- **Print-fiks (etterslep)**: utskriften var en svart tom side — .ramme
+  (main, arkets forelder!) sto i display:none-lista, og uten
+  color-scheme: light malte Chrome sidebakgrunnen mørk i mørkt tema.
+  REGEL: aldri skjul arkets forfedre i print-CSS, og tving alltid
+  html/body til color-scheme light + hvit bakgrunn. Verifisert med
+  Playwright page.pdf() i mørkt tema mot BÅDE dev og produksjon.
 
 ### 2026-07-10 (natt, del 3) — Punchliste 2: spill-mobil, hue-avstand, flyt-farger
 - **Spillet er mobilvennlig**: på ≤680px løftes overlays UT av den lille

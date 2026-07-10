@@ -395,8 +395,16 @@
   width: min(92%, 600px);
   min-height: 58px;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  gap: 6px;
   pointer-events: auto;
+  /* Rask tapp-frekvens i dialoger: ingen dobbelttapp-zoom/markering. */
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
   background: linear-gradient(180deg, var(--panel-2), var(--panel));
   border: 2px solid var(--line);
   border-radius: 12px;
@@ -481,6 +489,17 @@
   font-style: italic;
   color: #f3e7c8;
   font-size: 0.92rem;
+}
+/* Undertekst som sekundærlinje NÅR boksen samtidig viser dialog/CTA —
+   stemningsteksten skal aldri fortrenge interaksjonspunktet (funn 8). */
+.boxAmbient {
+  width: 100%;
+  text-align: center;
+  font-style: italic;
+  color: #d9cba9;
+  font-size: 0.8rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 5px;
 }
 .boxCta {
   display: flex;
@@ -860,6 +879,8 @@
   margin: 0;
   font-family: var(--font-geist-mono, monospace);
   font-size: 1.1rem;
+  /* Eksplisitt farge: sidens globale h2-farge (grønn) skal ikke lekke inn. */
+  color: var(--parch);
 }
 .menuActions {
   display: flex;
@@ -1025,6 +1046,9 @@
 .endgameTitle {
   margin: 0 0 10px;
   font-size: 1.4rem;
+  font-family: var(--font-geist-mono, monospace);
+  /* Eksplisitt farge: sidens globale h2-farge (grønn) skal ikke lekke inn. */
+  color: var(--parch);
 }
 .endgameMessage {
   margin: 0 0 16px;
@@ -1300,11 +1324,58 @@
   .stage {
     padding-bottom: max(clamp(8px, 3vw, 28px), env(safe-area-inset-bottom));
   }
-  /* Leave room for the pad inside a short landscape phone viewport. */
-  @media (orientation: landscape) {
-    .canvasFrame {
-      width: min(96vw, calc((100dvh - 190px) * 1.5), 980px);
-    }
+}
+
+/* Liggende telefon: styringen legges OPPÅ sidene (gamepad-mønster) i stedet
+   for under — ramma kan da bruke nesten hele høyden. HUD-en er fixed øverst
+   (se mobilblokka), så det reserveres bare plass til den + litt luft. */
+@media (pointer: coarse) and (orientation: landscape) and (max-height: 520px) {
+  .canvasFrame {
+    width: min(calc((100dvh - 118px) * 1.5), 96vw, 980px);
+    margin-top: 48px; /* HUD-sonen */
+  }
+  .padRow {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    padding: 0 max(10px, env(safe-area-inset-right)) 0
+      max(10px, env(safe-area-inset-left));
+    pointer-events: none;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .dpad,
+  .actionBtn {
+    pointer-events: auto;
+    opacity: 0.92;
+  }
+
+  /* Lav skjerm: Spill-knappen skal være synlig uten scrolling — knappene
+     løftes over kontroll-lista (lista kan scrolles til). */
+  .startCard {
+    display: flex;
+    flex-direction: column;
+  }
+  .controls {
+    order: 2;
+    margin: 14px 0 0;
+  }
+
+  /* Endgame-kortet komprimeres litt så mest mulig får plass. */
+  .endgameCard {
+    padding: 14px 16px;
+  }
+  .endgameMessage {
+    font-size: 0.86rem;
+    line-height: 1.45;
+    margin-bottom: 10px;
+  }
+  .endgameArtifacts {
+    gap: 2px 8px;
+    margin-bottom: 8px;
+  }
+  .endgameStats {
+    margin-bottom: 8px;
   }
 }
 
@@ -1385,11 +1456,14 @@
 }
 
 /* Touch-flater >= 44x44 px (WCAG/PRD-krav). Padden er allerede 52/74 px;
-   dette hever HUD-chips, spraakknapp og lukkekryss. */
+   dette hever HUD-chips, spraakknapp, lukkekryss, select-felter, valg-
+   knapper, meny-ekspandere og lenkene paa endgame-kortet. */
 @media (pointer: coarse) {
   .hudChip {
+    min-width: 44px;
     min-height: 44px;
     padding: 10px 12px;
+    justify-content: center;
   }
 
   .langChip,
@@ -1397,12 +1471,33 @@
     min-width: 44px;
     min-height: 44px;
   }
+
+  .codeBlank {
+    min-height: 44px;
+    padding: 4px 8px;
+    font-size: 1rem;
+  }
+
+  .choiceOption,
+  .msgOption,
+  .menuItemHead {
+    min-height: 44px;
+  }
+
+  .rewardLink,
+  .endgameContact a {
+    display: inline-block;
+    padding: 12px 8px;
+    margin: -8px -2px;
+  }
 }
 
-/* Smale skjermer: startskjermen løftes UT av den lille 3/2-ramma og
-   dekker hele viewporten (fixed) — hele kortet, inkludert Spill-knappen,
-   er synlig og skjermen scroller ved behov (liggende telefon). */
-@media (max-width: 680px) {
+/* Smale skjermer OG liggende touch-skjermer: overlays løftes UT av den
+   lille 3/2-ramma og dekker hele viewporten (fixed) — hele kortet,
+   inkludert Spill-knappen, er synlig og skjermen scroller ved behov.
+   NB: liggende telefoner er 640-950px BREDE, derfor holder ikke
+   max-width alene (funn 1 i SPILL-MOBIL-RAPPORT). */
+@media (max-width: 680px), (pointer: coarse) and (max-height: 520px) {
   .startScreen {
     position: fixed;
     inset: 0;
@@ -1454,23 +1549,54 @@
     z-index: 35;
   }
 
-  /* Menyer, paneler og minispill bruker hele skjermen — ikke 3/2-ramma */
+  /* Menyer, paneler, minispill OG endgame bruker hele skjermen — ikke
+     3/2-ramma (endgame-kortet var innesperret og avkuttet: funn 3). */
   .panelBackdrop,
   .modalBackdrop,
-  .menuBackdrop {
+  .menuBackdrop,
+  .endgameBackdrop {
     position: fixed;
     z-index: 45;
+  }
+
+  /* Belønningsbanneret løftes også ut — det ble klippet av rammekanten
+     (funn 5). Ligger i sonen under den fixed HUD-en. */
+  .rewardBanner {
+    position: fixed;
+    top: calc(max(8px, env(safe-area-inset-top)) + 108px);
+    z-index: 38;
   }
 }
 /* [data-touch] settes av samme deteksjon som VirtualPad
    (pointer: coarse ELLER ?touch=1) — gjor 44px-kravet testbart. */
 .stage[data-touch] .hudChip {
+  min-width: 44px;
   min-height: 44px;
   padding: 10px 12px;
+  justify-content: center;
 }
 
 .stage[data-touch] .langChip,
 .stage[data-touch] .panelClose {
   min-width: 44px;
   min-height: 44px;
+}
+
+.stage[data-touch] .codeBlank {
+  min-height: 44px;
+  padding: 4px 8px;
+  font-size: 1rem;
+}
+
+.stage[data-touch] .choiceOption,
+.stage[data-touch] .msgOption,
+.stage[data-touch] .menuItemHead {
+  min-height: 44px;
+}
+
+.stage[data-touch] .rewardLink,
+.stage[data-touch] .endgameContact a {
+  display: inline-block;
+  padding: 12px 8px;
+  margin: -8px -2px;
 }

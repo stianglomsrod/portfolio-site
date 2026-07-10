@@ -239,8 +239,8 @@ export default function PauseMenu({
                 <dd>
                   {touch
                     ? no
-                      ? "Pilknappene under spillet"
-                      : "The arrow buttons under the game"
+                      ? "Trykk dit du vil gå — eller pilknappene"
+                      : "Tap where you want to go — or the arrows"
                     : `WASD / ${no ? "piltaster" : "arrows"}`}
                 </dd>
               </div>
@@ -249,8 +249,8 @@ export default function PauseMenu({
                 <dd>
                   {touch
                     ? no
-                      ? "E-knappen, eller trykk på tekstboksen"
-                      : "The E button, or tap the text box"
+                      ? "Trykk på personer og ting — eller E-knappen"
+                      : "Tap people and things — or the E button"
                     : `E / ${no ? "mellomrom" : "space"}`}
                 </dd>
               </div>

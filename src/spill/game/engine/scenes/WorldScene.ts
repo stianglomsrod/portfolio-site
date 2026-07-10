@@ -2,7 +2,7 @@
 import Phaser from "phaser";
 import type { CtaPrompt, GameBridge } from "../bridge";
 import type { GameRuntime } from "../runtime";
-import { buildSolidGrid, tileCenter, validateMap } from "../systems/grid";
+import { buildSolidGrid, pxToTile, tileCenter, validateMap } from "../systems/grid";
 import { audio } from "../audio";
 import type {
   ContentPack,
@@ -65,12 +65,19 @@ export class WorldScene extends Phaser.Scene {
 
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private wasd!: Record<
-    "up" | "down" | "left" | "right",
+    "up" | "down" | "right" | "left",
     Phaser.Input.Keyboard.Key
   >;
   private interactKey!: Phaser.Input.Keyboard.Key;
   private touchDir = { x: 0, y: 0 };
   private unsub: Array<() => void> = [];
+
+  // Tapp-navigasjon: trykk på en rute -> gå dit; trykk på NPC/dør/objekt ->
+  // gå bort og utløs. D-pad/tastatur avbryter alltid en aktiv rute.
+  private path: Vec2[] | null = null; // gjenstående veipunkter (world-px)
+  private pathTarget: Target | null = null; // interager ved framkomst
+  private pathStuckPx = 0; // avstand ved forrige stuck-sjekk
+  private pathStuckAt = 0; // tidspunkt for forrige stuck-sjekk
 
   constructor() {
     super("WorldScene");
@@ -86,6 +93,8 @@ export class WorldScene extends Phaser.Scene {
     this.hints = new Map();
     this.current = null;
     this.lastPromptId = null;
+    this.path = null;
+    this.pathTarget = null;
   }
 
   create(data: WorldData): void {
@@ -125,6 +134,11 @@ export class WorldScene extends Phaser.Scene {
     this.createOverlays();
     this.setupInput();
     this.registerBridge();
+
+    // Belte og bukseseler mot stale CTA fra forrige kart: UI-et nullstilles
+    // eksplisitt (lastPromptId er null her, så setPrompt alene ville hoppet
+    // over emiten).
+    this.bridge.emit("prompt", null);
 
     this.cameras.main.fadeIn(220);
 
@@ -475,6 +489,15 @@ export class WorldScene extends Phaser.Scene {
     origin: Vec2,
   ): void {
     const s = this.size;
+    // Vandrere skal aldri stille seg i en døråpning og sperre utgangen.
+    const onExit = (tx: number, ty: number) =>
+      this.map.exits.some(
+        (e) =>
+          tx >= e.at.x &&
+          tx < e.at.x + e.at.w &&
+          ty >= e.at.y &&
+          ty < e.at.y + e.at.h,
+      );
     const pickTile = (): { x: number; y: number } => {
       for (let tries = 0; tries < 8; tries++) {
         const tx = origin.x + Phaser.Math.Between(-2, 2);
@@ -484,7 +507,8 @@ export class WorldScene extends Phaser.Scene {
           tx >= 0 &&
           ty < this.map.height &&
           tx < this.map.width &&
-          !this.solidGrid[ty]?.[tx]
+          !this.solidGrid[ty]?.[tx] &&
+          !onExit(tx, ty)
         ) {
           return tileCenter(tx, ty, s);
         }
@@ -700,9 +724,13 @@ export class WorldScene extends Phaser.Scene {
 
   private doTransition(mapId: string, spawn: string): void {
     this.transitioning = true;
+    this.cancelPath();
     this.player.setVelocity(0, 0);
     audio.sfx("door");
-    this.bridge.emit("prompt", null);
+    // Via setPrompt slik at lastPromptId følger med — en rå emit lot
+    // updateTarget re-emitte dør-CTA-en i SAMME frame, og den ble stående
+    // gjennom kartbyttet («Døra — Gå ut» midt i byen).
+    this.setPrompt(null);
     this.cameras.main.fadeOut(200);
     this.cameras.main.once(
       Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE,
@@ -735,6 +763,10 @@ export class WorldScene extends Phaser.Scene {
     ]);
     kb.on("keydown-SPACE", () => this.tryInteract());
     kb.on("keydown-E", () => this.tryInteract());
+
+    // Tapp/klikk i verden: gå dit, og interager hvis det står noe der.
+    // Gjelder alle pekertyper — pek-og-gå er like naturlig med mus.
+    this.input.on("pointerup", (p: Phaser.Input.Pointer) => this.onWorldTap(p));
   }
 
   private registerBridge(): void {
@@ -759,6 +791,223 @@ export class WorldScene extends Phaser.Scene {
     this.unsub.forEach((fn) => fn());
     this.unsub = [];
     this.input.keyboard?.removeAllListeners();
+    // InputPlugin overlever scene.restart — uten opprydding dobles lytterne.
+    this.input.off("pointerup");
+  }
+
+  /* ---------- tapp-navigasjon (gå dit du peker) ---------- */
+
+  private onWorldTap(p: Phaser.Input.Pointer): void {
+    if (this.paused || this.transitioning || !this.started) return;
+    // Trykket må ha STARTET på canvasen (Phaser fanger også slipp som
+    // hører til trykk på DOM-knappene rundt spillet).
+    if (p.downElement && p.downElement !== this.game.canvas) return;
+    // Bare korte, stillestående tapp — ikke sveip/hold.
+    if (p.upTime - p.downTime > 600) return;
+    if (Phaser.Math.Distance.Between(p.downX, p.downY, p.x, p.y) > 16) return;
+
+    const world = this.cameras.main.getWorldPoint(p.x, p.y);
+    const tx = pxToTile(world.x, this.size);
+    const ty = pxToTile(world.y, this.size);
+    if (tx < 0 || ty < 0 || tx >= this.map.width || ty >= this.map.height)
+      return;
+
+    const target = this.findTargetAt(world.x, world.y, tx, ty);
+    if (target) {
+      // Allerede innenfor rekkevidde? Utløs direkte — som å trykke E.
+      const d = Phaser.Math.Distance.Between(
+        this.player.x,
+        this.player.y,
+        target.x,
+        target.y,
+      );
+      if (d <= this.size * 1.6) {
+        this.cancelPath();
+        this.current = target;
+        this.tryInteract();
+        return;
+      }
+      const goal = {
+        x: pxToTile(target.x, this.size),
+        y: pxToTile(target.y, this.size),
+      };
+      this.startPath(goal, target, true);
+      return;
+    }
+
+    if (this.solidGrid[ty]?.[tx]) return; // vegg/prop: stille nei
+    this.startPath({ x: tx, y: ty }, null, false);
+  }
+
+  /** Interaktivt mål på/inntil tapp-punktet (NPC, dør, objekt). */
+  private findTargetAt(
+    wx: number,
+    wy: number,
+    tx: number,
+    ty: number,
+  ): Target | null {
+    let best: Target | null = null;
+    let bestDist = Infinity;
+    for (const t of this.targets) {
+      // Exits kan dekke flere fliser — treff på flis teller.
+      if (t.kind === "exit") {
+        const a = t.data.at;
+        if (tx >= a.x && tx < a.x + a.w && ty >= a.y && ty < a.y + a.h) {
+          const d = Phaser.Math.Distance.Between(wx, wy, t.x, t.y);
+          if (d < bestDist) {
+            best = t;
+            bestDist = d;
+          }
+          continue;
+        }
+      }
+      const d = Phaser.Math.Distance.Between(wx, wy, t.x, t.y);
+      if (d <= this.size * 0.8 && d < bestDist) {
+        best = t;
+        bestDist = d;
+      }
+    }
+    return best;
+  }
+
+  /** BFS på solid-gridet -> veipunkter. `nearGoal`: stopp på/inntil målet. */
+  private startPath(
+    goal: Vec2,
+    target: Target | null,
+    nearGoal: boolean,
+  ): void {
+    const start = {
+      x: pxToTile(this.player.x, this.size),
+      y: pxToTile(this.player.y, this.size),
+    };
+    const tiles = this.findPath(start, goal, nearGoal);
+    if (!tiles || tiles.length === 0) {
+      // Ikke nåbart — men er målet i interaksjonsradius, utløs likevel.
+      if (target) {
+        const d = Phaser.Math.Distance.Between(
+          this.player.x,
+          this.player.y,
+          target.x,
+          target.y,
+        );
+        if (d <= this.size * 1.6) {
+          this.current = target;
+          this.tryInteract();
+        }
+      }
+      return;
+    }
+    this.path = tiles.map((t) => tileCenter(t.x, t.y, this.size));
+    this.pathTarget = target;
+    this.pathStuckPx = Infinity;
+    this.pathStuckAt = this.time.now;
+    const last = tiles[tiles.length - 1];
+    this.showTapMarker(tileCenter(last.x, last.y, this.size), !!target);
+    audio.sfx("blip");
+  }
+
+  private cancelPath(): void {
+    this.path = null;
+    this.pathTarget = null;
+  }
+
+  /** 4-veis BFS. Returnerer flissti (uten startflisa), komprimert til
+   *  retningsskift, eller null. `nearGoal` godtar nabofliser som mål. */
+  private findPath(
+    start: Vec2,
+    goal: Vec2,
+    nearGoal: boolean,
+  ): Vec2[] | null {
+    const W = this.map.width;
+    const H = this.map.height;
+    const free = (x: number, y: number) =>
+      x >= 0 && y >= 0 && x < W && y < H && !this.solidGrid[y][x];
+    const isGoal = (x: number, y: number) =>
+      nearGoal
+        ? Math.abs(x - goal.x) + Math.abs(y - goal.y) <= 1
+        : x === goal.x && y === goal.y;
+
+    if (isGoal(start.x, start.y)) return [];
+    const key = (x: number, y: number) => y * W + x;
+    const prev = new Map<number, number>();
+    prev.set(key(start.x, start.y), -1);
+    let frontier = [start];
+    let found: Vec2 | null = null;
+
+    while (frontier.length && !found) {
+      const next: Vec2[] = [];
+      for (const cur of frontier) {
+        for (const [dx, dy] of [
+          [0, -1],
+          [0, 1],
+          [-1, 0],
+          [1, 0],
+        ] as const) {
+          const nx = cur.x + dx;
+          const ny = cur.y + dy;
+          if (prev.has(key(nx, ny))) continue;
+          // Målflisa kan være «solid» i gridet (dør i vegg, NPC på prop) —
+          // godta den som endepunkt, men gå aldri VIDERE gjennom solids.
+          const goalHit = isGoal(nx, ny);
+          if (!free(nx, ny) && !(goalHit && nx >= 0 && ny >= 0 && nx < W && ny < H))
+            continue;
+          prev.set(key(nx, ny), key(cur.x, cur.y));
+          if (goalHit) {
+            found = { x: nx, y: ny };
+            break;
+          }
+          if (free(nx, ny)) next.push({ x: nx, y: ny });
+        }
+        if (found) break;
+      }
+      frontier = next;
+    }
+    if (!found) return null;
+
+    // Nøst opp stien og komprimer kolineære strekk til retningsskift.
+    const full: Vec2[] = [];
+    let k: number | undefined = key(found.x, found.y);
+    while (k !== undefined && k !== -1) {
+      full.unshift({ x: k % W, y: Math.floor(k / W) });
+      k = prev.get(k);
+    }
+    full.shift(); // dropp startflisa
+    const out: Vec2[] = [];
+    for (let i = 0; i < full.length; i++) {
+      const a = full[i - 1] ?? start;
+      const b = full[i];
+      const c = full[i + 1];
+      const turn = !c || c.x - b.x !== b.x - a.x || c.y - b.y !== b.y - a.y;
+      if (turn) out.push(b);
+    }
+    return out;
+  }
+
+  /** Kort markør-blink der spilleren skal: ring for gange, ✦ for mål. */
+  private showTapMarker(at: Vec2, isTarget: boolean): void {
+    const mark = isTarget
+      ? this.add
+          .text(at.x, at.y, "✦", {
+            fontFamily: "monospace",
+            fontSize: "16px",
+            color: "#ffd23c",
+          })
+          .setOrigin(0.5)
+          .setResolution(3)
+      : this.add.circle(at.x, at.y, 7).setStrokeStyle(2, 0xffd23c, 0.9);
+    mark.setDepth(59_500);
+    if (this.reducedMotion) {
+      this.time.delayedCall(420, () => mark.destroy());
+      return;
+    }
+    this.tweens.add({
+      targets: mark,
+      scale: isTarget ? 1.25 : 1.7,
+      alpha: 0,
+      duration: 450,
+      ease: "Quad.out",
+      onComplete: () => mark.destroy(),
+    });
   }
 
   /* ---------- play lifecycle ---------- */
@@ -787,6 +1036,7 @@ export class WorldScene extends Phaser.Scene {
   private pause(): void {
     this.paused = true;
     this.touchDir = { x: 0, y: 0 };
+    this.cancelPath();
     if (this.player?.body) this.player.setVelocity(0, 0);
     if (this.input.keyboard) this.input.keyboard.enabled = false;
     this.setPrompt(null);
@@ -950,6 +1200,11 @@ export class WorldScene extends Phaser.Scene {
     if (this.cursors.down.isDown || this.wasd.down.isDown || this.touchDir.y > 0)
       vy += 1;
 
+    // Manuell styring (tastatur/D-pad) overstyrer og avbryter tapp-ruta.
+    if ((vx !== 0 || vy !== 0) && this.path) this.cancelPath();
+
+    if (this.path) this.followPath(time);
+
     const moving = vx !== 0 || vy !== 0;
     if (moving) {
       const len = Math.hypot(vx, vy) || 1;
@@ -958,9 +1213,10 @@ export class WorldScene extends Phaser.Scene {
       else if (vx > 0) this.facing = "right";
       else if (vy < 0) this.facing = "up";
       else if (vy > 0) this.facing = "down";
-    } else {
+    } else if (!this.path) {
       this.player.setVelocity(0, 0);
     }
+    const pathMoving = !!this.path;
 
     // Bouncy avatar: a hop + squash/stretch while moving, a gentle bob at rest.
     const px = this.player.x;
@@ -970,7 +1226,7 @@ export class WorldScene extends Phaser.Scene {
     let sy = 1;
     if (this.reducedMotion) {
       bob = 0;
-    } else if (moving) {
+    } else if (moving || pathMoving) {
       this.bobPhase += (this.game.loop.delta || 16) * 0.014;
       bob = Math.abs(Math.sin(this.bobPhase)) * 6;
       const sq = Math.cos(this.bobPhase) * 0.08;
@@ -1005,7 +1261,79 @@ export class WorldScene extends Phaser.Scene {
     this.updateGuide(time);
   }
 
+  /** Styr spilleren langs tapp-ruta. Kalles fra update() når path finnes. */
+  private followPath(time: number): void {
+    if (!this.path || this.path.length === 0) {
+      this.arriveAtPath();
+      return;
+    }
+
+    // Er interaksjonsmålet alt i rekkevidde, stopp og utløs — ikke gå
+    // helt inntil (samme radius som E-knappen bruker).
+    if (this.pathTarget) {
+      const d = Phaser.Math.Distance.Between(
+        this.player.x,
+        this.player.y,
+        this.pathTarget.x,
+        this.pathTarget.y,
+      );
+      if (d <= this.size * 1.3) {
+        this.arriveAtPath();
+        return;
+      }
+    }
+
+    const wp = this.path[0];
+    const dx = wp.x - this.player.x;
+    const dy = wp.y - this.player.y;
+    const d = Math.hypot(dx, dy);
+    if (d < 4) {
+      this.path.shift();
+      if (this.path.length === 0) this.arriveAtPath();
+      return;
+    }
+
+    this.player.setVelocity((dx / d) * SPEED, (dy / d) * SPEED);
+    if (Math.abs(dx) > Math.abs(dy)) this.facing = dx < 0 ? "left" : "right";
+    else this.facing = dy < 0 ? "up" : "down";
+
+    // Stuck-vakt: gjør vi ikke framgang på 700 ms (kollisjon med noe
+    // gridet ikke kjenner), avbrytes ruta i stedet for å skli mot veggen.
+    if (time - this.pathStuckAt > 700) {
+      if (this.pathStuckPx - d < 2) {
+        this.arriveAtPath();
+        return;
+      }
+      this.pathStuckPx = d;
+      this.pathStuckAt = time;
+    }
+  }
+
+  /** Ruta er ferdig (eller avbrutt): stopp, og utløs ev. ventende mål. */
+  private arriveAtPath(): void {
+    const target = this.pathTarget;
+    this.cancelPath();
+    this.player.setVelocity(0, 0);
+    if (!target) return;
+    const d = Phaser.Math.Distance.Between(
+      this.player.x,
+      this.player.y,
+      target.x,
+      target.y,
+    );
+    if (d > this.size * 1.6) return; // kom aldri fram — la det ligge
+    // Vend mot målet før interaksjonen.
+    const dx = target.x - this.player.x;
+    const dy = target.y - this.player.y;
+    if (Math.abs(dx) > Math.abs(dy)) this.facing = dx < 0 ? "left" : "right";
+    else this.facing = dy < 0 ? "up" : "down";
+    this.current = target;
+    this.tryInteract();
+  }
+
   private updateTarget(): void {
+    // Ikke re-emit CTA-er etter at et kartbytte har startet (stale prompt).
+    if (this.transitioning) return;
     const range = this.size * 1.6;
     let best: Target | null = null;
     let bestDist = range;

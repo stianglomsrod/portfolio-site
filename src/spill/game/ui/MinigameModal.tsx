@@ -25,6 +25,16 @@ export default function MinigameModal({
   const def = pack.minigames.find((m) => m.id === currentId);
   const panelRef = useRef<HTMLDivElement>(null);
 
+  // Ghost click-vern: fingeren som åpnet modalen (E-knappen) genererer et
+  // syntetisk klikk RETT ETTER at modalen har tegnet seg — og det klikket
+  // traff svaralternativet under tommelen. Ignorer pekerhendelser i en kort
+  // oppstartsperiode.
+  const [armed, setArmed] = useState(false);
+  useEffect(() => {
+    const t = window.setTimeout(() => setArmed(true), 400);
+    return () => window.clearTimeout(t);
+  }, []);
+
   useEffect(() => {
     panelRef.current?.focus({ preventScroll: true });
   }, [currentId]);
@@ -46,7 +56,10 @@ export default function MinigameModal({
   };
 
   return (
-    <div className={styles.modalBackdrop}>
+    <div
+      className={styles.modalBackdrop}
+      style={armed ? undefined : { pointerEvents: "none" }}
+    >
       <div
         ref={panelRef}
         className={styles.modal}

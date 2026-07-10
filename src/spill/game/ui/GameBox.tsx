@@ -45,7 +45,11 @@ export default function GameBox({
     return () => window.removeEventListener("keydown", onKey);
   }, [dialogue, onAdvance]);
 
-  const mode = dialogue ? "dialogue" : subtitle ? "subtitle" : cta ? "cta" : null;
+  // Interaksjon vinner alltid over stemningstekst: dialog/CTA eier boksen,
+  // og en samtidig undertekst vises som sekundærlinje over hovedraden i
+  // stedet for å fortrenge den (den gjemte «E Gå ut»-prompten i 4 s).
+  const mode = dialogue ? "dialogue" : cta ? "cta" : subtitle ? "subtitle" : null;
+  const ambient = subtitle && mode !== "subtitle" ? subtitle : null;
 
   const handleClick = () => {
     if (dialogue) onAdvance();
@@ -58,6 +62,9 @@ export default function GameBox({
 
   return (
     <div className={styles.gameBox} data-mode={mode} onClick={handleClick}>
+      {ambient && (
+        <span className={styles.boxAmbient}>{t(ambient, lang)}</span>
+      )}
       {mode === "dialogue" && dialogue && (
         <div className={styles.boxRow}>
           {dialogue.line.portrait && (

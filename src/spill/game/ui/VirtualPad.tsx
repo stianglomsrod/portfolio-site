@@ -138,7 +138,11 @@ export default function VirtualPad({
         className={styles.actionBtn}
         aria-label={dialogueOpen ? A.advance : A.action}
         disabled={disabled}
-        onPointerDown={(e) => {
+        // Utløses på pointerUP, ikke DOWN: fyrer den på down, rekker en modal
+        // å åpne under fingeren før browserens syntetiske klikk lander — og
+        // klikket traff da innholdet i modalen (auto-løste valg-minispill).
+        onPointerDown={(e) => e.preventDefault()}
+        onPointerUp={(e) => {
           e.preventDefault();
           onAction();
         }}

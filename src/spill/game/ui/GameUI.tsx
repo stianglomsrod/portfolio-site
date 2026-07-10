@@ -258,8 +258,8 @@ export default function GameUI({ bridge, runtime, pack, padHost }: Props) {
         <div className={styles.controlsBanner}>
           {coarsePointer
             ? lang === "no"
-              ? "Styr med knappene under spillet   ·   E undersøker"
-              : "Use the buttons below the game   ·   E inspects"
+              ? "Trykk i verden dit du vil gå   ·   trykk på ting for å undersøke"
+              : "Tap the world to walk there   ·   tap things to inspect"
             : lang === "no"
               ? "Beveg: WASD / piltaster   ·   Undersøk: E   ·   Meny: Esc"
               : "Move: WASD / arrows   ·   Interact: E   ·   Menu: Esc"}
@@ -277,7 +277,7 @@ export default function GameUI({ bridge, runtime, pack, padHost }: Props) {
               : null
           }
           subtitle={subtitle?.text ?? null}
-          cta={prompt}
+          cta={reward ? null : prompt} // banneret dekker CTA-en — ikke begge
           lang={lang}
           onAdvance={advanceDialogue}
           onInteract={() => bridge.emit("cmd:interact")}

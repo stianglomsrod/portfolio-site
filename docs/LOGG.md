@@ -6,6 +6,37 @@
 
 ## Changelog
 
+### 2026-07-10 (sein kveld) — Spillet mobiloptimalisert + tapp-navigasjon
+- **Alle funn fra SPILL-MOBIL-RAPPORT er fikset** (kun filer i src/spill/):
+  liggende format virker nå (breakpoint utvidet til `(pointer: coarse) and
+  (max-height: 520px)` + eget gamepad-oppsett: D-pad/E fixed på sidene,
+  ramma bruker nesten hele høyden, Spill-knappen løftet over kontroll-
+  lista); ghost click-en som auto-løste valg-minispillene er borte
+  (E-knappen fyrer på pointerup + modal/endgame ignorerer pekere første
+  400 ms); endgame-kortet og belønningsbanneret er fullskjerms/fixed på
+  mobil; grønn h2-lekkasje fikset med eksplisitt farge i CSS-modulen
+  (Base.astro urørt — annen økt eier den); 44px-runde på selects, chips,
+  valg-knapper, meny-ekspandere og endgame-lenker; undertekster viser seg
+  som sekundærlinje i boksen i stedet for å fortrenge CTA-en; badeanda
+  holder seg unna døråpninger.
+- **Ny styring: tapp-navigasjon** (best practice for casual topp-ned på
+  touch): trykk på en rute → BFS-sti på solid-gridet + markør-blink;
+  trykk på NPC/dør/objekt → gå innen rekkevidde og utløs interaksjonen
+  (låste dører gir beskjeden). D-pad/tastatur avbryter ruta; stuck-vakt
+  ved kollisjon; pek-og-gå virker også med mus på desktop. D-paden består.
+- **Stale prompt-race fikset**: dør-CTA kunne overleve kartbyttet
+  (updateTarget re-emitte i transisjonsframen) — nå nullstilles prompten
+  eksplisitt i doTransition + ved scene-create.
+- QA (Playwright, ekte touch): full gjennomspilling grønn mot prod-bygg
+  (0 tap-through, alle seks valgspill viser feil→riktig-flyt), 4 viewports
+  grønne (inkl. liggende), tapp-suite 12/12, desktop-regresjon 6/6
+  (tastatur + mus + ingen pad + fargefiks), tsc + build grønt. Alle
+  endgame-/reward-flater ≥ 44px. MERK: lange QA-løp kjøres mot statisk
+  bygg (`_baseline/qa/statisk-server.mjs`, port 4323) — dev-serverens HMR
+  full-reloader midt i løp når parallelle økter lagrer.
+- Skjermbilder oppdatert i `docs/innsikt/spill-mobil/`; addendum i
+  `docs/innsikt/SPILL-MOBIL-RAPPORT.md`. Ikke committet.
+
 ### 2026-07-10 (sen kveld) — Nav-finpuss: hamburger til høyre, verktøy i menyen, aksent-tintet header
 - **Hamburgeren står ytterst til høyre** (konvensjonen), og på mobil er
   topplinja nå bare merke + Meny: språkvelgeren («English version» med

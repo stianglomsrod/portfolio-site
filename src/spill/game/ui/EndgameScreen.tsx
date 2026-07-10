@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { StateSnapshot } from "../engine/bridge";
 import type { ContentPack, Lang } from "../engine/types";
 import { t } from "../engine/i18n";
@@ -37,8 +37,19 @@ export default function EndgameScreen({
     cardRef.current?.focus({ preventScroll: true });
   }, []);
 
+  // Ghost click-vern (samme som MinigameModal): tappen som leverte søknaden
+  // skal ikke også klikke på en kontaktlenke når kortet tegnes.
+  const [armed, setArmed] = useState(false);
+  useEffect(() => {
+    const t = window.setTimeout(() => setArmed(true), 400);
+    return () => window.clearTimeout(t);
+  }, []);
+
   return (
-    <div className={styles.endgameBackdrop}>
+    <div
+      className={styles.endgameBackdrop}
+      style={armed ? undefined : { pointerEvents: "none" }}
+    >
       <div
         ref={cardRef}
         className={styles.endgameCard}

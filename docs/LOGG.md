@@ -6,6 +6,40 @@
 
 ## Changelog
 
+### 2026-07-11 (natt) — GREN nye-verktoy: ni nye lærerverktøy til testing
+- **Ni nye verktøy på gren `nye-verktoy`** (IKKE pushet — Stian tester
+  lokalt på :4322 først). Norsk: Luketekst (/sandbox/luketekst, klikk
+  ord for luker + auto hvert n-te, ordbank, fasit), Rablete setninger
+  (/sandbox/setningsstokking, stokkede brikker + skrivelinjer),
+  Ord og bilde (/sandbox/ord-til-bilde, koblingsark der fasiten tegner
+  SVG-streker), Sporing (/sandbox/sporing, stiplet kontur-tekst på
+  skrivelinjer — SVG text med fill:none + dasharray + textLength),
+  Alfabetisering (/sandbox/alfabetisering, Intl.Collator('nb') så æøå
+  sorterer riktig). Matte: Regneark (/sandbox/regneark, kjerne i
+  src/lib/regneark.ts med tierovergang-styring, åpne oppgaver, aldri
+  negative svar, divisjon går opp — stresstestet 312 genereringer over
+  alle oppsett), Klokka (/sandbox/klokke, SVG-urskiver, les/tegn,
+  presisjon hel–5 min), Tallinjer (/sandbox/tallinje, sammenhengende
+  linjer med hull), Gangetabellen (/sandbox/gangetabell, SVG-rutenett
+  10×10). Alle med engelsk tvilling, RUTEKART-oppføring, fasit-mekanikk
+  (Ordkryss-mønsteret) der det gir mening, utkast i localStorage, og
+  print etter SVG-/understrek-reglene (aldri tomme CSS-kantbokser).
+- **BUGFIKS I DELT KJERNE (gjelder også prod-Ordkryss!)**: bannord-
+  filterets substring-regel blokkerte uskyldige norske ord — «sofaen»
+  inneholder faen, «slutt»/«avslutning» inneholder slut, «homogen»
+  homo, «spule» pule. Røyk-testen av Luketekst/Setningsstokking avslørte
+  det. Fikset med UNNTAK-liste i ordkryss-kjerne.ts: et ord frikjennes
+  når HVER forekomst av bannordet ligger inni et kjent uskyldig ord
+  («faenskapsofaen» stoppes fortsatt). MERK: den frittstående kopien i
+  cs50x-mappa er nå usynkron (jf. gjeldslista) — og fiksen bør til main
+  selv om resten av grenen skulle vrakes.
+- **Sandbox-gridet**: spillet tilbake til vanlig kortbredde — 14 kort =
+  7 hele rader + modul på full rad. Kort-tagger «Verktøy · norsk/matte».
+- QA på grenen: bygg grønt (40 ruter), axe 0/40, kant 0/40, røyk-suite
+  alle 9 verktøy grønn (generering, verktøyspesifikke kjennetegn,
+  fasit-toggle, ren konsoll), regneark-kjernen stresstestet, bingo- og
+  kryssord-suitene regresjonskjørt grønne etter filterendringen.
+
 ### 2026-07-11 (kveld, del 4) — Kryssord-print runde 4 (ENDELIG): rutenettet er SVG
 - **Gjennombruddet i feilsøkinga**: Stians skjermbilder viste at FASIT-
   utskriften (bokstaver i rutene) tegnet alle kanter, mens elevarket

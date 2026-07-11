@@ -1,0 +1,693 @@
+---
+/* Luketekst-verktøyet (cloze): læreren limer inn en tekst, velger luker
+   automatisk (hvert n-te ord) og/eller ved å klikke på ord i arket.
+   Lukene blir understreker (tekst — print-trygt), ordbanken stokkes,
+   og fasit-mekanikken er Ordkryss sin. Bannordfilteret deles med
+   Ordkryss (src/lib/ordkryss-kjerne.ts). */
+
+interface Props {
+  lang?: 'nb' | 'en';
+}
+
+const { lang = 'nb' } = Astro.props;
+
+const t =
+  lang === 'nb'
+    ? {
+        tittelFelt: 'Tittel på arket',
+        tittelEks: 'Skriv tittelen her',
+        tekst: 'Teksten',
+        tekstEks: 'Lim inn eller skriv teksten her …',
+        metode: 'Velg luker',
+        metodeKlikk: 'jeg klikker på ordene selv',
+        metode4: 'automatisk: ca. hvert 4. ord',
+        metode6: 'automatisk: ca. hvert 6. ord',
+        metode8: 'automatisk: ca. hvert 8. ord',
+        klikkHint: 'Etter at arket er laget kan du klikke på ord i det for å legge til eller fjerne luker.',
+        visOrdbank: 'Vis ordbank øverst på arket',
+        lag: 'Lag luketekst',
+        skrivUt: 'Skriv ut',
+        skrivUtFasit: 'Skriv ut fasit',
+        visFasit: 'Vis fasit her',
+        navnLinje: 'Navn: ____________________   Dato: ____________',
+        ordbank: 'Ordbank',
+        fasit: 'FASIT',
+        standardTittel: 'Luketekst',
+      }
+    : {
+        tittelFelt: 'Sheet title',
+        tittelEks: 'Type the title here',
+        tekst: 'The text',
+        tekstEks: 'Paste or type the text here …',
+        metode: 'Choose gaps',
+        metodeKlikk: 'I click the words myself',
+        metode4: 'automatic: about every 4th word',
+        metode6: 'automatic: about every 6th word',
+        metode8: 'automatic: about every 8th word',
+        klikkHint: 'After the sheet is made you can click words in it to add or remove gaps.',
+        visOrdbank: 'Show a word bank at the top of the sheet',
+        lag: 'Create gap-fill sheet',
+        skrivUt: 'Print',
+        skrivUtFasit: 'Print answer key',
+        visFasit: 'Show answers here',
+        navnLinje: 'Name: ____________________   Date: ____________',
+        ordbank: 'Word bank',
+        fasit: 'KEY',
+        standardTittel: 'Gap-fill text',
+      };
+---
+
+<div class="lu-verktoy" data-lang={lang} data-standardtittel={t.standardTittel}>
+  <div class="lu-oppsett">
+    <section class="lu-panel" aria-labelledby="lu-panel-tittel">
+      <h2 id="lu-panel-tittel" class="sr-only">{lang === 'nb' ? 'Oppsett' : 'Setup'}</h2>
+
+      <label class="lu-felt">
+        <span class="lu-felt-navn">{t.tittelFelt}</span>
+        <input type="text" id="lu-tittel" placeholder={t.tittelEks} maxlength="60" />
+      </label>
+
+      <label class="lu-felt">
+        <span class="lu-felt-navn">{t.tekst}</span>
+        <textarea id="lu-tekst" rows="9" maxlength="1600" placeholder={t.tekstEks}></textarea>
+      </label>
+
+      <label class="lu-felt">
+        <span class="lu-felt-navn">{t.metode}</span>
+        <select id="lu-metode">
+          <option value="klikk">{t.metodeKlikk}</option>
+          <option value="4">{t.metode4}</option>
+          <option value="6" selected>{t.metode6}</option>
+          <option value="8">{t.metode8}</option>
+        </select>
+      </label>
+      <p class="lu-hint">{t.klikkHint}</p>
+
+      <label class="lu-valg">
+        <input type="checkbox" id="lu-vis-ordbank" checked />
+        {t.visOrdbank}
+      </label>
+
+      <button type="button" id="lu-lag" class="knapp lu-primaer">{t.lag}</button>
+      <p id="lu-status" class="lu-status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="lu-visning" id="lu-ark-seksjon" hidden aria-labelledby="lu-visning-tittel">
+      <h2 id="lu-visning-tittel" class="sr-only">
+        {lang === 'nb' ? 'Forhåndsvisning' : 'Preview'}
+      </h2>
+      <div class="lu-handlinger">
+        <button type="button" id="lu-skriv-ut" class="knapp lu-primaer">{t.skrivUt}</button>
+        <button type="button" id="lu-skriv-ut-fasit" class="lu-sekundaer">{t.skrivUtFasit}</button>
+        <button type="button" id="lu-fasit-toggle" class="lu-sekundaer" aria-pressed="false">
+          {t.visFasit}
+        </button>
+      </div>
+
+      <div class="lu-sticky-print">
+        <button type="button" id="lu-skriv-ut-sticky" class="lu-sticky-knapp" title="Skriv ut arket (Ctrl+P)" aria-label={t.skrivUt}>
+          🖨
+        </button>
+      </div>
+
+      <div class="lu-ark" id="lu-ark">
+        <div class="lu-ark-hode">
+          <h3 id="lu-overskrift">{t.standardTittel}</h3>
+          <span class="lu-fasit-merke" aria-hidden="true">{t.fasit}</span>
+        </div>
+        <p class="lu-navn-linje">{t.navnLinje}</p>
+        <div class="lu-bank" id="lu-bank" hidden>
+          <p class="lu-bank-navn">{t.ordbank}</p>
+          <p class="lu-bank-ord" id="lu-bank-ord"></p>
+        </div>
+        <div id="lu-tekstflate" class="lu-tekstflate"></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<style is:global>
+  .lu-oppsett {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: var(--s-5);
+    align-items: start;
+    margin-top: var(--s-4);
+  }
+
+  @media (max-width: 900px) {
+    .lu-oppsett {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .lu-panel {
+    background: var(--flate);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: var(--s-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .lu-felt {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .lu-felt-navn {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--tekst);
+  }
+
+  .lu-panel input[type='text'],
+  .lu-panel select,
+  .lu-panel textarea {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    padding: 9px 10px;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--tekst);
+    min-height: 44px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .lu-panel textarea {
+    resize: vertical;
+    line-height: 1.5;
+  }
+
+  .lu-valg {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    min-height: 32px;
+    color: var(--tekst);
+  }
+
+  .lu-valg input {
+    width: 19px;
+    height: 19px;
+    accent-color: var(--salvie);
+    flex-shrink: 0;
+  }
+
+  @media (pointer: coarse) {
+    .lu-valg {
+      min-height: 44px;
+    }
+  }
+
+  .lu-hint {
+    margin: -8px 0 0;
+    font-size: 13.5px;
+    color: var(--dempet);
+  }
+
+  .lu-primaer {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 700;
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    border: none;
+    border-radius: 9px;
+    padding: 11px 20px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .lu-primaer:hover {
+    filter: brightness(1.06);
+  }
+
+  .lu-sekundaer {
+    font-family: var(--font-sans);
+    font-size: 14.5px;
+    font-weight: 600;
+    background: var(--bg);
+    color: var(--tekst);
+    border: 1px solid var(--linje);
+    border-radius: 9px;
+    padding: 10px 16px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .lu-sekundaer:hover {
+    border-color: var(--salvie);
+  }
+
+  .lu-status {
+    margin: 0;
+    font-size: 14.5px;
+    color: var(--dempet);
+    min-height: 1.4em;
+  }
+
+  .lu-status.feil {
+    color: var(--feil);
+  }
+
+  .lu-handlinger {
+    display: flex;
+    gap: var(--s-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--s-3);
+  }
+
+  .lu-sticky-print {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 15;
+  }
+
+  .lu-sticky-knapp {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 1px solid var(--linje);
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: var(--kort-skygge);
+    display: grid;
+    place-items: center;
+  }
+
+  .lu-ark {
+    background: #fff;
+    color: #111;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: 28px 32px;
+    max-width: 660px;
+  }
+
+  .lu-ark-hode {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  #lu-overskrift {
+    margin: 0 0 4px;
+    font-size: 24px;
+    color: #111;
+  }
+
+  .lu-fasit-merke {
+    display: none;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    color: #b3261e;
+    border: 2px solid #b3261e;
+    border-radius: 6px;
+    padding: 2px 8px;
+  }
+
+  .lu-verktoy.fasit-paa .lu-fasit-merke {
+    display: inline-block;
+  }
+
+  .lu-navn-linje {
+    margin: 0 0 16px;
+    font-size: 13.5px;
+    color: #333;
+  }
+
+  .lu-bank {
+    border: 2px solid #333;
+    border-radius: 6px;
+    padding: 8px 14px;
+    margin-bottom: 18px;
+    text-align: center;
+  }
+
+  .lu-bank-navn {
+    margin: 0;
+    font-weight: 700;
+    font-size: 14.5px;
+    text-decoration: underline;
+    color: #111;
+  }
+
+  .lu-bank-ord {
+    margin: 2px 0 0;
+    font-size: 15px;
+    color: #111;
+  }
+
+  .lu-tekstflate {
+    font-size: 17px;
+    line-height: 2.1;
+    color: #111;
+    white-space: pre-wrap;
+  }
+
+  /* Ordene er knapper (klikk = luke av/på), men ser ut som tekst */
+  .lu-ord {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    border-radius: 3px;
+  }
+
+  .lu-ord:hover,
+  .lu-ord:focus-visible {
+    background: #dcede2;
+    outline: none;
+  }
+
+  .lu-svar {
+    display: none;
+    font-weight: 700;
+    color: #1a6a3a;
+  }
+
+  .lu-verktoy.fasit-paa .lu-svar {
+    display: inline;
+  }
+
+  .lu-verktoy.fasit-paa .lu-strek {
+    display: none;
+  }
+
+  @media print {
+    @page {
+      margin: 14mm;
+    }
+
+    html,
+    body {
+      color-scheme: light;
+      background: #fff !important;
+      color: #000;
+    }
+
+    .topp,
+    .bunn,
+    .hopp,
+    .lu-panel,
+    .lu-handlinger,
+    .lu-side-hode,
+    .lu-sticky-print {
+      display: none !important;
+    }
+
+    .ramme {
+      padding: 0;
+      max-width: none;
+      min-height: 0;
+      background: #fff;
+    }
+
+    .lu-oppsett {
+      display: block;
+      margin: 0;
+    }
+
+    .lu-ark {
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 0;
+      max-width: none;
+    }
+
+    .lu-bank {
+      margin-bottom: 8mm;
+    }
+
+    .lu-verktoy:not(.print-fasit) .lu-svar {
+      display: none !important;
+    }
+
+    .lu-verktoy:not(.print-fasit) .lu-fasit-merke {
+      display: none !important;
+    }
+
+    .lu-verktoy.print-fasit .lu-svar {
+      display: inline !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+
+    .lu-verktoy.print-fasit .lu-strek {
+      display: none !important;
+    }
+
+    .lu-verktoy.print-fasit .lu-fasit-merke {
+      display: inline-block !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+  }
+</style>
+
+<script>
+  import { ordErUpassende } from '../lib/ordkryss-kjerne';
+
+  const rot = document.querySelector<HTMLElement>('.lu-verktoy');
+  if (rot) {
+    const lang = (rot.dataset.lang ?? 'nb') as 'nb' | 'en';
+    const standardTittel = rot.dataset.standardtittel ?? 'Luketekst';
+    const LAGRINGSNOKKEL = `luketekst-${lang}`;
+
+    const M =
+      lang === 'nb'
+        ? {
+            tomTekst: 'Skriv eller lim inn en tekst først.',
+            upassende: (o: string) =>
+              `«${o}» passer ikke på et skoleark. Endre teksten, så lager vi arket.`,
+            klart: (luker: number) =>
+              luker === 0
+                ? 'Arket er klart — klikk på ordene som skal bli luker.'
+                : `Arket er klart: ${luker} luker. Klikk på ord for å endre.`,
+          }
+        : {
+            tomTekst: 'Type or paste a text first.',
+            upassende: (o: string) =>
+              `“${o}” does not belong on a school sheet. Change the text and we will make the sheet.`,
+            klart: (luker: number) =>
+              luker === 0
+                ? 'The sheet is ready — click the words that should become gaps.'
+                : `The sheet is ready: ${luker} gaps. Click words to change.`,
+          };
+
+    interface Token {
+      tekst: string;
+      erOrd: boolean;
+      ordIndeks: number; // -1 for ikke-ord
+    }
+
+    let tokens: Token[] = [];
+    let luker = new Set<number>(); // ordIndekser
+    let fasitSynlig = false;
+
+    const el = <T extends HTMLElement = HTMLElement>(id: string): T =>
+      document.getElementById(id) as T;
+
+    function lagreUtkast() {
+      try {
+        localStorage.setItem(
+          LAGRINGSNOKKEL,
+          JSON.stringify({
+            tittel: el<HTMLInputElement>('lu-tittel').value,
+            tekst: el<HTMLTextAreaElement>('lu-tekst').value,
+            metode: el<HTMLSelectElement>('lu-metode').value,
+            visOrdbank: el<HTMLInputElement>('lu-vis-ordbank').checked,
+            luker: [...luker],
+          })
+        );
+      } catch {}
+    }
+
+    function lastUtkast(): number[] {
+      try {
+        const raa = localStorage.getItem(LAGRINGSNOKKEL);
+        if (!raa) return [];
+        const u = JSON.parse(raa);
+        el<HTMLInputElement>('lu-tittel').value = u.tittel ?? '';
+        el<HTMLTextAreaElement>('lu-tekst').value = u.tekst ?? '';
+        const metode = el<HTMLSelectElement>('lu-metode');
+        if ([...metode.options].some((o) => o.value === u.metode)) metode.value = u.metode;
+        el<HTMLInputElement>('lu-vis-ordbank').checked = u.visOrdbank !== false;
+        return Array.isArray(u.luker) ? u.luker.filter((n: unknown) => typeof n === 'number') : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function tokeniser(tekst: string): Token[] {
+      const deler = tekst.split(/([A-Za-zÆØÅæøåÉéÜüÖö0-9]+(?:[-'][A-Za-zÆØÅæøåÉéÜüÖö0-9]+)*)/);
+      const resultat: Token[] = [];
+      let ordIndeks = 0;
+      deler.forEach((del, i) => {
+        if (!del) return;
+        const erOrd = i % 2 === 1;
+        resultat.push({ tekst: del, erOrd, ordIndeks: erOrd ? ordIndeks++ : -1 });
+      });
+      return resultat;
+    }
+
+    function tegnArk() {
+      el('lu-overskrift').textContent =
+        el<HTMLInputElement>('lu-tittel').value.trim() || standardTittel;
+
+      const flate = el('lu-tekstflate');
+      flate.replaceChildren();
+      tokens.forEach((token) => {
+        if (!token.erOrd) {
+          flate.appendChild(document.createTextNode(token.tekst));
+          return;
+        }
+        const knapp = document.createElement('button');
+        knapp.type = 'button';
+        knapp.className = 'lu-ord';
+        knapp.setAttribute('data-i', String(token.ordIndeks));
+        if (luker.has(token.ordIndeks)) {
+          const strek = document.createElement('span');
+          strek.className = 'lu-strek';
+          strek.textContent = '_'.repeat(Math.min(14, Math.max(7, token.tekst.length + 3)));
+          const svar = document.createElement('span');
+          svar.className = 'lu-svar';
+          svar.textContent = token.tekst;
+          knapp.append(strek, svar);
+        } else {
+          knapp.textContent = token.tekst;
+        }
+        flate.appendChild(knapp);
+      });
+
+      const visBank = el<HTMLInputElement>('lu-vis-ordbank').checked;
+      const bank = el('lu-bank');
+      bank.hidden = !visBank || luker.size === 0;
+      if (visBank && luker.size > 0) {
+        const ord = tokens
+          .filter((tk) => tk.erOrd && luker.has(tk.ordIndeks))
+          .map((tk) => tk.tekst.toLowerCase());
+        for (let i = ord.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [ord[i], ord[j]] = [ord[j], ord[i]];
+        }
+        el('lu-bank-ord').textContent = ord.join('  –  ');
+      }
+
+      el('lu-ark-seksjon').removeAttribute('hidden');
+    }
+
+    function siStatus(tekst: string, erFeil = false) {
+      const status = el('lu-status');
+      status.textContent = tekst;
+      status.classList.toggle('feil', erFeil);
+    }
+
+    function generer(bevarLuker = false) {
+      const tekst = el<HTMLTextAreaElement>('lu-tekst').value;
+      if (!tekst.trim()) {
+        siStatus(M.tomTekst, true);
+        return;
+      }
+      tokens = tokeniser(tekst);
+      const ordene = tokens.filter((tk) => tk.erOrd);
+      for (const tk of ordene) {
+        if (ordErUpassende(tk.tekst)) {
+          siStatus(M.upassende(tk.tekst), true);
+          return;
+        }
+      }
+
+      if (!bevarLuker) {
+        luker = new Set();
+        const metode = el<HTMLSelectElement>('lu-metode').value;
+        if (metode !== 'klikk') {
+          const n = parseInt(metode, 10);
+          // start på ord nr. n (aldri første), hopp over rene tall
+          for (let i = n - 1; i < ordene.length; i += n) {
+            if (!/^\d+$/.test(ordene[i].tekst)) luker.add(ordene[i].ordIndeks);
+          }
+        }
+      } else {
+        // behold bare luker som fortsatt finnes
+        luker = new Set([...luker].filter((i) => i < ordene.length));
+      }
+
+      fasitSynlig = false;
+      el('lu-fasit-toggle').setAttribute('aria-pressed', 'false');
+      rot.classList.remove('fasit-paa');
+
+      tegnArk();
+      siStatus(M.klart(luker.size));
+      lagreUtkast();
+    }
+
+    // Klikk i arket: veksle luke for ordet
+    el('lu-tekstflate').addEventListener('click', (e) => {
+      const knapp = (e.target as HTMLElement).closest('.lu-ord');
+      if (!knapp) return;
+      const i = parseInt(knapp.getAttribute('data-i') ?? '', 10);
+      if (Number.isNaN(i)) return;
+      if (luker.has(i)) luker.delete(i);
+      else luker.add(i);
+      tegnArk();
+      siStatus(M.klart(luker.size));
+      lagreUtkast();
+    });
+
+    const lagredeLuker = lastUtkast();
+    if (lagredeLuker.length > 0 && el<HTMLTextAreaElement>('lu-tekst').value.trim()) {
+      luker = new Set(lagredeLuker);
+      tokens = tokeniser(el<HTMLTextAreaElement>('lu-tekst').value);
+      tegnArk();
+      siStatus(M.klart(luker.size));
+    }
+
+    el('lu-lag').addEventListener('click', () => generer(false));
+
+    el('lu-fasit-toggle').addEventListener('click', () => {
+      fasitSynlig = !fasitSynlig;
+      el('lu-fasit-toggle').setAttribute('aria-pressed', String(fasitSynlig));
+      rot.classList.toggle('fasit-paa', fasitSynlig);
+    });
+
+    const skrivUt = () => {
+      rot.classList.remove('print-fasit');
+      window.print();
+    };
+    el('lu-skriv-ut').addEventListener('click', skrivUt);
+    el('lu-skriv-ut-sticky').addEventListener('click', skrivUt);
+    el('lu-skriv-ut-fasit').addEventListener('click', () => {
+      rot.classList.add('print-fasit');
+      window.print();
+    });
+    window.addEventListener('afterprint', () => rot.classList.remove('print-fasit'));
+
+    ['lu-tittel', 'lu-tekst', 'lu-metode'].forEach((id) =>
+      el(id).addEventListener('change', lagreUtkast)
+    );
+    el('lu-vis-ordbank').addEventListener('change', () => {
+      if (tokens.length > 0) tegnArk();
+      lagreUtkast();
+    });
+  }
+</script>

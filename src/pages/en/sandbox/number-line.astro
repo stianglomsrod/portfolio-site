@@ -1,0 +1,45 @@
+---
+import Side from '../../../layouts/Side.astro';
+import TallinjeVerktoy from '../../../components/TallinjeVerktoy.astro';
+
+/* Number lines in the sandbox. NORSK TVILLING:
+   src/pages/sandbox/tallinje.astro — endre begge. */
+---
+
+<Side
+  lang="en"
+  title="Number lines — make printable number line sheets"
+  description="Number lines with gaps for pupils to fill in — count in 1s, 2s, 5s or 10s."
+>
+  <div class="ta-side-hode">
+    <p class="kicker">/sandbox · tool</p>
+    <h1>Number lines</h1>
+    <p class="dempet">
+      Make number line sheets: pick the start value, the jump and how many boxes are left empty. The lines connect, so the sheet covers a continuous range. Answer key included.
+    </p>
+  </div>
+  <TallinjeVerktoy lang="en" />
+</Side>
+
+<style>
+  .kicker {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: var(--tekst-label);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--hue-aksent);
+    margin: var(--s-7) 0 var(--s-2);
+  }
+
+  h1 {
+    font-size: var(--tekst-tittel);
+    margin: 0 0 var(--s-3);
+  }
+
+  .dempet {
+    color: var(--dempet);
+    max-width: 68ch;
+    margin: 0;
+  }
+</style>

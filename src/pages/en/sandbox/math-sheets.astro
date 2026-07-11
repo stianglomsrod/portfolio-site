@@ -1,0 +1,45 @@
+---
+import Side from '../../../layouts/Side.astro';
+import RegnearkVerktoy from '../../../components/RegnearkVerktoy.astro';
+
+/* Math sheets in the sandbox. NORSK TVILLING:
+   src/pages/sandbox/regneark.astro — endre begge. */
+---
+
+<Side
+  lang="en"
+  title="Math sheets — make printable arithmetic sheets"
+  description="Addition, subtraction, multiplication and division with a chosen range and regrouping control — plus an answer key."
+>
+  <div class="re-side-hode">
+    <p class="kicker">/sandbox · tool</p>
+    <h1>Math sheets</h1>
+    <p class="dempet">
+      Make arithmetic sheets: pick operations, number range, count and whether the problems use regrouping. Open problems (7 + __ = 12) are optional, and the answer key prints separately.
+    </p>
+  </div>
+  <RegnearkVerktoy lang="en" />
+</Side>
+
+<style>
+  .kicker {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: var(--tekst-label);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--hue-aksent);
+    margin: var(--s-7) 0 var(--s-2);
+  }
+
+  h1 {
+    font-size: var(--tekst-tittel);
+    margin: 0 0 var(--s-3);
+  }
+
+  .dempet {
+    color: var(--dempet);
+    max-width: 68ch;
+    margin: 0;
+  }
+</style>

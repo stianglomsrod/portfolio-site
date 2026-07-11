@@ -1,0 +1,45 @@
+---
+import Side from '../../../layouts/Side.astro';
+import SetningsstokkingVerktoy from '../../../components/SetningsstokkingVerktoy.astro';
+
+/* Scrambled sentences in the sandbox. NORSK TVILLING:
+   src/pages/sandbox/setningsstokking.astro — endre begge. */
+---
+
+<Side
+  lang="en"
+  title="Scrambled sentences — make printable sheets"
+  description="Type the sentences and the sheet shows the words scrambled — pupils write the sentence correctly on the line."
+>
+  <div class="se-side-hode">
+    <p class="kicker">/sandbox · tool</p>
+    <h1>Scrambled sentences</h1>
+    <p class="dempet">
+      Type sentences and the sheet shows the words as scrambled tiles. The pupil puts them in order and writes the sentence on the line below. Answer-key printing included.
+    </p>
+  </div>
+  <SetningsstokkingVerktoy lang="en" />
+</Side>
+
+<style>
+  .kicker {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: var(--tekst-label);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--hue-aksent);
+    margin: var(--s-7) 0 var(--s-2);
+  }
+
+  h1 {
+    font-size: var(--tekst-tittel);
+    margin: 0 0 var(--s-3);
+  }
+
+  .dempet {
+    color: var(--dempet);
+    max-width: 68ch;
+    margin: 0;
+  }
+</style>

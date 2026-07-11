@@ -1,0 +1,632 @@
+---
+/* Sporing-verktøyet: skriveark der eleven sporer stiplede bokstaver og
+   ord på skrivelinjer. Hver rad er SVG: linjesystem (topp/x-høyde
+   stiplet, grunnlinje heltrukket) og teksten gjentatt med stiplet
+   kontur (fill: none + stroke-dasharray) — første forekomst mørkere,
+   resten lysere. textLength gjør gjentakelsene forutsigbare. */
+
+interface Props {
+  lang?: 'nb' | 'en';
+}
+
+const { lang = 'nb' } = Astro.props;
+
+const t =
+  lang === 'nb'
+    ? {
+        tittelFelt: 'Tittel på arket',
+        tittelEks: 'Skriv tittelen her',
+        radNavn: 'Bokstaver eller ord (én per rad)',
+        radEks: 'skriv en bokstav eller et ord',
+        leggTil: '+ Legg til rad',
+        storrelse: 'Størrelse',
+        storrelseStor: 'stor (1.–2. trinn)',
+        storrelseMiddels: 'middels',
+        tomLinje: 'Tom skrivelinje under hver rad',
+        lag: 'Lag sporingsark',
+        skrivUt: 'Skriv ut',
+        navnLinje: 'Navn: ____________________   Dato: ____________',
+        instruks: 'Spor bokstavene så pent du kan.',
+        standardTittel: 'Sporing',
+      }
+    : {
+        tittelFelt: 'Sheet title',
+        tittelEks: 'Type the title here',
+        radNavn: 'Letters or words (one per row)',
+        radEks: 'type a letter or a word',
+        leggTil: '+ Add row',
+        storrelse: 'Size',
+        storrelseStor: 'large (early years)',
+        storrelseMiddels: 'medium',
+        tomLinje: 'Empty writing line under each row',
+        lag: 'Create tracing sheet',
+        skrivUt: 'Print',
+        navnLinje: 'Name: ____________________   Date: ____________',
+        instruks: 'Trace the letters as neatly as you can.',
+        standardTittel: 'Tracing',
+      };
+---
+
+<div class="sp-verktoy" data-lang={lang} data-standardtittel={t.standardTittel}>
+  <div class="sp-oppsett">
+    <section class="sp-panel" aria-labelledby="sp-panel-tittel">
+      <h2 id="sp-panel-tittel" class="sr-only">{lang === 'nb' ? 'Oppsett' : 'Setup'}</h2>
+
+      <label class="sp-felt">
+        <span class="sp-felt-navn">{t.tittelFelt}</span>
+        <input type="text" id="sp-tittel" placeholder={t.tittelEks} maxlength="60" />
+      </label>
+
+      <div class="sp-felt">
+        <span class="sp-felt-navn" id="sp-rad-navn">{t.radNavn}</span>
+        <ul id="sp-liste" aria-labelledby="sp-rad-navn"></ul>
+        <button type="button" id="sp-legg-til" class="sp-sekundaer">{t.leggTil}</button>
+      </div>
+
+      <label class="sp-felt">
+        <span class="sp-felt-navn">{t.storrelse}</span>
+        <select id="sp-storrelse">
+          <option value="stor" selected>{t.storrelseStor}</option>
+          <option value="middels">{t.storrelseMiddels}</option>
+        </select>
+      </label>
+
+      <label class="sp-valg">
+        <input type="checkbox" id="sp-tom-linje" checked />
+        {t.tomLinje}
+      </label>
+
+      <button type="button" id="sp-lag" class="knapp sp-primaer">{t.lag}</button>
+      <p id="sp-status" class="sp-status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="sp-visning" id="sp-ark-seksjon" hidden aria-labelledby="sp-visning-tittel">
+      <h2 id="sp-visning-tittel" class="sr-only">
+        {lang === 'nb' ? 'Forhåndsvisning' : 'Preview'}
+      </h2>
+      <div class="sp-handlinger">
+        <button type="button" id="sp-skriv-ut" class="knapp sp-primaer">{t.skrivUt}</button>
+      </div>
+
+      <div class="sp-sticky-print">
+        <button type="button" id="sp-skriv-ut-sticky" class="sp-sticky-knapp" title="Skriv ut arket (Ctrl+P)" aria-label={t.skrivUt}>
+          🖨
+        </button>
+      </div>
+
+      <div class="sp-ark" id="sp-ark">
+        <h3 id="sp-overskrift">{t.standardTittel}</h3>
+        <p class="sp-instruks">{t.instruks}</p>
+        <p class="sp-navn-linje">{t.navnLinje}</p>
+        <div id="sp-rader" class="sp-rader"></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<style is:global>
+  .sp-oppsett {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: var(--s-5);
+    align-items: start;
+    margin-top: var(--s-4);
+  }
+
+  @media (max-width: 900px) {
+    .sp-oppsett {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .sp-panel {
+    background: var(--flate);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: var(--s-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .sp-felt {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .sp-felt-navn {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--tekst);
+  }
+
+  .sp-panel input[type='text'],
+  .sp-panel select {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    padding: 9px 10px;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--tekst);
+    min-height: 44px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .sp-valg {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    min-height: 32px;
+    color: var(--tekst);
+  }
+
+  .sp-valg input {
+    width: 19px;
+    height: 19px;
+    accent-color: var(--salvie);
+    flex-shrink: 0;
+  }
+
+  @media (pointer: coarse) {
+    .sp-valg {
+      min-height: 44px;
+    }
+  }
+
+  #sp-liste {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .sp-rad-inn {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .sp-rad-inn input[type='text'] {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .sp-rad-inn.upassende input[type='text'] {
+    border-color: var(--feil);
+  }
+
+  .sp-ikonknapp {
+    font: inherit;
+    min-width: 44px;
+    min-height: 44px;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--tekst);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .sp-ikonknapp:hover {
+    border-color: var(--salvie);
+  }
+
+  .sp-primaer {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 700;
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    border: none;
+    border-radius: 9px;
+    padding: 11px 20px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .sp-primaer:hover {
+    filter: brightness(1.06);
+  }
+
+  .sp-sekundaer {
+    font-family: var(--font-sans);
+    font-size: 14.5px;
+    font-weight: 600;
+    background: var(--bg);
+    color: var(--tekst);
+    border: 1px solid var(--linje);
+    border-radius: 9px;
+    padding: 10px 16px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .sp-sekundaer:hover {
+    border-color: var(--salvie);
+  }
+
+  .sp-sekundaer:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  .sp-status {
+    margin: 0;
+    font-size: 14.5px;
+    color: var(--dempet);
+    min-height: 1.4em;
+  }
+
+  .sp-status.feil {
+    color: var(--feil);
+  }
+
+  .sp-handlinger {
+    display: flex;
+    gap: var(--s-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--s-3);
+  }
+
+  .sp-sticky-print {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 15;
+  }
+
+  .sp-sticky-knapp {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 1px solid var(--linje);
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: var(--kort-skygge);
+    display: grid;
+    place-items: center;
+  }
+
+  .sp-ark {
+    background: #fff;
+    color: #111;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: 28px 32px;
+    max-width: 660px;
+  }
+
+  #sp-overskrift {
+    margin: 0 0 4px;
+    font-size: 24px;
+    color: #111;
+  }
+
+  .sp-instruks {
+    margin: 0 0 6px;
+    font-size: 14.5px;
+    color: #333;
+  }
+
+  .sp-navn-linje {
+    margin: 0 0 18px;
+    font-size: 13.5px;
+    color: #333;
+  }
+
+  .sp-rader {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .sp-rader[data-storrelse='middels'] {
+    gap: 10px;
+  }
+
+  .sp-rad svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  @media print {
+    @page {
+      margin: 14mm;
+    }
+
+    html,
+    body {
+      color-scheme: light;
+      background: #fff !important;
+      color: #000;
+    }
+
+    .topp,
+    .bunn,
+    .hopp,
+    .sp-panel,
+    .sp-handlinger,
+    .sp-side-hode,
+    .sp-sticky-print {
+      display: none !important;
+    }
+
+    .ramme {
+      padding: 0;
+      max-width: none;
+      min-height: 0;
+      background: #fff;
+    }
+
+    .sp-oppsett {
+      display: block;
+      margin: 0;
+    }
+
+    .sp-ark {
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 0;
+      max-width: none;
+    }
+
+    .sp-rader {
+      gap: 7mm;
+    }
+
+    .sp-rader[data-storrelse='middels'] {
+      gap: 5mm;
+    }
+
+    .sp-rad {
+      break-inside: avoid;
+    }
+  }
+</style>
+
+<script>
+  import { ordErUpassende } from '../lib/ordkryss-kjerne';
+
+  const rot = document.querySelector<HTMLElement>('.sp-verktoy');
+  if (rot) {
+    const lang = (rot.dataset.lang ?? 'nb') as 'nb' | 'en';
+    const standardTittel = rot.dataset.standardtittel ?? 'Sporing';
+    const LAGRINGSNOKKEL = `sporing-${lang}`;
+    const MAKS = 8;
+    const NS = 'http://www.w3.org/2000/svg';
+
+    const M =
+      lang === 'nb'
+        ? {
+            minstEn: 'Skriv inn minst én bokstav eller ett ord.',
+            upassende: (o: string) =>
+              `«${o}» passer ikke på et skoleark. Bytt det ut, så lager vi arket.`,
+            klart: (n: number) => `Arket er klart: ${n} rader.`,
+            radAria: (i: number) => `Rad ${i}`,
+            fjern: (i: number) => `Fjern rad ${i}`,
+            radEks: 'skriv en bokstav eller et ord',
+          }
+        : {
+            minstEn: 'Type at least one letter or word.',
+            upassende: (o: string) =>
+              `“${o}” does not belong on a school sheet. Swap it and we will make the sheet.`,
+            klart: (n: number) => `The sheet is ready: ${n} rows.`,
+            radAria: (i: number) => `Row ${i}`,
+            fjern: (i: number) => `Remove row ${i}`,
+            radEks: 'type a letter or a word',
+          };
+
+    interface Rad {
+      id: number;
+      tekst: string;
+    }
+
+    let rader: Rad[] = [];
+    let nesteId = 1;
+
+    const el = <T extends HTMLElement = HTMLElement>(id: string): T =>
+      document.getElementById(id) as T;
+
+    function lagreUtkast() {
+      try {
+        localStorage.setItem(
+          LAGRINGSNOKKEL,
+          JSON.stringify({
+            tittel: el<HTMLInputElement>('sp-tittel').value,
+            storrelse: el<HTMLSelectElement>('sp-storrelse').value,
+            tomLinje: el<HTMLInputElement>('sp-tom-linje').checked,
+            rader: rader.map((r) => r.tekst),
+          })
+        );
+      } catch {}
+    }
+
+    function lastUtkast(): boolean {
+      try {
+        const raa = localStorage.getItem(LAGRINGSNOKKEL);
+        if (!raa) return false;
+        const u = JSON.parse(raa);
+        el<HTMLInputElement>('sp-tittel').value = u.tittel ?? '';
+        const felt = el<HTMLSelectElement>('sp-storrelse');
+        if ([...felt.options].some((o) => o.value === u.storrelse)) felt.value = u.storrelse;
+        el<HTMLInputElement>('sp-tom-linje').checked = u.tomLinje !== false;
+        (u.rader ?? []).forEach((r: unknown) => {
+          if (typeof r === 'string') rader.push({ id: nesteId++, tekst: r });
+        });
+        return rader.length > 0;
+      } catch {
+        return false;
+      }
+    }
+
+    function leggTil(tekst = '') {
+      if (rader.length >= MAKS) return;
+      rader.push({ id: nesteId++, tekst });
+      tegnListe();
+    }
+
+    function tegnListe() {
+      const liste = el('sp-liste');
+      liste.replaceChildren();
+      rader.forEach((rad, indeks) => {
+        const li = document.createElement('li');
+        li.className = 'sp-rad-inn';
+        const felt = document.createElement('input');
+        felt.type = 'text';
+        felt.value = rad.tekst.slice(0, 12);
+        felt.maxLength = 12;
+        felt.placeholder = M.radEks;
+        felt.setAttribute('aria-label', M.radAria(indeks + 1));
+        felt.addEventListener('input', () => {
+          rad.tekst = felt.value;
+          const stygt = ordErUpassende(felt.value);
+          li.classList.toggle('upassende', stygt);
+          felt.setAttribute('aria-invalid', stygt ? 'true' : 'false');
+          lagreUtkast();
+        });
+        const fjern = document.createElement('button');
+        fjern.type = 'button';
+        fjern.className = 'sp-ikonknapp';
+        fjern.textContent = '✕';
+        fjern.setAttribute('aria-label', M.fjern(indeks + 1));
+        fjern.addEventListener('click', () => {
+          rader = rader.filter((r) => r.id !== rad.id);
+          if (rader.length === 0) leggTil();
+          tegnListe();
+          lagreUtkast();
+        });
+        li.append(felt, fjern);
+        liste.appendChild(li);
+      });
+      el<HTMLButtonElement>('sp-legg-til').disabled = rader.length >= MAKS;
+    }
+
+    function svgEl(navn: string, attrs: Record<string, string>, tekst?: string) {
+      const e = document.createElementNS(NS, navn);
+      for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+      if (tekst !== undefined) e.textContent = tekst;
+      return e;
+    }
+
+    /* Én sporingsrad: linjesystem + teksten gjentatt med stiplet kontur.
+       Skala: font 13, grunnlinje y=15, x-høyde ≈ 6.5 over, topp ≈ 10. */
+    function lagRadSvg(tekst: string, medTekst: boolean) {
+      const svg = svgEl('svg', { viewBox: '0 0 200 21', 'aria-hidden': 'true' });
+      const grunn = 15;
+      svg.appendChild(svgEl('line', { x1: '0', y1: '4.5', x2: '200', y2: '4.5', stroke: '#c9c9c9', 'stroke-width': '0.35', 'stroke-dasharray': '2 2' }));
+      svg.appendChild(svgEl('line', { x1: '0', y1: '9.5', x2: '200', y2: '9.5', stroke: '#c9c9c9', 'stroke-width': '0.35', 'stroke-dasharray': '2 2' }));
+      svg.appendChild(svgEl('line', { x1: '0', y1: String(grunn), x2: '200', y2: String(grunn), stroke: '#777', 'stroke-width': '0.45' }));
+
+      if (medTekst) {
+        // textLength gir forutsigbar bredde per gjentakelse
+        const lengde = Math.max(2, tekst.length) * 7.2;
+        const antall = Math.max(1, Math.floor(202 / (lengde + 9)));
+        for (let i = 0; i < antall; i++) {
+          svg.appendChild(
+            svgEl(
+              'text',
+              {
+                x: String(3 + i * (lengde + 9)),
+                y: String(grunn),
+                'font-size': '13',
+                'font-weight': '600',
+                fill: 'none',
+                stroke: i === 0 ? '#444' : '#b9b9b9',
+                'stroke-width': '0.42',
+                'stroke-dasharray': '1.1 0.75',
+                textLength: String(lengde),
+                lengthAdjust: 'spacingAndGlyphs',
+              },
+              tekst
+            )
+          );
+        }
+      }
+      return svg;
+    }
+
+    function siStatus(tekst: string, erFeil = false) {
+      const status = el('sp-status');
+      status.textContent = tekst;
+      status.classList.toggle('feil', erFeil);
+    }
+
+    function generer() {
+      const rene = rader.map((r) => r.tekst.trim()).filter(Boolean);
+      if (rene.length === 0) {
+        siStatus(M.minstEn, true);
+        return;
+      }
+      for (const tekst of rene) {
+        if (ordErUpassende(tekst)) {
+          siStatus(M.upassende(tekst), true);
+          return;
+        }
+      }
+
+      el('sp-overskrift').textContent =
+        el<HTMLInputElement>('sp-tittel').value.trim() || standardTittel;
+
+      const beholder = el('sp-rader');
+      beholder.setAttribute('data-storrelse', el<HTMLSelectElement>('sp-storrelse').value);
+      beholder.replaceChildren();
+      const tomLinje = el<HTMLInputElement>('sp-tom-linje').checked;
+      rene.forEach((tekst) => {
+        const rad = document.createElement('div');
+        rad.className = 'sp-rad';
+        rad.appendChild(lagRadSvg(tekst, true));
+        beholder.appendChild(rad);
+        if (tomLinje) {
+          const tom = document.createElement('div');
+          tom.className = 'sp-rad';
+          tom.appendChild(lagRadSvg('', false));
+          beholder.appendChild(tom);
+        }
+      });
+
+      el('sp-ark-seksjon').removeAttribute('hidden');
+      siStatus(M.klart(rene.length));
+      lagreUtkast();
+    }
+
+    if (!lastUtkast()) {
+      leggTil();
+      leggTil();
+      leggTil();
+    }
+    tegnListe();
+
+    el('sp-legg-til').addEventListener('click', () => {
+      leggTil();
+      lagreUtkast();
+    });
+
+    el('sp-lag').addEventListener('click', generer);
+
+    const skrivUt = () => window.print();
+    el('sp-skriv-ut').addEventListener('click', skrivUt);
+    el('sp-skriv-ut-sticky').addEventListener('click', skrivUt);
+
+    ['sp-tittel', 'sp-storrelse', 'sp-tom-linje'].forEach((id) =>
+      el(id).addEventListener('change', lagreUtkast)
+    );
+  }
+</script>

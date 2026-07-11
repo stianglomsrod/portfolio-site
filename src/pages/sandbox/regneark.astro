@@ -1,0 +1,44 @@
+---
+import Side from '../../layouts/Side.astro';
+import RegnearkVerktoy from '../../components/RegnearkVerktoy.astro';
+
+/* Regneark i sandbox. ENGELSK TVILLING:
+   src/pages/en/sandbox/math-sheets.astro — endre begge. */
+---
+
+<Side
+  title="Regneark — lag oppgaveark i regning"
+  description="Pluss, minus, gange og dele med valgbart tallområde og tierovergang — pluss fasit-utskrift."
+>
+  <div class="re-side-hode">
+    <p class="kicker">/sandbox · verktøy</p>
+    <h1>Regneark</h1>
+    <p class="dempet">
+      Lag regneark: velg regnearter, tallområde, antall og om stykkene skal ha tierovergang. Åpne oppgaver (7 + __ = 12) er valgfritt, og fasiten skrives ut for seg.
+    </p>
+  </div>
+  <RegnearkVerktoy lang="nb" />
+</Side>
+
+<style>
+  .kicker {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: var(--tekst-label);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--hue-aksent);
+    margin: var(--s-7) 0 var(--s-2);
+  }
+
+  h1 {
+    font-size: var(--tekst-tittel);
+    margin: 0 0 var(--s-3);
+  }
+
+  .dempet {
+    color: var(--dempet);
+    max-width: 68ch;
+    margin: 0;
+  }
+</style>

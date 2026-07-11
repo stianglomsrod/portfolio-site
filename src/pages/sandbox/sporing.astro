@@ -1,0 +1,44 @@
+---
+import Side from '../../layouts/Side.astro';
+import SporingVerktoy from '../../components/SporingVerktoy.astro';
+
+/* Sporing i sandbox. ENGELSK TVILLING:
+   src/pages/en/sandbox/tracing.astro — endre begge. */
+---
+
+<Side
+  title="Sporing — lag skriveark med stiplede bokstaver"
+  description="Stiplede bokstaver og ord på skrivelinjer — eleven sporer og skriver selv etterpå."
+>
+  <div class="sp-side-hode">
+    <p class="kicker">/sandbox · verktøy</p>
+    <h1>Sporing</h1>
+    <p class="dempet">
+      Lag sporingsark for håndskrift: skriv bokstavene eller ordene, og arket viser dem med stiplet kontur på skrivelinjer — første tydelig, resten svakere. Valgfri tom linje under hver rad.
+    </p>
+  </div>
+  <SporingVerktoy lang="nb" />
+</Side>
+
+<style>
+  .kicker {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: var(--tekst-label);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--hue-aksent);
+    margin: var(--s-7) 0 var(--s-2);
+  }
+
+  h1 {
+    font-size: var(--tekst-tittel);
+    margin: 0 0 var(--s-3);
+  }
+
+  .dempet {
+    color: var(--dempet);
+    max-width: 68ch;
+    margin: 0;
+  }
+</style>

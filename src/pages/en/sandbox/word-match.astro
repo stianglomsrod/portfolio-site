@@ -1,0 +1,45 @@
+---
+import Side from '../../../layouts/Side.astro';
+import OrdTilBildeVerktoy from '../../../components/OrdTilBildeVerktoy.astro';
+
+/* Word and picture in the sandbox. NORSK TVILLING:
+   src/pages/sandbox/ord-til-bilde.astro — endre begge. */
+---
+
+<Side
+  lang="en"
+  title="Word and picture — make printable matching sheets"
+  description="Words in one column, shuffled pictures in the other — the pupil draws lines. The key draws them for you."
+>
+  <div class="ob-side-hode">
+    <p class="kicker">/sandbox · tool</p>
+    <h1>Word and picture</h1>
+    <p class="dempet">
+      Make matching sheets: type the words and paste a picture per word (Ctrl + V). The sheet shows the words on the left and the shuffled pictures on the right — the pupil draws lines. The answer key draws them.
+    </p>
+  </div>
+  <OrdTilBildeVerktoy lang="en" />
+</Side>
+
+<style>
+  .kicker {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: var(--tekst-label);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--hue-aksent);
+    margin: var(--s-7) 0 var(--s-2);
+  }
+
+  h1 {
+    font-size: var(--tekst-tittel);
+    margin: 0 0 var(--s-3);
+  }
+
+  .dempet {
+    color: var(--dempet);
+    max-width: 68ch;
+    margin: 0;
+  }
+</style>

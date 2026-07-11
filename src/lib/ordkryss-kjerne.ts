@@ -60,12 +60,46 @@ export function normaliserOrd(raatekst: string): string {
     .join('');
 }
 
+/* Uskyldige ord som inneholder et bannord som delstreng: «sofaen»
+   inneholder faen, «slutt» inneholder slut, «homogen» inneholder homo.
+   Et ord frikjennes bare når HVER forekomst av bannordet ligger inni
+   et av unntaksordene — «faenskapsofaen» stoppes fortsatt. */
+const UNNTAK: Record<string, string[]> = {
+  faen: ['sofaen'],
+  slut: ['slutt', 'slutn'], // slutte/til slutt + avslutning/beslutning
+  homo: ['homogen', 'homofon', 'homonym'],
+  pule: ['spule'],
+  kukk: ['kukkelure'],
+  puta: ['amputa'],
+  cock: ['cocktail'],
+  merde: ['merden', 'merder', 'merdene'],
+};
+
+function erFrikjent(norm: string, bann: string): boolean {
+  const unntak = UNNTAK[bann];
+  if (!unntak) return false;
+  let fra = norm.indexOf(bann);
+  while (fra !== -1) {
+    const dekket = unntak.some((u) => {
+      const offset = u.indexOf(bann);
+      if (offset === -1) return false;
+      const start = fra - offset;
+      return start >= 0 && norm.slice(start, start + u.length) === u;
+    });
+    if (!dekket) return false;
+    fra = norm.indexOf(bann, fra + 1);
+  }
+  return true;
+}
+
 /* Korte bannord må treffe hele ordet, lengre (4+) også som del av det.
-   Da stoppes «FAENSKAP», mens «KLASSE» går fint. */
+   Da stoppes «FAENSKAP», mens «KLASSE» — og «sofaen» — går fint. */
 export function ordErUpassende(ord: string): boolean {
   const norm = normaliserOrd(ord).toLowerCase();
   if (!norm) return false;
-  return BANNORD.some((b) => (b.length >= 4 ? norm.includes(b) : norm === b));
+  return BANNORD.some((b) =>
+    b.length >= 4 ? norm.includes(b) && !erFrikjent(norm, b) : norm === b
+  );
 }
 
 /* Alle leselinjer: rader, kolonner og begge diagonalretninger — hver av

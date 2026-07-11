@@ -1,0 +1,672 @@
+---
+/* Alfabetisering-verktøyet: eleven skriver ordene i alfabetisk
+   rekkefølge. Ordbanken stokkes; skrivelinjene er understreker
+   (print-trygt). Sorteringen bruker Intl.Collator('nb') så æ, ø og å
+   havner der de skal. Fasit-mekanikken er Ordkryss sin. */
+
+interface Props {
+  lang?: 'nb' | 'en';
+}
+
+const { lang = 'nb' } = Astro.props;
+
+const t =
+  lang === 'nb'
+    ? {
+        tittelFelt: 'Tittel på arket',
+        tittelEks: 'Skriv tittelen her',
+        ordNavn: 'Ordene',
+        ordEks: 'skriv et ord',
+        leggTil: '+ Legg til ord',
+        lag: 'Lag ark',
+        skrivUt: 'Skriv ut',
+        skrivUtFasit: 'Skriv ut fasit',
+        visFasit: 'Vis fasit her',
+        navnLinje: 'Navn: ____________________   Dato: ____________',
+        instruks: 'Skriv ordene i alfabetisk rekkefølge.',
+        ordbank: 'Ordbank',
+        fasit: 'FASIT',
+        standardTittel: 'Alfabetisk rekkefølge',
+      }
+    : {
+        tittelFelt: 'Sheet title',
+        tittelEks: 'Type the title here',
+        ordNavn: 'The words',
+        ordEks: 'type a word',
+        leggTil: '+ Add word',
+        lag: 'Create sheet',
+        skrivUt: 'Print',
+        skrivUtFasit: 'Print answer key',
+        visFasit: 'Show answers here',
+        navnLinje: 'Name: ____________________   Date: ____________',
+        instruks: 'Write the words in alphabetical order.',
+        ordbank: 'Word bank',
+        fasit: 'KEY',
+        standardTittel: 'Alphabetical order',
+      };
+---
+
+<div class="al-verktoy" data-lang={lang} data-standardtittel={t.standardTittel}>
+  <div class="al-oppsett">
+    <section class="al-panel" aria-labelledby="al-panel-tittel">
+      <h2 id="al-panel-tittel" class="sr-only">{lang === 'nb' ? 'Oppsett' : 'Setup'}</h2>
+
+      <label class="al-felt">
+        <span class="al-felt-navn">{t.tittelFelt}</span>
+        <input type="text" id="al-tittel" placeholder={t.tittelEks} maxlength="60" />
+      </label>
+
+      <div class="al-felt">
+        <span class="al-felt-navn" id="al-ord-navn">{t.ordNavn}</span>
+        <ul id="al-ord-liste" aria-labelledby="al-ord-navn"></ul>
+        <button type="button" id="al-legg-til" class="al-sekundaer">{t.leggTil}</button>
+      </div>
+
+      <button type="button" id="al-lag" class="knapp al-primaer">{t.lag}</button>
+      <p id="al-status" class="al-status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="al-visning" id="al-ark-seksjon" hidden aria-labelledby="al-visning-tittel">
+      <h2 id="al-visning-tittel" class="sr-only">
+        {lang === 'nb' ? 'Forhåndsvisning' : 'Preview'}
+      </h2>
+      <div class="al-handlinger">
+        <button type="button" id="al-skriv-ut" class="knapp al-primaer">{t.skrivUt}</button>
+        <button type="button" id="al-skriv-ut-fasit" class="al-sekundaer">{t.skrivUtFasit}</button>
+        <button type="button" id="al-fasit-toggle" class="al-sekundaer" aria-pressed="false">
+          {t.visFasit}
+        </button>
+      </div>
+
+      <div class="al-sticky-print">
+        <button type="button" id="al-skriv-ut-sticky" class="al-sticky-knapp" title="Skriv ut arket (Ctrl+P)" aria-label={t.skrivUt}>
+          🖨
+        </button>
+      </div>
+
+      <div class="al-ark" id="al-ark">
+        <div class="al-ark-hode">
+          <h3 id="al-overskrift">{t.standardTittel}</h3>
+          <span class="al-fasit-merke" aria-hidden="true">{t.fasit}</span>
+        </div>
+        <p class="al-instruks">{t.instruks}</p>
+        <p class="al-navn-linje">{t.navnLinje}</p>
+        <div class="al-bank">
+          <p class="al-bank-navn">{t.ordbank}</p>
+          <p class="al-bank-ord" id="al-bank-ord"></p>
+        </div>
+        <ol id="al-linjer" class="al-linjer"></ol>
+      </div>
+    </section>
+  </div>
+</div>
+
+<style is:global>
+  .al-oppsett {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: var(--s-5);
+    align-items: start;
+    margin-top: var(--s-4);
+  }
+
+  @media (max-width: 900px) {
+    .al-oppsett {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .al-panel {
+    background: var(--flate);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: var(--s-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .al-felt {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .al-felt-navn {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--tekst);
+  }
+
+  .al-panel input[type='text'] {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    padding: 9px 10px;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--tekst);
+    min-height: 44px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  #al-ord-liste {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .al-rad {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .al-rad input[type='text'] {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .al-rad.upassende input[type='text'] {
+    border-color: var(--feil);
+  }
+
+  .al-ikonknapp {
+    font: inherit;
+    min-width: 44px;
+    min-height: 44px;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--tekst);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .al-ikonknapp:hover {
+    border-color: var(--salvie);
+  }
+
+  .al-primaer {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 700;
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    border: none;
+    border-radius: 9px;
+    padding: 11px 20px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .al-primaer:hover {
+    filter: brightness(1.06);
+  }
+
+  .al-sekundaer {
+    font-family: var(--font-sans);
+    font-size: 14.5px;
+    font-weight: 600;
+    background: var(--bg);
+    color: var(--tekst);
+    border: 1px solid var(--linje);
+    border-radius: 9px;
+    padding: 10px 16px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .al-sekundaer:hover {
+    border-color: var(--salvie);
+  }
+
+  .al-sekundaer:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  .al-status {
+    margin: 0;
+    font-size: 14.5px;
+    color: var(--dempet);
+    min-height: 1.4em;
+  }
+
+  .al-status.feil {
+    color: var(--feil);
+  }
+
+  .al-handlinger {
+    display: flex;
+    gap: var(--s-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--s-3);
+  }
+
+  .al-sticky-print {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 15;
+  }
+
+  .al-sticky-knapp {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 1px solid var(--linje);
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: var(--kort-skygge);
+    display: grid;
+    place-items: center;
+  }
+
+  .al-ark {
+    background: #fff;
+    color: #111;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: 28px 32px;
+    max-width: 660px;
+  }
+
+  .al-ark-hode {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  #al-overskrift {
+    margin: 0 0 4px;
+    font-size: 24px;
+    color: #111;
+  }
+
+  .al-fasit-merke {
+    display: none;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    color: #b3261e;
+    border: 2px solid #b3261e;
+    border-radius: 6px;
+    padding: 2px 8px;
+  }
+
+  .al-verktoy.fasit-paa .al-fasit-merke {
+    display: inline-block;
+  }
+
+  .al-instruks {
+    margin: 0 0 6px;
+    font-size: 14.5px;
+    color: #333;
+  }
+
+  .al-navn-linje {
+    margin: 0 0 16px;
+    font-size: 13.5px;
+    color: #333;
+  }
+
+  .al-bank {
+    border: 2px solid #333;
+    border-radius: 6px;
+    padding: 8px 14px;
+    margin-bottom: 18px;
+    text-align: center;
+  }
+
+  .al-bank-navn {
+    margin: 0;
+    font-weight: 700;
+    font-size: 14.5px;
+    text-decoration: underline;
+    color: #111;
+  }
+
+  .al-bank-ord {
+    margin: 2px 0 0;
+    font-size: 16px;
+    color: #111;
+  }
+
+  .al-linjer {
+    margin: 0;
+    padding: 0 0 0 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    font-size: 17px;
+    color: #111;
+  }
+
+  .al-strek {
+    letter-spacing: 2px;
+    color: #333;
+  }
+
+  .al-svar {
+    display: none;
+    font-weight: 700;
+    color: #1a6a3a;
+  }
+
+  .al-verktoy.fasit-paa .al-svar {
+    display: inline;
+  }
+
+  .al-verktoy.fasit-paa .al-strek {
+    display: none;
+  }
+
+  @media print {
+    @page {
+      margin: 14mm;
+    }
+
+    html,
+    body {
+      color-scheme: light;
+      background: #fff !important;
+      color: #000;
+    }
+
+    .topp,
+    .bunn,
+    .hopp,
+    .al-panel,
+    .al-handlinger,
+    .al-side-hode,
+    .al-sticky-print {
+      display: none !important;
+    }
+
+    .ramme {
+      padding: 0;
+      max-width: none;
+      min-height: 0;
+      background: #fff;
+    }
+
+    .al-oppsett {
+      display: block;
+      margin: 0;
+    }
+
+    .al-ark {
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 0;
+      max-width: none;
+    }
+
+    .al-bank {
+      margin-bottom: 8mm;
+    }
+
+    .al-linjer {
+      gap: 8mm;
+    }
+
+    .al-linjer li {
+      break-inside: avoid;
+    }
+
+    .al-verktoy:not(.print-fasit) .al-svar {
+      display: none !important;
+    }
+
+    .al-verktoy:not(.print-fasit) .al-fasit-merke {
+      display: none !important;
+    }
+
+    .al-verktoy.print-fasit .al-svar {
+      display: inline !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+
+    .al-verktoy.print-fasit .al-strek {
+      display: none !important;
+    }
+
+    .al-verktoy.print-fasit .al-fasit-merke {
+      display: inline-block !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+  }
+</style>
+
+<script>
+  import { ordErUpassende } from '../lib/ordkryss-kjerne';
+
+  const rot = document.querySelector<HTMLElement>('.al-verktoy');
+  if (rot) {
+    const lang = (rot.dataset.lang ?? 'nb') as 'nb' | 'en';
+    const standardTittel = rot.dataset.standardtittel ?? 'Alfabetisk rekkefølge';
+    const LAGRINGSNOKKEL = `alfabetisering-${lang}`;
+    const MAKS_ORD = 12;
+
+    const M =
+      lang === 'nb'
+        ? {
+            minstTo: 'Skriv inn minst to ord.',
+            upassende: (o: string) =>
+              `«${o}» passer ikke på et skoleark. Bytt ut ordet, så lager vi arket.`,
+            klart: (n: number) => `Arket er klart: ${n} ord.`,
+            ordAria: (i: number) => `Ord ${i}`,
+            fjern: (i: number) => `Fjern ord ${i}`,
+            ordEks: 'skriv et ord',
+          }
+        : {
+            minstTo: 'Type at least two words.',
+            upassende: (o: string) =>
+              `“${o}” does not belong on a school sheet. Swap the word and we will make the sheet.`,
+            klart: (n: number) => `The sheet is ready: ${n} words.`,
+            ordAria: (i: number) => `Word ${i}`,
+            fjern: (i: number) => `Remove word ${i}`,
+            ordEks: 'type a word',
+          };
+
+    interface Rad {
+      id: number;
+      tekst: string;
+    }
+
+    let ordListe: Rad[] = [];
+    let nesteId = 1;
+    let fasitSynlig = false;
+
+    const el = <T extends HTMLElement = HTMLElement>(id: string): T =>
+      document.getElementById(id) as T;
+
+    function lagreUtkast() {
+      try {
+        localStorage.setItem(
+          LAGRINGSNOKKEL,
+          JSON.stringify({
+            tittel: el<HTMLInputElement>('al-tittel').value,
+            ord: ordListe.map((o) => o.tekst),
+          })
+        );
+      } catch {}
+    }
+
+    function lastUtkast(): boolean {
+      try {
+        const raa = localStorage.getItem(LAGRINGSNOKKEL);
+        if (!raa) return false;
+        const u = JSON.parse(raa);
+        el<HTMLInputElement>('al-tittel').value = u.tittel ?? '';
+        (u.ord ?? []).forEach((o: unknown) => {
+          if (typeof o === 'string') ordListe.push({ id: nesteId++, tekst: o });
+        });
+        return ordListe.length > 0;
+      } catch {
+        return false;
+      }
+    }
+
+    function leggTil(tekst = '') {
+      if (ordListe.length >= MAKS_ORD) return;
+      ordListe.push({ id: nesteId++, tekst });
+      tegnListe();
+    }
+
+    function tegnListe() {
+      const liste = el('al-ord-liste');
+      liste.replaceChildren();
+      ordListe.forEach((ord, indeks) => {
+        const rad = document.createElement('li');
+        rad.className = 'al-rad';
+        const felt = document.createElement('input');
+        felt.type = 'text';
+        felt.value = ord.tekst.slice(0, 18);
+        felt.maxLength = 18;
+        felt.placeholder = M.ordEks;
+        felt.setAttribute('aria-label', M.ordAria(indeks + 1));
+        felt.addEventListener('input', () => {
+          ord.tekst = felt.value;
+          const stygt = ordErUpassende(felt.value);
+          rad.classList.toggle('upassende', stygt);
+          felt.setAttribute('aria-invalid', stygt ? 'true' : 'false');
+          lagreUtkast();
+        });
+        if (ordErUpassende(ord.tekst)) rad.classList.add('upassende');
+        const fjern = document.createElement('button');
+        fjern.type = 'button';
+        fjern.className = 'al-ikonknapp';
+        fjern.textContent = '✕';
+        fjern.setAttribute('aria-label', M.fjern(indeks + 1));
+        fjern.addEventListener('click', () => {
+          ordListe = ordListe.filter((o) => o.id !== ord.id);
+          if (ordListe.length === 0) leggTil();
+          tegnListe();
+          lagreUtkast();
+        });
+        rad.append(felt, fjern);
+        liste.appendChild(rad);
+      });
+      el<HTMLButtonElement>('al-legg-til').disabled = ordListe.length >= MAKS_ORD;
+    }
+
+    function siStatus(tekst: string, erFeil = false) {
+      const status = el('al-status');
+      status.textContent = tekst;
+      status.classList.toggle('feil', erFeil);
+    }
+
+    function generer() {
+      const sett = new Set<string>();
+      const rene: string[] = [];
+      for (const o of ordListe) {
+        const tekst = o.tekst.trim().toLowerCase();
+        if (!tekst || sett.has(tekst)) continue;
+        sett.add(tekst);
+        rene.push(tekst);
+      }
+      if (rene.length < 2) {
+        siStatus(M.minstTo, true);
+        return;
+      }
+      for (const ord of rene) {
+        if (ordErUpassende(ord)) {
+          siStatus(M.upassende(ord), true);
+          return;
+        }
+      }
+
+      el('al-overskrift').textContent =
+        el<HTMLInputElement>('al-tittel').value.trim() || standardTittel;
+
+      // banken stokkes — og skal aldri stå ferdig sortert
+      const stokket = [...rene];
+      const collator = new Intl.Collator(lang === 'nb' ? 'nb' : 'en');
+      const sortert = [...rene].sort(collator.compare);
+      for (let forsok = 0; forsok < 12; forsok++) {
+        for (let i = stokket.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [stokket[i], stokket[j]] = [stokket[j], stokket[i]];
+        }
+        if (stokket.join(' ') !== sortert.join(' ')) break;
+      }
+      el('al-bank-ord').textContent = stokket.join('  –  ');
+
+      const linjer = el('al-linjer');
+      linjer.replaceChildren();
+      sortert.forEach((ord) => {
+        const li = document.createElement('li');
+        const strek = document.createElement('span');
+        strek.className = 'al-strek';
+        strek.textContent = '_'.repeat(28);
+        const svar = document.createElement('span');
+        svar.className = 'al-svar';
+        svar.textContent = ord;
+        li.append(strek, svar);
+        linjer.appendChild(li);
+      });
+
+      fasitSynlig = false;
+      el('al-fasit-toggle').setAttribute('aria-pressed', 'false');
+      rot.classList.remove('fasit-paa');
+
+      el('al-ark-seksjon').removeAttribute('hidden');
+      siStatus(M.klart(rene.length));
+      lagreUtkast();
+    }
+
+    if (!lastUtkast()) {
+      leggTil();
+      leggTil();
+      leggTil();
+      leggTil();
+    }
+    tegnListe();
+
+    el('al-legg-til').addEventListener('click', () => {
+      leggTil();
+      lagreUtkast();
+    });
+
+    el('al-lag').addEventListener('click', generer);
+
+    el('al-fasit-toggle').addEventListener('click', () => {
+      fasitSynlig = !fasitSynlig;
+      el('al-fasit-toggle').setAttribute('aria-pressed', String(fasitSynlig));
+      rot.classList.toggle('fasit-paa', fasitSynlig);
+    });
+
+    const skrivUt = () => {
+      rot.classList.remove('print-fasit');
+      window.print();
+    };
+    el('al-skriv-ut').addEventListener('click', skrivUt);
+    el('al-skriv-ut-sticky').addEventListener('click', skrivUt);
+    el('al-skriv-ut-fasit').addEventListener('click', () => {
+      rot.classList.add('print-fasit');
+      window.print();
+    });
+    window.addEventListener('afterprint', () => rot.classList.remove('print-fasit'));
+
+    el('al-tittel').addEventListener('change', lagreUtkast);
+  }
+</script>

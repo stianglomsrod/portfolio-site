@@ -1,0 +1,44 @@
+---
+import Side from '../../layouts/Side.astro';
+import LuketekstVerktoy from '../../components/LuketekstVerktoy.astro';
+
+/* Luketekst i sandbox. ENGELSK TVILLING:
+   src/pages/en/sandbox/gap-fill.astro — endre begge. */
+---
+
+<Side
+  title="Luketekst — lag utfyllingsark til utskrift"
+  description="Lim inn en tekst, velg hvilke ord som blir luker, og skriv ut — med ordbank og fasit."
+>
+  <div class="lu-side-hode">
+    <p class="kicker">/sandbox · verktøy</p>
+    <h1>Luketekst</h1>
+    <p class="dempet">
+      Lag utfyllingsark: lim inn en tekst og velg luker automatisk eller ved å klikke på ordene. Ordbank og fasit-utskrift er valgfritt.
+    </p>
+  </div>
+  <LuketekstVerktoy lang="nb" />
+</Side>
+
+<style>
+  .kicker {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: var(--tekst-label);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--hue-aksent);
+    margin: var(--s-7) 0 var(--s-2);
+  }
+
+  h1 {
+    font-size: var(--tekst-tittel);
+    margin: 0 0 var(--s-3);
+  }
+
+  .dempet {
+    color: var(--dempet);
+    max-width: 68ch;
+    margin: 0;
+  }
+</style>

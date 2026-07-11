@@ -1,0 +1,504 @@
+---
+/* Gangetabell-verktøyet: 10×10-tabellen som utfyllingsark. Hele
+   rutenettet er SVG (vektor-rects — tomme CSS-bokser culles i enkelte
+   Chrome-versjoner ved print, jf. Kryssord-lærdommen). Læreren velger
+   hvor mye som er forhåndsutfylt; fasit fyller alt. */
+
+interface Props {
+  lang?: 'nb' | 'en';
+}
+
+const { lang = 'nb' } = Astro.props;
+
+const t =
+  lang === 'nb'
+    ? {
+        tittelFelt: 'Tittel på arket',
+        tittelEks: 'Skriv tittelen her',
+        fyll: 'Forhåndsutfylt',
+        fyllIngen: 'tom tabell',
+        fyllNoe: 'ca. en tredjedel',
+        fyllMye: 'ca. to tredjedeler',
+        lag: 'Lag gangetabell',
+        skrivUt: 'Skriv ut',
+        skrivUtFasit: 'Skriv ut fasit',
+        visFasit: 'Vis fasit her',
+        navnLinje: 'Navn: ____________________   Dato: ____________',
+        fasit: 'FASIT',
+        instruks: 'Fyll inn tallene som mangler i gangetabellen.',
+        standardTittel: 'Gangetabellen',
+      }
+    : {
+        tittelFelt: 'Sheet title',
+        tittelEks: 'Type the title here',
+        fyll: 'Pre-filled',
+        fyllIngen: 'empty table',
+        fyllNoe: 'about a third',
+        fyllMye: 'about two thirds',
+        lag: 'Create times table',
+        skrivUt: 'Print',
+        skrivUtFasit: 'Print answer key',
+        visFasit: 'Show answers here',
+        navnLinje: 'Name: ____________________   Date: ____________',
+        fasit: 'KEY',
+        instruks: 'Fill in the missing numbers in the times table.',
+        standardTittel: 'Times table',
+      };
+---
+
+<div class="ga-verktoy" data-lang={lang} data-standardtittel={t.standardTittel}>
+  <div class="ga-oppsett">
+    <section class="ga-panel" aria-labelledby="ga-panel-tittel">
+      <h2 id="ga-panel-tittel" class="sr-only">{lang === 'nb' ? 'Oppsett' : 'Setup'}</h2>
+
+      <label class="ga-felt">
+        <span class="ga-felt-navn">{t.tittelFelt}</span>
+        <input type="text" id="ga-tittel" placeholder={t.tittelEks} maxlength="60" />
+      </label>
+
+      <label class="ga-felt">
+        <span class="ga-felt-navn">{t.fyll}</span>
+        <select id="ga-fyll">
+          <option value="0" selected>{t.fyllIngen}</option>
+          <option value="0.33">{t.fyllNoe}</option>
+          <option value="0.66">{t.fyllMye}</option>
+        </select>
+      </label>
+
+      <button type="button" id="ga-lag" class="knapp ga-primaer">{t.lag}</button>
+      <p id="ga-status" class="ga-status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="ga-visning" id="ga-ark-seksjon" hidden aria-labelledby="ga-visning-tittel">
+      <h2 id="ga-visning-tittel" class="sr-only">
+        {lang === 'nb' ? 'Forhåndsvisning' : 'Preview'}
+      </h2>
+      <div class="ga-handlinger">
+        <button type="button" id="ga-skriv-ut" class="knapp ga-primaer">{t.skrivUt}</button>
+        <button type="button" id="ga-skriv-ut-fasit" class="ga-sekundaer">{t.skrivUtFasit}</button>
+        <button type="button" id="ga-fasit-toggle" class="ga-sekundaer" aria-pressed="false">
+          {t.visFasit}
+        </button>
+      </div>
+
+      <div class="ga-sticky-print">
+        <button type="button" id="ga-skriv-ut-sticky" class="ga-sticky-knapp" title="Skriv ut arket (Ctrl+P)" aria-label={t.skrivUt}>
+          🖨
+        </button>
+      </div>
+
+      <div class="ga-ark" id="ga-ark">
+        <div class="ga-ark-hode">
+          <h3 id="ga-overskrift">{t.standardTittel}</h3>
+          <span class="ga-fasit-merke" aria-hidden="true">{t.fasit}</span>
+        </div>
+        <p class="ga-instruks">{t.instruks}</p>
+        <p class="ga-navn-linje">{t.navnLinje}</p>
+        <div id="ga-tabell" class="ga-tabell"></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<style is:global>
+  .ga-oppsett {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: var(--s-5);
+    align-items: start;
+    margin-top: var(--s-4);
+  }
+
+  @media (max-width: 900px) {
+    .ga-oppsett {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .ga-panel {
+    background: var(--flate);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: var(--s-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .ga-felt {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .ga-felt-navn {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--tekst);
+  }
+
+  .ga-panel input[type='text'],
+  .ga-panel select {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    padding: 9px 10px;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--tekst);
+    min-height: 44px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .ga-primaer {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 700;
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    border: none;
+    border-radius: 9px;
+    padding: 11px 20px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .ga-primaer:hover {
+    filter: brightness(1.06);
+  }
+
+  .ga-sekundaer {
+    font-family: var(--font-sans);
+    font-size: 14.5px;
+    font-weight: 600;
+    background: var(--bg);
+    color: var(--tekst);
+    border: 1px solid var(--linje);
+    border-radius: 9px;
+    padding: 10px 16px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .ga-sekundaer:hover {
+    border-color: var(--salvie);
+  }
+
+  .ga-status {
+    margin: 0;
+    font-size: 14.5px;
+    color: var(--dempet);
+    min-height: 1.4em;
+  }
+
+  .ga-handlinger {
+    display: flex;
+    gap: var(--s-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--s-3);
+  }
+
+  .ga-sticky-print {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 15;
+  }
+
+  .ga-sticky-knapp {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 1px solid var(--linje);
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: var(--kort-skygge);
+    display: grid;
+    place-items: center;
+  }
+
+  .ga-ark {
+    background: #fff;
+    color: #111;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: 28px 32px;
+    max-width: 660px;
+  }
+
+  .ga-ark-hode {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  #ga-overskrift {
+    margin: 0 0 4px;
+    font-size: 24px;
+    color: #111;
+  }
+
+  .ga-fasit-merke {
+    display: none;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    color: #b3261e;
+    border: 2px solid #b3261e;
+    border-radius: 6px;
+    padding: 2px 8px;
+  }
+
+  .ga-verktoy.fasit-paa .ga-fasit-merke {
+    display: inline-block;
+  }
+
+  .ga-instruks {
+    margin: 0 0 6px;
+    font-size: 14.5px;
+    color: #333;
+  }
+
+  .ga-navn-linje {
+    margin: 0 0 18px;
+    font-size: 13.5px;
+    color: #333;
+  }
+
+  .ga-tabell svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .ga-fasit-del {
+    display: none;
+  }
+
+  .ga-verktoy.fasit-paa .ga-fasit-del {
+    display: inline;
+  }
+
+  @media print {
+    @page {
+      margin: 14mm;
+    }
+
+    html,
+    body {
+      color-scheme: light;
+      background: #fff !important;
+      color: #000;
+    }
+
+    .topp,
+    .bunn,
+    .hopp,
+    .ga-panel,
+    .ga-handlinger,
+    .ga-side-hode,
+    .ga-sticky-print {
+      display: none !important;
+    }
+
+    .ramme {
+      padding: 0;
+      max-width: none;
+      min-height: 0;
+      background: #fff;
+    }
+
+    .ga-oppsett {
+      display: block;
+      margin: 0;
+    }
+
+    .ga-ark {
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 0;
+      max-width: none;
+    }
+
+    .ga-tabell {
+      break-inside: avoid;
+    }
+
+    .ga-verktoy:not(.print-fasit) .ga-fasit-del {
+      display: none !important;
+    }
+
+    .ga-verktoy:not(.print-fasit) .ga-fasit-merke {
+      display: none !important;
+    }
+
+    .ga-verktoy.print-fasit .ga-fasit-del {
+      display: inline !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+
+    .ga-verktoy.print-fasit .ga-fasit-merke {
+      display: inline-block !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+  }
+</style>
+
+<script>
+  const rot = document.querySelector<HTMLElement>('.ga-verktoy');
+  if (rot) {
+    const lang = (rot.dataset.lang ?? 'nb') as 'nb' | 'en';
+    const standardTittel = rot.dataset.standardtittel ?? 'Gangetabellen';
+    const LAGRINGSNOKKEL = `gangetabell-${lang}`;
+    const NS = 'http://www.w3.org/2000/svg';
+
+    const M =
+      lang === 'nb'
+        ? { klart: (skjulte: number) => `Tabellen er klar: ${skjulte} ruter å fylle inn.` }
+        : { klart: (skjulte: number) => `The table is ready: ${skjulte} squares to fill in.` };
+
+    let fasitSynlig = false;
+
+    const el = <T extends HTMLElement = HTMLElement>(id: string): T =>
+      document.getElementById(id) as T;
+
+    function svgEl(navn: string, attrs: Record<string, string>, tekst?: string) {
+      const e = document.createElementNS(NS, navn);
+      for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+      if (tekst !== undefined) e.textContent = tekst;
+      return e;
+    }
+
+    function siStatus(tekst: string) {
+      el('ga-status').textContent = tekst;
+    }
+
+    function generer() {
+      const andel = parseFloat(el<HTMLSelectElement>('ga-fyll').value);
+
+      el('ga-overskrift').textContent =
+        el<HTMLInputElement>('ga-tittel').value.trim() || standardTittel;
+
+      // 11×11: øverste rad og venstre kolonne er faktorer, hjørnet er ×
+      const C = 10; // rutestørrelse i viewBox-enheter
+      const svg = svgEl('svg', {
+        viewBox: `-0.5 -0.5 ${11 * C + 1} ${11 * C + 1}`,
+        'aria-hidden': 'true',
+      });
+
+      let skjulte = 0;
+      for (let rad = 0; rad <= 10; rad++) {
+        for (let kol = 0; kol <= 10; kol++) {
+          const x = kol * C;
+          const y = rad * C;
+          const hode = rad === 0 || kol === 0;
+          svg.appendChild(
+            svgEl('rect', {
+              x: String(x), y: String(y), width: String(C), height: String(C),
+              fill: hode ? '#ececec' : '#fff',
+              stroke: '#333',
+              'stroke-width': hode ? '0.65' : '0.5',
+            })
+          );
+          let tekst = '';
+          let fasitTekst = '';
+          if (rad === 0 && kol === 0) tekst = '×';
+          else if (rad === 0) tekst = String(kol);
+          else if (kol === 0) tekst = String(rad);
+          else {
+            const produkt = rad * kol;
+            if (Math.random() < andel) tekst = String(produkt);
+            else {
+              fasitTekst = String(produkt);
+              skjulte++;
+            }
+          }
+          if (tekst) {
+            svg.appendChild(
+              svgEl(
+                'text',
+                {
+                  x: String(x + C / 2), y: String(y + C / 2 + 1.6),
+                  'text-anchor': 'middle', 'font-size': '4.4',
+                  'font-weight': hode ? '700' : '400', fill: '#111',
+                },
+                tekst
+              )
+            );
+          } else if (fasitTekst) {
+            svg.appendChild(
+              svgEl(
+                'text',
+                {
+                  x: String(x + C / 2), y: String(y + C / 2 + 1.6),
+                  'text-anchor': 'middle', 'font-size': '4.4',
+                  'font-weight': '700', fill: '#1a6a3a', class: 'ga-fasit-del',
+                },
+                fasitTekst
+              )
+            );
+          }
+        }
+      }
+
+      const beholder = el('ga-tabell');
+      beholder.replaceChildren(svg);
+
+      fasitSynlig = false;
+      el('ga-fasit-toggle').setAttribute('aria-pressed', 'false');
+      rot.classList.remove('fasit-paa');
+
+      el('ga-ark-seksjon').removeAttribute('hidden');
+      siStatus(M.klart(skjulte));
+      try {
+        localStorage.setItem(
+          LAGRINGSNOKKEL,
+          JSON.stringify({
+            tittel: el<HTMLInputElement>('ga-tittel').value,
+            fyll: el<HTMLSelectElement>('ga-fyll').value,
+          })
+        );
+      } catch {}
+    }
+
+    try {
+      const u = JSON.parse(localStorage.getItem(LAGRINGSNOKKEL) ?? 'null');
+      if (u) {
+        el<HTMLInputElement>('ga-tittel').value = u.tittel ?? '';
+        const felt = el<HTMLSelectElement>('ga-fyll');
+        if ([...felt.options].some((o) => o.value === u.fyll)) felt.value = u.fyll;
+      }
+    } catch {}
+
+    el('ga-lag').addEventListener('click', generer);
+
+    el('ga-fasit-toggle').addEventListener('click', () => {
+      fasitSynlig = !fasitSynlig;
+      el('ga-fasit-toggle').setAttribute('aria-pressed', String(fasitSynlig));
+      rot.classList.toggle('fasit-paa', fasitSynlig);
+    });
+
+    const skrivUt = () => {
+      rot.classList.remove('print-fasit');
+      window.print();
+    };
+    el('ga-skriv-ut').addEventListener('click', skrivUt);
+    el('ga-skriv-ut-sticky').addEventListener('click', skrivUt);
+    el('ga-skriv-ut-fasit').addEventListener('click', () => {
+      rot.classList.add('print-fasit');
+      window.print();
+    });
+    window.addEventListener('afterprint', () => rot.classList.remove('print-fasit'));
+  }
+</script>

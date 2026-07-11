@@ -1,0 +1,622 @@
+---
+/* Regneark-verktøyet: regnestykker med pedagogiske regler, til utskrift.
+   Samme lest som søsknene: panel til venstre, hvitt ark til høyre.
+   Kjernen bor i src/lib/regneark.ts (DOM-fri). Fasit-mekanikken er
+   Ordkryss sin (fasit-paa/print-fasit + afterprint). Svarfelt er
+   understreker (tekst) — aldri tomme kant-bokser (print-culling). */
+
+interface Props {
+  lang?: 'nb' | 'en';
+}
+
+const { lang = 'nb' } = Astro.props;
+
+const t =
+  lang === 'nb'
+    ? {
+        tittelFelt: 'Tittel på arket',
+        tittelEks: 'Skriv tittelen her',
+        arter: 'Regnearter',
+        pluss: 'pluss +',
+        minus: 'minus −',
+        gange: 'gange ·',
+        dele: 'dele :',
+        omraade: 'Tallområde',
+        antall: 'Antall oppgaver',
+        overgang: 'Tierovergang (pluss/minus)',
+        overgangBlandet: 'blandet',
+        overgangUten: 'uten tierovergang',
+        overgangMed: 'bare med tierovergang',
+        aapne: 'Åpne oppgaver (7 + __ = 12)',
+        aapneIngen: 'ingen',
+        aapneNoen: 'noen (ca. 1 av 3)',
+        aapneAlle: 'alle',
+        lag: 'Lag regneark',
+        skrivUt: 'Skriv ut',
+        skrivUtFasit: 'Skriv ut fasit',
+        visFasit: 'Vis fasit her',
+        navnLinje: 'Navn: ____________________   Dato: ____________',
+        fasit: 'FASIT',
+        standardTittel: 'Regneark',
+      }
+    : {
+        tittelFelt: 'Sheet title',
+        tittelEks: 'Type the title here',
+        arter: 'Operations',
+        pluss: 'addition +',
+        minus: 'subtraction −',
+        gange: 'multiplication ·',
+        dele: 'division :',
+        omraade: 'Number range',
+        antall: 'Number of problems',
+        overgang: 'Regrouping (add/subtract)',
+        overgangBlandet: 'mixed',
+        overgangUten: 'no regrouping',
+        overgangMed: 'regrouping only',
+        aapne: 'Open problems (7 + __ = 12)',
+        aapneIngen: 'none',
+        aapneNoen: 'some (about 1 in 3)',
+        aapneAlle: 'all',
+        lag: 'Create math sheet',
+        skrivUt: 'Print',
+        skrivUtFasit: 'Print answer key',
+        visFasit: 'Show answers here',
+        navnLinje: 'Name: ____________________   Date: ____________',
+        fasit: 'KEY',
+        standardTittel: 'Math sheet',
+      };
+---
+
+<div class="re-verktoy" data-lang={lang} data-standardtittel={t.standardTittel}>
+  <div class="re-oppsett">
+    <section class="re-panel" aria-labelledby="re-panel-tittel">
+      <h2 id="re-panel-tittel" class="sr-only">{lang === 'nb' ? 'Oppsett' : 'Setup'}</h2>
+
+      <label class="re-felt">
+        <span class="re-felt-navn">{t.tittelFelt}</span>
+        <input type="text" id="re-tittel" placeholder={t.tittelEks} maxlength="60" />
+      </label>
+
+      <fieldset class="re-felt">
+        <legend class="re-felt-navn">{t.arter}</legend>
+        <label class="re-valg"><input type="checkbox" id="re-pluss" checked /> {t.pluss}</label>
+        <label class="re-valg"><input type="checkbox" id="re-minus" checked /> {t.minus}</label>
+        <label class="re-valg"><input type="checkbox" id="re-gange" /> {t.gange}</label>
+        <label class="re-valg"><input type="checkbox" id="re-dele" /> {t.dele}</label>
+      </fieldset>
+
+      <label class="re-felt">
+        <span class="re-felt-navn">{t.omraade}</span>
+        <select id="re-omraade">
+          <option value="10">0–10</option>
+          <option value="20" selected>0–20</option>
+          <option value="100">0–100</option>
+        </select>
+      </label>
+
+      <label class="re-felt">
+        <span class="re-felt-navn">{t.antall}</span>
+        <select id="re-antall">
+          <option value="10">10</option>
+          <option value="16" selected>16</option>
+          <option value="20">20</option>
+          <option value="30">30</option>
+        </select>
+      </label>
+
+      <label class="re-felt">
+        <span class="re-felt-navn">{t.overgang}</span>
+        <select id="re-overgang">
+          <option value="blandet" selected>{t.overgangBlandet}</option>
+          <option value="uten">{t.overgangUten}</option>
+          <option value="med">{t.overgangMed}</option>
+        </select>
+      </label>
+
+      <label class="re-felt">
+        <span class="re-felt-navn">{t.aapne}</span>
+        <select id="re-aapne">
+          <option value="0" selected>{t.aapneIngen}</option>
+          <option value="0.33">{t.aapneNoen}</option>
+          <option value="1">{t.aapneAlle}</option>
+        </select>
+      </label>
+
+      <button type="button" id="re-lag" class="knapp re-primaer">{t.lag}</button>
+      <p id="re-status" class="re-status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="re-visning" id="re-ark-seksjon" hidden aria-labelledby="re-visning-tittel">
+      <h2 id="re-visning-tittel" class="sr-only">
+        {lang === 'nb' ? 'Forhåndsvisning' : 'Preview'}
+      </h2>
+      <div class="re-handlinger">
+        <button type="button" id="re-skriv-ut" class="knapp re-primaer">{t.skrivUt}</button>
+        <button type="button" id="re-skriv-ut-fasit" class="re-sekundaer">{t.skrivUtFasit}</button>
+        <button type="button" id="re-fasit-toggle" class="re-sekundaer" aria-pressed="false">
+          {t.visFasit}
+        </button>
+      </div>
+
+      <div class="re-sticky-print">
+        <button type="button" id="re-skriv-ut-sticky" class="re-sticky-knapp" title="Skriv ut arket (Ctrl+P)" aria-label={t.skrivUt}>
+          🖨
+        </button>
+      </div>
+
+      <div class="re-ark" id="re-ark">
+        <div class="re-ark-hode">
+          <h3 id="re-overskrift">{t.standardTittel}</h3>
+          <span class="re-fasit-merke" aria-hidden="true">{t.fasit}</span>
+        </div>
+        <p class="re-navn-linje">{t.navnLinje}</p>
+        <ol id="re-oppgaver" class="re-oppgaver"></ol>
+      </div>
+    </section>
+  </div>
+</div>
+
+<style is:global>
+  .re-oppsett {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: var(--s-5);
+    align-items: start;
+    margin-top: var(--s-4);
+  }
+
+  @media (max-width: 900px) {
+    .re-oppsett {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .re-panel {
+    background: var(--flate);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: var(--s-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .re-felt {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    min-width: 0;
+    border: 0;
+    padding: 0;
+  }
+
+  .re-felt-navn {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--tekst);
+  }
+
+  .re-panel input[type='text'],
+  .re-panel select {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    padding: 9px 10px;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--tekst);
+    min-height: 44px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .re-valg {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    min-height: 32px;
+    color: var(--tekst);
+  }
+
+  .re-valg input {
+    width: 19px;
+    height: 19px;
+    accent-color: var(--salvie);
+    flex-shrink: 0;
+  }
+
+  @media (pointer: coarse) {
+    .re-valg {
+      min-height: 44px;
+    }
+  }
+
+  .re-primaer {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 700;
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    border: none;
+    border-radius: 9px;
+    padding: 11px 20px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .re-primaer:hover {
+    filter: brightness(1.06);
+  }
+
+  .re-sekundaer {
+    font-family: var(--font-sans);
+    font-size: 14.5px;
+    font-weight: 600;
+    background: var(--bg);
+    color: var(--tekst);
+    border: 1px solid var(--linje);
+    border-radius: 9px;
+    padding: 10px 16px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .re-sekundaer:hover {
+    border-color: var(--salvie);
+  }
+
+  .re-status {
+    margin: 0;
+    font-size: 14.5px;
+    color: var(--dempet);
+    min-height: 1.4em;
+  }
+
+  .re-status.feil {
+    color: var(--feil);
+  }
+
+  .re-handlinger {
+    display: flex;
+    gap: var(--s-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--s-3);
+  }
+
+  .re-sticky-print {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 15;
+  }
+
+  .re-sticky-knapp {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 1px solid var(--linje);
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: var(--kort-skygge);
+    display: grid;
+    place-items: center;
+  }
+
+  .re-ark {
+    background: #fff;
+    color: #111;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: 28px 32px;
+    max-width: 660px;
+  }
+
+  .re-ark-hode {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  #re-overskrift {
+    margin: 0 0 4px;
+    font-size: 24px;
+    color: #111;
+  }
+
+  .re-fasit-merke {
+    display: none;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    color: #b3261e;
+    border: 2px solid #b3261e;
+    border-radius: 6px;
+    padding: 2px 8px;
+  }
+
+  .re-verktoy.fasit-paa .re-fasit-merke {
+    display: inline-block;
+  }
+
+  .re-navn-linje {
+    margin: 0 0 18px;
+    font-size: 13.5px;
+    color: #333;
+  }
+
+  .re-oppgaver {
+    margin: 0;
+    padding: 0 0 0 26px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 40px;
+    font-size: 19px;
+    color: #111;
+  }
+
+  .re-oppgaver li {
+    padding-left: 4px;
+  }
+
+  /* Svaret: understreker som plass, fasittallet oppå i fasit-modus */
+  .re-strek {
+    letter-spacing: 1px;
+  }
+
+  .re-svar {
+    display: none;
+    font-weight: 700;
+    color: #1a6a3a;
+  }
+
+  .re-verktoy.fasit-paa .re-svar {
+    display: inline;
+  }
+
+  .re-verktoy.fasit-paa .re-strek {
+    display: none;
+  }
+
+  @media print {
+    @page {
+      margin: 14mm;
+    }
+
+    html,
+    body {
+      color-scheme: light;
+      background: #fff !important;
+      color: #000;
+    }
+
+    .topp,
+    .bunn,
+    .hopp,
+    .re-panel,
+    .re-handlinger,
+    .re-side-hode,
+    .re-sticky-print {
+      display: none !important;
+    }
+
+    .ramme {
+      padding: 0;
+      max-width: none;
+      min-height: 0;
+      background: #fff;
+    }
+
+    .re-oppsett {
+      display: block;
+      margin: 0;
+    }
+
+    .re-ark {
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 0;
+      max-width: none;
+    }
+
+    .re-oppgaver {
+      font-size: 16pt;
+      gap: 9mm 14mm;
+    }
+
+    .re-oppgaver li {
+      break-inside: avoid;
+    }
+
+    .re-verktoy:not(.print-fasit) .re-svar {
+      display: none !important;
+    }
+
+    .re-verktoy:not(.print-fasit) .re-fasit-merke {
+      display: none !important;
+    }
+
+    .re-verktoy.print-fasit .re-svar {
+      display: inline !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+
+    .re-verktoy.print-fasit .re-strek {
+      display: none !important;
+    }
+
+    .re-verktoy.print-fasit .re-fasit-merke {
+      display: inline-block !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+  }
+</style>
+
+<script>
+  import { lagRegneark, TEGN } from '../lib/regneark';
+  import type { Regneart } from '../lib/regneark';
+
+  const rot = document.querySelector<HTMLElement>('.re-verktoy');
+  if (rot) {
+    const lang = (rot.dataset.lang ?? 'nb') as 'nb' | 'en';
+    const standardTittel = rot.dataset.standardtittel ?? 'Regneark';
+    const LAGRINGSNOKKEL = `regneark-${lang}`;
+
+    const M =
+      lang === 'nb'
+        ? {
+            ingenArter: 'Velg minst én regneart.',
+            forFaa: (k: number) =>
+              `Fant bare ${k} ulike stykker med disse valgene — utvid tallområdet, senk antallet eller endre tierovergang-valget.`,
+            klart: (antall: number) => `Arket er klart: ${antall} oppgaver.`,
+          }
+        : {
+            ingenArter: 'Pick at least one operation.',
+            forFaa: (k: number) =>
+              `Only found ${k} distinct problems with these settings — widen the range, lower the count or change the regrouping setting.`,
+            klart: (antall: number) => `The sheet is ready: ${antall} problems.`,
+          };
+
+    let fasitSynlig = false;
+
+    const el = <T extends HTMLElement = HTMLElement>(id: string): T =>
+      document.getElementById(id) as T;
+
+    function lagreUtkast() {
+      try {
+        localStorage.setItem(
+          LAGRINGSNOKKEL,
+          JSON.stringify({
+            tittel: el<HTMLInputElement>('re-tittel').value,
+            pluss: el<HTMLInputElement>('re-pluss').checked,
+            minus: el<HTMLInputElement>('re-minus').checked,
+            gange: el<HTMLInputElement>('re-gange').checked,
+            dele: el<HTMLInputElement>('re-dele').checked,
+            omraade: el<HTMLSelectElement>('re-omraade').value,
+            antall: el<HTMLSelectElement>('re-antall').value,
+            overgang: el<HTMLSelectElement>('re-overgang').value,
+            aapne: el<HTMLSelectElement>('re-aapne').value,
+          })
+        );
+      } catch {}
+    }
+
+    function lastUtkast() {
+      try {
+        const raa = localStorage.getItem(LAGRINGSNOKKEL);
+        if (!raa) return;
+        const u = JSON.parse(raa);
+        el<HTMLInputElement>('re-tittel').value = u.tittel ?? '';
+        (['pluss', 'minus', 'gange', 'dele'] as const).forEach((art) => {
+          if (typeof u[art] === 'boolean') el<HTMLInputElement>(`re-${art}`).checked = u[art];
+        });
+        (['omraade', 'antall', 'overgang', 'aapne'] as const).forEach((navn) => {
+          const felt = el<HTMLSelectElement>(`re-${navn}`);
+          if ([...felt.options].some((o) => o.value === u[navn])) felt.value = u[navn];
+        });
+      } catch {}
+    }
+
+    function siStatus(tekst: string, erFeil = false) {
+      const status = el('re-status');
+      status.textContent = tekst;
+      status.classList.toggle('feil', erFeil);
+    }
+
+    function generer() {
+      const arter = (['pluss', 'minus', 'gange', 'dele'] as Regneart[]).filter(
+        (art) => el<HTMLInputElement>(`re-${art}`).checked
+      );
+      const resultat = lagRegneark({
+        arter,
+        maks: parseInt(el<HTMLSelectElement>('re-omraade').value, 10),
+        antall: parseInt(el<HTMLSelectElement>('re-antall').value, 10),
+        overgang: el<HTMLSelectElement>('re-overgang').value as 'blandet' | 'uten' | 'med',
+        aapneAndel: parseFloat(el<HTMLSelectElement>('re-aapne').value),
+      });
+      if ('feil' in resultat) {
+        siStatus(
+          resultat.feil === 'ingen-arter' ? M.ingenArter : M.forFaa(resultat.klarte),
+          true
+        );
+        return;
+      }
+
+      el('re-overskrift').textContent =
+        el<HTMLInputElement>('re-tittel').value.trim() || standardTittel;
+
+      const liste = el('re-oppgaver');
+      liste.replaceChildren();
+      resultat.oppgaver.forEach((o) => {
+        const li = document.createElement('li');
+        const legg = (tekst: string) => li.appendChild(document.createTextNode(tekst));
+        const luke = () => {
+          const strek = document.createElement('span');
+          strek.className = 're-strek';
+          strek.textContent = '_____';
+          li.appendChild(strek);
+        };
+        const svar = (tall: number) => {
+          const s = document.createElement('span');
+          s.className = 're-svar';
+          s.textContent = String(tall);
+          li.appendChild(s);
+        };
+        if (o.aapen) {
+          legg(`${o.a} ${TEGN[o.art]} `);
+          luke();
+          svar(o.b);
+          legg(` = ${o.svar}`);
+        } else {
+          legg(`${o.a} ${TEGN[o.art]} ${o.b} = `);
+          luke();
+          svar(o.svar);
+        }
+        liste.appendChild(li);
+      });
+
+      fasitSynlig = false;
+      el('re-fasit-toggle').setAttribute('aria-pressed', 'false');
+      rot.classList.remove('fasit-paa');
+
+      el('re-ark-seksjon').removeAttribute('hidden');
+      siStatus(M.klart(resultat.oppgaver.length));
+      lagreUtkast();
+    }
+
+    lastUtkast();
+
+    el('re-lag').addEventListener('click', generer);
+
+    el('re-fasit-toggle').addEventListener('click', () => {
+      fasitSynlig = !fasitSynlig;
+      el('re-fasit-toggle').setAttribute('aria-pressed', String(fasitSynlig));
+      rot.classList.toggle('fasit-paa', fasitSynlig);
+    });
+
+    const skrivUt = () => {
+      rot.classList.remove('print-fasit');
+      window.print();
+    };
+    el('re-skriv-ut').addEventListener('click', skrivUt);
+    el('re-skriv-ut-sticky').addEventListener('click', skrivUt);
+    el('re-skriv-ut-fasit').addEventListener('click', () => {
+      rot.classList.add('print-fasit');
+      window.print();
+    });
+    window.addEventListener('afterprint', () => rot.classList.remove('print-fasit'));
+
+    ['re-tittel', 're-pluss', 're-minus', 're-gange', 're-dele', 're-omraade', 're-antall', 're-overgang', 're-aapne'].forEach(
+      (id) => el(id).addEventListener('change', lagreUtkast)
+    );
+  }
+</script>

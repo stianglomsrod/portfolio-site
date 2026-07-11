@@ -1,0 +1,576 @@
+---
+/* Tallinje-verktøyet: tallinjer med hull, til utskrift. Hver linje er
+   SVG (linje, tick-merker, tall og tomme svarbokser som vektor-rect —
+   print-lærdommen fra Kryssord). Fasit-mekanikken er Ordkryss sin. */
+
+interface Props {
+  lang?: 'nb' | 'en';
+}
+
+const { lang = 'nb' } = Astro.props;
+
+const t =
+  lang === 'nb'
+    ? {
+        tittelFelt: 'Tittel på arket',
+        tittelEks: 'Skriv tittelen her',
+        fra: 'Første linje starter på',
+        steg: 'Hopp (intervall)',
+        linjer: 'Antall tallinjer',
+        hull: 'Tomme ruter per linje',
+        lag: 'Lag tallinjeark',
+        skrivUt: 'Skriv ut',
+        skrivUtFasit: 'Skriv ut fasit',
+        visFasit: 'Vis fasit her',
+        navnLinje: 'Navn: ____________________   Dato: ____________',
+        fasit: 'FASIT',
+        instruks: 'Fyll inn tallene som mangler.',
+        standardTittel: 'Tallinjer',
+      }
+    : {
+        tittelFelt: 'Sheet title',
+        tittelEks: 'Type the title here',
+        fra: 'First line starts at',
+        steg: 'Jump (interval)',
+        linjer: 'Number of lines',
+        hull: 'Empty boxes per line',
+        lag: 'Create number line sheet',
+        skrivUt: 'Print',
+        skrivUtFasit: 'Print answer key',
+        visFasit: 'Show answers here',
+        navnLinje: 'Name: ____________________   Date: ____________',
+        fasit: 'KEY',
+        instruks: 'Fill in the missing numbers.',
+        standardTittel: 'Number lines',
+      };
+---
+
+<div class="ta-verktoy" data-lang={lang} data-standardtittel={t.standardTittel}>
+  <div class="ta-oppsett">
+    <section class="ta-panel" aria-labelledby="ta-panel-tittel">
+      <h2 id="ta-panel-tittel" class="sr-only">{lang === 'nb' ? 'Oppsett' : 'Setup'}</h2>
+
+      <label class="ta-felt">
+        <span class="ta-felt-navn">{t.tittelFelt}</span>
+        <input type="text" id="ta-tittel" placeholder={t.tittelEks} maxlength="60" />
+      </label>
+
+      <label class="ta-felt">
+        <span class="ta-felt-navn">{t.fra}</span>
+        <input type="number" id="ta-fra" min="0" max="980" value="0" inputmode="numeric" />
+      </label>
+
+      <label class="ta-felt">
+        <span class="ta-felt-navn">{t.steg}</span>
+        <select id="ta-steg">
+          <option value="1" selected>1</option>
+          <option value="2">2</option>
+          <option value="5">5</option>
+          <option value="10">10</option>
+        </select>
+      </label>
+
+      <label class="ta-felt">
+        <span class="ta-felt-navn">{t.linjer}</span>
+        <select id="ta-linjer">
+          <option value="4">4</option>
+          <option value="6" selected>6</option>
+          <option value="8">8</option>
+        </select>
+      </label>
+
+      <label class="ta-felt">
+        <span class="ta-felt-navn">{t.hull}</span>
+        <select id="ta-hull">
+          <option value="3" selected>3</option>
+          <option value="5">5</option>
+          <option value="7">7</option>
+        </select>
+      </label>
+
+      <button type="button" id="ta-lag" class="knapp ta-primaer">{t.lag}</button>
+      <p id="ta-status" class="ta-status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="ta-visning" id="ta-ark-seksjon" hidden aria-labelledby="ta-visning-tittel">
+      <h2 id="ta-visning-tittel" class="sr-only">
+        {lang === 'nb' ? 'Forhåndsvisning' : 'Preview'}
+      </h2>
+      <div class="ta-handlinger">
+        <button type="button" id="ta-skriv-ut" class="knapp ta-primaer">{t.skrivUt}</button>
+        <button type="button" id="ta-skriv-ut-fasit" class="ta-sekundaer">{t.skrivUtFasit}</button>
+        <button type="button" id="ta-fasit-toggle" class="ta-sekundaer" aria-pressed="false">
+          {t.visFasit}
+        </button>
+      </div>
+
+      <div class="ta-sticky-print">
+        <button type="button" id="ta-skriv-ut-sticky" class="ta-sticky-knapp" title="Skriv ut arket (Ctrl+P)" aria-label={t.skrivUt}>
+          🖨
+        </button>
+      </div>
+
+      <div class="ta-ark" id="ta-ark">
+        <div class="ta-ark-hode">
+          <h3 id="ta-overskrift">{t.standardTittel}</h3>
+          <span class="ta-fasit-merke" aria-hidden="true">{t.fasit}</span>
+        </div>
+        <p class="ta-instruks">{t.instruks}</p>
+        <p class="ta-navn-linje">{t.navnLinje}</p>
+        <div id="ta-linjeliste" class="ta-linjeliste"></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<style is:global>
+  .ta-oppsett {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: var(--s-5);
+    align-items: start;
+    margin-top: var(--s-4);
+  }
+
+  @media (max-width: 900px) {
+    .ta-oppsett {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .ta-panel {
+    background: var(--flate);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: var(--s-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .ta-felt {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .ta-felt-navn {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--tekst);
+  }
+
+  .ta-panel input[type='text'],
+  .ta-panel input[type='number'],
+  .ta-panel select {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    padding: 9px 10px;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--tekst);
+    min-height: 44px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .ta-primaer {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 700;
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    border: none;
+    border-radius: 9px;
+    padding: 11px 20px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .ta-primaer:hover {
+    filter: brightness(1.06);
+  }
+
+  .ta-sekundaer {
+    font-family: var(--font-sans);
+    font-size: 14.5px;
+    font-weight: 600;
+    background: var(--bg);
+    color: var(--tekst);
+    border: 1px solid var(--linje);
+    border-radius: 9px;
+    padding: 10px 16px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .ta-sekundaer:hover {
+    border-color: var(--salvie);
+  }
+
+  .ta-status {
+    margin: 0;
+    font-size: 14.5px;
+    color: var(--dempet);
+    min-height: 1.4em;
+  }
+
+  .ta-status.feil {
+    color: var(--feil);
+  }
+
+  .ta-handlinger {
+    display: flex;
+    gap: var(--s-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--s-3);
+  }
+
+  .ta-sticky-print {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 15;
+  }
+
+  .ta-sticky-knapp {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 1px solid var(--linje);
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: var(--kort-skygge);
+    display: grid;
+    place-items: center;
+  }
+
+  .ta-ark {
+    background: #fff;
+    color: #111;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: 28px 32px;
+    max-width: 660px;
+  }
+
+  .ta-ark-hode {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  #ta-overskrift {
+    margin: 0 0 4px;
+    font-size: 24px;
+    color: #111;
+  }
+
+  .ta-fasit-merke {
+    display: none;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    color: #b3261e;
+    border: 2px solid #b3261e;
+    border-radius: 6px;
+    padding: 2px 8px;
+  }
+
+  .ta-verktoy.fasit-paa .ta-fasit-merke {
+    display: inline-block;
+  }
+
+  .ta-instruks {
+    margin: 0 0 6px;
+    font-size: 14.5px;
+    color: #333;
+  }
+
+  .ta-navn-linje {
+    margin: 0 0 18px;
+    font-size: 13.5px;
+    color: #333;
+  }
+
+  .ta-linjeliste {
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+  }
+
+  .ta-linje svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .ta-fasit-del {
+    display: none;
+  }
+
+  .ta-verktoy.fasit-paa .ta-fasit-del {
+    display: inline;
+  }
+
+  @media print {
+    @page {
+      margin: 14mm;
+    }
+
+    html,
+    body {
+      color-scheme: light;
+      background: #fff !important;
+      color: #000;
+    }
+
+    .topp,
+    .bunn,
+    .hopp,
+    .ta-panel,
+    .ta-handlinger,
+    .ta-side-hode,
+    .ta-sticky-print {
+      display: none !important;
+    }
+
+    .ramme {
+      padding: 0;
+      max-width: none;
+      min-height: 0;
+      background: #fff;
+    }
+
+    .ta-oppsett {
+      display: block;
+      margin: 0;
+    }
+
+    .ta-ark {
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 0;
+      max-width: none;
+    }
+
+    .ta-linjeliste {
+      gap: 14mm;
+    }
+
+    .ta-linje {
+      break-inside: avoid;
+    }
+
+    .ta-verktoy:not(.print-fasit) .ta-fasit-del {
+      display: none !important;
+    }
+
+    .ta-verktoy:not(.print-fasit) .ta-fasit-merke {
+      display: none !important;
+    }
+
+    .ta-verktoy.print-fasit .ta-fasit-del {
+      display: inline !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+
+    .ta-verktoy.print-fasit .ta-fasit-merke {
+      display: inline-block !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+  }
+</style>
+
+<script>
+  const rot = document.querySelector<HTMLElement>('.ta-verktoy');
+  if (rot) {
+    const lang = (rot.dataset.lang ?? 'nb') as 'nb' | 'en';
+    const standardTittel = rot.dataset.standardtittel ?? 'Tallinjer';
+    const LAGRINGSNOKKEL = `tallinje-${lang}`;
+    const NS = 'http://www.w3.org/2000/svg';
+    const PUNKTER = 11; // ticks per linje
+
+    const M =
+      lang === 'nb'
+        ? { klart: (n: number, hull: number) => `Arket er klart: ${n} tallinjer med ${hull} hull hver.` }
+        : { klart: (n: number, hull: number) => `The sheet is ready: ${n} number lines with ${hull} gaps each.` };
+
+    let fasitSynlig = false;
+
+    const el = <T extends HTMLElement = HTMLElement>(id: string): T =>
+      document.getElementById(id) as T;
+
+    function lagreUtkast() {
+      try {
+        localStorage.setItem(
+          LAGRINGSNOKKEL,
+          JSON.stringify({
+            tittel: el<HTMLInputElement>('ta-tittel').value,
+            fra: el<HTMLInputElement>('ta-fra').value,
+            steg: el<HTMLSelectElement>('ta-steg').value,
+            linjer: el<HTMLSelectElement>('ta-linjer').value,
+            hull: el<HTMLSelectElement>('ta-hull').value,
+          })
+        );
+      } catch {}
+    }
+
+    function lastUtkast() {
+      try {
+        const raa = localStorage.getItem(LAGRINGSNOKKEL);
+        if (!raa) return;
+        const u = JSON.parse(raa);
+        el<HTMLInputElement>('ta-tittel').value = u.tittel ?? '';
+        const fra = parseInt(u.fra, 10);
+        if (fra >= 0 && fra <= 980) el<HTMLInputElement>('ta-fra').value = String(fra);
+        (['steg', 'linjer', 'hull'] as const).forEach((navn) => {
+          const felt = el<HTMLSelectElement>(`ta-${navn}`);
+          if ([...felt.options].some((o) => o.value === u[navn])) felt.value = u[navn];
+        });
+      } catch {}
+    }
+
+    function svgEl(navn: string, attrs: Record<string, string>, tekst?: string) {
+      const e = document.createElementNS(NS, navn);
+      for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+      if (tekst !== undefined) e.textContent = tekst;
+      return e;
+    }
+
+    function lagLinjeSvg(start: number, steg: number, hull: Set<number>) {
+      const svg = svgEl('svg', { viewBox: '0 0 300 34', 'aria-hidden': 'true' });
+      const y = 12;
+      const x0 = 10;
+      const dx = (300 - 2 * x0) / (PUNKTER - 1);
+
+      svg.appendChild(
+        svgEl('line', { x1: String(x0 - 5), y1: String(y), x2: String(300 - x0 + 5), y2: String(y), stroke: '#333', 'stroke-width': '1.4' })
+      );
+      // pilspiss
+      svg.appendChild(
+        svgEl('path', {
+          d: `M ${300 - x0 + 5} ${y} l -4 -2.4 v 4.8 z`,
+          fill: '#333',
+        })
+      );
+
+      for (let i = 0; i < PUNKTER; i++) {
+        const x = x0 + i * dx;
+        const verdi = start + i * steg;
+        svg.appendChild(
+          svgEl('line', { x1: String(x), y1: String(y - 3.4), x2: String(x), y2: String(y + 3.4), stroke: '#333', 'stroke-width': '1.3' })
+        );
+        if (hull.has(i)) {
+          // tom svarboks under ticken — vektor-rect, aldri CSS-kant
+          svg.appendChild(
+            svgEl('rect', {
+              x: String(x - 8.5), y: '19', width: '17', height: '11',
+              fill: '#fff', stroke: '#555', 'stroke-width': '0.9', rx: '1.5',
+            })
+          );
+          svg.appendChild(
+            svgEl(
+              'text',
+              {
+                x: String(x), y: '27.6', 'text-anchor': 'middle', 'font-size': '8',
+                'font-weight': '700', fill: '#1a6a3a', class: 'ta-fasit-del',
+              },
+              String(verdi)
+            )
+          );
+        } else {
+          svg.appendChild(
+            svgEl(
+              'text',
+              { x: String(x), y: '27.6', 'text-anchor': 'middle', 'font-size': '8', fill: '#111' },
+              String(verdi)
+            )
+          );
+        }
+      }
+      return svg;
+    }
+
+    function siStatus(tekst: string, erFeil = false) {
+      const status = el('ta-status');
+      status.textContent = tekst;
+      status.classList.toggle('feil', erFeil);
+    }
+
+    function generer() {
+      const fraFelt = el<HTMLInputElement>('ta-fra');
+      const fra = Math.min(980, Math.max(0, parseInt(fraFelt.value, 10) || 0));
+      fraFelt.value = String(fra);
+      const steg = parseInt(el<HTMLSelectElement>('ta-steg').value, 10);
+      const antallLinjer = parseInt(el<HTMLSelectElement>('ta-linjer').value, 10);
+      const antallHull = parseInt(el<HTMLSelectElement>('ta-hull').value, 10);
+
+      el('ta-overskrift').textContent =
+        el<HTMLInputElement>('ta-tittel').value.trim() || standardTittel;
+
+      const liste = el('ta-linjeliste');
+      liste.replaceChildren();
+      for (let l = 0; l < antallLinjer; l++) {
+        // linjene fortsetter der forrige sluttet — sammenhengende tallrom
+        const start = fra + l * (PUNKTER - 1) * steg;
+        // hull: aldri første posisjon (ankeret eleven teller fra)
+        const posisjoner = Array.from({ length: PUNKTER - 1 }, (_, i) => i + 1);
+        for (let i = posisjoner.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [posisjoner[i], posisjoner[j]] = [posisjoner[j], posisjoner[i]];
+        }
+        const hull = new Set(posisjoner.slice(0, antallHull));
+        const rad = document.createElement('div');
+        rad.className = 'ta-linje';
+        rad.appendChild(lagLinjeSvg(start, steg, hull));
+        liste.appendChild(rad);
+      }
+
+      fasitSynlig = false;
+      el('ta-fasit-toggle').setAttribute('aria-pressed', 'false');
+      rot.classList.remove('fasit-paa');
+
+      el('ta-ark-seksjon').removeAttribute('hidden');
+      siStatus(M.klart(antallLinjer, antallHull));
+      lagreUtkast();
+    }
+
+    lastUtkast();
+
+    el('ta-lag').addEventListener('click', generer);
+
+    el('ta-fasit-toggle').addEventListener('click', () => {
+      fasitSynlig = !fasitSynlig;
+      el('ta-fasit-toggle').setAttribute('aria-pressed', String(fasitSynlig));
+      rot.classList.toggle('fasit-paa', fasitSynlig);
+    });
+
+    const skrivUt = () => {
+      rot.classList.remove('print-fasit');
+      window.print();
+    };
+    el('ta-skriv-ut').addEventListener('click', skrivUt);
+    el('ta-skriv-ut-sticky').addEventListener('click', skrivUt);
+    el('ta-skriv-ut-fasit').addEventListener('click', () => {
+      rot.classList.add('print-fasit');
+      window.print();
+    });
+    window.addEventListener('afterprint', () => rot.classList.remove('print-fasit'));
+
+    ['ta-tittel', 'ta-fra', 'ta-steg', 'ta-linjer', 'ta-hull'].forEach((id) =>
+      el(id).addEventListener('change', lagreUtkast)
+    );
+  }
+</script>

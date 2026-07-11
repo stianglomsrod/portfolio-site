@@ -1,0 +1,44 @@
+---
+import Side from '../../layouts/Side.astro';
+import SetningsstokkingVerktoy from '../../components/SetningsstokkingVerktoy.astro';
+
+/* Rablete setninger i sandbox. ENGELSK TVILLING:
+   src/pages/en/sandbox/sentence-scramble.astro — endre begge. */
+---
+
+<Side
+  title="Rablete setninger — lag ark med stokkede setninger"
+  description="Skriv setningene, og arket viser ordene stokket — elevene skriver setningen riktig på linja."
+>
+  <div class="se-side-hode">
+    <p class="kicker">/sandbox · verktøy</p>
+    <h1>Rablete setninger</h1>
+    <p class="dempet">
+      Skriv inn setninger, og arket viser ordene som stokkede brikker. Eleven setter dem i riktig rekkefølge og skriver setningen på linja under. Fasit-utskrift følger med.
+    </p>
+  </div>
+  <SetningsstokkingVerktoy lang="nb" />
+</Side>
+
+<style>
+  .kicker {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: var(--tekst-label);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--hue-aksent);
+    margin: var(--s-7) 0 var(--s-2);
+  }
+
+  h1 {
+    font-size: var(--tekst-tittel);
+    margin: 0 0 var(--s-3);
+  }
+
+  .dempet {
+    color: var(--dempet);
+    max-width: 68ch;
+    margin: 0;
+  }
+</style>

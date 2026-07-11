@@ -1,0 +1,842 @@
+---
+/* Ord-til-bilde-verktøyet: eleven trekker strek fra ordet til riktig
+   bilde. Hvert ord MÅ ha bilde (opplasting eller Ctrl+V, som søsknene).
+   Fast radhøyde gjør at fasit-strekene kan tegnes som SVG-linjer i
+   sonen mellom kolonnene. Fasit-mekanikken er Ordkryss sin. */
+
+interface Props {
+  lang?: 'nb' | 'en';
+}
+
+const { lang = 'nb' } = Astro.props;
+
+const t =
+  lang === 'nb'
+    ? {
+        tittelFelt: 'Tittel på arket',
+        tittelEks: 'Skriv tittelen her',
+        ordNavn: 'Ordene (med bilde)',
+        ordEks: 'skriv et ord',
+        leggTil: '+ Legg til ord',
+        bildeHint: 'Hvert ord trenger et bilde. Tips: kopier et bilde (høyreklikk → «Kopier bilde») og lim det inn i ordfeltet med Ctrl + V.',
+        lag: 'Lag ark',
+        skrivUt: 'Skriv ut',
+        skrivUtFasit: 'Skriv ut fasit',
+        visFasit: 'Vis fasit her',
+        navnLinje: 'Navn: ____________________   Dato: ____________',
+        instruks: 'Trekk strek fra ordet til riktig bilde.',
+        fasit: 'FASIT',
+        standardTittel: 'Ord og bilde',
+      }
+    : {
+        tittelFelt: 'Sheet title',
+        tittelEks: 'Type the title here',
+        ordNavn: 'The words (with pictures)',
+        ordEks: 'type a word',
+        leggTil: '+ Add word',
+        bildeHint: 'Each word needs a picture. Tip: copy a picture (right-click → “Copy image”) and paste it into the word field with Ctrl + V.',
+        lag: 'Create sheet',
+        skrivUt: 'Print',
+        skrivUtFasit: 'Print answer key',
+        visFasit: 'Show answers here',
+        navnLinje: 'Name: ____________________   Date: ____________',
+        instruks: 'Draw a line from the word to the right picture.',
+        fasit: 'KEY',
+        standardTittel: 'Word and picture',
+      };
+---
+
+<div class="ob-verktoy" data-lang={lang} data-standardtittel={t.standardTittel}>
+  <div class="ob-oppsett">
+    <section class="ob-panel" aria-labelledby="ob-panel-tittel">
+      <h2 id="ob-panel-tittel" class="sr-only">{lang === 'nb' ? 'Oppsett' : 'Setup'}</h2>
+
+      <label class="ob-felt">
+        <span class="ob-felt-navn">{t.tittelFelt}</span>
+        <input type="text" id="ob-tittel" placeholder={t.tittelEks} maxlength="60" />
+      </label>
+
+      <div class="ob-felt">
+        <span class="ob-felt-navn" id="ob-ord-navn">{t.ordNavn}</span>
+        <ul id="ob-ord-liste" aria-labelledby="ob-ord-navn"></ul>
+        <button type="button" id="ob-legg-til" class="ob-sekundaer">{t.leggTil}</button>
+        <p class="ob-hint">{t.bildeHint}</p>
+      </div>
+
+      <button type="button" id="ob-lag" class="knapp ob-primaer">{t.lag}</button>
+      <p id="ob-status" class="ob-status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="ob-visning" id="ob-ark-seksjon" hidden aria-labelledby="ob-visning-tittel">
+      <h2 id="ob-visning-tittel" class="sr-only">
+        {lang === 'nb' ? 'Forhåndsvisning' : 'Preview'}
+      </h2>
+      <div class="ob-handlinger">
+        <button type="button" id="ob-skriv-ut" class="knapp ob-primaer">{t.skrivUt}</button>
+        <button type="button" id="ob-skriv-ut-fasit" class="ob-sekundaer">{t.skrivUtFasit}</button>
+        <button type="button" id="ob-fasit-toggle" class="ob-sekundaer" aria-pressed="false">
+          {t.visFasit}
+        </button>
+      </div>
+
+      <div class="ob-sticky-print">
+        <button type="button" id="ob-skriv-ut-sticky" class="ob-sticky-knapp" title="Skriv ut arket (Ctrl+P)" aria-label={t.skrivUt}>
+          🖨
+        </button>
+      </div>
+
+      <div class="ob-ark" id="ob-ark">
+        <div class="ob-ark-hode">
+          <h3 id="ob-overskrift">{t.standardTittel}</h3>
+          <span class="ob-fasit-merke" aria-hidden="true">{t.fasit}</span>
+        </div>
+        <p class="ob-instruks">{t.instruks}</p>
+        <p class="ob-navn-linje">{t.navnLinje}</p>
+        <div class="ob-kobling">
+          <div id="ob-venstre" class="ob-kolonne"></div>
+          <div class="ob-mellom" id="ob-mellom"></div>
+          <div id="ob-hoyre" class="ob-kolonne"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<style is:global>
+  .ob-oppsett {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: var(--s-5);
+    align-items: start;
+    margin-top: var(--s-4);
+  }
+
+  @media (max-width: 900px) {
+    .ob-oppsett {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .ob-panel {
+    background: var(--flate);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: var(--s-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .ob-felt {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .ob-felt-navn {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--tekst);
+  }
+
+  .ob-panel input[type='text'] {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    padding: 9px 10px;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--tekst);
+    min-height: 44px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .ob-hint {
+    margin: 2px 0 0;
+    font-size: 13.5px;
+    color: var(--dempet);
+  }
+
+  #ob-ord-liste {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .ob-ord-rad {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .ob-ord-rad input[type='text'] {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .ob-ord-rad.upassende input[type='text'] {
+    border-color: var(--feil);
+  }
+
+  .ob-ord-rad.mangler-bilde .ob-ikonknapp {
+    border-color: var(--feil);
+  }
+
+  .ob-ikonknapp {
+    font: inherit;
+    min-width: 44px;
+    min-height: 44px;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--tekst);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    flex-shrink: 0;
+  }
+
+  .ob-ikonknapp:hover {
+    border-color: var(--salvie);
+  }
+
+  .ob-mini-bilde {
+    width: 36px;
+    height: 36px;
+    object-fit: cover;
+    border-radius: 6px;
+  }
+
+  .ob-bilde-holder {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+  }
+
+  .ob-fjern-bilde {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid var(--linje);
+    border-radius: 50%;
+    background: var(--flate-2);
+    color: var(--tekst);
+    font: 700 11px var(--font-hd);
+    line-height: 1;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    z-index: 1;
+  }
+
+  .ob-fjern-bilde:hover {
+    color: var(--feil);
+    border-color: var(--feil);
+  }
+
+  .ob-primaer {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 700;
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    border: none;
+    border-radius: 9px;
+    padding: 11px 20px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .ob-primaer:hover {
+    filter: brightness(1.06);
+  }
+
+  .ob-sekundaer {
+    font-family: var(--font-sans);
+    font-size: 14.5px;
+    font-weight: 600;
+    background: var(--bg);
+    color: var(--tekst);
+    border: 1px solid var(--linje);
+    border-radius: 9px;
+    padding: 10px 16px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .ob-sekundaer:hover {
+    border-color: var(--salvie);
+  }
+
+  .ob-sekundaer:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  .ob-status {
+    margin: 0;
+    font-size: 14.5px;
+    color: var(--dempet);
+    min-height: 1.4em;
+  }
+
+  .ob-status.feil {
+    color: var(--feil);
+  }
+
+  .ob-handlinger {
+    display: flex;
+    gap: var(--s-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--s-3);
+  }
+
+  .ob-sticky-print {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 15;
+  }
+
+  .ob-sticky-knapp {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 1px solid var(--linje);
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: var(--kort-skygge);
+    display: grid;
+    place-items: center;
+  }
+
+  .ob-ark {
+    --ob-rad: 78px;
+    background: #fff;
+    color: #111;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: 28px 32px;
+    max-width: 660px;
+  }
+
+  .ob-ark-hode {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  #ob-overskrift {
+    margin: 0 0 4px;
+    font-size: 24px;
+    color: #111;
+  }
+
+  .ob-fasit-merke {
+    display: none;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    color: #b3261e;
+    border: 2px solid #b3261e;
+    border-radius: 6px;
+    padding: 2px 8px;
+  }
+
+  .ob-verktoy.fasit-paa .ob-fasit-merke {
+    display: inline-block;
+  }
+
+  .ob-instruks {
+    margin: 0 0 6px;
+    font-size: 14.5px;
+    color: #333;
+  }
+
+  .ob-navn-linje {
+    margin: 0 0 18px;
+    font-size: 13.5px;
+    color: #333;
+  }
+
+  .ob-kobling {
+    display: grid;
+    grid-template-columns: 1fr 90px 1fr;
+    align-items: start;
+  }
+
+  .ob-kolonne {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ob-rad {
+    height: var(--ob-rad);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+  }
+
+  #ob-venstre .ob-rad {
+    justify-content: flex-end;
+    text-align: right;
+  }
+
+  .ob-punkt {
+    font-weight: 700;
+    color: #333;
+  }
+
+  .ob-rad img {
+    height: calc(var(--ob-rad) - 16px);
+    width: auto;
+    max-width: 120px;
+    object-fit: contain;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  .ob-mellom {
+    position: relative;
+    height: 100%;
+  }
+
+  .ob-mellom svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+  }
+
+  .ob-verktoy.fasit-paa .ob-mellom svg {
+    display: block;
+  }
+
+  @media print {
+    @page {
+      margin: 14mm;
+    }
+
+    html,
+    body {
+      color-scheme: light;
+      background: #fff !important;
+      color: #000;
+    }
+
+    .topp,
+    .bunn,
+    .hopp,
+    .ob-panel,
+    .ob-handlinger,
+    .ob-side-hode,
+    .ob-sticky-print {
+      display: none !important;
+    }
+
+    .ramme {
+      padding: 0;
+      max-width: none;
+      min-height: 0;
+      background: #fff;
+    }
+
+    .ob-oppsett {
+      display: block;
+      margin: 0;
+    }
+
+    .ob-ark {
+      --ob-rad: 24mm;
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 0;
+      max-width: none;
+    }
+
+    .ob-rad {
+      break-inside: avoid;
+    }
+
+    .ob-rad img {
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+
+    .ob-verktoy:not(.print-fasit) .ob-mellom svg {
+      display: none !important;
+    }
+
+    .ob-verktoy:not(.print-fasit) .ob-fasit-merke {
+      display: none !important;
+    }
+
+    .ob-verktoy.print-fasit .ob-mellom svg {
+      display: block !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+
+    .ob-verktoy.print-fasit .ob-fasit-merke {
+      display: inline-block !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+  }
+</style>
+
+<script>
+  import { ordErUpassende } from '../lib/ordkryss-kjerne';
+
+  const rot = document.querySelector<HTMLElement>('.ob-verktoy');
+  if (rot) {
+    const lang = (rot.dataset.lang ?? 'nb') as 'nb' | 'en';
+    const standardTittel = rot.dataset.standardtittel ?? 'Ord og bilde';
+    const LAGRINGSNOKKEL = `ord-til-bilde-${lang}`;
+    const MAKS_ORD = 8;
+    const NS = 'http://www.w3.org/2000/svg';
+
+    const M =
+      lang === 'nb'
+        ? {
+            minstTo: 'Skriv inn minst to ord.',
+            upassende: (o: string) =>
+              `«${o}» passer ikke på et skoleark. Bytt ut ordet, så lager vi arket.`,
+            manglerBilde: (o: string) => `«${o}» mangler bilde — lim inn eller last opp.`,
+            klart: (n: number) => `Arket er klart: ${n} par.`,
+            ordAria: (i: number) => `Ord ${i}`,
+            byttBilde: (i: number) => `Bytt bilde for ord ${i}`,
+            leggBilde: (i: number) => `Legg til bilde for ord ${i}`,
+            fjernBilde: (i: number) => `Fjern bildet for ord ${i}`,
+            fjernOrd: (i: number) => `Fjern ord ${i}`,
+            ordEks: 'skriv et ord',
+          }
+        : {
+            minstTo: 'Type at least two words.',
+            upassende: (o: string) =>
+              `“${o}” does not belong on a school sheet. Swap the word and we will make the sheet.`,
+            manglerBilde: (o: string) => `“${o}” has no picture — paste or upload one.`,
+            klart: (n: number) => `The sheet is ready: ${n} pairs.`,
+            ordAria: (i: number) => `Word ${i}`,
+            byttBilde: (i: number) => `Change picture for word ${i}`,
+            leggBilde: (i: number) => `Add picture for word ${i}`,
+            fjernBilde: (i: number) => `Remove the picture for word ${i}`,
+            fjernOrd: (i: number) => `Remove word ${i}`,
+            ordEks: 'type a word',
+          };
+
+    interface OrdRad {
+      id: number;
+      tekst: string;
+      bilde: string | null;
+    }
+
+    let ordListe: OrdRad[] = [];
+    let nesteId = 1;
+    let fasitSynlig = false;
+
+    const el = <T extends HTMLElement = HTMLElement>(id: string): T =>
+      document.getElementById(id) as T;
+
+    function lagreUtkast() {
+      try {
+        localStorage.setItem(
+          LAGRINGSNOKKEL,
+          JSON.stringify({
+            tittel: el<HTMLInputElement>('ob-tittel').value,
+            ord: ordListe.map((o) => o.tekst),
+          })
+        );
+      } catch {}
+    }
+
+    function lastUtkast(): boolean {
+      try {
+        const raa = localStorage.getItem(LAGRINGSNOKKEL);
+        if (!raa) return false;
+        const u = JSON.parse(raa);
+        el<HTMLInputElement>('ob-tittel').value = u.tittel ?? '';
+        (u.ord ?? []).forEach((o: unknown) => {
+          if (typeof o === 'string') ordListe.push({ id: nesteId++, tekst: o, bilde: null });
+        });
+        return ordListe.length > 0;
+      } catch {
+        return false;
+      }
+    }
+
+    function leggTilOrd(tekst = '') {
+      if (ordListe.length >= MAKS_ORD) return;
+      ordListe.push({ id: nesteId++, tekst, bilde: null });
+      tegnOrdListe();
+    }
+
+    function tegnOrdListe() {
+      const liste = el('ob-ord-liste');
+      liste.replaceChildren();
+
+      ordListe.forEach((ord, indeks) => {
+        const rad = document.createElement('li');
+        rad.className = 'ob-ord-rad';
+
+        const felt = document.createElement('input');
+        felt.type = 'text';
+        felt.value = ord.tekst.slice(0, 18);
+        felt.maxLength = 18;
+        felt.setAttribute('aria-label', M.ordAria(indeks + 1));
+        felt.placeholder = M.ordEks;
+        felt.addEventListener('input', () => {
+          ord.tekst = felt.value;
+          const stygt = ordErUpassende(felt.value);
+          rad.classList.toggle('upassende', stygt);
+          felt.setAttribute('aria-invalid', stygt ? 'true' : 'false');
+          lagreUtkast();
+        });
+        if (ordErUpassende(ord.tekst)) rad.classList.add('upassende');
+
+        felt.addEventListener('paste', (e) => {
+          const data = e.clipboardData;
+          if (!data) return;
+          const fraItems = [...data.items]
+            .find((i) => i.type.startsWith('image/'))
+            ?.getAsFile();
+          const fraFiler = [...data.files].find((f) => f.type.startsWith('image/'));
+          const fil = fraItems ?? fraFiler;
+          if (!fil) return;
+          e.preventDefault();
+          const leser = new FileReader();
+          leser.onload = () => {
+            ord.bilde = String(leser.result);
+            tegnOrdListe();
+            lagreUtkast();
+          };
+          leser.readAsDataURL(fil);
+        });
+
+        const bildeKnapp = document.createElement('button');
+        bildeKnapp.type = 'button';
+        bildeKnapp.className = 'ob-ikonknapp';
+        bildeKnapp.setAttribute(
+          'aria-label',
+          ord.bilde ? M.byttBilde(indeks + 1) : M.leggBilde(indeks + 1)
+        );
+        if (ord.bilde) {
+          const mini = document.createElement('img');
+          mini.src = ord.bilde;
+          mini.alt = '';
+          mini.className = 'ob-mini-bilde';
+          bildeKnapp.appendChild(mini);
+        } else {
+          bildeKnapp.textContent = '🖼';
+        }
+
+        const filFelt = document.createElement('input');
+        filFelt.type = 'file';
+        filFelt.accept = 'image/*';
+        filFelt.hidden = true;
+        filFelt.addEventListener('change', () => {
+          const fil = filFelt.files?.[0];
+          if (!fil) return;
+          const leser = new FileReader();
+          leser.onload = () => {
+            ord.bilde = String(leser.result);
+            tegnOrdListe();
+          };
+          leser.readAsDataURL(fil);
+        });
+        bildeKnapp.addEventListener('click', () => filFelt.click());
+
+        const bildeHolder = document.createElement('span');
+        bildeHolder.className = 'ob-bilde-holder';
+        bildeHolder.appendChild(bildeKnapp);
+        if (ord.bilde) {
+          const fjernBilde = document.createElement('button');
+          fjernBilde.type = 'button';
+          fjernBilde.className = 'ob-fjern-bilde';
+          fjernBilde.textContent = '✕';
+          fjernBilde.setAttribute('aria-label', M.fjernBilde(indeks + 1));
+          fjernBilde.addEventListener('click', () => {
+            ord.bilde = null;
+            tegnOrdListe();
+            lagreUtkast();
+          });
+          bildeHolder.appendChild(fjernBilde);
+        }
+
+        const fjern = document.createElement('button');
+        fjern.type = 'button';
+        fjern.className = 'ob-ikonknapp';
+        fjern.textContent = '✕';
+        fjern.setAttribute('aria-label', M.fjernOrd(indeks + 1));
+        fjern.addEventListener('click', () => {
+          ordListe = ordListe.filter((o) => o.id !== ord.id);
+          if (ordListe.length === 0) leggTilOrd();
+          tegnOrdListe();
+          lagreUtkast();
+        });
+
+        rad.append(felt, bildeHolder, filFelt, fjern);
+        liste.appendChild(rad);
+      });
+
+      el<HTMLButtonElement>('ob-legg-til').disabled = ordListe.length >= MAKS_ORD;
+    }
+
+    function siStatus(tekst: string, erFeil = false) {
+      const status = el('ob-status');
+      status.textContent = tekst;
+      status.classList.toggle('feil', erFeil);
+    }
+
+    function generer() {
+      const rene = ordListe
+        .map((o) => ({ ...o, tekst: o.tekst.trim() }))
+        .filter((o) => o.tekst.length > 0);
+      if (rene.length < 2) {
+        siStatus(M.minstTo, true);
+        return;
+      }
+      for (const o of rene) {
+        if (ordErUpassende(o.tekst)) {
+          siStatus(M.upassende(o.tekst), true);
+          return;
+        }
+        if (!o.bilde) {
+          siStatus(M.manglerBilde(o.tekst), true);
+          return;
+        }
+      }
+
+      el('ob-overskrift').textContent =
+        el<HTMLInputElement>('ob-tittel').value.trim() || standardTittel;
+
+      // plassering[i] = hvilken høyre-plass ord i havner på; unngå at
+      // alle står rett overfor sitt eget bilde
+      const plasser = rene.map((_, i) => i);
+      for (let i = plasser.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [plasser[i], plasser[j]] = [plasser[j], plasser[i]];
+      }
+      if (plasser.every((p, i) => p === i)) {
+        plasser.push(plasser.shift() as number);
+      }
+
+      const venstre = el('ob-venstre');
+      const hoyre = el('ob-hoyre');
+      venstre.replaceChildren();
+      hoyre.replaceChildren();
+
+      const BOKSTAVER = 'ABCDEFGH';
+      rene.forEach((o, i) => {
+        const rad = document.createElement('div');
+        rad.className = 'ob-rad';
+        const tekst = document.createElement('span');
+        tekst.textContent = o.tekst;
+        const punkt = document.createElement('span');
+        punkt.className = 'ob-punkt';
+        punkt.textContent = `${i + 1} ●`;
+        rad.append(tekst, punkt);
+        venstre.appendChild(rad);
+      });
+
+      // høyresiden i stokket rekkefølge: plass p viser bildet til ordet
+      // som har plasser[ord] = p
+      const paaPlass: number[] = [];
+      plasser.forEach((p, ordIndeks) => { paaPlass[p] = ordIndeks; });
+      paaPlass.forEach((ordIndeks, plass) => {
+        const o = rene[ordIndeks];
+        const rad = document.createElement('div');
+        rad.className = 'ob-rad';
+        const punkt = document.createElement('span');
+        punkt.className = 'ob-punkt';
+        punkt.textContent = `● ${BOKSTAVER[plass]}`;
+        const img = document.createElement('img');
+        img.src = o.bilde as string;
+        img.alt = '';
+        rad.append(punkt, img);
+        hoyre.appendChild(rad);
+      });
+
+      // fasitlinjene: SVG i mellomsonen, radsentre i prosent
+      const mellom = el('ob-mellom');
+      mellom.replaceChildren();
+      const svg = document.createElementNS(NS, 'svg');
+      svg.setAttribute('viewBox', `0 0 100 ${rene.length * 10}`);
+      svg.setAttribute('preserveAspectRatio', 'none');
+      svg.setAttribute('aria-hidden', 'true');
+      plasser.forEach((p, i) => {
+        const linje = document.createElementNS(NS, 'line');
+        linje.setAttribute('x1', '2');
+        linje.setAttribute('y1', String(i * 10 + 5));
+        linje.setAttribute('x2', '98');
+        linje.setAttribute('y2', String(p * 10 + 5));
+        linje.setAttribute('stroke', '#1a6a3a');
+        linje.setAttribute('stroke-width', '0.9');
+        linje.setAttribute('vector-effect', 'non-scaling-stroke');
+        svg.appendChild(linje);
+      });
+      mellom.appendChild(svg);
+
+      fasitSynlig = false;
+      el('ob-fasit-toggle').setAttribute('aria-pressed', 'false');
+      rot.classList.remove('fasit-paa');
+
+      el('ob-ark-seksjon').removeAttribute('hidden');
+      siStatus(M.klart(rene.length));
+      lagreUtkast();
+    }
+
+    if (!lastUtkast()) {
+      leggTilOrd();
+      leggTilOrd();
+      leggTilOrd();
+    }
+    tegnOrdListe();
+
+    el('ob-legg-til').addEventListener('click', () => {
+      leggTilOrd();
+      lagreUtkast();
+    });
+
+    el('ob-lag').addEventListener('click', generer);
+
+    el('ob-fasit-toggle').addEventListener('click', () => {
+      fasitSynlig = !fasitSynlig;
+      el('ob-fasit-toggle').setAttribute('aria-pressed', String(fasitSynlig));
+      rot.classList.toggle('fasit-paa', fasitSynlig);
+    });
+
+    const skrivUt = () => {
+      rot.classList.remove('print-fasit');
+      window.print();
+    };
+    el('ob-skriv-ut').addEventListener('click', skrivUt);
+    el('ob-skriv-ut-sticky').addEventListener('click', skrivUt);
+    el('ob-skriv-ut-fasit').addEventListener('click', () => {
+      rot.classList.add('print-fasit');
+      window.print();
+    });
+    window.addEventListener('afterprint', () => rot.classList.remove('print-fasit'));
+
+    el('ob-tittel').addEventListener('change', lagreUtkast);
+  }
+</script>

@@ -1,0 +1,616 @@
+---
+/* Klokkeark-verktøyet: SVG-urskiver til utskrift. To moduser: «les av»
+   (visere tegnet, eleven skriver klokkeslettet) og «tegn viserne»
+   (tom skive, klokkeslettet står under). Alt tegnes som SVG-vektorer —
+   print-lærdommen fra Kryssord (kanter på tomme CSS-bokser culles i
+   enkelte Chrome-versjoner). Fasit-mekanikken er Ordkryss sin. */
+
+interface Props {
+  lang?: 'nb' | 'en';
+}
+
+const { lang = 'nb' } = Astro.props;
+
+const t =
+  lang === 'nb'
+    ? {
+        tittelFelt: 'Tittel på arket',
+        tittelEks: 'Skriv tittelen her',
+        modus: 'Oppgavetype',
+        modusLes: 'Les av klokka — skriv klokkeslettet',
+        modusTegn: 'Tegn viserne — klokkeslettet står under',
+        presisjon: 'Presisjon',
+        presisjonHel: 'hele timer',
+        presisjonHalv: 'hele og halve timer',
+        presisjonKvart: 'kvarter',
+        presisjonFem: 'femminutter',
+        antall: 'Antall klokker',
+        lag: 'Lag klokkeark',
+        skrivUt: 'Skriv ut',
+        skrivUtFasit: 'Skriv ut fasit',
+        visFasit: 'Vis fasit her',
+        navnLinje: 'Navn: ____________________   Dato: ____________',
+        fasit: 'FASIT',
+        klPrefiks: 'kl.',
+        standardTittel: 'Klokka',
+      }
+    : {
+        tittelFelt: 'Sheet title',
+        tittelEks: 'Type the title here',
+        modus: 'Task type',
+        modusLes: 'Read the clock — write the time',
+        modusTegn: 'Draw the hands — the time is below',
+        presisjon: 'Precision',
+        presisjonHel: 'whole hours',
+        presisjonHalv: 'whole and half hours',
+        presisjonKvart: 'quarter hours',
+        presisjonFem: 'five minutes',
+        antall: 'Number of clocks',
+        lag: 'Create clock sheet',
+        skrivUt: 'Print',
+        skrivUtFasit: 'Print answer key',
+        visFasit: 'Show answers here',
+        navnLinje: 'Name: ____________________   Date: ____________',
+        fasit: 'KEY',
+        klPrefiks: '',
+        standardTittel: 'The clock',
+      };
+---
+
+<div class="kl-verktoy" data-lang={lang} data-standardtittel={t.standardTittel} data-klprefiks={t.klPrefiks}>
+  <div class="kl-oppsett">
+    <section class="kl-panel" aria-labelledby="kl-panel-tittel">
+      <h2 id="kl-panel-tittel" class="sr-only">{lang === 'nb' ? 'Oppsett' : 'Setup'}</h2>
+
+      <label class="kl-felt">
+        <span class="kl-felt-navn">{t.tittelFelt}</span>
+        <input type="text" id="kl-tittel" placeholder={t.tittelEks} maxlength="60" />
+      </label>
+
+      <label class="kl-felt">
+        <span class="kl-felt-navn">{t.modus}</span>
+        <select id="kl-modus">
+          <option value="les" selected>{t.modusLes}</option>
+          <option value="tegn">{t.modusTegn}</option>
+        </select>
+      </label>
+
+      <label class="kl-felt">
+        <span class="kl-felt-navn">{t.presisjon}</span>
+        <select id="kl-presisjon">
+          <option value="60">{t.presisjonHel}</option>
+          <option value="30" selected>{t.presisjonHalv}</option>
+          <option value="15">{t.presisjonKvart}</option>
+          <option value="5">{t.presisjonFem}</option>
+        </select>
+      </label>
+
+      <label class="kl-felt">
+        <span class="kl-felt-navn">{t.antall}</span>
+        <select id="kl-antall">
+          <option value="6">6</option>
+          <option value="9" selected>9</option>
+          <option value="12">12</option>
+        </select>
+      </label>
+
+      <button type="button" id="kl-lag" class="knapp kl-primaer">{t.lag}</button>
+      <p id="kl-status" class="kl-status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="kl-visning" id="kl-ark-seksjon" hidden aria-labelledby="kl-visning-tittel">
+      <h2 id="kl-visning-tittel" class="sr-only">
+        {lang === 'nb' ? 'Forhåndsvisning' : 'Preview'}
+      </h2>
+      <div class="kl-handlinger">
+        <button type="button" id="kl-skriv-ut" class="knapp kl-primaer">{t.skrivUt}</button>
+        <button type="button" id="kl-skriv-ut-fasit" class="kl-sekundaer">{t.skrivUtFasit}</button>
+        <button type="button" id="kl-fasit-toggle" class="kl-sekundaer" aria-pressed="false">
+          {t.visFasit}
+        </button>
+      </div>
+
+      <div class="kl-sticky-print">
+        <button type="button" id="kl-skriv-ut-sticky" class="kl-sticky-knapp" title="Skriv ut arket (Ctrl+P)" aria-label={t.skrivUt}>
+          🖨
+        </button>
+      </div>
+
+      <div class="kl-ark" id="kl-ark">
+        <div class="kl-ark-hode">
+          <h3 id="kl-overskrift">{t.standardTittel}</h3>
+          <span class="kl-fasit-merke" aria-hidden="true">{t.fasit}</span>
+        </div>
+        <p class="kl-navn-linje">{t.navnLinje}</p>
+        <div id="kl-klokker" class="kl-klokker"></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<style is:global>
+  .kl-oppsett {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: var(--s-5);
+    align-items: start;
+    margin-top: var(--s-4);
+  }
+
+  @media (max-width: 900px) {
+    .kl-oppsett {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .kl-panel {
+    background: var(--flate);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: var(--s-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .kl-felt {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .kl-felt-navn {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--tekst);
+  }
+
+  .kl-panel input[type='text'],
+  .kl-panel select {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    padding: 9px 10px;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--tekst);
+    min-height: 44px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .kl-primaer {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 700;
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    border: none;
+    border-radius: 9px;
+    padding: 11px 20px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .kl-primaer:hover {
+    filter: brightness(1.06);
+  }
+
+  .kl-sekundaer {
+    font-family: var(--font-sans);
+    font-size: 14.5px;
+    font-weight: 600;
+    background: var(--bg);
+    color: var(--tekst);
+    border: 1px solid var(--linje);
+    border-radius: 9px;
+    padding: 10px 16px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .kl-sekundaer:hover {
+    border-color: var(--salvie);
+  }
+
+  .kl-status {
+    margin: 0;
+    font-size: 14.5px;
+    color: var(--dempet);
+    min-height: 1.4em;
+  }
+
+  .kl-status.feil {
+    color: var(--feil);
+  }
+
+  .kl-handlinger {
+    display: flex;
+    gap: var(--s-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--s-3);
+  }
+
+  .kl-sticky-print {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 15;
+  }
+
+  .kl-sticky-knapp {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 1px solid var(--linje);
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: var(--kort-skygge);
+    display: grid;
+    place-items: center;
+  }
+
+  .kl-ark {
+    background: #fff;
+    color: #111;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: 28px 32px;
+    max-width: 660px;
+  }
+
+  .kl-ark-hode {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  #kl-overskrift {
+    margin: 0 0 4px;
+    font-size: 24px;
+    color: #111;
+  }
+
+  .kl-fasit-merke {
+    display: none;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    color: #b3261e;
+    border: 2px solid #b3261e;
+    border-radius: 6px;
+    padding: 2px 8px;
+  }
+
+  .kl-verktoy.fasit-paa .kl-fasit-merke {
+    display: inline-block;
+  }
+
+  .kl-navn-linje {
+    margin: 0 0 18px;
+    font-size: 13.5px;
+    color: #333;
+  }
+
+  .kl-klokker {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px 18px;
+  }
+
+  .kl-klokke svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* Fasit-deler i SVG-en: skjult til fasit slås på */
+  .kl-fasit-del {
+    display: none;
+  }
+
+  .kl-verktoy.fasit-paa .kl-fasit-del {
+    display: inline;
+  }
+
+  @media print {
+    @page {
+      margin: 14mm;
+    }
+
+    html,
+    body {
+      color-scheme: light;
+      background: #fff !important;
+      color: #000;
+    }
+
+    .topp,
+    .bunn,
+    .hopp,
+    .kl-panel,
+    .kl-handlinger,
+    .kl-side-hode,
+    .kl-sticky-print {
+      display: none !important;
+    }
+
+    .ramme {
+      padding: 0;
+      max-width: none;
+      min-height: 0;
+      background: #fff;
+    }
+
+    .kl-oppsett {
+      display: block;
+      margin: 0;
+    }
+
+    .kl-ark {
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 0;
+      max-width: none;
+    }
+
+    .kl-klokker {
+      gap: 10mm 8mm;
+    }
+
+    .kl-klokke {
+      break-inside: avoid;
+    }
+
+    .kl-verktoy:not(.print-fasit) .kl-fasit-del {
+      display: none !important;
+    }
+
+    .kl-verktoy:not(.print-fasit) .kl-fasit-merke {
+      display: none !important;
+    }
+
+    .kl-verktoy.print-fasit .kl-fasit-del {
+      display: inline !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+
+    .kl-verktoy.print-fasit .kl-fasit-merke {
+      display: inline-block !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+  }
+</style>
+
+<script>
+  const rot = document.querySelector<HTMLElement>('.kl-verktoy');
+  if (rot) {
+    const lang = (rot.dataset.lang ?? 'nb') as 'nb' | 'en';
+    const standardTittel = rot.dataset.standardtittel ?? 'Klokka';
+    const klPrefiks = rot.dataset.klprefiks ?? '';
+    const LAGRINGSNOKKEL = `klokke-${lang}`;
+    const NS = 'http://www.w3.org/2000/svg';
+
+    const M =
+      lang === 'nb'
+        ? { klart: (n: number) => `Arket er klart: ${n} klokker.` }
+        : { klart: (n: number) => `The sheet is ready: ${n} clocks.` };
+
+    let fasitSynlig = false;
+
+    const el = <T extends HTMLElement = HTMLElement>(id: string): T =>
+      document.getElementById(id) as T;
+
+    function lagreUtkast() {
+      try {
+        localStorage.setItem(
+          LAGRINGSNOKKEL,
+          JSON.stringify({
+            tittel: el<HTMLInputElement>('kl-tittel').value,
+            modus: el<HTMLSelectElement>('kl-modus').value,
+            presisjon: el<HTMLSelectElement>('kl-presisjon').value,
+            antall: el<HTMLSelectElement>('kl-antall').value,
+          })
+        );
+      } catch {}
+    }
+
+    function lastUtkast() {
+      try {
+        const raa = localStorage.getItem(LAGRINGSNOKKEL);
+        if (!raa) return;
+        const u = JSON.parse(raa);
+        el<HTMLInputElement>('kl-tittel').value = u.tittel ?? '';
+        (['modus', 'presisjon', 'antall'] as const).forEach((navn) => {
+          const felt = el<HTMLSelectElement>(`kl-${navn}`);
+          if ([...felt.options].some((o) => o.value === u[navn])) felt.value = u[navn];
+        });
+      } catch {}
+    }
+
+    function svgEl(navn: string, attrs: Record<string, string>, tekst?: string) {
+      const e = document.createElementNS(NS, navn);
+      for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+      if (tekst !== undefined) e.textContent = tekst;
+      return e;
+    }
+
+    /* Viser fra sentrum (50,50): vinkel 0 = rett opp */
+    function viser(vinkelGrader: number, lengde: number, bredde: string, klasse?: string) {
+      const rad = ((vinkelGrader - 90) * Math.PI) / 180;
+      const attrs: Record<string, string> = {
+        x1: '50',
+        y1: '50',
+        x2: String(50 + lengde * Math.cos(rad)),
+        y2: String(50 + lengde * Math.sin(rad)),
+        stroke: klasse ? '#1a6a3a' : '#222',
+        'stroke-width': bredde,
+        'stroke-linecap': 'round',
+      };
+      if (klasse) attrs.class = klasse;
+      return svgEl('line', attrs);
+    }
+
+    function lagKlokkeSvg(time: number, minutt: number, modus: 'les' | 'tegn') {
+      const svg = svgEl('svg', { viewBox: '0 0 100 122', 'aria-hidden': 'true' });
+
+      svg.appendChild(
+        svgEl('circle', { cx: '50', cy: '50', r: '46', fill: '#fff', stroke: '#333', 'stroke-width': '2.5' })
+      );
+      for (let i = 0; i < 60; i += 5) {
+        const rad = ((i * 6 - 90) * Math.PI) / 180;
+        svg.appendChild(
+          svgEl('line', {
+            x1: String(50 + 41 * Math.cos(rad)),
+            y1: String(50 + 41 * Math.sin(rad)),
+            x2: String(50 + 44.5 * Math.cos(rad)),
+            y2: String(50 + 44.5 * Math.sin(rad)),
+            stroke: '#333',
+            'stroke-width': '1.6',
+          })
+        );
+      }
+      for (let tall = 1; tall <= 12; tall++) {
+        const rad = ((tall * 30 - 90) * Math.PI) / 180;
+        svg.appendChild(
+          svgEl(
+            'text',
+            {
+              x: String(50 + 34 * Math.cos(rad)),
+              y: String(50 + 34 * Math.sin(rad) + 3.2),
+              'text-anchor': 'middle',
+              'font-size': '9.5',
+              'font-weight': '600',
+              fill: '#111',
+            },
+            String(tall)
+          )
+        );
+      }
+
+      const timeVinkel = ((time % 12) + minutt / 60) * 30;
+      const minuttVinkel = minutt * 6;
+      if (modus === 'les') {
+        svg.appendChild(viser(timeVinkel, 21, '4'));
+        svg.appendChild(viser(minuttVinkel, 32, '2.6'));
+      } else {
+        // Fasit-viserne: skjult til fasit slås på
+        svg.appendChild(viser(timeVinkel, 21, '4', 'kl-fasit-del'));
+        svg.appendChild(viser(minuttVinkel, 32, '2.6', 'kl-fasit-del'));
+      }
+      svg.appendChild(svgEl('circle', { cx: '50', cy: '50', r: '2.6', fill: '#222' }));
+
+      const digital = `${String(time).padStart(2, '0')}:${String(minutt).padStart(2, '0')}`;
+      const prefiks = klPrefiks ? `${klPrefiks} ` : '';
+      if (modus === 'les') {
+        svg.appendChild(
+          svgEl(
+            'text',
+            { x: '50', y: '114', 'text-anchor': 'middle', 'font-size': '11', fill: '#111' },
+            `${prefiks}_____ : _____`
+          )
+        );
+        svg.appendChild(
+          svgEl(
+            'text',
+            {
+              x: '50', y: '114', 'text-anchor': 'middle', 'font-size': '11',
+              'font-weight': '700', fill: '#1a6a3a', class: 'kl-fasit-del',
+            },
+            `${prefiks}${digital}`
+          )
+        );
+      } else {
+        svg.appendChild(
+          svgEl(
+            'text',
+            { x: '50', y: '114', 'text-anchor': 'middle', 'font-size': '12', 'font-weight': '700', fill: '#111' },
+            `${prefiks}${digital}`
+          )
+        );
+      }
+      return svg;
+    }
+
+    function siStatus(tekst: string, erFeil = false) {
+      const status = el('kl-status');
+      status.textContent = tekst;
+      status.classList.toggle('feil', erFeil);
+    }
+
+    function generer() {
+      const modus = el<HTMLSelectElement>('kl-modus').value as 'les' | 'tegn';
+      const steg = parseInt(el<HTMLSelectElement>('kl-presisjon').value, 10);
+      const antall = parseInt(el<HTMLSelectElement>('kl-antall').value, 10);
+
+      // Unike klokkeslett; ved hele timer finnes bare 12 — antall er ≤ 12
+      const brukte = new Set<string>();
+      const tider: Array<{ time: number; minutt: number }> = [];
+      let vakt = 0;
+      while (tider.length < antall && vakt < 2000) {
+        const time = 1 + Math.floor(Math.random() * 12);
+        const minutt = steg * Math.floor(Math.random() * (60 / steg));
+        const nokkel = `${time}:${minutt}`;
+        if (brukte.has(nokkel)) { vakt++; continue; }
+        brukte.add(nokkel);
+        tider.push({ time, minutt });
+      }
+
+      el('kl-overskrift').textContent =
+        el<HTMLInputElement>('kl-tittel').value.trim() || standardTittel;
+
+      const beholder = el('kl-klokker');
+      beholder.replaceChildren();
+      tider.forEach(({ time, minutt }) => {
+        const rute = document.createElement('div');
+        rute.className = 'kl-klokke';
+        rute.appendChild(lagKlokkeSvg(time, minutt, modus));
+        beholder.appendChild(rute);
+      });
+
+      fasitSynlig = false;
+      el('kl-fasit-toggle').setAttribute('aria-pressed', 'false');
+      rot.classList.remove('fasit-paa');
+
+      el('kl-ark-seksjon').removeAttribute('hidden');
+      siStatus(M.klart(tider.length));
+      lagreUtkast();
+    }
+
+    lastUtkast();
+
+    el('kl-lag').addEventListener('click', generer);
+
+    el('kl-fasit-toggle').addEventListener('click', () => {
+      fasitSynlig = !fasitSynlig;
+      el('kl-fasit-toggle').setAttribute('aria-pressed', String(fasitSynlig));
+      rot.classList.toggle('fasit-paa', fasitSynlig);
+    });
+
+    const skrivUt = () => {
+      rot.classList.remove('print-fasit');
+      window.print();
+    };
+    el('kl-skriv-ut').addEventListener('click', skrivUt);
+    el('kl-skriv-ut-sticky').addEventListener('click', skrivUt);
+    el('kl-skriv-ut-fasit').addEventListener('click', () => {
+      rot.classList.add('print-fasit');
+      window.print();
+    });
+    window.addEventListener('afterprint', () => rot.classList.remove('print-fasit'));
+
+    ['kl-tittel', 'kl-modus', 'kl-presisjon', 'kl-antall'].forEach((id) =>
+      el(id).addEventListener('change', lagreUtkast)
+    );
+  }
+</script>

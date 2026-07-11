@@ -1,0 +1,714 @@
+---
+/* Setningsstokking-verktøyet: læreren skriver setninger, arket viser
+   ordene stokket som brikker, og eleven skriver setningen riktig på
+   linja under. Brikkene har alltid innhold (print-trygt); skrivelinjene
+   er understreker. Fasit-mekanikken er Ordkryss sin. */
+
+interface Props {
+  lang?: 'nb' | 'en';
+}
+
+const { lang = 'nb' } = Astro.props;
+
+const t =
+  lang === 'nb'
+    ? {
+        tittelFelt: 'Tittel på arket',
+        tittelEks: 'Skriv tittelen her',
+        setninger: 'Setningene',
+        setningEks: 'skriv en setning',
+        leggTil: '+ Legg til setning',
+        smaa: 'Små bokstaver på brikkene — eleven setter stor bokstav og punktum selv',
+        toLinjer: 'To skrivelinjer per setning',
+        lag: 'Lag ark',
+        skrivUt: 'Skriv ut',
+        skrivUtFasit: 'Skriv ut fasit',
+        visFasit: 'Vis fasit her',
+        navnLinje: 'Navn: ____________________   Dato: ____________',
+        instruks: 'Sett ordene i riktig rekkefølge og skriv setningen på linja.',
+        fasit: 'FASIT',
+        standardTittel: 'Rablete setninger',
+      }
+    : {
+        tittelFelt: 'Sheet title',
+        tittelEks: 'Type the title here',
+        setninger: 'The sentences',
+        setningEks: 'type a sentence',
+        leggTil: '+ Add sentence',
+        smaa: 'Lowercase tiles — the pupil adds the capital letter and full stop',
+        toLinjer: 'Two writing lines per sentence',
+        lag: 'Create sheet',
+        skrivUt: 'Print',
+        skrivUtFasit: 'Print answer key',
+        visFasit: 'Show answers here',
+        navnLinje: 'Name: ____________________   Date: ____________',
+        instruks: 'Put the words in the right order and write the sentence on the line.',
+        fasit: 'KEY',
+        standardTittel: 'Scrambled sentences',
+      };
+---
+
+<div class="se-verktoy" data-lang={lang} data-standardtittel={t.standardTittel}>
+  <div class="se-oppsett">
+    <section class="se-panel" aria-labelledby="se-panel-tittel">
+      <h2 id="se-panel-tittel" class="sr-only">{lang === 'nb' ? 'Oppsett' : 'Setup'}</h2>
+
+      <label class="se-felt">
+        <span class="se-felt-navn">{t.tittelFelt}</span>
+        <input type="text" id="se-tittel" placeholder={t.tittelEks} maxlength="60" />
+      </label>
+
+      <div class="se-felt">
+        <span class="se-felt-navn" id="se-setning-navn">{t.setninger}</span>
+        <ul id="se-liste" aria-labelledby="se-setning-navn"></ul>
+        <button type="button" id="se-legg-til" class="se-sekundaer">{t.leggTil}</button>
+      </div>
+
+      <label class="se-valg">
+        <input type="checkbox" id="se-smaa" checked />
+        {t.smaa}
+      </label>
+
+      <label class="se-valg">
+        <input type="checkbox" id="se-to-linjer" />
+        {t.toLinjer}
+      </label>
+
+      <button type="button" id="se-lag" class="knapp se-primaer">{t.lag}</button>
+      <p id="se-status" class="se-status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="se-visning" id="se-ark-seksjon" hidden aria-labelledby="se-visning-tittel">
+      <h2 id="se-visning-tittel" class="sr-only">
+        {lang === 'nb' ? 'Forhåndsvisning' : 'Preview'}
+      </h2>
+      <div class="se-handlinger">
+        <button type="button" id="se-skriv-ut" class="knapp se-primaer">{t.skrivUt}</button>
+        <button type="button" id="se-skriv-ut-fasit" class="se-sekundaer">{t.skrivUtFasit}</button>
+        <button type="button" id="se-fasit-toggle" class="se-sekundaer" aria-pressed="false">
+          {t.visFasit}
+        </button>
+      </div>
+
+      <div class="se-sticky-print">
+        <button type="button" id="se-skriv-ut-sticky" class="se-sticky-knapp" title="Skriv ut arket (Ctrl+P)" aria-label={t.skrivUt}>
+          🖨
+        </button>
+      </div>
+
+      <div class="se-ark" id="se-ark">
+        <div class="se-ark-hode">
+          <h3 id="se-overskrift">{t.standardTittel}</h3>
+          <span class="se-fasit-merke" aria-hidden="true">{t.fasit}</span>
+        </div>
+        <p class="se-instruks">{t.instruks}</p>
+        <p class="se-navn-linje">{t.navnLinje}</p>
+        <ol id="se-oppgaver" class="se-oppgaver"></ol>
+      </div>
+    </section>
+  </div>
+</div>
+
+<style is:global>
+  .se-oppsett {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: var(--s-5);
+    align-items: start;
+    margin-top: var(--s-4);
+  }
+
+  @media (max-width: 900px) {
+    .se-oppsett {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .se-panel {
+    background: var(--flate);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: var(--s-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .se-felt {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .se-felt-navn {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--tekst);
+  }
+
+  .se-panel input[type='text'] {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    padding: 9px 10px;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--tekst);
+    min-height: 44px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .se-valg {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    min-height: 32px;
+    color: var(--tekst);
+  }
+
+  .se-valg input {
+    width: 19px;
+    height: 19px;
+    accent-color: var(--salvie);
+    flex-shrink: 0;
+  }
+
+  @media (pointer: coarse) {
+    .se-valg {
+      min-height: 44px;
+    }
+  }
+
+  #se-liste {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .se-rad {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .se-rad input[type='text'] {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .se-rad.upassende input[type='text'] {
+    border-color: var(--feil);
+  }
+
+  .se-ikonknapp {
+    font: inherit;
+    min-width: 44px;
+    min-height: 44px;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--tekst);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .se-ikonknapp:hover {
+    border-color: var(--salvie);
+  }
+
+  .se-primaer {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 700;
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    border: none;
+    border-radius: 9px;
+    padding: 11px 20px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .se-primaer:hover {
+    filter: brightness(1.06);
+  }
+
+  .se-sekundaer {
+    font-family: var(--font-sans);
+    font-size: 14.5px;
+    font-weight: 600;
+    background: var(--bg);
+    color: var(--tekst);
+    border: 1px solid var(--linje);
+    border-radius: 9px;
+    padding: 10px 16px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .se-sekundaer:hover {
+    border-color: var(--salvie);
+  }
+
+  .se-sekundaer:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  .se-status {
+    margin: 0;
+    font-size: 14.5px;
+    color: var(--dempet);
+    min-height: 1.4em;
+  }
+
+  .se-status.feil {
+    color: var(--feil);
+  }
+
+  .se-handlinger {
+    display: flex;
+    gap: var(--s-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--s-3);
+  }
+
+  .se-sticky-print {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 15;
+  }
+
+  .se-sticky-knapp {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 1px solid var(--linje);
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: var(--kort-skygge);
+    display: grid;
+    place-items: center;
+  }
+
+  .se-ark {
+    background: #fff;
+    color: #111;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: 28px 32px;
+    max-width: 660px;
+  }
+
+  .se-ark-hode {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  #se-overskrift {
+    margin: 0 0 4px;
+    font-size: 24px;
+    color: #111;
+  }
+
+  .se-fasit-merke {
+    display: none;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    color: #b3261e;
+    border: 2px solid #b3261e;
+    border-radius: 6px;
+    padding: 2px 8px;
+  }
+
+  .se-verktoy.fasit-paa .se-fasit-merke {
+    display: inline-block;
+  }
+
+  .se-instruks {
+    margin: 0 0 6px;
+    font-size: 14.5px;
+    color: #333;
+  }
+
+  .se-navn-linje {
+    margin: 0 0 18px;
+    font-size: 13.5px;
+    color: #333;
+  }
+
+  .se-oppgaver {
+    margin: 0;
+    padding: 0 0 0 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    font-size: 16px;
+    color: #111;
+  }
+
+  .se-brikker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .se-brikke {
+    border: 1.6px solid #333;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 16px;
+    background: #fff;
+  }
+
+  .se-skrivelinje {
+    display: block;
+    letter-spacing: 2px;
+    color: #333;
+    line-height: 2;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .se-svar {
+    display: none;
+    font-weight: 700;
+    color: #1a6a3a;
+    margin: 4px 0 0;
+  }
+
+  .se-verktoy.fasit-paa .se-svar {
+    display: block;
+  }
+
+  @media print {
+    @page {
+      margin: 14mm;
+    }
+
+    html,
+    body {
+      color-scheme: light;
+      background: #fff !important;
+      color: #000;
+    }
+
+    .topp,
+    .bunn,
+    .hopp,
+    .se-panel,
+    .se-handlinger,
+    .se-side-hode,
+    .se-sticky-print {
+      display: none !important;
+    }
+
+    .ramme {
+      padding: 0;
+      max-width: none;
+      min-height: 0;
+      background: #fff;
+    }
+
+    .se-oppsett {
+      display: block;
+      margin: 0;
+    }
+
+    .se-ark {
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 0;
+      max-width: none;
+    }
+
+    .se-oppgaver {
+      gap: 11mm;
+    }
+
+    .se-oppgaver li {
+      break-inside: avoid;
+    }
+
+    .se-verktoy:not(.print-fasit) .se-svar {
+      display: none !important;
+    }
+
+    .se-verktoy:not(.print-fasit) .se-fasit-merke {
+      display: none !important;
+    }
+
+    .se-verktoy.print-fasit .se-svar {
+      display: block !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+
+    .se-verktoy.print-fasit .se-fasit-merke {
+      display: inline-block !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+  }
+</style>
+
+<script>
+  import { ordErUpassende } from '../lib/ordkryss-kjerne';
+
+  const rot = document.querySelector<HTMLElement>('.se-verktoy');
+  if (rot) {
+    const lang = (rot.dataset.lang ?? 'nb') as 'nb' | 'en';
+    const standardTittel = rot.dataset.standardtittel ?? 'Rablete setninger';
+    const LAGRINGSNOKKEL = `setningsstokking-${lang}`;
+    const MAKS = 8;
+
+    const M =
+      lang === 'nb'
+        ? {
+            minstEn: 'Skriv inn minst én setning med minst to ord.',
+            upassende: (o: string) =>
+              `«${o}» passer ikke på et skoleark. Endre setningen, så lager vi arket.`,
+            klart: (n: number) => `Arket er klart: ${n} setninger.`,
+            setningAria: (i: number) => `Setning ${i}`,
+            fjern: (i: number) => `Fjern setning ${i}`,
+            setningEks: 'skriv en setning',
+          }
+        : {
+            minstEn: 'Type at least one sentence with at least two words.',
+            upassende: (o: string) =>
+              `“${o}” does not belong on a school sheet. Change the sentence and we will make the sheet.`,
+            klart: (n: number) => `The sheet is ready: ${n} sentences.`,
+            setningAria: (i: number) => `Sentence ${i}`,
+            fjern: (i: number) => `Remove sentence ${i}`,
+            setningEks: 'type a sentence',
+          };
+
+    interface Rad {
+      id: number;
+      tekst: string;
+    }
+
+    let setninger: Rad[] = [];
+    let nesteId = 1;
+    let fasitSynlig = false;
+
+    const el = <T extends HTMLElement = HTMLElement>(id: string): T =>
+      document.getElementById(id) as T;
+
+    function lagreUtkast() {
+      try {
+        localStorage.setItem(
+          LAGRINGSNOKKEL,
+          JSON.stringify({
+            tittel: el<HTMLInputElement>('se-tittel').value,
+            smaa: el<HTMLInputElement>('se-smaa').checked,
+            toLinjer: el<HTMLInputElement>('se-to-linjer').checked,
+            setninger: setninger.map((s) => s.tekst),
+          })
+        );
+      } catch {}
+    }
+
+    function lastUtkast(): boolean {
+      try {
+        const raa = localStorage.getItem(LAGRINGSNOKKEL);
+        if (!raa) return false;
+        const u = JSON.parse(raa);
+        el<HTMLInputElement>('se-tittel').value = u.tittel ?? '';
+        el<HTMLInputElement>('se-smaa').checked = u.smaa !== false;
+        el<HTMLInputElement>('se-to-linjer').checked = u.toLinjer === true;
+        (u.setninger ?? []).forEach((s: unknown) => {
+          if (typeof s === 'string') setninger.push({ id: nesteId++, tekst: s });
+        });
+        return setninger.length > 0;
+      } catch {
+        return false;
+      }
+    }
+
+    function leggTil(tekst = '') {
+      if (setninger.length >= MAKS) return;
+      setninger.push({ id: nesteId++, tekst });
+      tegnListe();
+    }
+
+    function tegnListe() {
+      const liste = el('se-liste');
+      liste.replaceChildren();
+      setninger.forEach((setning, indeks) => {
+        const rad = document.createElement('li');
+        rad.className = 'se-rad';
+        const felt = document.createElement('input');
+        felt.type = 'text';
+        felt.value = setning.tekst.slice(0, 90);
+        felt.maxLength = 90;
+        felt.placeholder = M.setningEks;
+        felt.setAttribute('aria-label', M.setningAria(indeks + 1));
+        felt.addEventListener('input', () => {
+          setning.tekst = felt.value;
+          const stygt = felt.value.split(/\s+/).some((o) => ordErUpassende(o));
+          rad.classList.toggle('upassende', stygt);
+          felt.setAttribute('aria-invalid', stygt ? 'true' : 'false');
+          lagreUtkast();
+        });
+        const fjern = document.createElement('button');
+        fjern.type = 'button';
+        fjern.className = 'se-ikonknapp';
+        fjern.textContent = '✕';
+        fjern.setAttribute('aria-label', M.fjern(indeks + 1));
+        fjern.addEventListener('click', () => {
+          setninger = setninger.filter((s) => s.id !== setning.id);
+          if (setninger.length === 0) leggTil();
+          tegnListe();
+          lagreUtkast();
+        });
+        rad.append(felt, fjern);
+        liste.appendChild(rad);
+      });
+      el<HTMLButtonElement>('se-legg-til').disabled = setninger.length >= MAKS;
+    }
+
+    function stokkUlik(ord: string[]): string[] {
+      if (ord.length < 2) return [...ord];
+      let kopi = [...ord];
+      for (let forsok = 0; forsok < 12; forsok++) {
+        for (let i = kopi.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [kopi[i], kopi[j]] = [kopi[j], kopi[i]];
+        }
+        if (kopi.join(' ') !== ord.join(' ')) return kopi;
+      }
+      // alle ord like — rekkefølgen spiller ingen rolle
+      return kopi;
+    }
+
+    function siStatus(tekst: string, erFeil = false) {
+      const status = el('se-status');
+      status.textContent = tekst;
+      status.classList.toggle('feil', erFeil);
+    }
+
+    function generer() {
+      const rene = setninger
+        .map((s) => s.tekst.trim().replace(/\s+/g, ' '))
+        .filter((s) => s.split(' ').filter(Boolean).length >= 2);
+      if (rene.length === 0) {
+        siStatus(M.minstEn, true);
+        return;
+      }
+      for (const setning of rene) {
+        for (const ord of setning.split(' ')) {
+          if (ordErUpassende(ord)) {
+            siStatus(M.upassende(ord), true);
+            return;
+          }
+        }
+      }
+
+      const smaa = el<HTMLInputElement>('se-smaa').checked;
+      const toLinjer = el<HTMLInputElement>('se-to-linjer').checked;
+
+      el('se-overskrift').textContent =
+        el<HTMLInputElement>('se-tittel').value.trim() || standardTittel;
+
+      const liste = el('se-oppgaver');
+      liste.replaceChildren();
+      rene.forEach((setning) => {
+        let ord = setning.split(' ');
+        if (smaa) {
+          ord = ord.map((o) => o.replace(/[.!?]+$/, '').toLowerCase()).filter(Boolean);
+        }
+        const stokket = stokkUlik(ord);
+
+        const li = document.createElement('li');
+        const brikker = document.createElement('div');
+        brikker.className = 'se-brikker';
+        stokket.forEach((o) => {
+          const brikke = document.createElement('span');
+          brikke.className = 'se-brikke';
+          brikke.textContent = o;
+          brikker.appendChild(brikke);
+        });
+        li.appendChild(brikker);
+
+        for (let l = 0; l < (toLinjer ? 2 : 1); l++) {
+          const linje = document.createElement('span');
+          linje.className = 'se-skrivelinje';
+          linje.textContent = '_'.repeat(64);
+          li.appendChild(linje);
+        }
+
+        const svar = document.createElement('p');
+        svar.className = 'se-svar';
+        svar.textContent = setning;
+        li.appendChild(svar);
+
+        liste.appendChild(li);
+      });
+
+      fasitSynlig = false;
+      el('se-fasit-toggle').setAttribute('aria-pressed', 'false');
+      rot.classList.remove('fasit-paa');
+
+      el('se-ark-seksjon').removeAttribute('hidden');
+      siStatus(M.klart(rene.length));
+      lagreUtkast();
+    }
+
+    if (!lastUtkast()) {
+      leggTil();
+      leggTil();
+      leggTil();
+    }
+    tegnListe();
+
+    el('se-legg-til').addEventListener('click', () => {
+      leggTil();
+      lagreUtkast();
+    });
+
+    el('se-lag').addEventListener('click', generer);
+
+    el('se-fasit-toggle').addEventListener('click', () => {
+      fasitSynlig = !fasitSynlig;
+      el('se-fasit-toggle').setAttribute('aria-pressed', String(fasitSynlig));
+      rot.classList.toggle('fasit-paa', fasitSynlig);
+    });
+
+    const skrivUt = () => {
+      rot.classList.remove('print-fasit');
+      window.print();
+    };
+    el('se-skriv-ut').addEventListener('click', skrivUt);
+    el('se-skriv-ut-sticky').addEventListener('click', skrivUt);
+    el('se-skriv-ut-fasit').addEventListener('click', () => {
+      rot.classList.add('print-fasit');
+      window.print();
+    });
+    window.addEventListener('afterprint', () => rot.classList.remove('print-fasit'));
+
+    ['se-tittel', 'se-smaa', 'se-to-linjer'].forEach((id) =>
+      el(id).addEventListener('change', lagreUtkast)
+    );
+  }
+</script>

@@ -484,58 +484,30 @@ const t =
   }
 
   /* Rutenettet: bare ordrutene tegnes (skjelett-kryssord).
-     INGEN TABELL: <table> feilet to ganger i Stians Chrome-utskrift
-     (først kant-bortfall, så radhøyder som gled og ga ikke-kvadratiske
-     ruter). CSS-grid med faste spor — repeat(n, var(--kv-celle)) i
-     kolonner OG grid-auto-rows — tvinger hver rute til nøyaktig kvadrat
-     i både skjerm og print; samme oppskrift som bingobrettene. Hver
-     rute eier høyre/bunn-kanten, topp/venstre legges på med klasser der
-     naboruta mangler (kv-kant-topp/kv-kant-venstre, regnes ved tegning). */
+     SVG, IKKE CSS-BOKSER: tre runder med tabell/div-kanter feilet på
+     tre ulike måter i Stians Chrome-utskrift — sist ved at kantene på
+     TOMME ruter culles i print (fasit med bokstaver tegnet alt, det
+     tomme elevarket mistet skillene). I SVG er streken selve innholdet
+     (vektor-rect per rute) og kan ikke optimaliseres bort, og
+     kvadratene ligger fast i viewBox-geometrien uansett motor. Samme
+     sjanger som flytskjemaet på /slik-jobber-jeg. Størrelsen styres
+     fortsatt av --kv-celle (bredde = celle × kolonner; høyden følger
+     viewBox-forholdet, så rutene ER kvadrater). */
   #kv-rutenett {
-    display: grid;
-    /* kolonnene settes ved tegning: repeat(n, var(--kv-celle)) */
-    grid-auto-rows: var(--kv-celle);
+    display: flex;
     justify-content: center;
   }
 
-  .kv-rute {
-    position: relative;
-    background: #fff;
-    border-right: var(--kv-strek) solid #333;
-    border-bottom: var(--kv-strek) solid #333;
-  }
-
-  .kv-rute.kv-kant-topp {
-    border-top: var(--kv-strek) solid #333;
-  }
-
-  .kv-rute.kv-kant-venstre {
-    border-left: var(--kv-strek) solid #333;
-  }
-
-  .kv-nr {
-    position: absolute;
-    top: 1px;
-    left: 3px;
-    font-size: calc(var(--kv-celle) * 0.26);
-    font-weight: 600;
-    line-height: 1;
-    color: #333;
+  #kv-rutenett svg {
+    display: block;
   }
 
   .kv-bokstav {
     display: none;
-    position: absolute;
-    inset: 0;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(var(--kv-celle) * 0.5);
-    font-weight: 600;
-    color: #1a6a3a;
   }
 
   .kv-verktoy.fasit-paa .kv-bokstav {
-    display: flex;
+    display: inline;
   }
 
   /* Ledetrådene: to spalter under rutenettet */
@@ -670,7 +642,7 @@ const t =
     }
 
     .kv-verktoy.print-fasit .kv-bokstav {
-      display: flex !important;
+      display: inline !important;
       print-color-adjust: exact;
       -webkit-print-color-adjust: exact;
     }
@@ -989,37 +961,72 @@ const t =
         if (!numre.has(start)) numre.set(start, p.nummer);
       });
 
-      settCellestorrelse(rutenett[0].length, rutenett.length);
+      const kolonner = rutenett[0].length;
+      const rader = rutenett.length;
+      settCellestorrelse(kolonner, rader);
       const nett = el('kv-rutenett');
       nett.replaceChildren();
-      nett.style.gridTemplateColumns = `repeat(${rutenett[0].length}, var(--kv-celle))`;
-      nett.setAttribute('data-kolonner', String(rutenett[0].length));
+      nett.setAttribute('data-kolonner', String(kolonner));
+      nett.setAttribute('data-rader', String(rader));
+
+      // 1 viewBox-enhet = 1 rute; margen gir plass til halve streken
+      // langs ytterkanten (SVG-strøk sentreres på kanten)
+      const NS = 'http://www.w3.org/2000/svg';
+      const MARG = 0.08;
+      const svg = document.createElementNS(NS, 'svg');
+      svg.setAttribute(
+        'viewBox',
+        `${-MARG} ${-MARG} ${kolonner + 2 * MARG} ${rader + 2 * MARG}`
+      );
+      svg.setAttribute('aria-hidden', 'true');
+      svg.style.width = `calc(var(--kv-celle) * ${kolonner + 2 * MARG})`;
+
       rutenett.forEach((rad, r) => {
         rad.forEach((bokstav, k) => {
-          const celle = document.createElement('div');
-          if (bokstav) {
-            celle.className = 'kv-rute';
-            // Kant-eierskap (jf. CSS-kommentaren): topp/venstre bare der
-            // naboruta mangler
-            if (r === 0 || !rutenett[r - 1][k]) celle.classList.add('kv-kant-topp');
-            if (k === 0 || !rad[k - 1]) celle.classList.add('kv-kant-venstre');
-            const nummer = numre.get(`${r},${k}`);
-            if (nummer) {
-              const nr = document.createElement('span');
-              nr.className = 'kv-nr';
-              nr.textContent = String(nummer);
-              celle.appendChild(nr);
-            }
-            const b = document.createElement('span');
-            b.className = 'kv-bokstav';
-            b.textContent = medValgtCase(bokstav);
-            celle.appendChild(b);
-          } else {
-            celle.className = 'kv-tom';
+          if (!bokstav) return;
+          const g = document.createElementNS(NS, 'g');
+          g.setAttribute('class', 'kv-rute');
+          g.setAttribute('data-r', String(r));
+          g.setAttribute('data-k', String(k));
+
+          const rekt = document.createElementNS(NS, 'rect');
+          rekt.setAttribute('x', String(k));
+          rekt.setAttribute('y', String(r));
+          rekt.setAttribute('width', '1');
+          rekt.setAttribute('height', '1');
+          rekt.setAttribute('fill', '#fff');
+          rekt.setAttribute('stroke', '#333');
+          rekt.setAttribute('stroke-width', '0.055');
+          g.appendChild(rekt);
+
+          const nummer = numre.get(`${r},${k}`);
+          if (nummer) {
+            const nr = document.createElementNS(NS, 'text');
+            nr.setAttribute('class', 'kv-nr');
+            nr.setAttribute('x', String(k + 0.08));
+            nr.setAttribute('y', String(r + 0.32));
+            nr.setAttribute('font-size', '0.27');
+            nr.setAttribute('font-weight', '600');
+            nr.setAttribute('fill', '#333');
+            nr.textContent = String(nummer);
+            g.appendChild(nr);
           }
-          nett.appendChild(celle);
+
+          const b = document.createElementNS(NS, 'text');
+          b.setAttribute('class', 'kv-bokstav');
+          b.setAttribute('x', String(k + 0.5));
+          b.setAttribute('y', String(r + 0.74));
+          b.setAttribute('text-anchor', 'middle');
+          b.setAttribute('font-size', '0.54');
+          b.setAttribute('font-weight', '700');
+          b.setAttribute('fill', '#1a6a3a');
+          b.textContent = medValgtCase(bokstav);
+          g.appendChild(b);
+
+          svg.appendChild(g);
         });
       });
+      nett.appendChild(svg);
 
       // Ledetrådene: nummer + bilde og/eller tekst, per retning
       for (const retning of ['vannrett', 'loddrett'] as const) {

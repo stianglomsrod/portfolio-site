@@ -6,6 +6,29 @@
 
 ## Changelog
 
+### 2026-07-11 (kveld, del 4) — Kryssord-print runde 4 (ENDELIG): rutenettet er SVG
+- **Gjennombruddet i feilsøkinga**: Stians skjermbilder viste at FASIT-
+  utskriften (bokstaver i rutene) tegnet alle kanter, mens elevarket
+  (tomme ruter) mistet dem — hans Chrome culler kantene på TOMME bokser
+  i print-pipelinen. Det forklarer alle tre CSS-rundene: bare celler med
+  synlig innhold beholdt kantene.
+- **Løsningen forlater CSS-kanter helt**: rutenettet tegnes nå som SVG —
+  én vektor-rect per rute (fill hvit, stroke #333), nummer og fasit-
+  bokstav som SVG-text i <g class=kv-rute data-r data-k>. Streken ER
+  innholdet og kan ikke culles; kvadratene ligger fast i viewBox-
+  geometrien (bredde = --kv-celle × kolonner, høyden følger forholdet).
+  Fasit-mekanikken uendret (CSS display på .kv-bokstav).
+- **Print-verifiseringen er nå eksakt**: Chromium maler SVG-rutene som
+  strøkne rektangler (1×1 viewBox-enhet) i PDF-strømmen — vakten krever
+  1:1 mellom ruter i DOM og mørke strøkne KVADRATER i PDF-en (45/45 i
+  både elev og fasit, 0 skjeve). Kvadrat-sjekk i print-CSS: 0,00px.
+- QA: UI-suite 22/22 (matrise via data-r/data-k), bygg grønt, axe 0/22,
+  kant 0/22. LÆRDOM: print-geometri verifiseres mot PDF-ens FAKTISKE
+  tegneoperasjoner (Chromium maler SVG-rect-strøk som «re S» i lokale
+  enheter — størrelsesfiltre i pt kastet dem); og når en brukers
+  nettleser culler tomme boksers kanter, er svaret vektorgrafikk, ikke
+  mer CSS.
+
 ### 2026-07-11 (kveld, del 3) — Kryssord-print runde 3: tabellen kastet, grid tvinger kvadrater
 - **Stians retest nr. 2**: kantene kom, men rutene var ikke kvadrater —
   tabellens radhøyder gled i hans Chrome-print og ga silhuett-aktige

@@ -484,11 +484,14 @@ const t =
   }
 
   /* Rutenettet: bare ordrutene tegnes (skjelett-kryssord).
-     VIKTIG: border-collapse: separate, IKKE collapse — Chromium mister
-     kollapsede tabellkanter i utskrift når cellene har position:
-     relative (som nummer-hjørnet trenger). Hver rute eier derfor høyre/
-     bunn-kanten sin, og topp/venstre legges på med klasser der naboen
-     mangler (kv-kant-topp/kv-kant-venstre, regnes ut ved tegning). */
+     VIKTIG print-lærdom i to trinn: (1) border-collapse: collapse
+     mistet kanter i utskrift, (2) selv med separate kanter droppet
+     Stians Chrome de innvendige loddrette strekene — fellesnevneren var
+     position: relative PÅ CELLENE. Cellene er derfor rene layoutbokser
+     (som i Ordkryss), og kanter + nummer + fasitbokstav bor i en vanlig
+     indre boks (.kv-boks) — samme sjanger som Silhuettenes bokser, som
+     printer feilfritt. Topp/venstre-kant legges på med klasser der
+     naboruta mangler (kv-kant-topp/kv-kant-venstre, regnes ved tegning). */
   #kv-rutenett {
     border-collapse: separate;
     border-spacing: 0;
@@ -500,20 +503,23 @@ const t =
     height: var(--kv-celle);
     min-width: var(--kv-celle);
     padding: 0;
-    position: relative;
   }
 
-  #kv-rutenett td.kv-rute {
+  .kv-boks {
+    display: block;
+    width: 100%;
+    height: var(--kv-celle);
+    position: relative;
     border-right: var(--kv-strek) solid #333;
     border-bottom: var(--kv-strek) solid #333;
     background: #fff;
   }
 
-  #kv-rutenett td.kv-rute.kv-kant-topp {
+  #kv-rutenett td.kv-kant-topp .kv-boks {
     border-top: var(--kv-strek) solid #333;
   }
 
-  #kv-rutenett td.kv-rute.kv-kant-venstre {
+  #kv-rutenett td.kv-kant-venstre .kv-boks {
     border-left: var(--kv-strek) solid #333;
   }
 
@@ -1006,17 +1012,20 @@ const t =
             // naboruta mangler
             if (r === 0 || !rutenett[r - 1][k]) td.classList.add('kv-kant-topp');
             if (k === 0 || !rad[k - 1]) td.classList.add('kv-kant-venstre');
+            const boks = document.createElement('span');
+            boks.className = 'kv-boks';
             const nummer = numre.get(`${r},${k}`);
             if (nummer) {
               const nr = document.createElement('span');
               nr.className = 'kv-nr';
               nr.textContent = String(nummer);
-              td.appendChild(nr);
+              boks.appendChild(nr);
             }
             const b = document.createElement('span');
             b.className = 'kv-bokstav';
             b.textContent = medValgtCase(bokstav);
-            td.appendChild(b);
+            boks.appendChild(b);
+            td.appendChild(boks);
           } else {
             td.className = 'kv-tom';
           }

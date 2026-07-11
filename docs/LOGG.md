@@ -6,6 +6,25 @@
 
 ## Changelog
 
+### 2026-07-11 (kveld, del 2) — Print-fiks runde 2: kantene UT av tabellcellene
+- **Stians retest viste resthull**: separate borders hjalp (boksene kom),
+  men de innvendige loddrette skillene manglet fortsatt i HANS Chrome —
+  ikke reproduserbart i Playwright-Chromium selv med topptekst/marger/
+  skalering (repro-skript prøvde fire innstillingsvarianter, alle
+  komplette). Fellesnevner i begge feilrundene: position: relative på
+  selve tabellcellene. Ordkryss (tabellkanter, ingen relpos-celler)
+  printer fint hos ham.
+- **Fiksen fjerner mistenkte helt**: cellene er nå rene layoutbokser;
+  kanter, nummer og fasitbokstav bor i en indre .kv-boks (vanlig span
+  med borders — Silhuett-sjangeren, print-bevist). Kant-eierskapet
+  (høyre/bunn + kv-kant-topp/-venstre der nabo mangler) er uendret.
+- QA: geometri-målingen grønn i alle fire print-varianter + hovedsjekken
+  (elev/fasit 60+53 striper, krav 1021pt per retning), UI-suite 22/22,
+  bygg grønt, axe 0/22, kant 0/22. LÆRDOM: print-bugs i brukerens
+  nettleser kan være versjonsspesifikke og umulige å reprodusere lokalt
+  — fjern hele den mistenkte mekanismen (tabellkant-maling) i stedet
+  for å flikke på den, og be brukeren reteste.
+
 ### 2026-07-11 (kveld) — Print-fiks for Kryssord: kantene forsvant i utskrift
 - **Stians funn i prod**: utskriftsforhåndsvisningen viste rutenettet
   nesten uten kantlinjer (bare spredte streker), mens skjermen var

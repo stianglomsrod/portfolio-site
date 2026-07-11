@@ -150,7 +150,7 @@ const t =
           <span class="re-fasit-merke" aria-hidden="true">{t.fasit}</span>
         </div>
         <p class="re-navn-linje">{t.navnLinje}</p>
-        <ol id="re-oppgaver" class="re-oppgaver"></ol>
+        <ul id="re-oppgaver" class="re-oppgaver"></ul>
       </div>
     </section>
   </div>
@@ -353,16 +353,13 @@ const t =
 
   .re-oppgaver {
     margin: 0;
-    padding: 0 0 0 26px;
+    padding: 0;
+    list-style: none;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px 40px;
     font-size: 19px;
     color: #111;
-  }
-
-  .re-oppgaver li {
-    padding-left: 4px;
   }
 
   /* Svaret: understreker som plass, fasittallet oppå i fasit-modus */

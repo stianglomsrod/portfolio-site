@@ -91,7 +91,12 @@ export function lagRegneark({
     // «med tierovergang» på 0–10 er umulig for pluss (summen må ≤ 10);
     // bom-telleren fanger det og gir for-faa-mulige
 
-    const nokkel = `${art}|${a}|${b}`;
+    // Pluss og gange er kommutative: 9 · 1 og 1 · 9 er samme stykke,
+    // så nøkkelen er rekkefølge-uavhengig for dem
+    const nokkel =
+      art === 'pluss' || art === 'gange'
+        ? `${art}|${Math.min(a, b)}|${Math.max(a, b)}`
+        : `${art}|${a}|${b}`;
     if (brukte.has(nokkel)) { bom++; continue; }
     brukte.add(nokkel);
 

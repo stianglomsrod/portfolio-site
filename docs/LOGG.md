@@ -37,7 +37,25 @@
 - Skjermbilder oppdatert i `docs/innsikt/spill-mobil/`; addendum i
   `docs/innsikt/SPILL-MOBIL-RAPPORT.md`. Ikke committet.
 
-### 2026-07-11 — UX-QA av header/meny/scroll + terskel-fiks
+### 2026-07-11 — Silhuetter: stokket ordbank + dynamisk layout (A4/A3)
+- **Ordbanken stokkes** (Fisher-Yates) ved hver generering så rekkefølgen
+  aldri speiler silhuettene — eleven kan ikke skrive av ovenfra og ned.
+- **Dynamisk layout**: --si-skala regnes i print-mm ut fra antall ord,
+  lengste ord (i bokser), bilder og ordbank-linjer. Få ord = store
+  silhuetter (tak 2.0), mange = mindre; over ~6 ord vurderes to kolonner
+  (grid), og faller beste A4-skala under 0.85 velges A3 (egen
+  @page-regel injiseres som style-element — @page kan ikke styres med
+  klasser). Skjermforhåndsvisningen speiler skalaen (px-basert).
+  MAKS_ORD 10 → 24. Status forteller layouten («… i to kolonner på A3»).
+- **To brekk-lærdommer**: (1) print-emulering på skjerm måler i
+  VIEWPORT-bredde — mm-brekk må verifiseres med page.pdf(), ikke
+  emulateMedia; (2) flex-wrap i silhuetten lot en boks brekke ned og
+  blåse radhøyden (side 2) — print har nowrap, breddebudsjettet har 3mm
+  slakk og skala rundes NED.
+- QA: PDF-verifisert 3/8/14/22 ord + ekstremtilfelle (22-bokstavs ord)
+  — alle på ÉN side (A4/A4/A4/A3/A4). Bygg grønt, axe 0/18, kant 0/18.
+
+
 - **Playwright-gjennomgang** av hele header-maskineriet: tilstandsmaskinen
   (transparent topp → glass ved scroll → auto-hide → glass tilbake ved
   scroll opp → transparent på topp) er korrekt i alle overganger; åpen

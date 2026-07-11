@@ -355,10 +355,13 @@ const t =
 
   /* ---- Arket: alltid hvitt papir, uavhengig av tema ---- */
   .si-ark {
-    --si-x: 26px; /* x-høyden */
-    --si-topp: 13px; /* over x-høyden (høye bokstaver) */
-    --si-bunn: 13px; /* under grunnlinja (dype bokstaver) */
-    --si-bredde: 28px;
+    /* --si-skala settes av genereringen: få ord = store silhuetter,
+       mange ord = mindre (og to kolonner / A3 ved behov) */
+    --si-skala: 1;
+    --si-x: calc(26px * var(--si-skala)); /* x-høyden */
+    --si-topp: calc(13px * var(--si-skala)); /* over x-høyden */
+    --si-bunn: calc(13px * var(--si-skala)); /* under grunnlinja */
+    --si-bredde: calc(28px * var(--si-skala));
     --si-strek: 2px;
     background: #fff;
     color: #111;
@@ -415,7 +418,14 @@ const t =
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 22px;
+    gap: calc(22px * var(--si-skala));
+  }
+
+  .si-rader[data-kolonner='2'] {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: calc(28px * var(--si-skala));
+    row-gap: calc(22px * var(--si-skala));
   }
 
   .si-rad {
@@ -425,8 +435,8 @@ const t =
   }
 
   .si-rad-bilde {
-    width: 64px;
-    height: 64px;
+    width: calc(64px * var(--si-skala));
+    height: calc(64px * var(--si-skala));
     object-fit: cover;
     border: 1px solid #333;
     border-radius: 4px;
@@ -505,10 +515,10 @@ const t =
     }
 
     .si-ark {
-      --si-x: 9mm;
-      --si-topp: 4.5mm;
-      --si-bunn: 4.5mm;
-      --si-bredde: 9.5mm;
+      --si-x: calc(9mm * var(--si-skala));
+      --si-topp: calc(4.5mm * var(--si-skala));
+      --si-bunn: calc(4.5mm * var(--si-skala));
+      --si-bredde: calc(9.5mm * var(--si-skala));
       --si-strek: 0.5mm;
       border: none;
       box-shadow: none;
@@ -518,17 +528,26 @@ const t =
     }
 
     .si-rader {
-      gap: 9mm;
+      gap: calc(9mm * var(--si-skala));
+    }
+
+    .si-rader[data-kolonner='2'] {
+      column-gap: calc(10mm * var(--si-skala));
+      row-gap: calc(9mm * var(--si-skala));
     }
 
     .si-rad {
-      gap: 8mm;
+      gap: calc(8mm * var(--si-skala));
       break-inside: avoid;
     }
 
+    .si-ord {
+      flex-wrap: nowrap;
+    }
+
     .si-rad-bilde {
-      width: 20mm;
-      height: 20mm;
+      width: calc(20mm * var(--si-skala));
+      height: calc(20mm * var(--si-skala));
       print-color-adjust: exact;
       -webkit-print-color-adjust: exact;
     }
@@ -548,7 +567,7 @@ const t =
     const lang = (rot.dataset.lang ?? 'nb') as 'nb' | 'en';
     const standardTittel = rot.dataset.standardtittel ?? 'Silhuetter';
     const LAGRINGSNOKKEL = `silhuett-${lang}`;
-    const MAKS_ORD = 10;
+    const MAKS_ORD = 24;
 
     const M =
       lang === 'nb'
@@ -556,7 +575,8 @@ const t =
             minstEttOrd: 'Skriv inn minst ett ord først.',
             upassende: (o: string) =>
               `«${o}» passer ikke på et skoleark. Bytt ut ordet, så lager vi arket.`,
-            klart: (antall: number) => `Arket er klart: ${antall} ord.`,
+            klart: (antall: number, kolonner: number, ark: string) =>
+              `Arket er klart: ${antall} ord${kolonner === 2 ? ' i to kolonner' : ''}${ark === 'a3' ? ' på A3' : ''}.`,
             ordAria: (i: number) => `Ord ${i}`,
             byttBilde: (i: number) => `Bytt bilde for ord ${i}`,
             leggBilde: (i: number) => `Legg til bilde for ord ${i}`,
@@ -568,7 +588,8 @@ const t =
             minstEttOrd: 'Type at least one word first.',
             upassende: (o: string) =>
               `“${o}” does not belong on a school sheet. Swap the word and we will make the sheet.`,
-            klart: (antall: number) => `The sheet is ready: ${antall} words.`,
+            klart: (antall: number, kolonner: number, ark: string) =>
+              `The sheet is ready: ${antall} words${kolonner === 2 ? ' in two columns' : ''}${ark === 'a3' ? ' on A3' : ''}.`,
             ordAria: (i: number) => `Word ${i}`,
             byttBilde: (i: number) => `Change picture for word ${i}`,
             leggBilde: (i: number) => `Add picture for word ${i}`,
@@ -731,6 +752,73 @@ const t =
       status.classList.toggle('feil', erFeil);
     }
 
+    /* Layoutberegning: få ord = store silhuetter, mange = mindre, to
+       kolonner over 10 rader-ekvivalenter, og A3 når A4 måtte krympe
+       under lesbart. Alt regnes i print-mm (skjermen speiler skalaen). */
+    function velgLayout(
+      antall: number,
+      maxLen: number,
+      harBilde: boolean,
+      visBank: boolean
+    ) {
+      const skalaFor = (kolonner: number, ark: 'a4' | 'a3') => {
+        const bredde = (ark === 'a3' ? 269 : 182) - (kolonner - 1) * 10;
+        // Høydebudsjett: topptekst 34mm, ordbank vokser med antall linjer
+        // (ca. 10 ord per linje), pluss 8mm sikkerhetsmargin mot side 2
+        const bankHoyde = visBank ? 14 + Math.ceil(antall / 10) * 7 : 0;
+        const hoyde = (ark === 'a3' ? 392 : 269) - 34 - bankHoyde - 8;
+        const kolB = bredde / kolonner - 3; // 3mm slakk mot boks-brekk
+        const radBredde = maxLen * 9.5 + (harBilde ? 28 : 0);
+        const radHoyde = 27 + (harBilde ? 2 : 0);
+        const raderPerKol = Math.ceil(antall / kolonner);
+        return Math.min(2, kolB / radBredde, hoyde / (raderPerKol * radHoyde));
+      };
+      // Prøv A4 først (1 kolonne, så 2 hvis mange ord) — A3 bare når
+      // A4 ikke gir lesbar størrelse
+      const kandidater: Array<{ kolonner: number; ark: 'a4' | 'a3' }> = [
+        { kolonner: 1, ark: 'a4' },
+      ];
+      if (antall > 6) kandidater.push({ kolonner: 2, ark: 'a4' });
+      let best = kandidater[0];
+      let bestSkala = skalaFor(best.kolonner, best.ark);
+      for (const k of kandidater.slice(1)) {
+        const sk = skalaFor(k.kolonner, k.ark);
+        if (sk > bestSkala) {
+          best = k;
+          bestSkala = sk;
+        }
+      }
+      if (bestSkala < 0.85) {
+        for (const k of [
+          { kolonner: 2, ark: 'a3' as const },
+          { kolonner: 1, ark: 'a3' as const },
+        ]) {
+          const sk = skalaFor(k.kolonner, k.ark);
+          if (sk > bestSkala) {
+            best = k;
+            bestSkala = sk;
+          }
+        }
+      }
+      return { ...best, skala: Math.max(0.55, Math.floor(bestSkala * 100) / 100) };
+    }
+
+    /* A3 krever egen @page-regel — den kan ikke styres med klasser, så
+       den injiseres/fjernes som eget style-element */
+    function settArkStorrelse(ark: 'a4' | 'a3') {
+      let stil = document.getElementById('si-page-stil');
+      if (ark === 'a3') {
+        if (!stil) {
+          stil = document.createElement('style');
+          stil.id = 'si-page-stil';
+          document.head.appendChild(stil);
+        }
+        stil.textContent = '@media print { @page { size: A3 portrait; margin: 14mm; } }';
+      } else if (stil) {
+        stil.remove();
+      }
+    }
+
     function generer() {
       const rene = ordListe
         .map((o) => ({ ...o, tekst: o.tekst.trim() }))
@@ -752,17 +840,36 @@ const t =
       el('si-overskrift').textContent =
         el<HTMLInputElement>('si-tittel').value.trim() || standardTittel;
 
+      // Ordbanken STOKKES (Fisher-Yates) så rekkefølgen aldri speiler
+      // silhuettene — ellers kan eleven bare skrive av ovenfra og ned
       const visBank = el<HTMLInputElement>('si-vis-ordbank').checked;
       const bank = el('si-bank');
       bank.hidden = !visBank;
       if (visBank) {
-        el('si-bank-ord').textContent = rene
-          .map((o) => normaliserOrd(o.tekst).toLowerCase())
-          .join('  –  ');
+        const stokket = rene.map((o) => normaliserOrd(o.tekst).toLowerCase());
+        for (let i = stokket.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [stokket[i], stokket[j]] = [stokket[j], stokket[i]];
+        }
+        el('si-bank-ord').textContent = stokket.join('  –  ');
       }
+
+      // Dynamisk layout ut fra antall og lengste ord
+      const bokserPerOrd = rene.map((o) => bokstavBokser(o.tekst).length);
+      const maxLen = Math.max(1, ...bokserPerOrd);
+      const harBilde = rene.some((o) => o.bilde);
+      const layout = velgLayout(rene.length, maxLen, harBilde, visBank);
+      const ark = el('si-ark');
+      ark.style.setProperty('--si-skala', String(layout.skala));
+      settArkStorrelse(layout.ark);
 
       // Radene: bilde (om det finnes) + silhuettboksene
       const rader = el('si-rader');
+      if (layout.kolonner === 2) {
+        rader.setAttribute('data-kolonner', '2');
+      } else {
+        rader.removeAttribute('data-kolonner');
+      }
       rader.replaceChildren();
       rene.forEach((o) => {
         const rad = document.createElement('li');
@@ -789,7 +896,7 @@ const t =
       });
 
       el('si-ark-seksjon').removeAttribute('hidden');
-      siStatus(M.klart(rene.length));
+      siStatus(M.klart(rene.length, layout.kolonner, layout.ark));
       lagreUtkast();
     }
 

@@ -55,7 +55,7 @@
 - QA: PDF-verifisert 3/8/14/22 ord + ekstremtilfelle (22-bokstavs ord)
   — alle på ÉN side (A4/A4/A4/A3/A4). Bygg grønt, axe 0/18, kant 0/18.
 
-
+### 2026-07-11 — UX-QA av header/meny/scroll + terskel-fiks
 - **Playwright-gjennomgang** av hele header-maskineriet: tilstandsmaskinen
   (transparent topp → glass ved scroll → auto-hide → glass tilbake ved
   scroll opp → transparent på topp) er korrekt i alle overganger; åpen
@@ -71,7 +71,7 @@
   (812 > 800, og raden får plass der).
 - QA: bygg grønt, axe 0/18, kant-sjekk 0/18.
 
-
+### 2026-07-10 (natt mot 11.) — Glass-header og lagdelte skygger
 - **Headeren er tintet glass med scroll-tilstand** (Stians funn: den
   opake tint-platen ble brå): øverst på siden er headeren HELT
   transparent (ingen plate — headeren er siden), og ved scroll (y ≥ 24)
@@ -88,7 +88,7 @@
   rosa-palett (hue 340) og mørk — glasset følger paletten. Bygg grønt,
   axe 0/18, kant-sjekk 0/18.
 
-
+### 2026-07-10 (sen kveld) — Nav-finpuss: hamburger til høyre, verktøy i menyen, aksent-tintet header
 - **Hamburgeren står ytterst til høyre** (konvensjonen), og på mobil er
   topplinja nå bare merke + Meny: språkvelgeren («English version» med
   full tekst) og tema-switchen bor nederst i nedtrekkslista, bak en
@@ -108,7 +108,7 @@
   lys — synlig men nøktern, og følger aksent-slideren i Modul C live.
   L holdt nær de gamle verdiene så kontrasten står (axe 0/18).
 
-
+### 2026-07-10 (kveld) — Hamburgermeny på mobil, scroll-avsløring, trykkflater
 - **Hamburgermeny på mobil** (≤680px, kun med JS): den synlige to-raders
   menyen kostet 166px = 20 % av førstevisningen på 375×812 — nå er
   topplinja 53px med «Meny»-knapp (ikon + tekstetikett, NN/g: ikon+tekst

@@ -1,0 +1,48 @@
+---
+import Side from '../../../layouts/Side.astro';
+import KryssordVerktoy from '../../../components/KryssordVerktoy.astro';
+
+/* Crossword in the sandbox: skeleton crossword from a word list, for
+   print. NORSK TVILLING: src/pages/sandbox/kryssord.astro — endre begge. */
+---
+
+<Side
+  lang="en"
+  title="Crossword — make printable crosswords"
+  description="Type the words and clues and get a ready-to-print crossword — with pictures as clues if you like, a word bank and an answer key."
+>
+  <div class="kv-side-hode">
+    <p class="kicker">/sandbox · tool</p>
+    <h1>Crossword</h1>
+    <p class="dempet">
+      Make printable crosswords: type the words with a clue text or a
+      picture, and the tool weaves them into a crossword with numbered
+      squares and clues below. Word bank and answer-key printing are
+      optional.
+    </p>
+  </div>
+  <KryssordVerktoy lang="en" />
+</Side>
+
+<style>
+  .kicker {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: var(--tekst-label);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--hue-aksent);
+    margin: var(--s-7) 0 var(--s-2);
+  }
+
+  h1 {
+    font-size: var(--tekst-tittel);
+    margin: 0 0 var(--s-3);
+  }
+
+  .dempet {
+    color: var(--dempet);
+    max-width: 68ch;
+    margin: 0;
+  }
+</style>

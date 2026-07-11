@@ -17,7 +17,7 @@ import HueVelger from '../components/HueVelger.astro';
   </p>
 
   <div class="eks-grid">
-    <a class="eksperiment" href="/sandbox/skamlos-pitch">
+    <a class="eksperiment eks-bred" href="/sandbox/skamlos-pitch">
       <span class="eks-tag">Spill</span>
       <span class="eks-tittel">Skamløs Pitch: Kompetansebyen</span>
       <span class="eks-tekst">
@@ -57,6 +57,16 @@ import HueVelger from '../components/HueVelger.astro';
       <span class="eks-cta">lag brett <span class="pil" aria-hidden="true">→</span></span>
     </a>
 
+    <a class="eksperiment" href="/sandbox/kryssord">
+      <span class="eks-tag">Verktøy</span>
+      <span class="eks-tittel">Kryssord</span>
+      <span class="eks-tekst">
+        Kryssord til utskrift: ord med tekst eller bilde som ledetråd,
+        nummererte ruter, ordbank og fasit.
+      </span>
+      <span class="eks-cta">lag et kryssord <span class="pil" aria-hidden="true">→</span></span>
+    </a>
+
     <div class="full-rad">
       <HueVelger lang="nb" />
     </div>
@@ -84,11 +94,11 @@ import HueVelger from '../components/HueVelger.astro';
     max-width: 68ch;
   }
 
-  /* Delt spor-regel: to spor som de fire kortene fyller i to hele rader,
-     og modulen spenner hele raden — alle høyrekanter deler dermed samme
-     kant. (auto-fit fungerte ikke her: raden med full-rad-elementet holdt
-     et tomt spor i live, så kortene stoppet før kanten.) Håndheves av
-     _baseline/qa/kant-sjekk.mjs. */
+  /* Delt spor-regel: spillet spenner hele første rad, de fire verktøyene
+     fyller to hele rader (2×2), og modulen spenner siste rad — alle
+     høyrekanter deler dermed samme kant. (auto-fit fungerte ikke her:
+     rader med fullrads-elementer holdt et tomt spor i live, så kortene
+     stoppet før kanten.) Håndheves av _baseline/qa/kant-sjekk.mjs. */
   .eks-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -96,7 +106,8 @@ import HueVelger from '../components/HueVelger.astro';
     margin-top: var(--s-5);
   }
 
-  .full-rad {
+  .full-rad,
+  .eks-bred {
     grid-column: 1 / -1;
   }
 

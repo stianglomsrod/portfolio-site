@@ -6,6 +6,38 @@
 
 ## Changelog
 
+### 2026-07-11 — Nytt lærerverktøy: Kryssord (skjelett-kryssord)
+- **Kryssord** (/sandbox/kryssord, EN: /en/sandbox/crossword): læreren
+  skriver ord med ledetrådtekst OG/ELLER bilde (minst én per ord, valgt
+  av Stian), og verktøyet fletter dem til et skjelett-kryssord med
+  nummererte ruter og Vannrett →/Loddrett ↓-lister under. Fasit-mekanikk
+  og STORE/små-valg er Ordkryss sitt mønster (fasit-paa/print-fasit +
+  afterprint); ordbank (stokket) er valgfri. Rutestørrelsen regnes i mm
+  så rutenettet alltid får plass på A4-bredden.
+- **Kjernen** (`src/lib/kryssord.ts`, DOM-fri): klassiske criss-cross-
+  regler — kryssing kun på lik bokstav, aldri to ord samme retning i
+  samme rute, ingen sidekontakt, alt henger sammen. Dermed er hver
+  sammenhengende bokstavrekke i rutenettet ALLTID et av lærerens ord.
+  Legging med opptil 240 omstarter og to vekslende strategier (lengst
+  først / dårligst koblede tidlig — «KIWI-problemet»: ord med sjeldne
+  bokstaver må inn før krysspunktene bygges igjen). Ord som ikke deler
+  nok bokstaver med resten navngis i feilmeldingen i stedet for å
+  droppes stille.
+- **Sandbox-gridet lagt om for fem kort**: spillet spenner hele første
+  rad (eks-bred), de fire verktøyene står 2×2, modulen på full rad —
+  alle rader hele, så kant-flukten holder.
+- QA: kjerne-stresstest 200 genereringer × 5 ordbanker (alle rekker =
+  ord, sammenheng, radvis nummerering, feilstier; verstefall 35 ms),
+  UI-suite 22/22 grønn (`_baseline/qa/kryssord-test.mjs`): DOM-rutenett
+  uten tilfeldige sekvenser, fasit-toggle, elev- og fasit-PDF 1 side,
+  ordbank + små bokstaver uten ny legging, valideringsfeil, bilde som
+  eneste ledetråd, utkast med ledetråder over reload. Bygg grønt,
+  axe 0/22, kant 0/22. LÆRDOM (Playwright): addInitScript kjører på
+  nytt ved HVER navigasjon — scenarier med egen localStorage må ha egen
+  context, ellers overskrives det du satte i evaluate før reload.
+- Ordbingo fra tidligere i dag verifisert live i prod (200 på begge
+  språk) etter push.
+
 ### 2026-07-11 — Nytt lærerverktøy: Ordbingo
 - **Ordbingo** (/sandbox/ordbingo, EN: /en/sandbox/word-bingo): læreren
   skriver ordlista (samme rad-UI som søsknene: bilde per ord via knapp

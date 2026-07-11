@@ -17,7 +17,7 @@ import HueVelger from '../../components/HueVelger.astro';
   </p>
 
   <div class="eks-grid">
-    <a class="eksperiment" href="/sandbox/skamlos-pitch">
+    <a class="eksperiment eks-bred" href="/sandbox/skamlos-pitch">
       <span class="eks-tag">Game</span>
       <span class="eks-tittel">Skamløs Pitch: Kompetansebyen</span>
       <span class="eks-tekst">
@@ -57,6 +57,16 @@ import HueVelger from '../../components/HueVelger.astro';
       <span class="eks-cta">make boards <span class="pil" aria-hidden="true">→</span></span>
     </a>
 
+    <a class="eksperiment" href="/en/sandbox/crossword">
+      <span class="eks-tag">Tool</span>
+      <span class="eks-tittel">Crossword</span>
+      <span class="eks-tekst">
+        Printable crosswords: words with a text or picture clue, numbered
+        squares, a word bank and an answer key.
+      </span>
+      <span class="eks-cta">make a crossword <span class="pil" aria-hidden="true">→</span></span>
+    </a>
+
     <div class="full-rad">
       <HueVelger lang="en" />
     </div>
@@ -92,7 +102,8 @@ import HueVelger from '../../components/HueVelger.astro';
     margin-top: var(--s-5);
   }
 
-  .full-rad {
+  .full-rad,
+  .eks-bred {
     grid-column: 1 / -1;
   }
 

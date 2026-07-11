@@ -1,0 +1,46 @@
+---
+import Side from '../../layouts/Side.astro';
+import KryssordVerktoy from '../../components/KryssordVerktoy.astro';
+
+/* Kryssord i sandbox: skjelett-kryssord fra en ordliste, til utskrift.
+   ENGELSK TVILLING: src/pages/en/sandbox/crossword.astro — endre begge. */
+---
+
+<Side
+  title="Kryssord — lag kryssord til utskrift"
+  description="Skriv inn ordene og ledetrådene, og få et ferdig kryssord til utskrift — med bilder som ledetråder om du vil, ordbank og fasit."
+>
+  <div class="kv-side-hode">
+    <p class="kicker">/sandbox · verktøy</p>
+    <h1>Kryssord</h1>
+    <p class="dempet">
+      Lag kryssord til utskrift: skriv inn ordene med ledetrådtekst eller
+      bilde, og verktøyet fletter dem sammen til et kryssord med nummererte
+      ruter og ledetråder under. Ordbank og fasit-utskrift er valgfritt.
+    </p>
+  </div>
+  <KryssordVerktoy lang="nb" />
+</Side>
+
+<style>
+  .kicker {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: var(--tekst-label);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--hue-aksent);
+    margin: var(--s-7) 0 var(--s-2);
+  }
+
+  h1 {
+    font-size: var(--tekst-tittel);
+    margin: 0 0 var(--s-3);
+  }
+
+  .dempet {
+    color: var(--dempet);
+    max-width: 68ch;
+    margin: 0;
+  }
+</style>

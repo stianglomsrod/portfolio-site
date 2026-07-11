@@ -1,0 +1,1159 @@
+---
+/* Kryssord-verktøyet: skjelett-kryssord fra lærerens ordliste, til
+   utskrift. Hvert ord får ledetrådtekst og/eller bilde (minst én av
+   delene); rutene nummereres og ledetrådene listes som Vannrett →/
+   Loddrett ↓ under rutenettet. Samme lest som søsknene: oppsett i
+   venstremargen, hvitt ark til høyre — arket ER utskriften. Leggingen
+   bor i src/lib/kryssord.ts (DOM-fri, stresstestet); bannordfilter og
+   normalisering deles med Ordkryss (src/lib/ordkryss-kjerne.ts).
+   Fasit-mekanikken er Ordkryss sin: «Vis fasit her» (klasse fasit-paa),
+   «Skriv ut fasit» (klasse print-fasit + afterprint-opprydding). */
+
+interface Props {
+  lang?: 'nb' | 'en';
+}
+
+const { lang = 'nb' } = Astro.props;
+
+const t =
+  lang === 'nb'
+    ? {
+        tittelFelt: 'Tittel på arket',
+        tittelEks: 'Skriv tittelen her',
+        ordNavn: 'Ordene i kryssordet',
+        ordEks: 'skriv et ord',
+        ledetraadEks: 'ledetråd — valgfri når ordet har bilde',
+        leggTil: '+ Legg til ord',
+        bildeHint: 'Hvert ord trenger ledetråd, bilde eller begge. Tips: kopier et bilde (høyreklikk → «Kopier bilde») og lim det inn i ordfeltet med Ctrl + V.',
+        bokstaver: 'Bokstaver i fasit og ordbank',
+        valgStore: 'STORE (ABC)',
+        valgSmaa: 'små (abc)',
+        visOrdbank: 'Vis ordbank øverst på arket',
+        lag: 'Lag kryssord',
+        skrivUt: 'Skriv ut',
+        skrivUtFasit: 'Skriv ut fasit',
+        visFasit: 'Vis fasit her',
+        navnLinje: 'Navn: ____________________   Dato: ____________',
+        ordbank: 'Ordbank',
+        vannrett: 'Vannrett →',
+        loddrett: 'Loddrett ↓',
+        rutenettAria: 'Kryssordrutenett',
+        fasit: 'FASIT',
+        standardTittel: 'Kryssord',
+      }
+    : {
+        tittelFelt: 'Sheet title',
+        tittelEks: 'Type the title here',
+        ordNavn: 'Words in the crossword',
+        ordEks: 'type a word',
+        ledetraadEks: 'clue — optional when the word has a picture',
+        leggTil: '+ Add word',
+        bildeHint: 'Each word needs a clue, a picture or both. Tip: copy a picture (right-click → “Copy image”) and paste it into the word field with Ctrl + V.',
+        bokstaver: 'Letters in the key and word bank',
+        valgStore: 'UPPERCASE (ABC)',
+        valgSmaa: 'lowercase (abc)',
+        visOrdbank: 'Show a word bank at the top of the sheet',
+        lag: 'Create crossword',
+        skrivUt: 'Print',
+        skrivUtFasit: 'Print answer key',
+        visFasit: 'Show answers here',
+        navnLinje: 'Name: ____________________   Date: ____________',
+        ordbank: 'Word bank',
+        vannrett: 'Across →',
+        loddrett: 'Down ↓',
+        rutenettAria: 'Crossword grid',
+        fasit: 'KEY',
+        standardTittel: 'Crossword',
+      };
+---
+
+<div class="kv-verktoy" data-lang={lang} data-standardtittel={t.standardTittel}>
+  <div class="kv-oppsett">
+    <section class="kv-panel" aria-labelledby="kv-panel-tittel">
+      <h2 id="kv-panel-tittel" class="sr-only">{lang === 'nb' ? 'Oppsett' : 'Setup'}</h2>
+
+      <label class="kv-felt">
+        <span class="kv-felt-navn">{t.tittelFelt}</span>
+        <input type="text" id="kv-tittel" placeholder={t.tittelEks} maxlength="60" />
+      </label>
+
+      <div class="kv-felt">
+        <span class="kv-felt-navn" id="kv-ord-navn">{t.ordNavn}</span>
+        <ul id="kv-ord-liste" aria-labelledby="kv-ord-navn"></ul>
+        <button type="button" id="kv-legg-til" class="kv-sekundaer">{t.leggTil}</button>
+        <p class="kv-hint">{t.bildeHint}</p>
+      </div>
+
+      <label class="kv-felt">
+        <span class="kv-felt-navn">{t.bokstaver}</span>
+        <select id="kv-bokstaver">
+          <option value="store" selected>{t.valgStore}</option>
+          <option value="smaa">{t.valgSmaa}</option>
+        </select>
+      </label>
+
+      <label class="kv-valg">
+        <input type="checkbox" id="kv-vis-ordbank" />
+        {t.visOrdbank}
+      </label>
+
+      <button type="button" id="kv-lag" class="knapp kv-primaer">{t.lag}</button>
+      <p id="kv-status" class="kv-status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="kv-visning" id="kv-ark-seksjon" hidden aria-labelledby="kv-visning-tittel">
+      <h2 id="kv-visning-tittel" class="sr-only">
+        {lang === 'nb' ? 'Forhåndsvisning' : 'Preview'}
+      </h2>
+      <div class="kv-handlinger">
+        <button type="button" id="kv-skriv-ut" class="knapp kv-primaer">{t.skrivUt}</button>
+        <button type="button" id="kv-skriv-ut-fasit" class="kv-sekundaer">{t.skrivUtFasit}</button>
+        <button type="button" id="kv-fasit-toggle" class="kv-sekundaer" aria-pressed="false">
+          {t.visFasit}
+        </button>
+      </div>
+
+      <div class="kv-sticky-print">
+        <button type="button" id="kv-skriv-ut-sticky" class="kv-sticky-knapp" title="Skriv ut arket (Ctrl+P)" aria-label={t.skrivUt}>
+          🖨
+        </button>
+      </div>
+
+      <div class="kv-ark" id="kv-ark">
+        <div class="kv-ark-hode">
+          <h3 id="kv-overskrift">{t.standardTittel}</h3>
+          <span class="kv-fasit-merke" aria-hidden="true">{t.fasit}</span>
+        </div>
+        <p class="kv-navn-linje">{t.navnLinje}</p>
+        <div class="kv-bank" id="kv-bank" hidden>
+          <p class="kv-bank-navn">{t.ordbank}</p>
+          <p class="kv-bank-ord" id="kv-bank-ord"></p>
+        </div>
+        <table id="kv-rutenett" aria-label={t.rutenettAria}></table>
+        <div class="kv-ledetraader">
+          <section id="kv-vannrett-seksjon">
+            <h4>{t.vannrett}</h4>
+            <ul id="kv-vannrett"></ul>
+          </section>
+          <section id="kv-loddrett-seksjon">
+            <h4>{t.loddrett}</h4>
+            <ul id="kv-loddrett"></ul>
+          </section>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<style is:global>
+  /* Skjerm: verktøyet følger sidens tokens; arket er alltid hvit «papir». */
+  .kv-oppsett {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: var(--s-5);
+    align-items: start;
+    margin-top: var(--s-4);
+  }
+
+  @media (max-width: 900px) {
+    .kv-oppsett {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .kv-panel {
+    background: var(--flate);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: var(--s-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .kv-felt {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .kv-felt-navn {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--tekst);
+  }
+
+  .kv-panel input[type='text'],
+  .kv-panel select {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    padding: 9px 10px;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--tekst);
+    min-height: 44px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .kv-valg {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    min-height: 32px;
+    color: var(--tekst);
+  }
+
+  .kv-valg input {
+    width: 19px;
+    height: 19px;
+    accent-color: var(--salvie);
+    flex-shrink: 0;
+  }
+
+  /* Beroringsskjerm: hele valg-etiketten skal vaere et trygt maal */
+  @media (pointer: coarse) {
+    .kv-valg {
+      min-height: 44px;
+    }
+  }
+
+  .kv-hint {
+    margin: 2px 0 0;
+    font-size: 13.5px;
+    color: var(--dempet);
+  }
+
+  #kv-ord-liste {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* To linjer per ord: ordet med knappene sine, ledetråden under */
+  .kv-ord-rad {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .kv-ord-linje {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .kv-ord-linje input[type='text'] {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .kv-ord-rad.upassende input[type='text'] {
+    border-color: var(--feil);
+  }
+
+  .kv-ledetraad-felt {
+    font-size: 15px !important;
+    min-height: 40px !important;
+  }
+
+  .kv-ikonknapp {
+    font: inherit;
+    min-width: 44px;
+    min-height: 44px;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--tekst);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    flex-shrink: 0;
+  }
+
+  .kv-ikonknapp:hover {
+    border-color: var(--salvie);
+  }
+
+  .kv-mini-bilde {
+    width: 36px;
+    height: 36px;
+    object-fit: cover;
+    border-radius: 6px;
+  }
+
+  /* Fjern-bilde-badgen — samme mønster som i de andre verktøyene */
+  .kv-bilde-holder {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+  }
+
+  .kv-fjern-bilde {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid var(--linje);
+    border-radius: 50%;
+    background: var(--flate-2);
+    color: var(--tekst);
+    font: 700 11px var(--font-hd);
+    line-height: 1;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    z-index: 1;
+  }
+
+  .kv-fjern-bilde:hover {
+    color: var(--feil);
+    border-color: var(--feil);
+  }
+
+  .kv-fjern-bilde:focus-visible {
+    outline: 2px solid var(--salvie);
+    outline-offset: 1px;
+  }
+
+  .kv-primaer {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 700;
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    border: none;
+    border-radius: 9px;
+    padding: 11px 20px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .kv-primaer:hover {
+    filter: brightness(1.06);
+  }
+
+  .kv-sekundaer {
+    font-family: var(--font-sans);
+    font-size: 14.5px;
+    font-weight: 600;
+    background: var(--bg);
+    color: var(--tekst);
+    border: 1px solid var(--linje);
+    border-radius: 9px;
+    padding: 10px 16px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .kv-sekundaer:hover {
+    border-color: var(--salvie);
+  }
+
+  .kv-sekundaer:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  .kv-status {
+    margin: 0;
+    font-size: 14.5px;
+    color: var(--dempet);
+    min-height: 1.4em;
+  }
+
+  .kv-status.feil {
+    color: var(--feil);
+  }
+
+  .kv-handlinger {
+    display: flex;
+    gap: var(--s-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--s-3);
+  }
+
+  /* Flytende print-knapp når arket er langt */
+  .kv-sticky-print {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 15;
+  }
+
+  .kv-sticky-knapp {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 1px solid var(--linje);
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: var(--kort-skygge);
+    display: grid;
+    place-items: center;
+  }
+
+  .kv-sticky-knapp:hover {
+    filter: brightness(1.06);
+  }
+
+  /* ---- Arket: alltid hvitt papir, uavhengig av tema ---- */
+  .kv-ark {
+    /* --kv-celle settes av genereringen ut fra rutenettets størrelse */
+    --kv-celle: 34px;
+    --kv-strek: 2px;
+    background: #fff;
+    color: #111;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: 28px 32px;
+    max-width: 660px;
+  }
+
+  .kv-ark-hode {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  #kv-overskrift {
+    margin: 0 0 4px;
+    font-size: 24px;
+    color: #111;
+  }
+
+  .kv-fasit-merke {
+    display: none;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    color: #b3261e;
+    border: 2px solid #b3261e;
+    border-radius: 6px;
+    padding: 2px 8px;
+  }
+
+  .kv-verktoy.fasit-paa .kv-fasit-merke {
+    display: inline-block;
+  }
+
+  .kv-navn-linje {
+    margin: 0 0 16px;
+    font-size: 13.5px;
+    color: #333;
+  }
+
+  .kv-bank {
+    border: 2px solid #333;
+    border-radius: 6px;
+    padding: 8px 14px;
+    margin-bottom: 18px;
+    text-align: center;
+  }
+
+  .kv-bank-navn {
+    margin: 0;
+    font-weight: 700;
+    font-size: 14.5px;
+    text-decoration: underline;
+    color: #111;
+  }
+
+  .kv-bank-ord {
+    margin: 2px 0 0;
+    font-size: 15px;
+    color: #111;
+  }
+
+  /* Rutenettet: bare ordrutene tegnes (skjelett-kryssord) */
+  #kv-rutenett {
+    border-collapse: collapse;
+    margin: 0 auto;
+  }
+
+  #kv-rutenett td {
+    width: var(--kv-celle);
+    height: var(--kv-celle);
+    min-width: var(--kv-celle);
+    padding: 0;
+    position: relative;
+  }
+
+  #kv-rutenett td.kv-rute {
+    border: var(--kv-strek) solid #333;
+    background: #fff;
+  }
+
+  .kv-nr {
+    position: absolute;
+    top: 1px;
+    left: 3px;
+    font-size: calc(var(--kv-celle) * 0.26);
+    font-weight: 600;
+    line-height: 1;
+    color: #333;
+  }
+
+  .kv-bokstav {
+    display: none;
+    position: absolute;
+    inset: 0;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(var(--kv-celle) * 0.5);
+    font-weight: 600;
+    color: #1a6a3a;
+  }
+
+  .kv-verktoy.fasit-paa .kv-bokstav {
+    display: flex;
+  }
+
+  /* Ledetrådene: to spalter under rutenettet */
+  .kv-ledetraader {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 28px;
+    margin-top: 20px;
+  }
+
+  @media (max-width: 560px) {
+    .kv-ledetraader {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .kv-ledetraader h4 {
+    margin: 0 0 6px;
+    font-size: 15px;
+    color: #111;
+  }
+
+  .kv-ledetraader ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .kv-ledetraader li {
+    font-size: 14.5px;
+    line-height: 1.35;
+    color: #111;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .kv-ledetraad-nr {
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .kv-ledetraad-bilde {
+    height: 30px;
+    width: auto;
+    max-width: 72px;
+    object-fit: contain;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  /* ---- Utskrift: kun arket, alltid lyst ---- */
+  @media print {
+    @page {
+      margin: 14mm;
+    }
+
+    /* Lys utskrift uansett tema: color-scheme dark får ellers Chrome til
+       å male hele arket mørkt i print */
+    html,
+    body {
+      color-scheme: light;
+      background: #fff !important;
+      color: #000;
+    }
+
+    /* Skjul alt UI-krom — men ALDRI .ramme (main): den er arkets
+       forelder, og skjules den, printes en tom side */
+    .topp,
+    .bunn,
+    .hopp,
+    .kv-panel,
+    .kv-handlinger,
+    .kv-side-hode,
+    .kv-sticky-print {
+      display: none !important;
+    }
+
+    .ramme {
+      padding: 0;
+      max-width: none;
+      min-height: 0;
+      background: #fff;
+    }
+
+    .kv-oppsett {
+      display: block;
+      margin: 0;
+    }
+
+    .kv-ark {
+      /* --kv-celle-print settes av genereringen (mm) */
+      --kv-celle: var(--kv-celle-print, 9mm);
+      --kv-strek: 0.5mm;
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 0;
+      max-width: none;
+    }
+
+    /* Rutenettet skal aldri brytes over sider; ledetrådene kan flyte
+       til side 2, men aldri midt i en ledetråd */
+    #kv-rutenett {
+      break-inside: avoid;
+    }
+
+    .kv-ledetraader li {
+      break-inside: avoid;
+    }
+
+    .kv-bank {
+      margin-bottom: 8mm;
+    }
+
+    .kv-ledetraad-bilde {
+      height: 11mm;
+      max-width: 26mm;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+
+    /* Vanlig utskrift er ren selv om skjerm-fasiten står på */
+    .kv-verktoy:not(.print-fasit) .kv-bokstav {
+      display: none !important;
+    }
+
+    .kv-verktoy:not(.print-fasit) .kv-fasit-merke {
+      display: none !important;
+    }
+
+    .kv-verktoy.print-fasit .kv-bokstav {
+      display: flex !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+
+    .kv-verktoy.print-fasit .kv-fasit-merke {
+      display: inline-block !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+  }
+</style>
+
+<script>
+  import { lagKryssord } from '../lib/kryssord';
+  import type { KryssordPlassering } from '../lib/kryssord';
+  import { normaliserOrd, ordErUpassende } from '../lib/ordkryss-kjerne';
+
+  const rot = document.querySelector<HTMLElement>('.kv-verktoy');
+  if (rot) {
+    const lang = (rot.dataset.lang ?? 'nb') as 'nb' | 'en';
+    const standardTittel = rot.dataset.standardtittel ?? 'Kryssord';
+    const LAGRINGSNOKKEL = `kryssord-${lang}`;
+    const MAKS_ORD = 20;
+
+    const M =
+      lang === 'nb'
+        ? {
+            minstTo: 'Skriv inn minst to ord først.',
+            forKort: (o: string) => `«${o}» må ha minst to bokstaver.`,
+            upassende: (o: string) =>
+              `«${o}» passer ikke på et skoleark. Bytt ut ordet, så lager vi kryssordet.`,
+            utenLedetraad: (o: string) =>
+              `«${o}» mangler ledetråd. Skriv en ledetråd eller legg på et bilde.`,
+            fikkIkke: (liste: string[]) =>
+              `Fikk ikke flettet ${liste.map((o) => `«${o.toLowerCase()}»`).join(', ')} inn i kryssordet — ${liste.length === 1 ? 'ordet deler' : 'ordene deler'} for få bokstaver med resten. Bytt ut eller legg til flere ord.`,
+            klart: (antall: number, vannrett: number, loddrett: number) =>
+              `Kryssordet er klart: ${antall} ord — ${vannrett} vannrett, ${loddrett} loddrett.`,
+            ordAria: (i: number) => `Ord ${i}`,
+            ledetraadAria: (i: number) => `Ledetråd for ord ${i}`,
+            byttBilde: (i: number) => `Bytt bilde for ord ${i}`,
+            leggBilde: (i: number) => `Legg til bilde for ord ${i}`,
+            fjernBilde: (i: number) => `Fjern bildet for ord ${i}`,
+            fjernOrd: (i: number) => `Fjern ord ${i}`,
+            ordEks: 'skriv et ord',
+            ledetraadEks: 'ledetråd — valgfri når ordet har bilde',
+          }
+        : {
+            minstTo: 'Type at least two words first.',
+            forKort: (o: string) => `“${o}” needs at least two letters.`,
+            upassende: (o: string) =>
+              `“${o}” does not belong on a school sheet. Swap the word and we will make the crossword.`,
+            utenLedetraad: (o: string) =>
+              `“${o}” has no clue. Write a clue or add a picture.`,
+            fikkIkke: (liste: string[]) =>
+              `Could not weave ${liste.map((o) => `“${o.toLowerCase()}”`).join(', ')} into the crossword — ${liste.length === 1 ? 'it shares' : 'they share'} too few letters with the rest. Swap or add more words.`,
+            klart: (antall: number, vannrett: number, loddrett: number) =>
+              `The crossword is ready: ${antall} words — ${vannrett} across, ${loddrett} down.`,
+            ordAria: (i: number) => `Word ${i}`,
+            ledetraadAria: (i: number) => `Clue for word ${i}`,
+            byttBilde: (i: number) => `Change picture for word ${i}`,
+            leggBilde: (i: number) => `Add picture for word ${i}`,
+            fjernBilde: (i: number) => `Remove the picture for word ${i}`,
+            fjernOrd: (i: number) => `Remove word ${i}`,
+            ordEks: 'type a word',
+            ledetraadEks: 'clue — optional when the word has a picture',
+          };
+
+    interface OrdRad {
+      id: number;
+      tekst: string;
+      ledetraad: string;
+      bilde: string | null;
+    }
+
+    interface SisteResultat {
+      rutenett: (string | null)[][];
+      plasseringer: KryssordPlassering[];
+      ord: OrdRad[]; // de unike radene, i samme rekkefølge som kjernen fikk
+    }
+
+    let ordListe: OrdRad[] = [];
+    let nesteId = 1;
+    let sisteResultat: SisteResultat | null = null;
+    let fasitSynlig = false;
+
+    const el = <T extends HTMLElement = HTMLElement>(id: string): T =>
+      document.getElementById(id) as T;
+
+    function lagreUtkast() {
+      try {
+        localStorage.setItem(
+          LAGRINGSNOKKEL,
+          JSON.stringify({
+            tittel: el<HTMLInputElement>('kv-tittel').value,
+            bokstaver: el<HTMLSelectElement>('kv-bokstaver').value,
+            visOrdbank: el<HTMLInputElement>('kv-vis-ordbank').checked,
+            ord: ordListe.map((o) => ({ tekst: o.tekst, ledetraad: o.ledetraad })),
+          })
+        );
+      } catch {}
+    }
+
+    function lastUtkast(): boolean {
+      try {
+        const raa = localStorage.getItem(LAGRINGSNOKKEL);
+        if (!raa) return false;
+        const u = JSON.parse(raa);
+        el<HTMLInputElement>('kv-tittel').value = u.tittel ?? '';
+        if (u.bokstaver === 'smaa' || u.bokstaver === 'store') {
+          el<HTMLSelectElement>('kv-bokstaver').value = u.bokstaver;
+        }
+        el<HTMLInputElement>('kv-vis-ordbank').checked = u.visOrdbank === true;
+        // Tåler utkast fra andre versjoner: strenger eller objekter
+        (u.ord ?? []).forEach((o: unknown) => {
+          const obj = (o ?? {}) as Record<string, unknown>;
+          const tekst =
+            typeof o === 'string' ? o : typeof obj.tekst === 'string' ? obj.tekst : '';
+          const ledetraad = typeof obj.ledetraad === 'string' ? obj.ledetraad : '';
+          ordListe.push({ id: nesteId++, tekst, ledetraad, bilde: null });
+        });
+        return ordListe.length > 0;
+      } catch {
+        return false;
+      }
+    }
+
+    function leggTilOrd(tekst = '') {
+      if (ordListe.length >= MAKS_ORD) return;
+      ordListe.push({ id: nesteId++, tekst, ledetraad: '', bilde: null });
+      tegnOrdListe();
+    }
+
+    function tegnOrdListe() {
+      const liste = el('kv-ord-liste');
+      liste.replaceChildren();
+
+      ordListe.forEach((ord, indeks) => {
+        const rad = document.createElement('li');
+        rad.className = 'kv-ord-rad';
+
+        const linje = document.createElement('div');
+        linje.className = 'kv-ord-linje';
+
+        const felt = document.createElement('input');
+        felt.type = 'text';
+        felt.value = ord.tekst.slice(0, 15);
+        felt.maxLength = 15;
+        felt.setAttribute('aria-label', M.ordAria(indeks + 1));
+        felt.placeholder = M.ordEks;
+        felt.addEventListener('input', () => {
+          ord.tekst = felt.value;
+          const stygt = ordErUpassende(felt.value);
+          rad.classList.toggle('upassende', stygt);
+          felt.setAttribute('aria-invalid', stygt ? 'true' : 'false');
+          lagreUtkast();
+        });
+        if (ordErUpassende(ord.tekst)) rad.classList.add('upassende');
+
+        // Lim inn bilde rett i ordfeltet: både «Kopier bilde» fra nettet
+        // (clipboardData.items) og kopierte bildefiler fra filutforskeren
+        // (clipboardData.files). Vanlig tekst-liming går sin gang.
+        felt.addEventListener('paste', (e) => {
+          const data = e.clipboardData;
+          if (!data) return;
+          const fraItems = [...data.items]
+            .find((i) => i.type.startsWith('image/'))
+            ?.getAsFile();
+          const fraFiler = [...data.files].find((f) => f.type.startsWith('image/'));
+          const fil = fraItems ?? fraFiler;
+          if (!fil) return;
+          e.preventDefault();
+          const leser = new FileReader();
+          leser.onload = () => {
+            ord.bilde = String(leser.result);
+            tegnOrdListe();
+            lagreUtkast();
+          };
+          leser.readAsDataURL(fil);
+        });
+
+        const bildeKnapp = document.createElement('button');
+        bildeKnapp.type = 'button';
+        bildeKnapp.className = 'kv-ikonknapp';
+        bildeKnapp.setAttribute(
+          'aria-label',
+          ord.bilde ? M.byttBilde(indeks + 1) : M.leggBilde(indeks + 1)
+        );
+
+        if (ord.bilde) {
+          const mini = document.createElement('img');
+          mini.src = ord.bilde;
+          mini.alt = '';
+          mini.className = 'kv-mini-bilde';
+          bildeKnapp.appendChild(mini);
+        } else {
+          bildeKnapp.textContent = '🖼';
+        }
+
+        const filFelt = document.createElement('input');
+        filFelt.type = 'file';
+        filFelt.accept = 'image/*';
+        filFelt.hidden = true;
+        filFelt.addEventListener('change', () => {
+          const fil = filFelt.files?.[0];
+          if (!fil) return;
+          const leser = new FileReader();
+          leser.onload = () => {
+            ord.bilde = String(leser.result);
+            tegnOrdListe();
+          };
+          leser.readAsDataURL(fil);
+        });
+        bildeKnapp.addEventListener('click', () => filFelt.click());
+
+        // Bildet kan fjernes for seg (uten å slette ordet)
+        const bildeHolder = document.createElement('span');
+        bildeHolder.className = 'kv-bilde-holder';
+        bildeHolder.appendChild(bildeKnapp);
+        if (ord.bilde) {
+          const fjernBilde = document.createElement('button');
+          fjernBilde.type = 'button';
+          fjernBilde.className = 'kv-fjern-bilde';
+          fjernBilde.textContent = '✕';
+          fjernBilde.setAttribute('aria-label', M.fjernBilde(indeks + 1));
+          fjernBilde.addEventListener('click', () => {
+            ord.bilde = null;
+            tegnOrdListe();
+            lagreUtkast();
+          });
+          bildeHolder.appendChild(fjernBilde);
+        }
+
+        const fjern = document.createElement('button');
+        fjern.type = 'button';
+        fjern.className = 'kv-ikonknapp';
+        fjern.textContent = '✕';
+        fjern.setAttribute('aria-label', M.fjernOrd(indeks + 1));
+        fjern.addEventListener('click', () => {
+          ordListe = ordListe.filter((o) => o.id !== ord.id);
+          if (ordListe.length === 0) leggTilOrd();
+          tegnOrdListe();
+          lagreUtkast();
+        });
+
+        linje.append(felt, bildeHolder, filFelt, fjern);
+
+        const ledetraadFelt = document.createElement('input');
+        ledetraadFelt.type = 'text';
+        ledetraadFelt.className = 'kv-ledetraad-felt';
+        ledetraadFelt.value = ord.ledetraad.slice(0, 90);
+        ledetraadFelt.maxLength = 90;
+        ledetraadFelt.setAttribute('aria-label', M.ledetraadAria(indeks + 1));
+        ledetraadFelt.placeholder = M.ledetraadEks;
+        ledetraadFelt.addEventListener('input', () => {
+          ord.ledetraad = ledetraadFelt.value;
+          lagreUtkast();
+        });
+
+        rad.append(linje, ledetraadFelt);
+        liste.appendChild(rad);
+      });
+
+      el<HTMLButtonElement>('kv-legg-til').disabled = ordListe.length >= MAKS_ORD;
+    }
+
+    function siStatus(tekst: string, erFeil = false) {
+      const status = el('kv-status');
+      status.textContent = tekst;
+      status.classList.toggle('feil', erFeil);
+    }
+
+    /* Rutestørrelsen: skjermen speiler print-skalaen. Rutenettet skal
+       fylle A4-bredden godt uten å sprenge den (14mm marger → 182mm),
+       og aldri bli så høyt at det dytter ledetrådene ut alene. */
+    function settCellestorrelse(kolonner: number, rader: number) {
+      const ark = el('kv-ark');
+      const skjerm = Math.max(18, Math.min(36, Math.floor(592 / kolonner), Math.floor(560 / rader)));
+      const print = Math.max(5.5, Math.min(10, Math.floor((182 / kolonner) * 10) / 10, Math.floor((175 / rader) * 10) / 10));
+      ark.style.setProperty('--kv-celle', `${skjerm}px`);
+      ark.style.setProperty('--kv-celle-print', `${print}mm`);
+    }
+
+    function medValgtCase(tekst: string): string {
+      return el<HTMLSelectElement>('kv-bokstaver').value === 'smaa'
+        ? tekst.toLowerCase()
+        : tekst.toUpperCase();
+    }
+
+    /* Tegner hele arket fra sisteResultat + gjeldende valg (bokstaver,
+       ordbank). Kalles på nytt når valgene endres — uten ny legging. */
+    function tegnArk() {
+      if (!sisteResultat) return;
+      const { rutenett, plasseringer, ord } = sisteResultat;
+
+      el('kv-overskrift').textContent =
+        el<HTMLInputElement>('kv-tittel').value.trim() || standardTittel;
+
+      // Ordbanken stokkes så rekkefølgen aldri avslører nummereringen
+      const visBank = el<HTMLInputElement>('kv-vis-ordbank').checked;
+      const bank = el('kv-bank');
+      bank.hidden = !visBank;
+      if (visBank) {
+        const stokket = ord.map((o) => medValgtCase(normaliserOrd(o.tekst)));
+        for (let i = stokket.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [stokket[i], stokket[j]] = [stokket[j], stokket[i]];
+        }
+        el('kv-bank-ord').textContent = stokket.join('  –  ');
+      }
+
+      // Rutenettet: startnumre i hjørnet, fasitbokstaven skjult bak
+      // fasit-klassene (Ordkryss-mekanikken)
+      const numre = new Map<string, number>();
+      plasseringer.forEach((p) => {
+        const start = `${p.rad},${p.kol}`;
+        if (!numre.has(start)) numre.set(start, p.nummer);
+      });
+
+      settCellestorrelse(rutenett[0].length, rutenett.length);
+      const tabell = el('kv-rutenett');
+      tabell.replaceChildren();
+      rutenett.forEach((rad, r) => {
+        const tr = document.createElement('tr');
+        rad.forEach((bokstav, k) => {
+          const td = document.createElement('td');
+          if (bokstav) {
+            td.className = 'kv-rute';
+            const nummer = numre.get(`${r},${k}`);
+            if (nummer) {
+              const nr = document.createElement('span');
+              nr.className = 'kv-nr';
+              nr.textContent = String(nummer);
+              td.appendChild(nr);
+            }
+            const b = document.createElement('span');
+            b.className = 'kv-bokstav';
+            b.textContent = medValgtCase(bokstav);
+            td.appendChild(b);
+          } else {
+            td.className = 'kv-tom';
+          }
+          tr.appendChild(td);
+        });
+        tabell.appendChild(tr);
+      });
+
+      // Ledetrådene: nummer + bilde og/eller tekst, per retning
+      for (const retning of ['vannrett', 'loddrett'] as const) {
+        const liste = el(`kv-${retning}`);
+        liste.replaceChildren();
+        plasseringer
+          .filter((p) => p.retning === retning)
+          .sort((a, b) => a.nummer - b.nummer)
+          .forEach((p) => {
+            const rad = ord[p.indeks];
+            const li = document.createElement('li');
+            const nr = document.createElement('span');
+            nr.className = 'kv-ledetraad-nr';
+            nr.textContent = `${p.nummer}.`;
+            li.appendChild(nr);
+            if (rad.bilde) {
+              const img = document.createElement('img');
+              img.src = rad.bilde;
+              img.alt = '';
+              img.className = 'kv-ledetraad-bilde';
+              li.appendChild(img);
+            }
+            const tekst = rad.ledetraad.trim();
+            if (tekst) {
+              const t = document.createElement('span');
+              t.textContent = tekst;
+              li.appendChild(t);
+            }
+            liste.appendChild(li);
+          });
+      }
+
+      el('kv-ark-seksjon').removeAttribute('hidden');
+    }
+
+    function generer() {
+      const rene = ordListe
+        .map((o) => ({ ...o, tekst: o.tekst.trim(), ledetraad: o.ledetraad.trim() }))
+        .filter((o) => o.tekst.length > 0);
+
+      for (const o of rene) {
+        if (ordErUpassende(o.tekst)) {
+          siStatus(M.upassende(o.tekst), true);
+          return;
+        }
+        if (normaliserOrd(o.tekst).length < 2) {
+          siStatus(M.forKort(o.tekst), true);
+          return;
+        }
+        if (!o.ledetraad && !o.bilde) {
+          siStatus(M.utenLedetraad(o.tekst), true);
+          return;
+        }
+      }
+
+      // Duplikater fjernes (samme ord to steder gir meningsløse ledetråder)
+      const sett = new Set<string>();
+      const unike: OrdRad[] = [];
+      for (const o of rene) {
+        const nokkel = normaliserOrd(o.tekst);
+        if (sett.has(nokkel)) continue;
+        sett.add(nokkel);
+        unike.push(o);
+      }
+
+      if (unike.length < 2) {
+        siStatus(M.minstTo, true);
+        return;
+      }
+
+      const resultat = lagKryssord(unike.map((o) => normaliserOrd(o.tekst)));
+      if ('feil' in resultat) {
+        siStatus(
+          resultat.feil === 'fikk-ikke-plass' ? M.fikkIkke(resultat.ordListe) : M.minstTo,
+          true
+        );
+        return;
+      }
+
+      sisteResultat = {
+        rutenett: resultat.rutenett,
+        plasseringer: resultat.plasseringer,
+        ord: unike,
+      };
+
+      // Ny generering starter alltid uten synlig fasit
+      fasitSynlig = false;
+      el('kv-fasit-toggle').setAttribute('aria-pressed', 'false');
+      rot.classList.remove('fasit-paa');
+
+      tegnArk();
+      const vannrett = resultat.plasseringer.filter((p) => p.retning === 'vannrett').length;
+      siStatus(M.klart(resultat.plasseringer.length, vannrett, resultat.plasseringer.length - vannrett));
+      lagreUtkast();
+    }
+
+    // Init
+    if (!lastUtkast()) {
+      leggTilOrd();
+      leggTilOrd();
+      leggTilOrd();
+    }
+    tegnOrdListe();
+
+    el('kv-legg-til').addEventListener('click', () => {
+      leggTilOrd();
+      const felter = document.querySelectorAll<HTMLInputElement>(
+        '#kv-ord-liste .kv-ord-linje input[type="text"]'
+      );
+      felter[felter.length - 1]?.focus();
+      lagreUtkast();
+    });
+
+    el('kv-lag').addEventListener('click', generer);
+
+    el('kv-fasit-toggle').addEventListener('click', () => {
+      fasitSynlig = !fasitSynlig;
+      el('kv-fasit-toggle').setAttribute('aria-pressed', String(fasitSynlig));
+      rot.classList.toggle('fasit-paa', fasitSynlig);
+    });
+
+    const skrivUt = () => {
+      rot.classList.remove('print-fasit');
+      window.print();
+    };
+    el('kv-skriv-ut').addEventListener('click', skrivUt);
+    el('kv-skriv-ut-sticky').addEventListener('click', skrivUt);
+
+    el('kv-skriv-ut-fasit').addEventListener('click', () => {
+      rot.classList.add('print-fasit');
+      window.print();
+    });
+
+    window.addEventListener('afterprint', () => {
+      rot.classList.remove('print-fasit');
+    });
+
+    ['kv-bokstaver', 'kv-vis-ordbank'].forEach((id) =>
+      el(id).addEventListener('change', () => {
+        if (sisteResultat) tegnArk();
+        lagreUtkast();
+      })
+    );
+
+    el('kv-tittel').addEventListener('input', () => {
+      if (sisteResultat) {
+        el('kv-overskrift').textContent =
+          el<HTMLInputElement>('kv-tittel').value.trim() || standardTittel;
+      }
+      lagreUtkast();
+    });
+  }
+</script>

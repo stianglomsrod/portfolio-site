@@ -414,8 +414,10 @@ const t =
 
   /* ---- Arket: alltid hvitt papir, uavhengig av tema ---- */
   .kv-ark {
-    /* --kv-celle settes av genereringen ut fra rutenettets størrelse */
-    --kv-celle: 34px;
+    /* Genereringen setter --kv-celle-skjerm/-print inline; kartleggingen
+       til --kv-celle skjer HER så print-regelen kan vinne (inline
+       --kv-celle ville overstyrt @media print) */
+    --kv-celle: var(--kv-celle-skjerm, 34px);
     --kv-strek: 2px;
     background: #fff;
     color: #111;
@@ -481,9 +483,15 @@ const t =
     color: #111;
   }
 
-  /* Rutenettet: bare ordrutene tegnes (skjelett-kryssord) */
+  /* Rutenettet: bare ordrutene tegnes (skjelett-kryssord).
+     VIKTIG: border-collapse: separate, IKKE collapse — Chromium mister
+     kollapsede tabellkanter i utskrift når cellene har position:
+     relative (som nummer-hjørnet trenger). Hver rute eier derfor høyre/
+     bunn-kanten sin, og topp/venstre legges på med klasser der naboen
+     mangler (kv-kant-topp/kv-kant-venstre, regnes ut ved tegning). */
   #kv-rutenett {
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     margin: 0 auto;
   }
 
@@ -496,8 +504,17 @@ const t =
   }
 
   #kv-rutenett td.kv-rute {
-    border: var(--kv-strek) solid #333;
+    border-right: var(--kv-strek) solid #333;
+    border-bottom: var(--kv-strek) solid #333;
     background: #fff;
+  }
+
+  #kv-rutenett td.kv-rute.kv-kant-topp {
+    border-top: var(--kv-strek) solid #333;
+  }
+
+  #kv-rutenett td.kv-rute.kv-kant-venstre {
+    border-left: var(--kv-strek) solid #333;
   }
 
   .kv-nr {
@@ -617,7 +634,6 @@ const t =
     }
 
     .kv-ark {
-      /* --kv-celle-print settes av genereringen (mm) */
       --kv-celle: var(--kv-celle-print, 9mm);
       --kv-strek: 0.5mm;
       border: none;
@@ -937,7 +953,7 @@ const t =
       const ark = el('kv-ark');
       const skjerm = Math.max(18, Math.min(36, Math.floor(592 / kolonner), Math.floor(560 / rader)));
       const print = Math.max(5.5, Math.min(10, Math.floor((182 / kolonner) * 10) / 10, Math.floor((175 / rader) * 10) / 10));
-      ark.style.setProperty('--kv-celle', `${skjerm}px`);
+      ark.style.setProperty('--kv-celle-skjerm', `${skjerm}px`);
       ark.style.setProperty('--kv-celle-print', `${print}mm`);
     }
 
@@ -986,6 +1002,10 @@ const t =
           const td = document.createElement('td');
           if (bokstav) {
             td.className = 'kv-rute';
+            // Kant-eierskap (jf. CSS-kommentaren): topp/venstre bare der
+            // naboruta mangler
+            if (r === 0 || !rutenett[r - 1][k]) td.classList.add('kv-kant-topp');
+            if (k === 0 || !rad[k - 1]) td.classList.add('kv-kant-venstre');
             const nummer = numre.get(`${r},${k}`);
             if (nummer) {
               const nr = document.createElement('span');

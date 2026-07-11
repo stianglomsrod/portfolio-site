@@ -6,6 +6,29 @@
 
 ## Changelog
 
+### 2026-07-11 (kveld) — Print-fiks for Kryssord: kantene forsvant i utskrift
+- **Stians funn i prod**: utskriftsforhåndsvisningen viste rutenettet
+  nesten uten kantlinjer (bare spredte streker), mens skjermen var
+  korrekt. To feil rettet i KryssordVerktoy:
+  (1) `border-collapse: collapse` byttet til `separate` + border-spacing
+  0 — hver rute eier høyre/bunn-kanten, topp/venstre legges på med
+  klasser (kv-kant-topp/-venstre) der naboruta mangler. Chromiums
+  print-pipeline mister kollapsede tabellkanter når cellene har
+  position: relative (som nummer-hjørnet krever).
+  (2) rutestørrelsen ble satt inline som `--kv-celle` og overstyrte
+  dermed print-regelen i mm — nå settes `--kv-celle-skjerm`/`-print`
+  inline og kartlegges til `--kv-celle` i CSS-en, så @media print vinner.
+- **Verifisering uten pdftoppm** (`kryssord-print-verifisering.mjs`):
+  PDF-ens innholdsstrøm inflateres og parses geometrisk — mørke, tynne
+  fylte rektangler er kantstripene. Elev OG fasit: 63 vannrette
+  (Σ 2403pt) + 50 loddrette (Σ 1894pt), godt over kravet på 1021pt per
+  retning for 45 ruter à 10mm. Print-emulert skjermbilde bekrefter
+  layouten. LÆRDOM: sideantall i PDF er IKKE print-verifisering —
+  mål kantverket geometrisk, og A/B-testen viste at også kollapsede
+  kanter legger tegneoperasjoner (bortfallet skjer i malingen), så
+  positiv geometri-måling er den pålitelige sjekken.
+- QA: bygg grønt, UI-suite 22/22, axe 0/22, kant 0/22.
+
 ### 2026-07-11 — Nytt lærerverktøy: Kryssord (skjelett-kryssord)
 - **Kryssord** (/sandbox/kryssord, EN: /en/sandbox/crossword): læreren
   skriver ord med ledetrådtekst OG/ELLER bilde (minst én per ord, valgt

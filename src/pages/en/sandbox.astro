@@ -47,6 +47,16 @@ import HueVelger from '../../components/HueVelger.astro';
       <span class="eks-cta">make a sheet <span class="pil" aria-hidden="true">→</span></span>
     </a>
 
+    <a class="eksperiment" href="/en/sandbox/word-bingo">
+      <span class="eks-tag">Tool</span>
+      <span class="eks-tittel">Word bingo</span>
+      <span class="eks-tekst">
+        Unique printable bingo boards for the whole class: pick a board
+        size and a count. Optional pictures and calling slips.
+      </span>
+      <span class="eks-cta">make boards <span class="pil" aria-hidden="true">→</span></span>
+    </a>
+
     <div class="full-rad">
       <HueVelger lang="en" />
     </div>
@@ -77,7 +87,7 @@ import HueVelger from '../../components/HueVelger.astro';
   /* Delt spor-regel: se den norske tvillingen. Håndheves av kant-sjekk. */
   .eks-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--s-3);
     margin-top: var(--s-5);
   }

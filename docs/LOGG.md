@@ -6,6 +6,26 @@
 
 ## Changelog
 
+### 2026-07-11 — Nytt lærerverktøy: Ordbingo
+- **Ordbingo** (/sandbox/ordbingo, EN: /en/sandbox/word-bingo): læreren
+  skriver ordlista (samme rad-UI som søsknene: bilde per ord via knapp
+  eller Ctrl+V, bannordfilter, utkast i localStorage uten bilder), velger
+  brettstørrelse (3×3/4×4) og antall (1–40), og verktøyet trekker unike
+  brett — helst ulike ORDSETT, ved få ord godtas ulik plassering (to
+  nivåer i `src/lib/bingo.ts`, DOM-fri). Duplikatord fjernes før trekking
+  (ville gitt dobbeltruter). Utskrift: to brett per A4-side med stiplet
+  klippelinje mellom (brett brytes aldri over sider), og valgfrie
+  trekkelapper på egen side til å klippe opp. Compliance-porten kjørt
+  først: 🟢 (rad 18 i compliance_register.md — klientside, ingen data ut).
+- **Sandbox-gridet er nå to spor** (fire kort i to hele rader + modul på
+  full rad) — tre spor ville latt fjerdekortet stå alene mot kant-sjekken.
+- QA: bygg grønt, axe 0/20, kant 0/20 (begge vaktene kan de to nye
+  rutene), funksjonell Playwright-suite 20/20 grønn
+  (`_baseline/qa/bingo-test.mjs`): unikhet på sett OG plassering,
+  dublett-, bannord- og for-få-ord-flyt, simulert bilde-paste helt ut i
+  rute og trekkelapp, PDF-sideantall verifisert med page.pdf() i mørkt
+  tema (2 brett/side + lappeside), utkast over reload.
+
 ### 2026-07-11 — Dokumentavvik rettet: main er produksjonsgrenen overalt
 - CLAUDE.md og docs/HANDOVER-PROMPT.md sa fortsatt at arbeidet skjer på
   gren v3 og at main var den gamle live-siden — to dager etter at v3 gikk

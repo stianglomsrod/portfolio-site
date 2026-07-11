@@ -47,6 +47,16 @@ import HueVelger from '../components/HueVelger.astro';
       <span class="eks-cta">lag et ark <span class="pil" aria-hidden="true">→</span></span>
     </a>
 
+    <a class="eksperiment" href="/sandbox/ordbingo">
+      <span class="eks-tag">Verktøy</span>
+      <span class="eks-tittel">Ordbingo</span>
+      <span class="eks-tekst">
+        Unike bingobrett til hele klassen, til utskrift: velg brettstørrelse
+        og antall. Valgfrie bilder og trekkelapper.
+      </span>
+      <span class="eks-cta">lag brett <span class="pil" aria-hidden="true">→</span></span>
+    </a>
+
     <div class="full-rad">
       <HueVelger lang="nb" />
     </div>
@@ -74,14 +84,14 @@ import HueVelger from '../components/HueVelger.astro';
     max-width: 68ch;
   }
 
-  /* Delt spor-regel: tre spor som kortene fyller helt, og modulen spenner
-     hele raden — alle høyrekanter deler dermed samme kant. (auto-fit
-     fungerte ikke her: raden med full-rad-elementet holdt et tomt spor
-     i live, så kortene stoppet før kanten.) Håndheves av
+  /* Delt spor-regel: to spor som de fire kortene fyller i to hele rader,
+     og modulen spenner hele raden — alle høyrekanter deler dermed samme
+     kant. (auto-fit fungerte ikke her: raden med full-rad-elementet holdt
+     et tomt spor i live, så kortene stoppet før kanten.) Håndheves av
      _baseline/qa/kant-sjekk.mjs. */
   .eks-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--s-3);
     margin-top: var(--s-5);
   }

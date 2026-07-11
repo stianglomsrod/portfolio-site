@@ -1,0 +1,988 @@
+---
+/* Ordbingo-verktøyet: læreren skriver inn ordlista, verktøyet trekker N
+   unike bingobrett for utskrift (to brett per side, klippelinje mellom)
+   og valgfrie trekkelapper til å klippe opp. Samme lest som Ordkryss/
+   Silhuetter: oppsett i venstremargen, hvitt ark til høyre — arket ER
+   utskriften. Trekkingen bor i src/lib/bingo.ts; bannordfilteret deles
+   med Ordkryss (src/lib/ordkryss-kjerne.ts). */
+
+interface Props {
+  lang?: 'nb' | 'en';
+}
+
+const { lang = 'nb' } = Astro.props;
+
+const t =
+  lang === 'nb'
+    ? {
+        tittelFelt: 'Tittel på brettene',
+        tittelEks: 'Skriv tittelen her',
+        ordNavn: 'Ordene det spilles med',
+        ordEks: 'skriv et ord',
+        leggTil: '+ Legg til ord',
+        bildeHint: 'Bilde ved ordet er valgfritt og blir med på utskriften. Tips: kopier et bilde (høyreklikk → «Kopier bilde») og lim det inn i ordfeltet med Ctrl + V.',
+        storrelse: 'Brettstørrelse',
+        antall: 'Antall brett (ett per elev)',
+        visLapper: 'Ta med trekkelapper til å klippe opp',
+        lag: 'Lag bingobrett',
+        skrivUt: 'Skriv ut',
+        navnLinje: 'Navn: ____________________',
+        lapperTittel: 'Trekkelapper — klipp opp og trekk fra en boks',
+        standardTittel: 'Ordbingo',
+      }
+    : {
+        tittelFelt: 'Board title',
+        tittelEks: 'Type the title here',
+        ordNavn: 'Words to play with',
+        ordEks: 'type a word',
+        leggTil: '+ Add word',
+        bildeHint: 'A picture per word is optional and prints with the boards. Tip: copy a picture (right-click → “Copy image”) and paste it into the word field with Ctrl + V.',
+        storrelse: 'Board size',
+        antall: 'Number of boards (one per pupil)',
+        visLapper: 'Include calling slips to cut up',
+        lag: 'Create bingo boards',
+        skrivUt: 'Print',
+        navnLinje: 'Name: ____________________',
+        lapperTittel: 'Calling slips — cut up and draw from a box',
+        standardTittel: 'Word bingo',
+      };
+---
+
+<div class="bi-verktoy" data-lang={lang} data-standardtittel={t.standardTittel}>
+  <div class="bi-oppsett">
+    <section class="bi-panel" aria-labelledby="bi-panel-tittel">
+      <h2 id="bi-panel-tittel" class="sr-only">{lang === 'nb' ? 'Oppsett' : 'Setup'}</h2>
+
+      <label class="bi-felt">
+        <span class="bi-felt-navn">{t.tittelFelt}</span>
+        <input type="text" id="bi-tittel" placeholder={t.tittelEks} maxlength="40" />
+      </label>
+
+      <div class="bi-felt">
+        <span class="bi-felt-navn" id="bi-ord-navn">{t.ordNavn}</span>
+        <ul id="bi-ord-liste" aria-labelledby="bi-ord-navn"></ul>
+        <button type="button" id="bi-legg-til" class="bi-sekundaer">{t.leggTil}</button>
+        <p class="bi-hint">{t.bildeHint}</p>
+      </div>
+
+      <label class="bi-felt">
+        <span class="bi-felt-navn">{t.storrelse}</span>
+        <select id="bi-storrelse">
+          <option value="3">3 × 3 (9 {lang === 'nb' ? 'ruter' : 'squares'})</option>
+          <option value="4" selected>4 × 4 (16 {lang === 'nb' ? 'ruter' : 'squares'})</option>
+        </select>
+      </label>
+
+      <label class="bi-felt">
+        <span class="bi-felt-navn">{t.antall}</span>
+        <input type="number" id="bi-antall" min="1" max="40" value="10" inputmode="numeric" />
+      </label>
+
+      <label class="bi-valg">
+        <input type="checkbox" id="bi-vis-lapper" checked />
+        {t.visLapper}
+      </label>
+
+      <button type="button" id="bi-lag" class="knapp bi-primaer">{t.lag}</button>
+      <p id="bi-status" class="bi-status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="bi-visning" id="bi-ark-seksjon" hidden aria-labelledby="bi-visning-tittel">
+      <h2 id="bi-visning-tittel" class="sr-only">
+        {lang === 'nb' ? 'Forhåndsvisning' : 'Preview'}
+      </h2>
+      <div class="bi-handlinger">
+        <button type="button" id="bi-skriv-ut" class="knapp bi-primaer">{t.skrivUt}</button>
+      </div>
+
+      <div class="bi-sticky-print">
+        <button type="button" id="bi-skriv-ut-sticky" class="bi-sticky-knapp" title="Skriv ut brettene (Ctrl+P)" aria-label={t.skrivUt}>
+          🖨
+        </button>
+      </div>
+
+      <div class="bi-ark" id="bi-ark">
+        <div id="bi-brettliste" class="bi-brettliste"></div>
+        <section class="bi-lapper" id="bi-lapper" hidden>
+          <p class="bi-lapper-tittel">{t.lapperTittel}</p>
+          <div class="bi-lapp-grid" id="bi-lapp-grid"></div>
+        </section>
+      </div>
+    </section>
+  </div>
+</div>
+
+<style is:global>
+  /* Skjerm: verktøyet følger sidens tokens; arket er alltid hvit «papir». */
+  .bi-oppsett {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: var(--s-5);
+    align-items: start;
+    margin-top: var(--s-4);
+  }
+
+  @media (max-width: 900px) {
+    .bi-oppsett {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .bi-panel {
+    background: var(--flate);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: var(--s-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .bi-felt {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .bi-felt-navn {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--tekst);
+  }
+
+  .bi-panel input[type='text'],
+  .bi-panel input[type='number'],
+  .bi-panel select {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    padding: 9px 10px;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--tekst);
+    min-height: 44px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .bi-valg {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    min-height: 32px;
+    color: var(--tekst);
+  }
+
+  .bi-valg input {
+    width: 19px;
+    height: 19px;
+    accent-color: var(--salvie);
+    flex-shrink: 0;
+  }
+
+  /* Beroringsskjerm: hele valg-etiketten skal vaere et trygt maal */
+  @media (pointer: coarse) {
+    .bi-valg {
+      min-height: 44px;
+    }
+  }
+
+  .bi-hint {
+    margin: 2px 0 0;
+    font-size: 13.5px;
+    color: var(--dempet);
+  }
+
+  #bi-ord-liste {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .bi-ord-rad {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .bi-ord-rad input[type='text'] {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .bi-ord-rad.upassende input[type='text'] {
+    border-color: var(--feil);
+  }
+
+  .bi-ikonknapp {
+    font: inherit;
+    min-width: 44px;
+    min-height: 44px;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--tekst);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    flex-shrink: 0;
+  }
+
+  .bi-ikonknapp:hover {
+    border-color: var(--salvie);
+  }
+
+  .bi-mini-bilde {
+    width: 36px;
+    height: 36px;
+    object-fit: cover;
+    border-radius: 6px;
+  }
+
+  /* Fjern-bilde-badgen — samme mønster som i Ordkryss/Silhuetter */
+  .bi-bilde-holder {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+  }
+
+  .bi-fjern-bilde {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid var(--linje);
+    border-radius: 50%;
+    background: var(--flate-2);
+    color: var(--tekst);
+    font: 700 11px var(--font-hd);
+    line-height: 1;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    z-index: 1;
+  }
+
+  .bi-fjern-bilde:hover {
+    color: var(--feil);
+    border-color: var(--feil);
+  }
+
+  .bi-fjern-bilde:focus-visible {
+    outline: 2px solid var(--salvie);
+    outline-offset: 1px;
+  }
+
+  .bi-primaer {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 700;
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    border: none;
+    border-radius: 9px;
+    padding: 11px 20px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .bi-primaer:hover {
+    filter: brightness(1.06);
+  }
+
+  .bi-sekundaer {
+    font-family: var(--font-sans);
+    font-size: 14.5px;
+    font-weight: 600;
+    background: var(--bg);
+    color: var(--tekst);
+    border: 1px solid var(--linje);
+    border-radius: 9px;
+    padding: 10px 16px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .bi-sekundaer:hover {
+    border-color: var(--salvie);
+  }
+
+  .bi-sekundaer:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  .bi-status {
+    margin: 0;
+    font-size: 14.5px;
+    color: var(--dempet);
+    min-height: 1.4em;
+  }
+
+  .bi-status.feil {
+    color: var(--feil);
+  }
+
+  .bi-handlinger {
+    display: flex;
+    gap: var(--s-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--s-3);
+  }
+
+  /* Flytende print-knapp når arket er langt */
+  .bi-sticky-print {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 15;
+  }
+
+  .bi-sticky-knapp {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 1px solid var(--linje);
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: var(--kort-skygge);
+    display: grid;
+    place-items: center;
+  }
+
+  .bi-sticky-knapp:hover {
+    filter: brightness(1.06);
+  }
+
+  /* ---- Arket: alltid hvitt papir, uavhengig av tema ---- */
+  .bi-ark {
+    background: #fff;
+    color: #111;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: 28px 32px;
+    max-width: 660px;
+  }
+
+  .bi-brettliste {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .bi-brett-hode {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+
+  .bi-brett-tittel {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #111;
+  }
+
+  .bi-navn {
+    margin: 0;
+    font-size: 13.5px;
+    color: #333;
+    white-space: nowrap;
+  }
+
+  /* Rutenettet: cellene deler kantstrek — rammer på topp/venstre av
+     nettet, høyre/bunn av hver celle. Radhøyden og skriften styres av
+     brettstørrelsen (data-s). */
+  .bi-rutenett {
+    display: grid;
+    border-top: var(--bi-strek, 2px) solid #333;
+    border-left: var(--bi-strek, 2px) solid #333;
+  }
+
+  .bi-rutenett[data-s='3'] {
+    grid-template-columns: repeat(3, 1fr);
+    --bi-celle: 96px;
+    --bi-skrift: 19px;
+  }
+
+  .bi-rutenett[data-s='4'] {
+    grid-template-columns: repeat(4, 1fr);
+    --bi-celle: 72px;
+    --bi-skrift: 16px;
+  }
+
+  .bi-celle {
+    box-sizing: border-box;
+    min-height: var(--bi-celle);
+    border-right: var(--bi-strek, 2px) solid #333;
+    border-bottom: var(--bi-strek, 2px) solid #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 6px;
+    text-align: center;
+    font-size: var(--bi-skrift);
+    line-height: 1.2;
+    overflow-wrap: break-word;
+    min-width: 0;
+    color: #111;
+  }
+
+  .bi-celle-bilde {
+    width: auto;
+    max-width: 90%;
+    height: calc(var(--bi-celle) * 0.52);
+    object-fit: contain;
+  }
+
+  .bi-celle.har-bilde {
+    font-size: calc(var(--bi-skrift) * 0.82);
+  }
+
+  /* Trekkelappene: stiplet kant = klippelinje */
+  .bi-lapper {
+    margin-top: 32px;
+  }
+
+  .bi-lapper-tittel {
+    margin: 0 0 10px;
+    font-size: 14.5px;
+    font-weight: 700;
+    color: #111;
+  }
+
+  .bi-lapp-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+  }
+
+  .bi-lapp {
+    border: 1.5px dashed #666;
+    margin: -0.75px;
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px;
+    font-size: 16px;
+    text-align: center;
+    overflow-wrap: break-word;
+    min-width: 0;
+    color: #111;
+  }
+
+  .bi-lapp-bilde {
+    width: auto;
+    max-width: 40%;
+    height: 34px;
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+
+  /* ---- Utskrift: kun arket, alltid lyst ---- */
+  @media print {
+    @page {
+      margin: 14mm;
+    }
+
+    /* Lys utskrift uansett tema: color-scheme dark får ellers Chrome til
+       å male hele arket mørkt i print */
+    html,
+    body {
+      color-scheme: light;
+      background: #fff !important;
+      color: #000;
+    }
+
+    /* Skjul alt UI-krom — men ALDRI .ramme (main): den er arkets
+       forelder, og skjules den, printes en tom side */
+    .topp,
+    .bunn,
+    .hopp,
+    .bi-panel,
+    .bi-handlinger,
+    .bi-side-hode,
+    .bi-sticky-print {
+      display: none !important;
+    }
+
+    .ramme {
+      padding: 0;
+      max-width: none;
+      min-height: 0;
+      background: #fff;
+    }
+
+    .bi-oppsett {
+      display: block;
+      margin: 0;
+    }
+
+    .bi-ark {
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 0;
+      max-width: none;
+    }
+
+    .bi-brettliste {
+      display: block;
+    }
+
+    /* To brett per side: klippelinje mellom parene, sideskift etter
+       hvert par. Brettet brytes aldri over sider. */
+    .bi-brett {
+      break-inside: avoid;
+    }
+
+    .bi-brett + .bi-brett {
+      margin-top: 10mm;
+      padding-top: 9mm;
+      border-top: 0.4mm dashed #666;
+    }
+
+    .bi-brett:nth-child(even) {
+      break-after: page;
+    }
+
+    /* Brettet som åpner en ny side skal ikke dra med seg klippelinja */
+    .bi-brett:nth-child(even) + .bi-brett {
+      border-top: none;
+      margin-top: 0;
+      padding-top: 0;
+    }
+
+    .bi-rutenett {
+      --bi-strek: 0.5mm;
+    }
+
+    .bi-rutenett[data-s='3'] {
+      --bi-celle: 32mm;
+      --bi-skrift: 15pt;
+    }
+
+    .bi-rutenett[data-s='4'] {
+      --bi-celle: 24mm;
+      --bi-skrift: 12pt;
+    }
+
+    .bi-celle-bilde,
+    .bi-lapp-bilde {
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+
+    .bi-lapper {
+      break-before: page;
+      margin-top: 0;
+    }
+
+    .bi-lapp {
+      min-height: 18mm;
+      border-width: 0.4mm;
+    }
+
+    .bi-lapp-bilde {
+      height: 12mm;
+    }
+  }
+</style>
+
+<script>
+  import { lagBingoBrett } from '../lib/bingo';
+  import { ordErUpassende } from '../lib/ordkryss-kjerne';
+
+  const rot = document.querySelector<HTMLElement>('.bi-verktoy');
+  if (rot) {
+    const lang = (rot.dataset.lang ?? 'nb') as 'nb' | 'en';
+    const standardTittel = rot.dataset.standardtittel ?? 'Ordbingo';
+    const LAGRINGSNOKKEL = `ordbingo-${lang}`;
+    const MAKS_ORD = 30;
+
+    const M =
+      lang === 'nb'
+        ? {
+            forFaa: (s: number, trengs: number, har: number) =>
+              `Bingo ${s} × ${s} trenger minst ${trengs} ulike ord — du har ${har}. Legg til flere ord eller velg mindre brett.`,
+            upassende: (o: string) =>
+              `«${o}» passer ikke på et skoleark. Bytt ut ordet, så lager vi brettene.`,
+            fikkIkke: 'Fikk ikke laget nok ulike brett — legg til flere ord.',
+            klart: (brett: number, s: number, sider: number) =>
+              `${brett} brett er klare (${s} × ${s}). Utskriften blir ${sider} ${sider === 1 ? 'side' : 'sider'}.`,
+            ordAria: (i: number) => `Ord ${i}`,
+            byttBilde: (i: number) => `Bytt bilde for ord ${i}`,
+            leggBilde: (i: number) => `Legg til bilde for ord ${i}`,
+            fjernBilde: (i: number) => `Fjern bildet for ord ${i}`,
+            fjernOrd: (i: number) => `Fjern ord ${i}`,
+            ordEks: 'skriv et ord',
+            brettAria: (i: number) => `Bingobrett ${i}`,
+            navnLinje: 'Navn: ____________________',
+          }
+        : {
+            forFaa: (s: number, trengs: number, har: number) =>
+              `Bingo ${s} × ${s} needs at least ${trengs} different words — you have ${har}. Add more words or pick a smaller board.`,
+            upassende: (o: string) =>
+              `“${o}” does not belong on a school sheet. Swap the word and we will make the boards.`,
+            fikkIkke: 'Could not make enough different boards — add more words.',
+            klart: (brett: number, s: number, sider: number) =>
+              `${brett} boards are ready (${s} × ${s}). The printout is ${sider} ${sider === 1 ? 'page' : 'pages'}.`,
+            ordAria: (i: number) => `Word ${i}`,
+            byttBilde: (i: number) => `Change picture for word ${i}`,
+            leggBilde: (i: number) => `Add picture for word ${i}`,
+            fjernBilde: (i: number) => `Remove the picture for word ${i}`,
+            fjernOrd: (i: number) => `Remove word ${i}`,
+            ordEks: 'type a word',
+            brettAria: (i: number) => `Bingo board ${i}`,
+            navnLinje: 'Name: ____________________',
+          };
+
+    interface OrdRad {
+      id: number;
+      tekst: string;
+      bilde: string | null;
+    }
+
+    let ordListe: OrdRad[] = [];
+    let nesteId = 1;
+
+    const el = <T extends HTMLElement = HTMLElement>(id: string): T =>
+      document.getElementById(id) as T;
+
+    function lagreUtkast() {
+      try {
+        localStorage.setItem(
+          LAGRINGSNOKKEL,
+          JSON.stringify({
+            tittel: el<HTMLInputElement>('bi-tittel').value,
+            storrelse: el<HTMLSelectElement>('bi-storrelse').value,
+            antall: el<HTMLInputElement>('bi-antall').value,
+            visLapper: el<HTMLInputElement>('bi-vis-lapper').checked,
+            ord: ordListe.map((o) => o.tekst),
+          })
+        );
+      } catch {}
+    }
+
+    function lastUtkast(): boolean {
+      try {
+        const raa = localStorage.getItem(LAGRINGSNOKKEL);
+        if (!raa) return false;
+        const u = JSON.parse(raa);
+        el<HTMLInputElement>('bi-tittel').value = u.tittel ?? '';
+        if (u.storrelse === '3' || u.storrelse === '4') {
+          el<HTMLSelectElement>('bi-storrelse').value = u.storrelse;
+        }
+        const antall = parseInt(u.antall, 10);
+        if (antall >= 1 && antall <= 40) {
+          el<HTMLInputElement>('bi-antall').value = String(antall);
+        }
+        el<HTMLInputElement>('bi-vis-lapper').checked = u.visLapper !== false;
+        // Tåler utkast fra andre versjoner: strenger eller {tekst, bilde}
+        (u.ord ?? []).forEach((o: unknown) => {
+          const tekst =
+            typeof o === 'string'
+              ? o
+              : typeof (o as Record<string, unknown>)?.tekst === 'string'
+                ? ((o as Record<string, unknown>).tekst as string)
+                : '';
+          ordListe.push({ id: nesteId++, tekst, bilde: null });
+        });
+        return ordListe.length > 0;
+      } catch {
+        return false;
+      }
+    }
+
+    function leggTilOrd(tekst = '') {
+      if (ordListe.length >= MAKS_ORD) return;
+      ordListe.push({ id: nesteId++, tekst, bilde: null });
+      tegnOrdListe();
+    }
+
+    function tegnOrdListe() {
+      const liste = el('bi-ord-liste');
+      liste.replaceChildren();
+
+      ordListe.forEach((ord, indeks) => {
+        const rad = document.createElement('li');
+        rad.className = 'bi-ord-rad';
+
+        const felt = document.createElement('input');
+        felt.type = 'text';
+        felt.value = ord.tekst.slice(0, 18);
+        felt.maxLength = 18;
+        felt.setAttribute('aria-label', M.ordAria(indeks + 1));
+        felt.placeholder = M.ordEks;
+        felt.addEventListener('input', () => {
+          ord.tekst = felt.value;
+          const stygt = ordErUpassende(felt.value);
+          rad.classList.toggle('upassende', stygt);
+          felt.setAttribute('aria-invalid', stygt ? 'true' : 'false');
+          lagreUtkast();
+        });
+        if (ordErUpassende(ord.tekst)) rad.classList.add('upassende');
+
+        // Lim inn bilde rett i ordfeltet: både «Kopier bilde» fra nettet
+        // (clipboardData.items) og kopierte bildefiler fra filutforskeren
+        // (clipboardData.files). Vanlig tekst-liming går sin gang.
+        felt.addEventListener('paste', (e) => {
+          const data = e.clipboardData;
+          if (!data) return;
+          const fraItems = [...data.items]
+            .find((i) => i.type.startsWith('image/'))
+            ?.getAsFile();
+          const fraFiler = [...data.files].find((f) => f.type.startsWith('image/'));
+          const fil = fraItems ?? fraFiler;
+          if (!fil) return;
+          e.preventDefault();
+          const leser = new FileReader();
+          leser.onload = () => {
+            ord.bilde = String(leser.result);
+            tegnOrdListe();
+            lagreUtkast();
+          };
+          leser.readAsDataURL(fil);
+        });
+
+        const bildeKnapp = document.createElement('button');
+        bildeKnapp.type = 'button';
+        bildeKnapp.className = 'bi-ikonknapp';
+        bildeKnapp.setAttribute(
+          'aria-label',
+          ord.bilde ? M.byttBilde(indeks + 1) : M.leggBilde(indeks + 1)
+        );
+
+        if (ord.bilde) {
+          const mini = document.createElement('img');
+          mini.src = ord.bilde;
+          mini.alt = '';
+          mini.className = 'bi-mini-bilde';
+          bildeKnapp.appendChild(mini);
+        } else {
+          bildeKnapp.textContent = '🖼';
+        }
+
+        const filFelt = document.createElement('input');
+        filFelt.type = 'file';
+        filFelt.accept = 'image/*';
+        filFelt.hidden = true;
+        filFelt.addEventListener('change', () => {
+          const fil = filFelt.files?.[0];
+          if (!fil) return;
+          const leser = new FileReader();
+          leser.onload = () => {
+            ord.bilde = String(leser.result);
+            tegnOrdListe();
+          };
+          leser.readAsDataURL(fil);
+        });
+        bildeKnapp.addEventListener('click', () => filFelt.click());
+
+        // Bildet kan fjernes for seg (uten å slette ordet)
+        const bildeHolder = document.createElement('span');
+        bildeHolder.className = 'bi-bilde-holder';
+        bildeHolder.appendChild(bildeKnapp);
+        if (ord.bilde) {
+          const fjernBilde = document.createElement('button');
+          fjernBilde.type = 'button';
+          fjernBilde.className = 'bi-fjern-bilde';
+          fjernBilde.textContent = '✕';
+          fjernBilde.setAttribute('aria-label', M.fjernBilde(indeks + 1));
+          fjernBilde.addEventListener('click', () => {
+            ord.bilde = null;
+            tegnOrdListe();
+            lagreUtkast();
+          });
+          bildeHolder.appendChild(fjernBilde);
+        }
+
+        const fjern = document.createElement('button');
+        fjern.type = 'button';
+        fjern.className = 'bi-ikonknapp';
+        fjern.textContent = '✕';
+        fjern.setAttribute('aria-label', M.fjernOrd(indeks + 1));
+        fjern.addEventListener('click', () => {
+          ordListe = ordListe.filter((o) => o.id !== ord.id);
+          if (ordListe.length === 0) leggTilOrd();
+          tegnOrdListe();
+          lagreUtkast();
+        });
+
+        rad.append(felt, bildeHolder, filFelt, fjern);
+        liste.appendChild(rad);
+      });
+
+      el<HTMLButtonElement>('bi-legg-til').disabled = ordListe.length >= MAKS_ORD;
+    }
+
+    function siStatus(tekst: string, erFeil = false) {
+      const status = el('bi-status');
+      status.textContent = tekst;
+      status.classList.toggle('feil', erFeil);
+    }
+
+    function generer() {
+      const rene = ordListe
+        .map((o) => ({ ...o, tekst: o.tekst.trim() }))
+        .filter((o) => o.tekst.length > 0);
+
+      for (const o of rene) {
+        if (ordErUpassende(o.tekst)) {
+          siStatus(M.upassende(o.tekst), true);
+          return;
+        }
+      }
+
+      // Duplikater fjernes (samme ord to ganger ville gitt brett med
+      // dobbeltruter); bildet følger første forekomst av ordet
+      const sett = new Set<string>();
+      const unike: OrdRad[] = [];
+      for (const o of rene) {
+        const nokkel = o.tekst.toLowerCase();
+        if (sett.has(nokkel)) continue;
+        sett.add(nokkel);
+        unike.push(o);
+      }
+
+      const sideLengde = parseInt(el<HTMLSelectElement>('bi-storrelse').value, 10);
+      const trengs = sideLengde * sideLengde;
+      if (unike.length < trengs) {
+        siStatus(M.forFaa(sideLengde, trengs, unike.length), true);
+        return;
+      }
+
+      const antallFelt = el<HTMLInputElement>('bi-antall');
+      const antallBrett = Math.min(40, Math.max(1, parseInt(antallFelt.value, 10) || 1));
+      antallFelt.value = String(antallBrett);
+
+      const resultat = lagBingoBrett({
+        ord: unike.map((o) => o.tekst),
+        sideLengde,
+        antallBrett,
+      });
+      if ('feil' in resultat) {
+        siStatus(resultat.feil === 'for-faa-ord' ? M.forFaa(sideLengde, trengs, unike.length) : M.fikkIkke, true);
+        return;
+      }
+
+      const tittel =
+        el<HTMLInputElement>('bi-tittel').value.trim() || standardTittel;
+      const bilder = new Map(unike.map((o) => [o.tekst.toLowerCase(), o.bilde]));
+
+      // Brettene
+      const liste = el('bi-brettliste');
+      liste.replaceChildren();
+      resultat.brett.forEach((rader, indeks) => {
+        const brett = document.createElement('section');
+        brett.className = 'bi-brett';
+        brett.setAttribute('aria-label', M.brettAria(indeks + 1));
+
+        const hode = document.createElement('div');
+        hode.className = 'bi-brett-hode';
+        const tittelEl = document.createElement('p');
+        tittelEl.className = 'bi-brett-tittel';
+        tittelEl.textContent = tittel;
+        const navn = document.createElement('p');
+        navn.className = 'bi-navn';
+        navn.textContent = M.navnLinje;
+        hode.append(tittelEl, navn);
+
+        const rutenett = document.createElement('div');
+        rutenett.className = 'bi-rutenett';
+        rutenett.setAttribute('data-s', String(sideLengde));
+        rader.flat().forEach((ord) => {
+          const celle = document.createElement('div');
+          celle.className = 'bi-celle';
+          const bilde = bilder.get(ord.toLowerCase());
+          if (bilde) {
+            celle.classList.add('har-bilde');
+            const img = document.createElement('img');
+            img.src = bilde;
+            img.alt = '';
+            img.className = 'bi-celle-bilde';
+            celle.appendChild(img);
+          }
+          const tekst = document.createElement('span');
+          tekst.textContent = ord;
+          celle.appendChild(tekst);
+          rutenett.appendChild(celle);
+        });
+
+        brett.append(hode, rutenett);
+        liste.appendChild(brett);
+      });
+
+      // Trekkelappene: alle ordene i stokket rekkefølge, på egen side
+      const visLapper = el<HTMLInputElement>('bi-vis-lapper').checked;
+      const lapper = el('bi-lapper');
+      lapper.hidden = !visLapper;
+      if (visLapper) {
+        const grid = el('bi-lapp-grid');
+        grid.replaceChildren();
+        unike.forEach((o) => {
+          const lapp = document.createElement('div');
+          lapp.className = 'bi-lapp';
+          if (o.bilde) {
+            const img = document.createElement('img');
+            img.src = o.bilde;
+            img.alt = '';
+            img.className = 'bi-lapp-bilde';
+            lapp.appendChild(img);
+          }
+          const tekst = document.createElement('span');
+          tekst.textContent = o.tekst;
+          lapp.appendChild(tekst);
+          grid.appendChild(lapp);
+        });
+      }
+
+      const sider = Math.ceil(resultat.brett.length / 2) + (visLapper ? 1 : 0);
+      el('bi-ark-seksjon').removeAttribute('hidden');
+      siStatus(M.klart(resultat.brett.length, sideLengde, sider));
+      lagreUtkast();
+    }
+
+    // Init
+    if (!lastUtkast()) {
+      for (let i = 0; i < 4; i++) leggTilOrd();
+    }
+    tegnOrdListe();
+
+    ['bi-tittel', 'bi-storrelse', 'bi-antall', 'bi-vis-lapper'].forEach((id) =>
+      el(id).addEventListener('change', lagreUtkast)
+    );
+
+    el('bi-legg-til').addEventListener('click', () => {
+      leggTilOrd();
+      lagreUtkast();
+    });
+
+    el('bi-lag').addEventListener('click', generer);
+
+    const skrivUt = () => window.print();
+    el('bi-skriv-ut').addEventListener('click', skrivUt);
+    el('bi-skriv-ut-sticky').addEventListener('click', skrivUt);
+  }
+</script>

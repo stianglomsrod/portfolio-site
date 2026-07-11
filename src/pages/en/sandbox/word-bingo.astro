@@ -1,0 +1,48 @@
+---
+import Side from '../../../layouts/Side.astro';
+import OrdbingoVerktoy from '../../../components/OrdbingoVerktoy.astro';
+
+/* Word bingo in the sandbox: unique printable bingo boards from a word
+   list. NORSK TVILLING: src/pages/sandbox/ordbingo.astro — endre begge. */
+---
+
+<Side
+  lang="en"
+  title="Word bingo — make printable bingo boards"
+  description="Type the words to play with and get unique bingo boards for the whole class — with optional pictures and calling slips to cut up."
+>
+  <div class="bi-side-hode">
+    <p class="kicker">/sandbox · tool</p>
+    <h1>Word bingo</h1>
+    <p class="dempet">
+      Make printable bingo boards: type the words to play with, pick a board
+      size and a count, and the tool draws unique boards for the whole class
+      — two per page with a cutting line. Pictures per word and calling
+      slips are optional.
+    </p>
+  </div>
+  <OrdbingoVerktoy lang="en" />
+</Side>
+
+<style>
+  .kicker {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: var(--tekst-label);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--hue-aksent);
+    margin: var(--s-7) 0 var(--s-2);
+  }
+
+  h1 {
+    font-size: var(--tekst-tittel);
+    margin: 0 0 var(--s-3);
+  }
+
+  .dempet {
+    color: var(--dempet);
+    max-width: 68ch;
+    margin: 0;
+  }
+</style>

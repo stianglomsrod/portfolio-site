@@ -15,6 +15,7 @@ export const RUTEKART: Record<string, string> = {
   '/sandbox': '/en/sandbox',
   '/sandbox/ordkryss': '/en/sandbox/wordsearch',
   '/sandbox/silhuett': '/en/sandbox/word-shapes',
+  '/sandbox/ordbingo': '/en/sandbox/word-bingo',
   '/slik-jobber-jeg': '/en/how-i-work',
   '/om': '/en/about',
   '/kolofon': '/en/colophon',

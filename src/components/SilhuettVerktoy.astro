@@ -19,7 +19,7 @@ const t =
         ordNavn: 'Ordene elevene skal skrive',
         ordEks: 'skriv et ord',
         leggTil: '+ Legg til ord',
-        bildeHint: 'Bilde ved ordet er valgfritt og blir med på utskriften.',
+        bildeHint: 'Bilde ved ordet er valgfritt og blir med på utskriften. Tips: kopier et bilde (høyreklikk → «Kopier bilde») og lim det inn i ordfeltet med Ctrl + V.',
         visOrdbank: 'Vis ordbank øverst på arket',
         lag: 'Lag skriveark',
         skrivUt: 'Skriv ut',
@@ -34,7 +34,7 @@ const t =
         ordNavn: 'Words for the pupils to write',
         ordEks: 'type a word',
         leggTil: '+ Add word',
-        bildeHint: 'A picture per word is optional and prints with the sheet.',
+        bildeHint: 'A picture per word is optional and prints with the sheet. Tip: copy a picture (right-click → “Copy image”) and paste it into the word field with Ctrl + V.',
         visOrdbank: 'Show a word bank at the top of the sheet',
         lag: 'Create writing sheet',
         skrivUt: 'Print',
@@ -674,6 +674,28 @@ const t =
           lagreUtkast();
         });
         if (ordErUpassende(ord.tekst)) rad.classList.add('upassende');
+
+        // Lim inn bilde rett i ordfeltet: både «Kopier bilde» fra nettet
+        // (clipboardData.items) og kopierte bildefiler fra filutforskeren
+        // (clipboardData.files). Vanlig tekst-liming går sin gang.
+        felt.addEventListener('paste', (e) => {
+          const data = e.clipboardData;
+          if (!data) return;
+          const fraItems = [...data.items]
+            .find((i) => i.type.startsWith('image/'))
+            ?.getAsFile();
+          const fraFiler = [...data.files].find((f) => f.type.startsWith('image/'));
+          const fil = fraItems ?? fraFiler;
+          if (!fil) return;
+          e.preventDefault();
+          const leser = new FileReader();
+          leser.onload = () => {
+            ord.bilde = String(leser.result);
+            tegnOrdListe();
+            lagreUtkast();
+          };
+          leser.readAsDataURL(fil);
+        });
 
         const bildeKnapp = document.createElement('button');
         bildeKnapp.type = 'button';

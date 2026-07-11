@@ -37,6 +37,17 @@
 - Skjermbilder oppdatert i `docs/innsikt/spill-mobil/`; addendum i
   `docs/innsikt/SPILL-MOBIL-RAPPORT.md`. Ikke committet.
 
+### 2026-07-11 — Lim inn bilder med Ctrl+V i begge lærerverktøy
+- **Bilde-paste i ordfeltene** (Ordkryss + Silhuetter): kopier et bilde
+  på nettet (høyreklikk → «Kopier bilde») eller en bildefil i
+  filutforskeren, og lim inn med Ctrl+V i ordfeltet — bildet legger seg
+  på ordet akkurat som ved opplasting (miniatyr + fjern-badge). Leses
+  fra clipboardData.items (bitmap) OG .files (kopiert fil); vanlig
+  tekstliming kapres aldri (preventDefault kun ved bildefunn).
+  Hint-teksten under ordlista forklarer trikset på begge språk.
+- Verifisert med simulert ClipboardEvent i begge verktøy: bilde satt,
+  badge på plass, tekst-paste upåvirket. Bygg grønt, axe 0/18, kant 0/18.
+
 ### 2026-07-11 — Silhuetter: stokket ordbank + dynamisk layout (A4/A3)
 - **Ordbanken stokkes** (Fisher-Yates) ved hver generering så rekkefølgen
   aldri speiler silhuettene — eleven kan ikke skrive av ovenfra og ned.

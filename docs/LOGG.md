@@ -572,6 +572,10 @@
   alle utganger merket.
 
 **Rigg**
+- Push til main etter fullført arbeid trenger ikke eget klarsignal fra
+  Stian (hans beslutning 2026-07-11) — men ALLTID grønn QA først, og
+  push er fortsatt prod-deploy. Andre irreversible remote-operasjoner
+  krever fortsatt eksplisitt ja.
 - Commit med `git commit -F <fil>` (PS 5.1 brekker anførselstegn).
 - Datafila heter `src/data/now.json` — aldri `now.json` i rota (Vercel).
 - `vercel.json` = security-headers, må ikke overskrives.

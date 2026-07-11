@@ -47,8 +47,10 @@ den hver økt.
   repo eller klient. Ingen cookies, ingen tredjeparts-requests fra klient,
   ingen analytics.
 - Bruk av lagret legitimasjon og irreversible remote-operasjoner (branch-/tag-
-  sletting, force-push, repo-innstillinger, prod-deploy) krever eksplisitt
-  ja fra Stian i sanntid — oppdraget alene er ikke nok.
+  sletting, force-push, repo-innstillinger) krever eksplisitt ja fra Stian i
+  sanntid. **Unntak (Stians beslutning 2026-07-11): push til main etter
+  fullført arbeid trenger ikke eget klarsignal** — forutsatt grønn QA først
+  (bygg + axe + kant-sjekk, og verktøy-/spillsuiter der de er berørt).
 
 ## Rapportformat
 

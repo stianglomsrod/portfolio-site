@@ -6,6 +6,17 @@
 
 ## Changelog
 
+### 2026-07-11 — Dokumentavvik rettet: main er produksjonsgrenen overalt
+- CLAUDE.md og docs/HANDOVER-PROMPT.md sa fortsatt at arbeidet skjer på
+  gren v3 og at main var den gamle live-siden — to dager etter at v3 gikk
+  til prod og main tok over. Begge er rettet: main = produksjonsgren, push
+  = prod-deploy (krever grønn QA først), legacy-nextjs bevares, v3 er
+  historisk. CLAUDE.md peker nå på LOGG.md som kilde til sannhet for
+  tilstand, og now.json-fella (aldri i rota) er presisert der.
+- HANDOVER-PROMPT: «Tilstand akkurat nå» peker til LOGG-en i stedet for å
+  duplisere den; gjenstående-lista oppdatert (GITHUB_TOKEN er satt,
+  release-gate kjøres mot prod, ikke preview).
+
 ### 2026-07-10 (sein kveld) — Spillet mobiloptimalisert + tapp-navigasjon
 - **Alle funn fra SPILL-MOBIL-RAPPORT er fikset** (kun filer i src/spill/):
   liggende format virker nå (breakpoint utvidet til `(pointer: coarse) and

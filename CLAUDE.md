@@ -22,11 +22,20 @@ mono-labels) · påstand + kvittering · salvie kun om levende/handlekraftig ·
 lekenhet i detaljene. Hero = én levende setning fra now.json + GitHub med
 aktivitetsmatrisen som bevis under.
 
-## Repo (revidert 09.07.2026)
+## Repo (revidert 11.07.2026)
 
-Arbeidet ligger på gren **v3** i github.com/stianglomsrod/portfolio-site.
-`main` der er dagens live-side (stianglomsrod.no) og røres ikke før release.
-Det tidligere repoet stianglomsrod-no er arkivert (historikk t.o.m. flyttingen).
+Repo: github.com/stianglomsrod/portfolio-site. **`main` er produksjonsgrenen**
+— v3-koden gikk til prod (stianglomsrod.no) 2026-07-10, og alt arbeid skjer nå
+på main. Den gamle Next.js-siden er bevart som gren `legacy-nextjs` (ikke
+slett). Grenen `v3` er historisk og synces ikke lenger. Det tidligere repoet
+stianglomsrod-no er arkivert (historikk t.o.m. flyttingen).
+
+Push til main bygger prod-prosjektet «stianglomsrod» på Vercel direkte —
+push er altså prod-deploy og krever grønn QA (bygg + axe + kant-sjekk) først.
+
+**`docs/LOGG.md` er levende logg** og kilden til sannhet om tilstand, teknisk
+gjeld og regler som har blitt til underveis. Les den ved onboarding; oppdater
+den hver økt.
 
 ## Invarianter (gjelder hver iterasjon)
 
@@ -57,8 +66,9 @@ godkjenner det i økta. Hver godkjent endring får:
 
 ## Praktisk
 
-- `now.json` i repo-rota er levende data (hero + ticker), ikke dokumentasjon —
-  redigeres fritt uten spec-prosess.
+- Levende data (hero-setningen m.m.) bor i `src/data/now.json` — redigeres
+  fritt uten spec-prosess. ALDRI legg en fil som heter `now.json` i repo-rota:
+  navnet er legacy Vercel-konfig og stopper bygget.
 - `_baseline/` er gitignored arbeidsområde for Fase 0 (klon av dagens
   portfolio-site + QA-verktøy). Fase 0-leveransene ligger i `docs/innsikt/`.
 - All tekst i guidene er sample (lo-fi); struktur/stil/tilstander er hi-fi og

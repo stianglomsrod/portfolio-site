@@ -11,13 +11,15 @@ Glomsrød (lærer på Kongeveien skole, på vei inn i utviklerrollen, søker
 utvikler/UX/AI-native-jobb). Les denne fila og skum `BESLUTNINGER.md` +
 `docs/handoff/` før du gjør noe.
 
-## Repo og grener
+## Repo og grener (revidert 2026-07-11)
 
 - Repo: `github.com/stianglomsrod/portfolio-site`, arbeidskatalog
   `C:\Users\x_ray\kode 2026\Claude\hjemmeside`.
-- **`v3` er produksjonsgrenen** — alt arbeid skjer her, og Vercel skal bygge
-  fra v3. `main` er dagens gamle live-side og skal stå urørt til
-  domene-flippen. Det skal IKKE merges til main.
+- **`main` er produksjonsgrenen** — v3-koden gikk til prod 2026-07-10 og alt
+  arbeid skjer på main. Push til main bygger Vercel-prosjektet «stianglomsrod»
+  (= stianglomsrod.no) direkte, så push = prod-deploy: kjør QA først.
+- Den gamle Next.js-siden er bevart som gren `legacy-nextjs` (ikke slett).
+  Grenen `v3` er historisk og synces ikke lenger ved push (Vercel-kvote).
 - Repoet `stianglomsrod-no` er arkivert og skal ikke brukes.
 
 ## Stack
@@ -99,29 +101,22 @@ Kontrast er målt og holder AA uansett tone — så lenge du aldri endrer L/C.
 - Dev-server: `npm run dev` på port 4322 (se `.claude/launch.json` i
   Grindverk-repoet hvis du bruker preview-verktøy).
 
-## Tilstand akkurat nå (2026-07-09)
+## Tilstand akkurat nå
 
-Sist committet på v3: hue-drevet helsidepalett, auto-hide sticky nav med
-egen `--nav-bg`-nyanse, prosjektkort med lenkesone som kortfot og pil-hover,
-salvie-titler, klikkbare kort (strukket lenke: historie-lenke der den
-finnes, ellers første lenke), galleri-hover, hue2-aksentslider +
-tilbakestill-knapp, typografi-bump (brødtekst 17px, småtekst +0,5–1px),
-breddejustering (hovedcase/kort-grid/reisen-blokk fyller ramma på 1060px så
-kantene flukter). Tokenmaxx-notisen bor i `src/data/now.json`
-(`notis`/`notisNaar`) og rendres i hero + reisen — slett feltene når den er
-utdatert.
+**`docs/LOGG.md` er kilden til sannhet** for tilstand, teknisk gjeld og
+regler — les changeloggen øverst der for hva som skjedde sist. Denne fila
+beskriver bare det varige riggbildet.
 
-Verifisert lokalt: bygg grønt, axe 0 brudd på 7 ruter, kontrastmatrise ved
-flere hue-verdier i begge temaer.
+Siden er I PRODUKSJON på stianglomsrod.no (siden 2026-07-10). GITHUB_TOKEN
+er satt som Vercel-env og verifisert live; heatmap og «aktiv i dag» er
+ferske (forsidene rendres per forespørsel med s-maxage 900/SWR).
 
-## Gjenstående arbeid
+## Gjenstående arbeid (se gjeldslista i LOGG.md for full liste)
 
-1. **Release-gate på Vercel-preview** (venter på Stian: Vercel-prosjekt som
-   bygger v3, env-vars `GITHUB_TOKEN` + `RESEND_API_KEY`, Resend
-   DNS-verifisering): Lighthouse ≥95 på alle ruter, full manuell
-   gjennomspilling, axe på preview-URL. Deretter domene-flipp.
+1. **Release-gate mot produksjon** (kjørt til prod før gaten): Lighthouse
+   ≥95 på alle ruter mot stianglomsrod.no + full manuell gjennomspilling.
 2. Kontaktskjemaet svarer 503 «ikke-konfigurert» til RESEND_API_KEY er satt
-   — det er villet oppførsel.
+   og Resend-DNS er verifisert (Stians hånd) — villet fail-closed.
 3. Ubesvart tilbud: OG-delingsbilde.
 4. TODO-er: mp3-diett for spilllyd (ffmpeg mangler på maskinen),
    size-adjust-fallbacks for fontene.

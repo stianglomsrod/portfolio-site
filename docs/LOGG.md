@@ -6,6 +6,24 @@
 
 ## Changelog
 
+### 2026-07-11 (kveld, del 3) — Kryssord-print runde 3: tabellen kastet, grid tvinger kvadrater
+- **Stians retest nr. 2**: kantene kom, men rutene var ikke kvadrater —
+  tabellens radhøyder gled i hans Chrome-print og ga silhuett-aktige
+  bokser. Tabellen har dermed feilet to ganger på to ulike måter, og er
+  KASTET: rutenettet er nå CSS-grid med faste spor
+  (grid-template-columns: repeat(n, var(--kv-celle)) + grid-auto-rows)
+  — layoutmotoren garanterer kvadratene, samme oppskrift som
+  bingobrettene. Cellene er divs (rolle img på containeren, aria-label
+  består); kant-eierskapet uendret.
+- **Ny vakt i print-verifiseringen**: kvadrat-sjekk under print-CSS —
+  hver rute måles med getBoundingClientRect, krav ≤ 0,5px avvik
+  bredde/høyde og mellom ruter. Målt: 0,00px på begge.
+- QA: geometri grønn i alle fire print-varianter (elev + fasit),
+  UI-suite 22/22 (matrise leses nå via data-kolonner), bygg grønt,
+  axe 0/22, kant 0/22. REGEL (herdet): rutenett som skal PRINTES bygges
+  med CSS-grid og faste spor — aldri <table> (radhøyder og kantmaling
+  er upålitelige i print på tvers av Chrome-versjoner).
+
 ### 2026-07-11 (kveld, del 2) — Print-fiks runde 2: kantene UT av tabellcellene
 - **Stians retest viste resthull**: separate borders hjalp (boksene kom),
   men de innvendige loddrette skillene manglet fortsatt i HANS Chrome —

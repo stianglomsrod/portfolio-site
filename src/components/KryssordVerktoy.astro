@@ -129,7 +129,7 @@ const t =
           <p class="kv-bank-navn">{t.ordbank}</p>
           <p class="kv-bank-ord" id="kv-bank-ord"></p>
         </div>
-        <table id="kv-rutenett" aria-label={t.rutenettAria}></table>
+        <div id="kv-rutenett" role="img" aria-label={t.rutenettAria}></div>
         <div class="kv-ledetraader">
           <section id="kv-vannrett-seksjon">
             <h4>{t.vannrett}</h4>
@@ -484,42 +484,32 @@ const t =
   }
 
   /* Rutenettet: bare ordrutene tegnes (skjelett-kryssord).
-     VIKTIG print-lærdom i to trinn: (1) border-collapse: collapse
-     mistet kanter i utskrift, (2) selv med separate kanter droppet
-     Stians Chrome de innvendige loddrette strekene — fellesnevneren var
-     position: relative PÅ CELLENE. Cellene er derfor rene layoutbokser
-     (som i Ordkryss), og kanter + nummer + fasitbokstav bor i en vanlig
-     indre boks (.kv-boks) — samme sjanger som Silhuettenes bokser, som
-     printer feilfritt. Topp/venstre-kant legges på med klasser der
+     INGEN TABELL: <table> feilet to ganger i Stians Chrome-utskrift
+     (først kant-bortfall, så radhøyder som gled og ga ikke-kvadratiske
+     ruter). CSS-grid med faste spor — repeat(n, var(--kv-celle)) i
+     kolonner OG grid-auto-rows — tvinger hver rute til nøyaktig kvadrat
+     i både skjerm og print; samme oppskrift som bingobrettene. Hver
+     rute eier høyre/bunn-kanten, topp/venstre legges på med klasser der
      naboruta mangler (kv-kant-topp/kv-kant-venstre, regnes ved tegning). */
   #kv-rutenett {
-    border-collapse: separate;
-    border-spacing: 0;
-    margin: 0 auto;
+    display: grid;
+    /* kolonnene settes ved tegning: repeat(n, var(--kv-celle)) */
+    grid-auto-rows: var(--kv-celle);
+    justify-content: center;
   }
 
-  #kv-rutenett td {
-    width: var(--kv-celle);
-    height: var(--kv-celle);
-    min-width: var(--kv-celle);
-    padding: 0;
-  }
-
-  .kv-boks {
-    display: block;
-    width: 100%;
-    height: var(--kv-celle);
+  .kv-rute {
     position: relative;
+    background: #fff;
     border-right: var(--kv-strek) solid #333;
     border-bottom: var(--kv-strek) solid #333;
-    background: #fff;
   }
 
-  #kv-rutenett td.kv-kant-topp .kv-boks {
+  .kv-rute.kv-kant-topp {
     border-top: var(--kv-strek) solid #333;
   }
 
-  #kv-rutenett td.kv-kant-venstre .kv-boks {
+  .kv-rute.kv-kant-venstre {
     border-left: var(--kv-strek) solid #333;
   }
 
@@ -1000,38 +990,35 @@ const t =
       });
 
       settCellestorrelse(rutenett[0].length, rutenett.length);
-      const tabell = el('kv-rutenett');
-      tabell.replaceChildren();
+      const nett = el('kv-rutenett');
+      nett.replaceChildren();
+      nett.style.gridTemplateColumns = `repeat(${rutenett[0].length}, var(--kv-celle))`;
+      nett.setAttribute('data-kolonner', String(rutenett[0].length));
       rutenett.forEach((rad, r) => {
-        const tr = document.createElement('tr');
         rad.forEach((bokstav, k) => {
-          const td = document.createElement('td');
+          const celle = document.createElement('div');
           if (bokstav) {
-            td.className = 'kv-rute';
+            celle.className = 'kv-rute';
             // Kant-eierskap (jf. CSS-kommentaren): topp/venstre bare der
             // naboruta mangler
-            if (r === 0 || !rutenett[r - 1][k]) td.classList.add('kv-kant-topp');
-            if (k === 0 || !rad[k - 1]) td.classList.add('kv-kant-venstre');
-            const boks = document.createElement('span');
-            boks.className = 'kv-boks';
+            if (r === 0 || !rutenett[r - 1][k]) celle.classList.add('kv-kant-topp');
+            if (k === 0 || !rad[k - 1]) celle.classList.add('kv-kant-venstre');
             const nummer = numre.get(`${r},${k}`);
             if (nummer) {
               const nr = document.createElement('span');
               nr.className = 'kv-nr';
               nr.textContent = String(nummer);
-              boks.appendChild(nr);
+              celle.appendChild(nr);
             }
             const b = document.createElement('span');
             b.className = 'kv-bokstav';
             b.textContent = medValgtCase(bokstav);
-            boks.appendChild(b);
-            td.appendChild(boks);
+            celle.appendChild(b);
           } else {
-            td.className = 'kv-tom';
+            celle.className = 'kv-tom';
           }
-          tr.appendChild(td);
+          nett.appendChild(celle);
         });
-        tabell.appendChild(tr);
       });
 
       // Ledetrådene: nummer + bilde og/eller tekst, per retning

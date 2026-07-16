@@ -6,6 +6,31 @@
 
 ## Changelog
 
+### 2026-07-16 — Lærerrommet + bølge 1 fra idébanken (7 nye verktøy)
+- **Lærerrommet** (/laerer, EN /en/teacher): kuratert samleside for alle
+  utskriftsverktøyene i tre kategorier (Norsk, Matematikk, Lek og
+  aktivitet), drevet av delt katalog i `src/lib/verktoykatalog.ts` så
+  tvillingsidene ikke drifter. Sandboxen er slanket til spillet + ett
+  Lærerrommet-kort + hue-modulen. NB: /laerer er IKKE i hovednavigasjonen
+  — det er Stians designvalg å ta.
+- **Sju nye verktøy fra research-bølge 1** (hver med egen commit, norsk +
+  engelsk tvilling, fasit-mekanikk, utkast, katalog- og QA-registrering):
+  Ordkjeder (round-robin-kjeding, bannordfilter på KJEDESTRENGEN — 
+  sammensetninger kan danne nye ord), Hundrekartet (SVG, tre moduser),
+  Hentediktat (to utskrifter: kort til veggen + elevark, print-kort/
+  print-elevark-klasser), Hemmelig kode (tallkode fast/stokket + 29 egne
+  SVG-symbolglyfer; «katt» = 11,1,20,20 verifisert), Mengder og tierammer
+  (telle/fylle/tiervenner, terningmønstre der 7+ = 6+resten), Ord med
+  hull (målrettede grafemer: kj/skj/sj lengstematch, ng/nk, dobbel
+  konsonant — ord uten grafemet navngis), Tallpyramider & magiske
+  kvadrater (kjerne i `src/lib/tallpyramide.ts`: komplett løsning først,
+  grådig hulling med propagerings-garanti → alltid løsbart uten
+  gjetting; stresstest 1350 genereringer grønn).
+- Lærerrommet har nå 20 verktøykort. QA: røyk-suite 16 verktøy grønn,
+  bygg grønt, axe 0/56, kant 0/56, alle kortlenker svarer.
+- LÆRDOM (gjentatt for ettertiden): addInitScript reseeder localStorage
+  ved reload — tilstandsendring i tester gjøres via UI-hendelser.
+
 ### 2026-07-16 — Research: 20 verifiserte kandidater til nye verktøy
 - **Multi-agent research** (49 agenter: 8 kildesveip → 198 funn → syntese
   → adversariell verifisering med teknisk + pedagogisk linse per

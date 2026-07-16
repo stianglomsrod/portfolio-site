@@ -1,0 +1,646 @@
+---
+/* Tieramme-verktøyet: mengdeforståelse for 1.–2. trinn. Tre moduser:
+   «telle» (prikker vises, eleven skriver tallet), «fylle» (tallet vises,
+   eleven tegner prikkene) og «tiervenner» (n prikker — hvor mange
+   mangler til 10?). Representasjon: tieramme (2×5) eller terningmønstre
+   (subitisering). Alt tegnes som SVG. Fasit-mekanikken er Ordkryss sin. */
+
+interface Props {
+  lang?: 'nb' | 'en';
+}
+
+const { lang = 'nb' } = Astro.props;
+
+const t =
+  lang === 'nb'
+    ? {
+        tittelFelt: 'Tittel på arket',
+        tittelEks: 'Skriv tittelen her',
+        modus: 'Oppgavetype',
+        modusTelle: 'telle — skriv hvor mange prikker',
+        modusFylle: 'fylle — tegn like mange prikker som tallet',
+        modusVenn: 'tiervenner — hvor mange mangler til 10?',
+        form: 'Prikkene vises som',
+        formRamme: 'tieramme (2 × 5)',
+        formTerning: 'terningmønstre',
+        omraade: 'Tallområde',
+        omr10: '0–10',
+        omr20: '0–20 (dobbel tieramme)',
+        antall: 'Antall oppgaver',
+        lag: 'Lag mengdeark',
+        skrivUt: 'Skriv ut',
+        skrivUtFasit: 'Skriv ut fasit',
+        visFasit: 'Vis fasit her',
+        navnLinje: 'Navn: ____________________   Dato: ____________',
+        fasit: 'FASIT',
+        standardTittel: 'Mengder og tierammer',
+      }
+    : {
+        tittelFelt: 'Sheet title',
+        tittelEks: 'Type the title here',
+        modus: 'Task type',
+        modusTelle: 'count — write how many dots',
+        modusFylle: 'fill — draw as many dots as the number',
+        modusVenn: 'friends of ten — how many are missing?',
+        form: 'Dots are shown as',
+        formRamme: 'ten frame (2 × 5)',
+        formTerning: 'dice patterns',
+        omraade: 'Number range',
+        omr10: '0–10',
+        omr20: '0–20 (double ten frame)',
+        antall: 'Number of tasks',
+        lag: 'Create quantity sheet',
+        skrivUt: 'Print',
+        skrivUtFasit: 'Print answer key',
+        visFasit: 'Show answers here',
+        navnLinje: 'Name: ____________________   Date: ____________',
+        fasit: 'KEY',
+        standardTittel: 'Quantities and ten frames',
+      };
+---
+
+<div class="ti-verktoy" data-lang={lang} data-standardtittel={t.standardTittel}>
+  <div class="ti-oppsett">
+    <section class="ti-panel" aria-labelledby="ti-panel-tittel">
+      <h2 id="ti-panel-tittel" class="sr-only">{lang === 'nb' ? 'Oppsett' : 'Setup'}</h2>
+
+      <label class="ti-felt">
+        <span class="ti-felt-navn">{t.tittelFelt}</span>
+        <input type="text" id="ti-tittel" placeholder={t.tittelEks} maxlength="60" />
+      </label>
+
+      <label class="ti-felt">
+        <span class="ti-felt-navn">{t.modus}</span>
+        <select id="ti-modus">
+          <option value="telle" selected>{t.modusTelle}</option>
+          <option value="fylle">{t.modusFylle}</option>
+          <option value="venn">{t.modusVenn}</option>
+        </select>
+      </label>
+
+      <label class="ti-felt">
+        <span class="ti-felt-navn">{t.form}</span>
+        <select id="ti-form">
+          <option value="ramme" selected>{t.formRamme}</option>
+          <option value="terning">{t.formTerning}</option>
+        </select>
+      </label>
+
+      <label class="ti-felt">
+        <span class="ti-felt-navn">{t.omraade}</span>
+        <select id="ti-omraade">
+          <option value="10" selected>{t.omr10}</option>
+          <option value="20">{t.omr20}</option>
+        </select>
+      </label>
+
+      <label class="ti-felt">
+        <span class="ti-felt-navn">{t.antall}</span>
+        <select id="ti-antall">
+          <option value="6">6</option>
+          <option value="9" selected>9</option>
+          <option value="12">12</option>
+        </select>
+      </label>
+
+      <button type="button" id="ti-lag" class="knapp ti-primaer">{t.lag}</button>
+      <p id="ti-status" class="ti-status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="ti-visning" id="ti-ark-seksjon" hidden aria-labelledby="ti-visning-tittel">
+      <h2 id="ti-visning-tittel" class="sr-only">
+        {lang === 'nb' ? 'Forhåndsvisning' : 'Preview'}
+      </h2>
+      <div class="ti-handlinger">
+        <button type="button" id="ti-skriv-ut" class="knapp ti-primaer">{t.skrivUt}</button>
+        <button type="button" id="ti-skriv-ut-fasit" class="ti-sekundaer">{t.skrivUtFasit}</button>
+        <button type="button" id="ti-fasit-toggle" class="ti-sekundaer" aria-pressed="false">
+          {t.visFasit}
+        </button>
+      </div>
+
+      <div class="ti-sticky-print">
+        <button type="button" id="ti-skriv-ut-sticky" class="ti-sticky-knapp" title="Skriv ut arket (Ctrl+P)" aria-label={t.skrivUt}>
+          🖨
+        </button>
+      </div>
+
+      <div class="ti-ark" id="ti-ark">
+        <div class="ti-ark-hode">
+          <h3 id="ti-overskrift">{t.standardTittel}</h3>
+          <span class="ti-fasit-merke" aria-hidden="true">{t.fasit}</span>
+        </div>
+        <p class="ti-instruks" id="ti-instruks"></p>
+        <p class="ti-navn-linje">{t.navnLinje}</p>
+        <div id="ti-oppgaver" class="ti-oppgaver"></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<style is:global>
+  .ti-oppsett {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: var(--s-5);
+    align-items: start;
+    margin-top: var(--s-4);
+  }
+
+  @media (max-width: 900px) {
+    .ti-oppsett {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .ti-panel {
+    background: var(--flate);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: var(--s-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .ti-felt {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .ti-felt-navn {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--tekst);
+  }
+
+  .ti-panel input[type='text'],
+  .ti-panel select {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    padding: 9px 10px;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--tekst);
+    min-height: 44px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .ti-primaer {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 700;
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    border: none;
+    border-radius: 9px;
+    padding: 11px 20px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .ti-primaer:hover {
+    filter: brightness(1.06);
+  }
+
+  .ti-sekundaer {
+    font-family: var(--font-sans);
+    font-size: 14.5px;
+    font-weight: 600;
+    background: var(--bg);
+    color: var(--tekst);
+    border: 1px solid var(--linje);
+    border-radius: 9px;
+    padding: 10px 16px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .ti-sekundaer:hover {
+    border-color: var(--salvie);
+  }
+
+  .ti-status {
+    margin: 0;
+    font-size: 14.5px;
+    color: var(--dempet);
+    min-height: 1.4em;
+  }
+
+  .ti-handlinger {
+    display: flex;
+    gap: var(--s-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--s-3);
+  }
+
+  .ti-sticky-print {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 15;
+  }
+
+  .ti-sticky-knapp {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 1px solid var(--linje);
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: var(--kort-skygge);
+    display: grid;
+    place-items: center;
+  }
+
+  .ti-ark {
+    background: #fff;
+    color: #111;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: 28px 32px;
+    max-width: 660px;
+  }
+
+  .ti-ark-hode {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  #ti-overskrift {
+    margin: 0 0 4px;
+    font-size: 24px;
+    color: #111;
+  }
+
+  .ti-fasit-merke {
+    display: none;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    color: #b3261e;
+    border: 2px solid #b3261e;
+    border-radius: 6px;
+    padding: 2px 8px;
+  }
+
+  .ti-verktoy.fasit-paa .ti-fasit-merke {
+    display: inline-block;
+  }
+
+  .ti-instruks {
+    margin: 0 0 6px;
+    font-size: 14.5px;
+    color: #333;
+  }
+
+  .ti-navn-linje {
+    margin: 0 0 18px;
+    font-size: 13.5px;
+    color: #333;
+  }
+
+  .ti-oppgaver {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px 18px;
+  }
+
+  .ti-oppgave svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .ti-fasit-del {
+    display: none;
+  }
+
+  .ti-verktoy.fasit-paa .ti-fasit-del {
+    display: inline;
+  }
+
+  .ti-verktoy.fasit-paa .ti-strek {
+    display: none;
+  }
+
+  @media print {
+    @page {
+      margin: 14mm;
+    }
+
+    html,
+    body {
+      color-scheme: light;
+      background: #fff !important;
+      color: #000;
+    }
+
+    .topp,
+    .bunn,
+    .hopp,
+    .ti-panel,
+    .ti-handlinger,
+    .ti-side-hode,
+    .ti-sticky-print {
+      display: none !important;
+    }
+
+    .ramme {
+      padding: 0;
+      max-width: none;
+      min-height: 0;
+      background: #fff;
+    }
+
+    .ti-oppsett {
+      display: block;
+      margin: 0;
+    }
+
+    .ti-ark {
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 0;
+      max-width: none;
+    }
+
+    .ti-oppgaver {
+      gap: 12mm 8mm;
+    }
+
+    .ti-oppgave {
+      break-inside: avoid;
+    }
+
+    .ti-verktoy:not(.print-fasit) .ti-fasit-del {
+      display: none !important;
+    }
+
+    .ti-verktoy:not(.print-fasit) .ti-fasit-merke {
+      display: none !important;
+    }
+
+    .ti-verktoy.print-fasit .ti-fasit-del {
+      display: inline !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+
+    .ti-verktoy.print-fasit .ti-strek {
+      display: none !important;
+    }
+
+    .ti-verktoy.print-fasit .ti-fasit-merke {
+      display: inline-block !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+  }
+</style>
+
+<script>
+  const rot = document.querySelector<HTMLElement>('.ti-verktoy');
+  if (rot) {
+    const lang = (rot.dataset.lang ?? 'nb') as 'nb' | 'en';
+    const standardTittel = rot.dataset.standardtittel ?? 'Mengder og tierammer';
+    const LAGRINGSNOKKEL = `tieramme-${lang}`;
+    const NS = 'http://www.w3.org/2000/svg';
+
+    const M =
+      lang === 'nb'
+        ? {
+            instruks: {
+              telle: 'Tell prikkene og skriv tallet.',
+              fylle: 'Tegn like mange prikker som tallet viser.',
+              venn: 'Hvor mange prikker mangler for å fylle tierammen? Skriv tallet.',
+            } as Record<string, string>,
+            klart: (n: number) => `Arket er klart: ${n} oppgaver.`,
+          }
+        : {
+            instruks: {
+              telle: 'Count the dots and write the number.',
+              fylle: 'Draw as many dots as the number shows.',
+              venn: 'How many dots are missing to fill the ten frame? Write the number.',
+            } as Record<string, string>,
+            klart: (n: number) => `The sheet is ready: ${n} tasks.`,
+          };
+
+    let fasitSynlig = false;
+
+    const el = <T extends HTMLElement = HTMLElement>(id: string): T =>
+      document.getElementById(id) as T;
+
+    function svgEl(navn: string, attrs: Record<string, string>, tekst?: string) {
+      const e = document.createElementNS(NS, navn);
+      for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+      if (tekst !== undefined) e.textContent = tekst;
+      return e;
+    }
+
+    /* Tieramme (2×5) med `fylte` prikker, tegnet fra (x, y). Prikker som
+       hører til fasiten (fylle-modus) får klassen ti-fasit-del. */
+    function tegnRamme(svg: SVGElement, x: number, y: number, fylte: number, fasitPrikker: boolean) {
+      const C = 12;
+      for (let i = 0; i < 10; i++) {
+        const kol = i % 5;
+        const rad = Math.floor(i / 5);
+        svg.appendChild(
+          svgEl('rect', {
+            x: String(x + kol * C), y: String(y + rad * C), width: String(C), height: String(C),
+            fill: '#fff', stroke: '#333', 'stroke-width': '0.9',
+          })
+        );
+        if (i < fylte) {
+          const attrs: Record<string, string> = {
+            cx: String(x + kol * C + C / 2),
+            cy: String(y + rad * C + C / 2),
+            r: '3.9',
+            fill: fasitPrikker ? '#1a6a3a' : '#222',
+          };
+          if (fasitPrikker) attrs.class = 'ti-fasit-del';
+          svg.appendChild(svgEl('circle', attrs));
+        }
+      }
+    }
+
+    /* Terningmønster for 1–6 i en 24×24-boks fra (x, y) */
+    const PIPS: Record<number, [number, number][]> = {
+      0: [],
+      1: [[12, 12]],
+      2: [[6, 6], [18, 18]],
+      3: [[6, 6], [12, 12], [18, 18]],
+      4: [[6, 6], [18, 6], [6, 18], [18, 18]],
+      5: [[6, 6], [18, 6], [12, 12], [6, 18], [18, 18]],
+      6: [[6, 6], [18, 6], [6, 12], [18, 12], [6, 18], [18, 18]],
+    };
+
+    function tegnTerning(svg: SVGElement, x: number, y: number, verdi: number) {
+      svg.appendChild(
+        svgEl('rect', {
+          x: String(x), y: String(y), width: '24', height: '24', rx: '4',
+          fill: '#fff', stroke: '#333', 'stroke-width': '1.1',
+        })
+      );
+      (PIPS[verdi] ?? []).forEach(([px, py]) => {
+        svg.appendChild(svgEl('circle', { cx: String(x + px), cy: String(y + py), r: '2.6', fill: '#222' }));
+      });
+    }
+
+    function lagOppgaveSvg(
+      tall: number,
+      modus: 'telle' | 'fylle' | 'venn',
+      form: 'ramme' | 'terning',
+      dobbel: boolean
+    ): SVGElement {
+      const bredde = dobbel ? 128 : 64;
+      const svg = svgEl('svg', { viewBox: `0 0 ${Math.max(bredde, 70)} 50`, 'aria-hidden': 'true' });
+
+      if (form === 'terning' && modus === 'telle') {
+        // 1–6 som én terning; 7–12 som «6 + resten» (dobbeltmønster)
+        if (tall <= 6) tegnTerning(svg, 4, 1, tall);
+        else {
+          tegnTerning(svg, 4, 1, 6);
+          tegnTerning(svg, 34, 1, tall - 6);
+        }
+      } else {
+        const vises = modus === 'fylle' ? 0 : modus === 'venn' ? tall : tall;
+        const fasitPrikker = modus === 'fylle';
+        if (dobbel) {
+          tegnRamme(svg, 2, 1, Math.min(10, modus === 'fylle' ? tall : vises), fasitPrikker);
+          tegnRamme(svg, 66, 1, Math.max(0, (modus === 'fylle' ? tall : vises) - 10), fasitPrikker);
+        } else {
+          tegnRamme(svg, 2, 1, modus === 'fylle' ? tall : vises, fasitPrikker);
+        }
+      }
+
+      // teksten under: oppgave + skjulbar strek + fasit (faste x-posisjoner)
+      const yTekst = 40;
+      const tekst = (x: number, innhold: string, ekstra: Record<string, string> = {}) =>
+        svg.appendChild(
+          svgEl('text', { x: String(x), y: String(yTekst), 'font-size': '9', fill: '#333', ...ekstra }, innhold)
+        );
+      if (modus === 'telle') {
+        tekst(4, '=');
+        tekst(11, '______', { class: 'ti-strek' });
+        tekst(12, String(tall), { class: 'ti-fasit-del', 'font-weight': '700', fill: '#1a6a3a' });
+      } else if (modus === 'fylle') {
+        tekst(4, String(tall), { 'font-size': '12', 'font-weight': '700', fill: '#111' });
+      } else {
+        tekst(4, `${tall} +`);
+        tekst(21, '_____', { class: 'ti-strek' });
+        tekst(23, String(10 - tall), { class: 'ti-fasit-del', 'font-weight': '700', fill: '#1a6a3a' });
+        tekst(41, '= 10');
+      }
+      return svg;
+    }
+
+    function generer() {
+      const modus = el<HTMLSelectElement>('ti-modus').value as 'telle' | 'fylle' | 'venn';
+      const form = el<HTMLSelectElement>('ti-form').value as 'ramme' | 'terning';
+      const maks = parseInt(el<HTMLSelectElement>('ti-omraade').value, 10);
+      const antall = parseInt(el<HTMLSelectElement>('ti-antall').value, 10);
+      const dobbel = maks === 20 && modus !== 'venn' && form === 'ramme';
+
+      // tallpool: tiervenner 0–10; terning-telling 1–12; ellers 0–maks.
+      // Trekkes med minst mulig gjenbruk (stokket pool som fylles på)
+      const tak = modus === 'venn' ? 10 : form === 'terning' && modus === 'telle' ? 12 : maks;
+      const bunn = modus === 'venn' ? 0 : form === 'terning' && modus === 'telle' ? 1 : 0;
+      const pool: number[] = [];
+      const fyllPool = () => {
+        const alle = [];
+        for (let v = bunn; v <= tak; v++) alle.push(v);
+        for (let i = alle.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [alle[i], alle[j]] = [alle[j], alle[i]];
+        }
+        pool.push(...alle);
+      };
+      const tallrekke: number[] = [];
+      while (tallrekke.length < antall) {
+        if (pool.length === 0) fyllPool();
+        const kandidat = pool.shift() as number;
+        if (tallrekke[tallrekke.length - 1] === kandidat) {
+          pool.push(kandidat);
+          if (pool.length === 1) fyllPool();
+          continue;
+        }
+        tallrekke.push(kandidat);
+      }
+
+      el('ti-overskrift').textContent =
+        el<HTMLInputElement>('ti-tittel').value.trim() || standardTittel;
+      el('ti-instruks').textContent = M.instruks[modus];
+
+      const beholder = el('ti-oppgaver');
+      beholder.replaceChildren();
+      tallrekke.forEach((tall) => {
+        const boks = document.createElement('div');
+        boks.className = 'ti-oppgave';
+        boks.appendChild(lagOppgaveSvg(tall, modus, form, dobbel));
+        beholder.appendChild(boks);
+      });
+
+      fasitSynlig = false;
+      el('ti-fasit-toggle').setAttribute('aria-pressed', 'false');
+      rot.classList.remove('fasit-paa');
+
+      el('ti-ark-seksjon').removeAttribute('hidden');
+      el('ti-status').textContent = M.klart(antall);
+      try {
+        localStorage.setItem(
+          LAGRINGSNOKKEL,
+          JSON.stringify({
+            tittel: el<HTMLInputElement>('ti-tittel').value,
+            modus, form,
+            omraade: el<HTMLSelectElement>('ti-omraade').value,
+            antall: el<HTMLSelectElement>('ti-antall').value,
+          })
+        );
+      } catch {}
+    }
+
+    try {
+      const u = JSON.parse(localStorage.getItem(LAGRINGSNOKKEL) ?? 'null');
+      if (u) {
+        el<HTMLInputElement>('ti-tittel').value = u.tittel ?? '';
+        (['modus', 'form', 'omraade', 'antall'] as const).forEach((navn) => {
+          const felt = el<HTMLSelectElement>(`ti-${navn}`);
+          if ([...felt.options].some((o) => o.value === u[navn])) felt.value = u[navn];
+        });
+      }
+    } catch {}
+
+    el('ti-lag').addEventListener('click', generer);
+
+    el('ti-fasit-toggle').addEventListener('click', () => {
+      fasitSynlig = !fasitSynlig;
+      el('ti-fasit-toggle').setAttribute('aria-pressed', String(fasitSynlig));
+      rot.classList.toggle('fasit-paa', fasitSynlig);
+    });
+
+    const skrivUt = () => {
+      rot.classList.remove('print-fasit');
+      window.print();
+    };
+    el('ti-skriv-ut').addEventListener('click', skrivUt);
+    el('ti-skriv-ut-sticky').addEventListener('click', skrivUt);
+    el('ti-skriv-ut-fasit').addEventListener('click', () => {
+      rot.classList.add('print-fasit');
+      window.print();
+    });
+    window.addEventListener('afterprint', () => rot.classList.remove('print-fasit'));
+  }
+</script>

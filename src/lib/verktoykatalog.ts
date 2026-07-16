@@ -247,6 +247,21 @@ export const VERKTOY: Verktoykort[] = [
       cta: 'make a sheet',
     },
   },
+  {
+    slugNb: '/sandbox/tierammer',
+    slugEn: '/en/sandbox/ten-frames',
+    kategori: 'matte',
+    nb: {
+      tittel: 'Mengder og tierammer',
+      tekst: 'Telle prikker, tegne mengder eller finne tiervenner — tierammer og terningmønstre for 1.–2. trinn.',
+      cta: 'lag et ark',
+    },
+    en: {
+      tittel: 'Quantities and ten frames',
+      tekst: 'Count dots, draw quantities or find friends of ten — ten frames and dice patterns for early maths.',
+      cta: 'make a sheet',
+    },
+  },
   // ---- Lek og aktivitet ----
   {
     slugNb: '/sandbox/hentediktat',

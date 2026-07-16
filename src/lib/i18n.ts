@@ -31,6 +31,7 @@ export const RUTEKART: Record<string, string> = {
   '/sandbox/hundrekart': '/en/sandbox/hundred-chart',
   '/sandbox/hentediktat': '/en/sandbox/running-dictation',
   '/sandbox/hemmelig-kode': '/en/sandbox/secret-code',
+  '/sandbox/tierammer': '/en/sandbox/ten-frames',
   '/slik-jobber-jeg': '/en/how-i-work',
   '/om': '/en/about',
   '/kolofon': '/en/colophon',

@@ -1,0 +1,47 @@
+---
+import Side from '../../layouts/Side.astro';
+import TierammeVerktoy from '../../components/TierammeVerktoy.astro';
+
+/* Tierammer i Lærerrommet. ENGELSK TVILLING:
+   src/pages/en/sandbox/ten-frames.astro — endre begge. */
+---
+
+<Side
+  title="Mengder og tierammer — lag mengdeark til utskrift"
+  description="Tierammer og terningmønstre: telle prikker, tegne mengder eller finne tiervenner. For begynneropplæringen, med fasit."
+>
+  <div class="ti-side-hode">
+    <p class="kicker">/lærer · matematikk</p>
+    <h1>Mengder og tierammer</h1>
+    <p class="dempet">
+      Lag mengdeark for begynneropplæringen: elevene teller prikker i
+      tierammer eller terningmønstre, tegner mengder selv, eller finner
+      tiervenner. Velg tallområde 0–10 eller 0–20 — fasiten skrives ut
+      for seg.
+    </p>
+  </div>
+  <TierammeVerktoy lang="nb" />
+</Side>
+
+<style>
+  .kicker {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: var(--tekst-label);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--hue-aksent);
+    margin: var(--s-7) 0 var(--s-2);
+  }
+
+  h1 {
+    font-size: var(--tekst-tittel);
+    margin: 0 0 var(--s-3);
+  }
+
+  .dempet {
+    color: var(--dempet);
+    max-width: 68ch;
+    margin: 0;
+  }
+</style>

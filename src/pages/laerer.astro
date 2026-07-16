@@ -1,0 +1,148 @@
+---
+import Side from '../layouts/Side.astro';
+import { VERKTOY, KATEGORINAVN } from '../lib/verktoykatalog';
+import type { Kategori } from '../lib/verktoykatalog';
+
+/* Lærerrommet: kuratert samleside for alle utskriftsverktøyene, i
+   kategorier. Kortdataene bor i src/lib/verktoykatalog.ts (delt med
+   engelsk tvilling). ENGELSK TVILLING: src/pages/en/teacher.astro —
+   endre begge (prosaen her, kortene i katalogen). */
+
+const kategorier: Kategori[] = ['norsk', 'matte', 'lek'];
+---
+
+<Side
+  title="Lærerrommet — verktøy for lærere"
+  description="Gratis verktøy for lærere: skriv inn ordene eller tallene dine, og skriv ut ferdige oppgaveark med fasit. Ingen konto, ingenting lagres."
+>
+  <p class="kicker">/lærer</p>
+  <h1>Lærerrommet</h1>
+  <p class="dempet">
+    Verktøy som lager oppgaveark av innholdet ditt: skriv inn ukas ord eller
+    velg tallområde, trykk lag, skriv ut. Fasit følger med der det gir mening.
+    Alt skjer i nettleseren din — ingen konto, ingenting lastes opp, og
+    utkastet ditt venter i samme nettleser neste gang.
+  </p>
+
+  {kategorier.map((kategori) => (
+    <section class="lr-seksjon" aria-labelledby={`lr-${kategori}`}>
+      <h2 id={`lr-${kategori}`}>{KATEGORINAVN[kategori].nb}</h2>
+      <div class="eks-grid">
+        {VERKTOY.filter((v) => v.kategori === kategori).map((v) => (
+          <a class="eksperiment" href={v.slugNb}>
+            <span class="eks-tittel">{v.nb.tittel}</span>
+            <span class="eks-tekst">{v.nb.tekst}</span>
+            <span class="eks-cta">{v.nb.cta} <span class="pil" aria-hidden="true">→</span></span>
+          </a>
+        ))}
+      </div>
+    </section>
+  ))}
+
+  <p class="lr-fot dempet">
+    Verktøyene er laget av en lærer, for lærere — og listen vokser. Savner du
+    noe? <a href="mailto:stianglomsrod@gmail.com">Si fra</a>, så ser jeg på det.
+  </p>
+</Side>
+
+<style>
+  .kicker {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: var(--tekst-label);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--hue-aksent);
+    margin: var(--s-7) 0 var(--s-2);
+  }
+
+  h1 {
+    font-size: var(--tekst-tittel);
+    margin: 0 0 var(--s-3);
+  }
+
+  .dempet {
+    color: var(--dempet);
+    max-width: 68ch;
+  }
+
+  .lr-seksjon {
+    margin-top: var(--s-6);
+  }
+
+  .lr-seksjon h2 {
+    font-size: 21px;
+    color: var(--overskrift, var(--tekst));
+    margin: 0 0 var(--s-3);
+  }
+
+  .eks-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-3);
+  }
+
+  @media (max-width: 900px) {
+    .eks-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .eksperiment {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    background: var(--flate);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: var(--s-4) var(--s-4);
+    text-decoration: none;
+    transition: border-color 160ms, transform 160ms var(--ease), box-shadow 160ms var(--ease);
+  }
+
+  .eksperiment:hover,
+  .eksperiment:focus-visible {
+    border-color: var(--salvie);
+    transform: translateY(-3px);
+    box-shadow: var(--kort-skygge-hover);
+  }
+
+  .eks-tittel {
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--tekst);
+  }
+
+  .eks-tekst {
+    font-size: 15.5px;
+    line-height: 1.5;
+    color: var(--dempet);
+  }
+
+  .eks-cta {
+    font-family: var(--font-hd);
+    font-size: 14.5px;
+    color: var(--salvie);
+    margin-top: auto;
+  }
+
+  .pil {
+    display: inline-block;
+    transition: transform var(--dur-mikro) var(--ease);
+  }
+
+  .eksperiment:hover .pil,
+  .eksperiment:focus-visible .pil {
+    transform: translateX(3px);
+  }
+
+  .lr-fot {
+    margin-top: var(--s-6);
+    font-size: 15px;
+  }
+
+  .lr-fot a {
+    color: var(--salvie);
+  }
+</style>

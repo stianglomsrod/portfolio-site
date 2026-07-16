@@ -1,0 +1,47 @@
+---
+import Side from '../../../layouts/Side.astro';
+import OrdMedHullVerktoy from '../../../components/OrdMedHullVerktoy.astro';
+
+/* Missing letters in the teacher's room. NORSK TVILLING:
+   src/pages/sandbox/ord-med-hull.astro — endre begge. */
+---
+
+<Side
+  lang="en"
+  title="Words with holes — make printable spelling sheets"
+  description="Your words with missing letters: random ones, the vowels, or targeted digraphs and double consonants. Answer key included."
+>
+  <div class="oh-side-hode">
+    <p class="kicker">/teacher · language</p>
+    <h1>Words with holes</h1>
+    <p class="dempet">
+      Make spelling sheets: your words get missing letters for the pupil to
+      fill in. Pick random letters, the vowels — or targeted practice on
+      digraphs and double consonants. Word bank and answer key included.
+    </p>
+  </div>
+  <OrdMedHullVerktoy lang="en" />
+</Side>
+
+<style>
+  .kicker {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: var(--tekst-label);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--hue-aksent);
+    margin: var(--s-7) 0 var(--s-2);
+  }
+
+  h1 {
+    font-size: var(--tekst-tittel);
+    margin: 0 0 var(--s-3);
+  }
+
+  .dempet {
+    color: var(--dempet);
+    max-width: 68ch;
+    margin: 0;
+  }
+</style>

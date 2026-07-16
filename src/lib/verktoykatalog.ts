@@ -218,6 +218,21 @@ export const VERKTOY: Verktoykort[] = [
     },
   },
   {
+    slugNb: '/sandbox/ord-med-hull',
+    slugEn: '/en/sandbox/missing-letters',
+    kategori: 'norsk',
+    nb: {
+      tittel: 'Ord med hull',
+      tekst: 'Ukas ord med manglende bokstaver — tilfeldige, vokaler, eller målrettet kj/skj/sj, ng/nk og dobbel konsonant.',
+      cta: 'lag et ark',
+    },
+    en: {
+      tittel: 'Words with holes',
+      tekst: 'Your words with missing letters — random, vowels, or targeted digraphs and double consonants.',
+      cta: 'make a sheet',
+    },
+  },
+  {
     slugNb: '/sandbox/hemmelig-kode',
     slugEn: '/en/sandbox/secret-code',
     kategori: 'norsk',

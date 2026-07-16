@@ -1,0 +1,808 @@
+---
+/* Ord med hull-verktøyet: lærerens ord får manglende bokstaver som
+   eleven fyller inn. Fire moduser: tilfeldige bokstaver, første bokstav,
+   alle vokaler — og målrettet GRAFEM (kj/skj/sj, ng/nk eller dobbel
+   konsonant), som er standard norsk rettskrivingsdidaktikk. Hullingen
+   er ren strengmanipulasjon; fasit er originalordene. */
+
+interface Props {
+  lang?: 'nb' | 'en';
+}
+
+const { lang = 'nb' } = Astro.props;
+
+const t =
+  lang === 'nb'
+    ? {
+        tittelFelt: 'Tittel på arket',
+        tittelEks: 'Skriv tittelen her',
+        ordNavn: 'Ordene (gjerne ukas øveord)',
+        ordEks: 'skriv et ord',
+        leggTil: '+ Legg til ord',
+        modus: 'Hva skal mangle?',
+        modusTilfeldig1: 'én tilfeldig bokstav',
+        modusTilfeldig2: 'to tilfeldige bokstaver',
+        modusForste: 'første bokstav',
+        modusVokaler: 'alle vokalene',
+        modusKj: 'kj / skj / sj',
+        modusNg: 'ng / nk',
+        modusDobbel: 'dobbel konsonant',
+        visOrdbank: 'Vis ordbank øverst på arket',
+        lag: 'Lag ark',
+        skrivUt: 'Skriv ut',
+        skrivUtFasit: 'Skriv ut fasit',
+        visFasit: 'Vis fasit her',
+        navnLinje: 'Navn: ____________________   Dato: ____________',
+        ordbank: 'Ordbank',
+        instruks: 'Fyll inn bokstavene som mangler.',
+        fasit: 'FASIT',
+        standardTittel: 'Ord med hull',
+      }
+    : {
+        tittelFelt: 'Sheet title',
+        tittelEks: 'Type the title here',
+        ordNavn: "The words (this week's words work well)",
+        ordEks: 'type a word',
+        leggTil: '+ Add word',
+        modus: 'What should be missing?',
+        modusTilfeldig1: 'one random letter',
+        modusTilfeldig2: 'two random letters',
+        modusForste: 'the first letter',
+        modusVokaler: 'all the vowels',
+        modusKj: 'kj / skj / sj (Norwegian)',
+        modusNg: 'ng / nk',
+        modusDobbel: 'double consonant',
+        visOrdbank: 'Show a word bank at the top of the sheet',
+        lag: 'Create sheet',
+        skrivUt: 'Print',
+        skrivUtFasit: 'Print answer key',
+        visFasit: 'Show answers here',
+        navnLinje: 'Name: ____________________   Date: ____________',
+        ordbank: 'Word bank',
+        instruks: 'Fill in the missing letters.',
+        fasit: 'KEY',
+        standardTittel: 'Words with holes',
+      };
+---
+
+<div class="oh-verktoy" data-lang={lang} data-standardtittel={t.standardTittel}>
+  <div class="oh-oppsett">
+    <section class="oh-panel" aria-labelledby="oh-panel-tittel">
+      <h2 id="oh-panel-tittel" class="sr-only">{lang === 'nb' ? 'Oppsett' : 'Setup'}</h2>
+
+      <label class="oh-felt">
+        <span class="oh-felt-navn">{t.tittelFelt}</span>
+        <input type="text" id="oh-tittel" placeholder={t.tittelEks} maxlength="60" />
+      </label>
+
+      <div class="oh-felt">
+        <span class="oh-felt-navn" id="oh-ord-navn">{t.ordNavn}</span>
+        <ul id="oh-liste" aria-labelledby="oh-ord-navn"></ul>
+        <button type="button" id="oh-legg-til" class="oh-sekundaer">{t.leggTil}</button>
+      </div>
+
+      <label class="oh-felt">
+        <span class="oh-felt-navn">{t.modus}</span>
+        <select id="oh-modus">
+          <option value="tilfeldig-1" selected>{t.modusTilfeldig1}</option>
+          <option value="tilfeldig-2">{t.modusTilfeldig2}</option>
+          <option value="forste">{t.modusForste}</option>
+          <option value="vokaler">{t.modusVokaler}</option>
+          <option value="kj">{t.modusKj}</option>
+          <option value="ng">{t.modusNg}</option>
+          <option value="dobbel">{t.modusDobbel}</option>
+        </select>
+      </label>
+
+      <label class="oh-valg">
+        <input type="checkbox" id="oh-vis-ordbank" checked />
+        {t.visOrdbank}
+      </label>
+
+      <button type="button" id="oh-lag" class="knapp oh-primaer">{t.lag}</button>
+      <p id="oh-status" class="oh-status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="oh-visning" id="oh-ark-seksjon" hidden aria-labelledby="oh-visning-tittel">
+      <h2 id="oh-visning-tittel" class="sr-only">
+        {lang === 'nb' ? 'Forhåndsvisning' : 'Preview'}
+      </h2>
+      <div class="oh-handlinger">
+        <button type="button" id="oh-skriv-ut" class="knapp oh-primaer">{t.skrivUt}</button>
+        <button type="button" id="oh-skriv-ut-fasit" class="oh-sekundaer">{t.skrivUtFasit}</button>
+        <button type="button" id="oh-fasit-toggle" class="oh-sekundaer" aria-pressed="false">
+          {t.visFasit}
+        </button>
+      </div>
+
+      <div class="oh-sticky-print">
+        <button type="button" id="oh-skriv-ut-sticky" class="oh-sticky-knapp" title="Skriv ut arket (Ctrl+P)" aria-label={t.skrivUt}>
+          🖨
+        </button>
+      </div>
+
+      <div class="oh-ark" id="oh-ark">
+        <div class="oh-ark-hode">
+          <h3 id="oh-overskrift">{t.standardTittel}</h3>
+          <span class="oh-fasit-merke" aria-hidden="true">{t.fasit}</span>
+        </div>
+        <p class="oh-instruks">{t.instruks}</p>
+        <p class="oh-navn-linje">{t.navnLinje}</p>
+        <div class="oh-bank" id="oh-bank" hidden>
+          <p class="oh-bank-navn">{t.ordbank}</p>
+          <p class="oh-bank-ord" id="oh-bank-ord"></p>
+        </div>
+        <ul id="oh-ord" class="oh-ordliste"></ul>
+      </div>
+    </section>
+  </div>
+</div>
+
+<style is:global>
+  .oh-oppsett {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: var(--s-5);
+    align-items: start;
+    margin-top: var(--s-4);
+  }
+
+  @media (max-width: 900px) {
+    .oh-oppsett {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .oh-panel {
+    background: var(--flate);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: var(--s-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .oh-felt {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .oh-felt-navn {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--tekst);
+  }
+
+  .oh-panel input[type='text'],
+  .oh-panel select {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    padding: 9px 10px;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--tekst);
+    min-height: 44px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .oh-valg {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    min-height: 32px;
+    color: var(--tekst);
+  }
+
+  .oh-valg input {
+    width: 19px;
+    height: 19px;
+    accent-color: var(--salvie);
+    flex-shrink: 0;
+  }
+
+  @media (pointer: coarse) {
+    .oh-valg {
+      min-height: 44px;
+    }
+  }
+
+  #oh-liste {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .oh-rad {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .oh-rad input[type='text'] {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .oh-rad.upassende input[type='text'] {
+    border-color: var(--feil);
+  }
+
+  .oh-ikonknapp {
+    font: inherit;
+    min-width: 44px;
+    min-height: 44px;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--tekst);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .oh-ikonknapp:hover {
+    border-color: var(--salvie);
+  }
+
+  .oh-primaer {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 700;
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    border: none;
+    border-radius: 9px;
+    padding: 11px 20px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .oh-primaer:hover {
+    filter: brightness(1.06);
+  }
+
+  .oh-sekundaer {
+    font-family: var(--font-sans);
+    font-size: 14.5px;
+    font-weight: 600;
+    background: var(--bg);
+    color: var(--tekst);
+    border: 1px solid var(--linje);
+    border-radius: 9px;
+    padding: 10px 16px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .oh-sekundaer:hover {
+    border-color: var(--salvie);
+  }
+
+  .oh-sekundaer:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  .oh-status {
+    margin: 0;
+    font-size: 14.5px;
+    color: var(--dempet);
+    min-height: 1.4em;
+  }
+
+  .oh-status.feil {
+    color: var(--feil);
+  }
+
+  .oh-handlinger {
+    display: flex;
+    gap: var(--s-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--s-3);
+  }
+
+  .oh-sticky-print {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 15;
+  }
+
+  .oh-sticky-knapp {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 1px solid var(--linje);
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: var(--kort-skygge);
+    display: grid;
+    place-items: center;
+  }
+
+  .oh-ark {
+    background: #fff;
+    color: #111;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: 28px 32px;
+    max-width: 660px;
+  }
+
+  .oh-ark-hode {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  #oh-overskrift {
+    margin: 0 0 4px;
+    font-size: 24px;
+    color: #111;
+  }
+
+  .oh-fasit-merke {
+    display: none;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    color: #b3261e;
+    border: 2px solid #b3261e;
+    border-radius: 6px;
+    padding: 2px 8px;
+  }
+
+  .oh-verktoy.fasit-paa .oh-fasit-merke {
+    display: inline-block;
+  }
+
+  .oh-instruks {
+    margin: 0 0 6px;
+    font-size: 14.5px;
+    color: #333;
+  }
+
+  .oh-navn-linje {
+    margin: 0 0 16px;
+    font-size: 13.5px;
+    color: #333;
+  }
+
+  .oh-bank {
+    border: 2px solid #333;
+    border-radius: 6px;
+    padding: 8px 14px;
+    margin-bottom: 18px;
+    text-align: center;
+  }
+
+  .oh-bank-navn {
+    margin: 0;
+    font-weight: 700;
+    font-size: 14.5px;
+    text-decoration: underline;
+    color: #111;
+  }
+
+  .oh-bank-ord {
+    margin: 2px 0 0;
+    font-size: 15px;
+    color: #111;
+  }
+
+  .oh-ordliste {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px 32px;
+  }
+
+  .oh-ord {
+    font-size: 27px;
+    letter-spacing: 0.12em;
+    color: #111;
+  }
+
+  .oh-hull {
+    color: #333;
+  }
+
+  .oh-svar {
+    display: none;
+    font-weight: 700;
+    color: #1a6a3a;
+  }
+
+  .oh-verktoy.fasit-paa .oh-svar {
+    display: inline;
+  }
+
+  .oh-verktoy.fasit-paa .oh-hull {
+    display: none;
+  }
+
+  @media print {
+    @page {
+      margin: 14mm;
+    }
+
+    html,
+    body {
+      color-scheme: light;
+      background: #fff !important;
+      color: #000;
+    }
+
+    .topp,
+    .bunn,
+    .hopp,
+    .oh-panel,
+    .oh-handlinger,
+    .oh-side-hode,
+    .oh-sticky-print {
+      display: none !important;
+    }
+
+    .ramme {
+      padding: 0;
+      max-width: none;
+      min-height: 0;
+      background: #fff;
+    }
+
+    .oh-oppsett {
+      display: block;
+      margin: 0;
+    }
+
+    .oh-ark {
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 0;
+      max-width: none;
+    }
+
+    .oh-bank {
+      margin-bottom: 8mm;
+    }
+
+    .oh-ordliste {
+      gap: 12mm 14mm;
+    }
+
+    .oh-ordliste li {
+      break-inside: avoid;
+    }
+
+    .oh-verktoy:not(.print-fasit) .oh-svar {
+      display: none !important;
+    }
+
+    .oh-verktoy:not(.print-fasit) .oh-fasit-merke {
+      display: none !important;
+    }
+
+    .oh-verktoy.print-fasit .oh-svar {
+      display: inline !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+
+    .oh-verktoy.print-fasit .oh-hull {
+      display: none !important;
+    }
+
+    .oh-verktoy.print-fasit .oh-fasit-merke {
+      display: inline-block !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+  }
+</style>
+
+<script>
+  import { ordErUpassende } from '../lib/ordkryss-kjerne';
+
+  const rot = document.querySelector<HTMLElement>('.oh-verktoy');
+  if (rot) {
+    const lang = (rot.dataset.lang ?? 'nb') as 'nb' | 'en';
+    const standardTittel = rot.dataset.standardtittel ?? 'Ord med hull';
+    const LAGRINGSNOKKEL = `ord-med-hull-${lang}`;
+    const MAKS = 16;
+    const VOKALER = 'aeiouyæøåé';
+
+    const M =
+      lang === 'nb'
+        ? {
+            minstEtt: 'Skriv inn minst ett ord.',
+            upassende: (o: string) =>
+              `«${o}» passer ikke på et skoleark. Bytt ut ordet, så lager vi arket.`,
+            forKort: (o: string) => `«${o}» må ha minst tre bokstaver.`,
+            utenGrafem: (o: string, g: string) =>
+              `«${o}» inneholder ikke ${g} — bytt ut ordet eller velg en annen modus.`,
+            klart: (n: number) => `Arket er klart: ${n} ord.`,
+            ordAria: (i: number) => `Ord ${i}`,
+            fjern: (i: number) => `Fjern ord ${i}`,
+            ordEks: 'skriv et ord',
+            grafemNavn: { kj: 'kj/skj/sj', ng: 'ng/nk', dobbel: 'dobbel konsonant' } as Record<string, string>,
+          }
+        : {
+            minstEtt: 'Type at least one word.',
+            upassende: (o: string) =>
+              `“${o}” does not belong on a school sheet. Swap the word and we will make the sheet.`,
+            forKort: (o: string) => `“${o}” needs at least three letters.`,
+            utenGrafem: (o: string, g: string) =>
+              `“${o}” does not contain ${g} — swap the word or pick another mode.`,
+            klart: (n: number) => `The sheet is ready: ${n} words.`,
+            ordAria: (i: number) => `Word ${i}`,
+            fjern: (i: number) => `Remove word ${i}`,
+            ordEks: 'type a word',
+            grafemNavn: { kj: 'kj/skj/sj', ng: 'ng/nk', dobbel: 'a double consonant' } as Record<string, string>,
+          };
+
+    interface Rad {
+      id: number;
+      tekst: string;
+    }
+
+    let ordListe: Rad[] = [];
+    let nesteId = 1;
+    let fasitSynlig = false;
+
+    const el = <T extends HTMLElement = HTMLElement>(id: string): T =>
+      document.getElementById(id) as T;
+
+    function lagreUtkast() {
+      try {
+        localStorage.setItem(
+          LAGRINGSNOKKEL,
+          JSON.stringify({
+            tittel: el<HTMLInputElement>('oh-tittel').value,
+            modus: el<HTMLSelectElement>('oh-modus').value,
+            visOrdbank: el<HTMLInputElement>('oh-vis-ordbank').checked,
+            ord: ordListe.map((o) => o.tekst),
+          })
+        );
+      } catch {}
+    }
+
+    function lastUtkast(): boolean {
+      try {
+        const raa = localStorage.getItem(LAGRINGSNOKKEL);
+        if (!raa) return false;
+        const u = JSON.parse(raa);
+        el<HTMLInputElement>('oh-tittel').value = u.tittel ?? '';
+        const felt = el<HTMLSelectElement>('oh-modus');
+        if ([...felt.options].some((o) => o.value === u.modus)) felt.value = u.modus;
+        el<HTMLInputElement>('oh-vis-ordbank').checked = u.visOrdbank !== false;
+        (u.ord ?? []).forEach((o: unknown) => {
+          if (typeof o === 'string') ordListe.push({ id: nesteId++, tekst: o });
+        });
+        return ordListe.length > 0;
+      } catch {
+        return false;
+      }
+    }
+
+    function leggTil(tekst = '') {
+      if (ordListe.length >= MAKS) return;
+      ordListe.push({ id: nesteId++, tekst });
+      tegnListe();
+    }
+
+    function tegnListe() {
+      const liste = el('oh-liste');
+      liste.replaceChildren();
+      ordListe.forEach((ord, indeks) => {
+        const rad = document.createElement('li');
+        rad.className = 'oh-rad';
+        const felt = document.createElement('input');
+        felt.type = 'text';
+        felt.value = ord.tekst.slice(0, 16);
+        felt.maxLength = 16;
+        felt.placeholder = M.ordEks;
+        felt.setAttribute('aria-label', M.ordAria(indeks + 1));
+        felt.addEventListener('input', () => {
+          ord.tekst = felt.value;
+          const stygt = ordErUpassende(felt.value);
+          rad.classList.toggle('upassende', stygt);
+          felt.setAttribute('aria-invalid', stygt ? 'true' : 'false');
+          lagreUtkast();
+        });
+        if (ordErUpassende(ord.tekst)) rad.classList.add('upassende');
+        const fjern = document.createElement('button');
+        fjern.type = 'button';
+        fjern.className = 'oh-ikonknapp';
+        fjern.textContent = '✕';
+        fjern.setAttribute('aria-label', M.fjern(indeks + 1));
+        fjern.addEventListener('click', () => {
+          ordListe = ordListe.filter((o) => o.id !== ord.id);
+          if (ordListe.length === 0) leggTil();
+          tegnListe();
+          lagreUtkast();
+        });
+        rad.append(felt, fjern);
+        liste.appendChild(rad);
+      });
+      el<HTMLButtonElement>('oh-legg-til').disabled = ordListe.length >= MAKS;
+    }
+
+    function siStatus(tekst: string, erFeil = false) {
+      const status = el('oh-status');
+      status.textContent = tekst;
+      status.classList.toggle('feil', erFeil);
+    }
+
+    /* Hvilke posisjoner i ordet skjules? null = grafemet finnes ikke. */
+    function finnHull(ord: string, modus: string): number[] | null {
+      const n = ord.length;
+      if (modus === 'forste') return [0];
+      if (modus === 'vokaler') {
+        const hull = [...ord].map((b, i) => (VOKALER.includes(b) ? i : -1)).filter((i) => i >= 0);
+        return hull.length > 0 ? hull : null;
+      }
+      if (modus === 'kj' || modus === 'ng') {
+        // lengste grafem først: skj før sj/kj
+        const grafemer = modus === 'kj' ? ['skj', 'kj', 'sj'] : ['ng', 'nk'];
+        for (const g of grafemer) {
+          const i = ord.indexOf(g);
+          if (i !== -1) return Array.from({ length: g.length }, (_, k) => i + k);
+        }
+        return null;
+      }
+      if (modus === 'dobbel') {
+        const m = ord.match(/([bcdfghjklmnpqrstvwxz])\1/);
+        if (!m || m.index === undefined) return null;
+        return [m.index, m.index + 1];
+      }
+      // tilfeldig-1 / tilfeldig-2
+      const antall = modus === 'tilfeldig-2' ? 2 : 1;
+      const posisjoner = Array.from({ length: n }, (_, i) => i);
+      for (let i = posisjoner.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [posisjoner[i], posisjoner[j]] = [posisjoner[j], posisjoner[i]];
+      }
+      return posisjoner.slice(0, Math.min(antall, n - 1)).sort((a, b) => a - b);
+    }
+
+    function generer() {
+      const modus = el<HTMLSelectElement>('oh-modus').value;
+      const sett = new Set<string>();
+      const rene: string[] = [];
+      for (const o of ordListe) {
+        const tekst = o.tekst.trim().toLowerCase();
+        if (!tekst) continue;
+        if (ordErUpassende(tekst)) {
+          siStatus(M.upassende(tekst), true);
+          return;
+        }
+        if (tekst.length < 3) {
+          siStatus(M.forKort(tekst), true);
+          return;
+        }
+        if (sett.has(tekst)) continue;
+        sett.add(tekst);
+        rene.push(tekst);
+      }
+      if (rene.length === 0) {
+        siStatus(M.minstEtt, true);
+        return;
+      }
+
+      // hulling — grafem-modusene krever at grafemet finnes i hvert ord
+      const hullPerOrd: number[][] = [];
+      for (const ord of rene) {
+        const hull = finnHull(ord, modus);
+        if (hull === null) {
+          siStatus(M.utenGrafem(ord, M.grafemNavn[modus] ?? modus), true);
+          return;
+        }
+        hullPerOrd.push(hull);
+      }
+
+      el('oh-overskrift').textContent =
+        el<HTMLInputElement>('oh-tittel').value.trim() || standardTittel;
+
+      const visBank = el<HTMLInputElement>('oh-vis-ordbank').checked;
+      const bank = el('oh-bank');
+      bank.hidden = !visBank;
+      if (visBank) {
+        const stokket = [...rene];
+        for (let i = stokket.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [stokket[i], stokket[j]] = [stokket[j], stokket[i]];
+        }
+        el('oh-bank-ord').textContent = stokket.join('  –  ');
+      }
+
+      const liste = el('oh-ord');
+      liste.replaceChildren();
+      rene.forEach((ord, indeks) => {
+        const hull = new Set(hullPerOrd[indeks]);
+        const li = document.createElement('li');
+        const ordEl = document.createElement('span');
+        ordEl.className = 'oh-ord';
+        [...ord].forEach((bokstav, i) => {
+          if (hull.has(i)) {
+            const strek = document.createElement('span');
+            strek.className = 'oh-hull';
+            strek.textContent = '_';
+            const svar = document.createElement('span');
+            svar.className = 'oh-svar';
+            svar.textContent = bokstav;
+            ordEl.append(strek, svar);
+          } else {
+            ordEl.appendChild(document.createTextNode(bokstav));
+          }
+        });
+        li.appendChild(ordEl);
+        liste.appendChild(li);
+      });
+
+      fasitSynlig = false;
+      el('oh-fasit-toggle').setAttribute('aria-pressed', 'false');
+      rot.classList.remove('fasit-paa');
+
+      el('oh-ark-seksjon').removeAttribute('hidden');
+      siStatus(M.klart(rene.length));
+      lagreUtkast();
+    }
+
+    if (!lastUtkast()) {
+      leggTil();
+      leggTil();
+      leggTil();
+      leggTil();
+    }
+    tegnListe();
+
+    el('oh-legg-til').addEventListener('click', () => {
+      leggTil();
+      lagreUtkast();
+    });
+
+    el('oh-lag').addEventListener('click', generer);
+
+    el('oh-fasit-toggle').addEventListener('click', () => {
+      fasitSynlig = !fasitSynlig;
+      el('oh-fasit-toggle').setAttribute('aria-pressed', String(fasitSynlig));
+      rot.classList.toggle('fasit-paa', fasitSynlig);
+    });
+
+    const skrivUt = () => {
+      rot.classList.remove('print-fasit');
+      window.print();
+    };
+    el('oh-skriv-ut').addEventListener('click', skrivUt);
+    el('oh-skriv-ut-sticky').addEventListener('click', skrivUt);
+    el('oh-skriv-ut-fasit').addEventListener('click', () => {
+      rot.classList.add('print-fasit');
+      window.print();
+    });
+    window.addEventListener('afterprint', () => rot.classList.remove('print-fasit'));
+
+    ['oh-tittel', 'oh-modus', 'oh-vis-ordbank'].forEach((id) =>
+      el(id).addEventListener('change', lagreUtkast)
+    );
+  }
+</script>

@@ -1,0 +1,47 @@
+---
+import Side from '../../layouts/Side.astro';
+import OrdMedHullVerktoy from '../../components/OrdMedHullVerktoy.astro';
+
+/* Ord med hull i Lærerrommet. ENGELSK TVILLING:
+   src/pages/en/sandbox/missing-letters.astro — endre begge. */
+---
+
+<Side
+  title="Ord med hull — lag rettskrivingsark til utskrift"
+  description="Ukas ord med manglende bokstaver: tilfeldige, vokalene, eller målrettet kj/skj/sj, ng/nk og dobbel konsonant. Med fasit."
+>
+  <div class="oh-side-hode">
+    <p class="kicker">/lærer · norsk</p>
+    <h1>Ord med hull</h1>
+    <p class="dempet">
+      Lag rettskrivingsark: ordene dine får manglende bokstaver som eleven
+      fyller inn. Velg tilfeldige bokstaver, vokalene — eller målrettet
+      trening på kj/skj/sj, ng/nk og dobbel konsonant. Ordbank og fasit
+      følger med.
+    </p>
+  </div>
+  <OrdMedHullVerktoy lang="nb" />
+</Side>
+
+<style>
+  .kicker {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: var(--tekst-label);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--hue-aksent);
+    margin: var(--s-7) 0 var(--s-2);
+  }
+
+  h1 {
+    font-size: var(--tekst-tittel);
+    margin: 0 0 var(--s-3);
+  }
+
+  .dempet {
+    color: var(--dempet);
+    max-width: 68ch;
+    margin: 0;
+  }
+</style>

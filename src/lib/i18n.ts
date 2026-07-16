@@ -33,6 +33,7 @@ export const RUTEKART: Record<string, string> = {
   '/sandbox/hemmelig-kode': '/en/sandbox/secret-code',
   '/sandbox/tierammer': '/en/sandbox/ten-frames',
   '/sandbox/ord-med-hull': '/en/sandbox/missing-letters',
+  '/sandbox/tallpyramide': '/en/sandbox/number-pyramids',
   '/slik-jobber-jeg': '/en/how-i-work',
   '/om': '/en/about',
   '/kolofon': '/en/colophon',

@@ -1,0 +1,608 @@
+---
+/* Tallpyramide-verktøyet: regnepyramider (hver stein = summen av de to
+   under) og magiske kvadrater (alle linjer deler sum). Kjernen bor i
+   src/lib/tallpyramide.ts — komplett løsning genereres først, felter
+   skjules grådig med propagerings-garanti, så hver oppgave er løsbar
+   uten gjetting. Alt tegnes som SVG. */
+
+interface Props {
+  lang?: 'nb' | 'en';
+}
+
+const { lang = 'nb' } = Astro.props;
+
+const t =
+  lang === 'nb'
+    ? {
+        tittelFelt: 'Tittel på arket',
+        tittelEks: 'Skriv tittelen her',
+        type: 'Oppgavetype',
+        typePyramide: 'tallpyramider',
+        typeMagisk: 'magiske kvadrater',
+        typeBlandet: 'blandet',
+        rader: 'Pyramidens høyde',
+        rader3: '3 rader (småtrinn)',
+        rader4: '4 rader',
+        rader5: '5 rader',
+        maks: 'Største tall',
+        vanskelighet: 'Vanskelighetsgrad',
+        lett: 'lett — få tomme felt',
+        middels: 'middels',
+        vanskelig: 'vanskelig — flest mulig tomme',
+        antall: 'Antall oppgaver',
+        lag: 'Lag oppgaveark',
+        skrivUt: 'Skriv ut',
+        skrivUtFasit: 'Skriv ut fasit',
+        visFasit: 'Vis fasit her',
+        navnLinje: 'Navn: ____________________   Dato: ____________',
+        instruksPyramide: 'Hver stein er summen av de to steinene under.',
+        instruksMagisk: 'Alle rader, kolonner og diagonaler skal ha samme sum.',
+        sumTekst: 'Sum',
+        fasit: 'FASIT',
+        standardTittel: 'Tallpyramider',
+      }
+    : {
+        tittelFelt: 'Sheet title',
+        tittelEks: 'Type the title here',
+        type: 'Task type',
+        typePyramide: 'number pyramids',
+        typeMagisk: 'magic squares',
+        typeBlandet: 'mixed',
+        rader: 'Pyramid height',
+        rader3: '3 rows (early years)',
+        rader4: '4 rows',
+        rader5: '5 rows',
+        maks: 'Largest number',
+        vanskelighet: 'Difficulty',
+        lett: 'easy — few empty fields',
+        middels: 'medium',
+        vanskelig: 'hard — as many empty as possible',
+        antall: 'Number of tasks',
+        lag: 'Create sheet',
+        skrivUt: 'Print',
+        skrivUtFasit: 'Print answer key',
+        visFasit: 'Show answers here',
+        navnLinje: 'Name: ____________________   Date: ____________',
+        instruksPyramide: 'Each stone is the sum of the two stones below it.',
+        instruksMagisk: 'Every row, column and diagonal must have the same sum.',
+        sumTekst: 'Sum',
+        fasit: 'KEY',
+        standardTittel: 'Number pyramids',
+      };
+---
+
+<div class="py-verktoy" data-lang={lang} data-standardtittel={t.standardTittel}>
+  <div class="py-oppsett">
+    <section class="py-panel" aria-labelledby="py-panel-tittel">
+      <h2 id="py-panel-tittel" class="sr-only">{lang === 'nb' ? 'Oppsett' : 'Setup'}</h2>
+
+      <label class="py-felt">
+        <span class="py-felt-navn">{t.tittelFelt}</span>
+        <input type="text" id="py-tittel" placeholder={t.tittelEks} maxlength="60" />
+      </label>
+
+      <label class="py-felt">
+        <span class="py-felt-navn">{t.type}</span>
+        <select id="py-type">
+          <option value="pyramide" selected>{t.typePyramide}</option>
+          <option value="magisk">{t.typeMagisk}</option>
+          <option value="blandet">{t.typeBlandet}</option>
+        </select>
+      </label>
+
+      <label class="py-felt">
+        <span class="py-felt-navn">{t.rader}</span>
+        <select id="py-rader">
+          <option value="3">{t.rader3}</option>
+          <option value="4" selected>{t.rader4}</option>
+          <option value="5">{t.rader5}</option>
+        </select>
+      </label>
+
+      <label class="py-felt">
+        <span class="py-felt-navn">{t.maks}</span>
+        <select id="py-maks">
+          <option value="20">20</option>
+          <option value="50" selected>50</option>
+          <option value="100">100</option>
+        </select>
+      </label>
+
+      <label class="py-felt">
+        <span class="py-felt-navn">{t.vanskelighet}</span>
+        <select id="py-vanskelighet">
+          <option value="lett">{t.lett}</option>
+          <option value="middels" selected>{t.middels}</option>
+          <option value="vanskelig">{t.vanskelig}</option>
+        </select>
+      </label>
+
+      <label class="py-felt">
+        <span class="py-felt-navn">{t.antall}</span>
+        <select id="py-antall">
+          <option value="4">4</option>
+          <option value="6" selected>6</option>
+          <option value="8">8</option>
+        </select>
+      </label>
+
+      <button type="button" id="py-lag" class="knapp py-primaer">{t.lag}</button>
+      <p id="py-status" class="py-status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="py-visning" id="py-ark-seksjon" hidden aria-labelledby="py-visning-tittel">
+      <h2 id="py-visning-tittel" class="sr-only">
+        {lang === 'nb' ? 'Forhåndsvisning' : 'Preview'}
+      </h2>
+      <div class="py-handlinger">
+        <button type="button" id="py-skriv-ut" class="knapp py-primaer">{t.skrivUt}</button>
+        <button type="button" id="py-skriv-ut-fasit" class="py-sekundaer">{t.skrivUtFasit}</button>
+        <button type="button" id="py-fasit-toggle" class="py-sekundaer" aria-pressed="false">
+          {t.visFasit}
+        </button>
+      </div>
+
+      <div class="py-sticky-print">
+        <button type="button" id="py-skriv-ut-sticky" class="py-sticky-knapp" title="Skriv ut arket (Ctrl+P)" aria-label={t.skrivUt}>
+          🖨
+        </button>
+      </div>
+
+      <div class="py-ark" id="py-ark">
+        <div class="py-ark-hode">
+          <h3 id="py-overskrift">{t.standardTittel}</h3>
+          <span class="py-fasit-merke" aria-hidden="true">{t.fasit}</span>
+        </div>
+        <p class="py-instruks" id="py-instruks"></p>
+        <p class="py-navn-linje">{t.navnLinje}</p>
+        <div id="py-oppgaver" class="py-oppgaver"></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<style is:global>
+  .py-oppsett {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: var(--s-5);
+    align-items: start;
+    margin-top: var(--s-4);
+  }
+
+  @media (max-width: 900px) {
+    .py-oppsett {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .py-panel {
+    background: var(--flate);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: var(--s-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .py-felt {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .py-felt-navn {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--tekst);
+  }
+
+  .py-panel input[type='text'],
+  .py-panel select {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    padding: 9px 10px;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--tekst);
+    min-height: 44px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .py-primaer {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 700;
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    border: none;
+    border-radius: 9px;
+    padding: 11px 20px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .py-primaer:hover {
+    filter: brightness(1.06);
+  }
+
+  .py-sekundaer {
+    font-family: var(--font-sans);
+    font-size: 14.5px;
+    font-weight: 600;
+    background: var(--bg);
+    color: var(--tekst);
+    border: 1px solid var(--linje);
+    border-radius: 9px;
+    padding: 10px 16px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .py-sekundaer:hover {
+    border-color: var(--salvie);
+  }
+
+  .py-status {
+    margin: 0;
+    font-size: 14.5px;
+    color: var(--dempet);
+    min-height: 1.4em;
+  }
+
+  .py-handlinger {
+    display: flex;
+    gap: var(--s-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--s-3);
+  }
+
+  .py-sticky-print {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 15;
+  }
+
+  .py-sticky-knapp {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 1px solid var(--linje);
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: var(--kort-skygge);
+    display: grid;
+    place-items: center;
+  }
+
+  .py-ark {
+    background: #fff;
+    color: #111;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: 28px 32px;
+    max-width: 660px;
+  }
+
+  .py-ark-hode {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  #py-overskrift {
+    margin: 0 0 4px;
+    font-size: 24px;
+    color: #111;
+  }
+
+  .py-fasit-merke {
+    display: none;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    color: #b3261e;
+    border: 2px solid #b3261e;
+    border-radius: 6px;
+    padding: 2px 8px;
+  }
+
+  .py-verktoy.fasit-paa .py-fasit-merke {
+    display: inline-block;
+  }
+
+  .py-instruks {
+    margin: 0 0 6px;
+    font-size: 14.5px;
+    color: #333;
+  }
+
+  .py-navn-linje {
+    margin: 0 0 18px;
+    font-size: 13.5px;
+    color: #333;
+  }
+
+  .py-oppgaver {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 26px 22px;
+  }
+
+  .py-oppgave svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .py-fasit-del {
+    display: none;
+  }
+
+  .py-verktoy.fasit-paa .py-fasit-del {
+    display: inline;
+  }
+
+  @media print {
+    @page {
+      margin: 14mm;
+    }
+
+    html,
+    body {
+      color-scheme: light;
+      background: #fff !important;
+      color: #000;
+    }
+
+    .topp,
+    .bunn,
+    .hopp,
+    .py-panel,
+    .py-handlinger,
+    .py-side-hode,
+    .py-sticky-print {
+      display: none !important;
+    }
+
+    .ramme {
+      padding: 0;
+      max-width: none;
+      min-height: 0;
+      background: #fff;
+    }
+
+    .py-oppsett {
+      display: block;
+      margin: 0;
+    }
+
+    .py-ark {
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 0;
+      max-width: none;
+    }
+
+    .py-oppgaver {
+      gap: 14mm 12mm;
+    }
+
+    .py-oppgave {
+      break-inside: avoid;
+    }
+
+    .py-verktoy:not(.print-fasit) .py-fasit-del {
+      display: none !important;
+    }
+
+    .py-verktoy:not(.print-fasit) .py-fasit-merke {
+      display: none !important;
+    }
+
+    .py-verktoy.print-fasit .py-fasit-del {
+      display: inline !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+
+    .py-verktoy.print-fasit .py-fasit-merke {
+      display: inline-block !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+  }
+</style>
+
+<script>
+  import { lagPyramide, lagMagiskKvadrat } from '../lib/tallpyramide';
+  import type { Vanskelighet } from '../lib/tallpyramide';
+
+  const rot = document.querySelector<HTMLElement>('.py-verktoy');
+  if (rot) {
+    const lang = (rot.dataset.lang ?? 'nb') as 'nb' | 'en';
+    const standardTittel = rot.dataset.standardtittel ?? 'Tallpyramider';
+    const LAGRINGSNOKKEL = `tallpyramide-${lang}`;
+    const NS = 'http://www.w3.org/2000/svg';
+
+    const M =
+      lang === 'nb'
+        ? {
+            instruksPyramide: 'Hver stein er summen av de to steinene under.',
+            instruksMagisk: 'Alle rader, kolonner og diagonaler skal ha samme sum.',
+            instruksBegge: 'Pyramide: hver stein er summen av de to under. Kvadrat: alle rader, kolonner og diagonaler har samme sum.',
+            sum: 'Sum',
+            klart: (n: number) => `Arket er klart: ${n} oppgaver.`,
+          }
+        : {
+            instruksPyramide: 'Each stone is the sum of the two stones below it.',
+            instruksMagisk: 'Every row, column and diagonal must have the same sum.',
+            instruksBegge: 'Pyramid: each stone is the sum of the two below. Square: every row, column and diagonal shares the same sum.',
+            sum: 'Sum',
+            klart: (n: number) => `The sheet is ready: ${n} tasks.`,
+          };
+
+    let fasitSynlig = false;
+
+    const el = <T extends HTMLElement = HTMLElement>(id: string): T =>
+      document.getElementById(id) as T;
+
+    function svgEl(navn: string, attrs: Record<string, string>, tekst?: string) {
+      const e = document.createElementNS(NS, navn);
+      for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+      if (tekst !== undefined) e.textContent = tekst;
+      return e;
+    }
+
+    function celle(
+      svg: SVGElement,
+      x: number,
+      y: number,
+      b: number,
+      h: number,
+      verdi: number,
+      skjult: boolean
+    ) {
+      svg.appendChild(
+        svgEl('rect', {
+          x: String(x), y: String(y), width: String(b), height: String(h),
+          fill: '#fff', stroke: '#333', 'stroke-width': '0.7', rx: '1.4',
+        })
+      );
+      const attrs: Record<string, string> = {
+        x: String(x + b / 2), y: String(y + h / 2 + 2.4),
+        'text-anchor': 'middle', 'font-size': '6.4', fill: '#111',
+      };
+      if (skjult) {
+        attrs.fill = '#1a6a3a';
+        attrs['font-weight'] = '700';
+        attrs.class = 'py-fasit-del';
+      }
+      svg.appendChild(svgEl('text', attrs, String(verdi)));
+    }
+
+    function lagPyramideSvg(rader: number[][], skjult: boolean[][]): SVGElement {
+      const B = 20;
+      const H = 11;
+      const bunn = rader[rader.length - 1].length;
+      const bredde = bunn * B + 2;
+      const svg = svgEl('svg', { viewBox: `0 0 ${bredde} ${rader.length * H + 2}`, 'aria-hidden': 'true' });
+      rader.forEach((rad, r) => {
+        const x0 = (bredde - rad.length * B) / 2;
+        rad.forEach((verdi, i) => {
+          celle(svg, x0 + i * B, 1 + r * H, B, H, verdi, skjult[r][i]);
+        });
+      });
+      return svg;
+    }
+
+    function lagMagiskSvg(celler: number[], skjult: boolean[], sum: number): SVGElement {
+      const C = 16;
+      const svg = svgEl('svg', { viewBox: `0 0 ${3 * C + 34} ${3 * C + 2}`, 'aria-hidden': 'true' });
+      celler.forEach((verdi, i) => {
+        const rad = Math.floor(i / 3);
+        const kol = i % 3;
+        celle(svg, 1 + kol * C, 1 + rad * C, C, C, verdi, skjult[i]);
+      });
+      svg.appendChild(
+        svgEl('text', {
+          x: String(3 * C + 6), y: String(1.5 * C + 3),
+          'font-size': '6.2', 'font-weight': '700', fill: '#333',
+        }, `${M.sum} = ${sum}`)
+      );
+      return svg;
+    }
+
+    function generer() {
+      const type = el<HTMLSelectElement>('py-type').value as 'pyramide' | 'magisk' | 'blandet';
+      const rader = parseInt(el<HTMLSelectElement>('py-rader').value, 10);
+      const maks = parseInt(el<HTMLSelectElement>('py-maks').value, 10);
+      const vanskelighet = el<HTMLSelectElement>('py-vanskelighet').value as Vanskelighet;
+      const antall = parseInt(el<HTMLSelectElement>('py-antall').value, 10);
+
+      el('py-overskrift').textContent =
+        el<HTMLInputElement>('py-tittel').value.trim() || standardTittel;
+      el('py-instruks').textContent =
+        type === 'pyramide' ? M.instruksPyramide : type === 'magisk' ? M.instruksMagisk : M.instruksBegge;
+
+      const beholder = el('py-oppgaver');
+      beholder.replaceChildren();
+      for (let i = 0; i < antall; i++) {
+        const denne = type === 'blandet' ? (i % 2 === 0 ? 'pyramide' : 'magisk') : type;
+        const boks = document.createElement('div');
+        boks.className = 'py-oppgave';
+        if (denne === 'pyramide') {
+          const p = lagPyramide(rader, maks, vanskelighet);
+          boks.appendChild(lagPyramideSvg(p.rader, p.skjult));
+        } else {
+          const m = lagMagiskKvadrat(maks, vanskelighet);
+          boks.appendChild(lagMagiskSvg(m.celler, m.skjult, m.sum));
+        }
+        beholder.appendChild(boks);
+      }
+
+      fasitSynlig = false;
+      el('py-fasit-toggle').setAttribute('aria-pressed', 'false');
+      rot.classList.remove('fasit-paa');
+
+      el('py-ark-seksjon').removeAttribute('hidden');
+      el('py-status').textContent = M.klart(antall);
+      try {
+        localStorage.setItem(
+          LAGRINGSNOKKEL,
+          JSON.stringify({
+            tittel: el<HTMLInputElement>('py-tittel').value,
+            type,
+            rader: el<HTMLSelectElement>('py-rader').value,
+            maks: el<HTMLSelectElement>('py-maks').value,
+            vanskelighet,
+            antall: el<HTMLSelectElement>('py-antall').value,
+          })
+        );
+      } catch {}
+    }
+
+    try {
+      const u = JSON.parse(localStorage.getItem(LAGRINGSNOKKEL) ?? 'null');
+      if (u) {
+        el<HTMLInputElement>('py-tittel').value = u.tittel ?? '';
+        (['type', 'rader', 'maks', 'vanskelighet', 'antall'] as const).forEach((navn) => {
+          const felt = el<HTMLSelectElement>(`py-${navn}`);
+          if ([...felt.options].some((o) => o.value === u[navn])) felt.value = u[navn];
+        });
+      }
+    } catch {}
+
+    el('py-lag').addEventListener('click', generer);
+
+    el('py-fasit-toggle').addEventListener('click', () => {
+      fasitSynlig = !fasitSynlig;
+      el('py-fasit-toggle').setAttribute('aria-pressed', String(fasitSynlig));
+      rot.classList.toggle('fasit-paa', fasitSynlig);
+    });
+
+    const skrivUt = () => {
+      rot.classList.remove('print-fasit');
+      window.print();
+    };
+    el('py-skriv-ut').addEventListener('click', skrivUt);
+    el('py-skriv-ut-sticky').addEventListener('click', skrivUt);
+    el('py-skriv-ut-fasit').addEventListener('click', () => {
+      rot.classList.add('print-fasit');
+      window.print();
+    });
+    window.addEventListener('afterprint', () => rot.classList.remove('print-fasit'));
+  }
+</script>

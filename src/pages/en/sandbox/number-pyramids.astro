@@ -1,0 +1,48 @@
+---
+import Side from '../../../layouts/Side.astro';
+import TallpyramideVerktoy from '../../../components/TallpyramideVerktoy.astro';
+
+/* Number pyramids in the teacher's room. NORSK TVILLING:
+   src/pages/sandbox/tallpyramide.astro — endre begge. */
+---
+
+<Side
+  lang="en"
+  title="Number pyramids — make printable puzzle sheets"
+  description="Addition pyramids and magic squares with guaranteed-solvable gaps — pick height, number range and difficulty. Answer key included."
+>
+  <div class="py-side-hode">
+    <p class="kicker">/teacher · maths</p>
+    <h1>Number pyramids</h1>
+    <p class="dempet">
+      Make problem-solving sheets: addition pyramids where each stone is the
+      sum of the two below, and magic squares where every line shares the
+      same sum. The gaps are always solvable without guessing — pick the
+      difficulty, range and count. The answer key prints separately.
+    </p>
+  </div>
+  <TallpyramideVerktoy lang="en" />
+</Side>
+
+<style>
+  .kicker {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: var(--tekst-label);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--hue-aksent);
+    margin: var(--s-7) 0 var(--s-2);
+  }
+
+  h1 {
+    font-size: var(--tekst-tittel);
+    margin: 0 0 var(--s-3);
+  }
+
+  .dempet {
+    color: var(--dempet);
+    max-width: 68ch;
+    margin: 0;
+  }
+</style>

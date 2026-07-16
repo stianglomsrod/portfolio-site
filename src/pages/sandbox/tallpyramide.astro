@@ -1,0 +1,47 @@
+---
+import Side from '../../layouts/Side.astro';
+import TallpyramideVerktoy from '../../components/TallpyramideVerktoy.astro';
+
+/* Tallpyramider i Lærerrommet. ENGELSK TVILLING:
+   src/pages/en/sandbox/number-pyramids.astro — endre begge. */
+---
+
+<Side
+  title="Tallpyramider — lag oppgaveark til utskrift"
+  description="Regnepyramider og magiske kvadrater med garantert løsbare hull — velg høyde, tallområde og vanskelighetsgrad. Med fasit."
+>
+  <div class="py-side-hode">
+    <p class="kicker">/lærer · matematikk</p>
+    <h1>Tallpyramider</h1>
+    <p class="dempet">
+      Lag problemløsingsark: regnepyramider der hver stein er summen av de
+      to under, og magiske kvadrater der alle linjer deler samme sum. Hullene
+      er alltid løsbare uten gjetting — velg vanskelighetsgrad, tallområde
+      og antall. Fasiten skrives ut for seg.
+    </p>
+  </div>
+  <TallpyramideVerktoy lang="nb" />
+</Side>
+
+<style>
+  .kicker {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: var(--tekst-label);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--hue-aksent);
+    margin: var(--s-7) 0 var(--s-2);
+  }
+
+  h1 {
+    font-size: var(--tekst-tittel);
+    margin: 0 0 var(--s-3);
+  }
+
+  .dempet {
+    color: var(--dempet);
+    max-width: 68ch;
+    margin: 0;
+  }
+</style>

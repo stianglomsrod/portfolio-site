@@ -277,6 +277,21 @@ export const VERKTOY: Verktoykort[] = [
       cta: 'make a sheet',
     },
   },
+  {
+    slugNb: '/sandbox/tallpyramide',
+    slugEn: '/en/sandbox/number-pyramids',
+    kategori: 'matte',
+    nb: {
+      tittel: 'Tallpyramider',
+      tekst: 'Regnepyramider og magiske kvadrater — hullene er alltid løsbare uten gjetting. Fasit følger med.',
+      cta: 'lag et ark',
+    },
+    en: {
+      tittel: 'Number pyramids',
+      tekst: 'Addition pyramids and magic squares — the gaps are always solvable without guessing. Answer key included.',
+      cta: 'make a sheet',
+    },
+  },
   // ---- Lek og aktivitet ----
   {
     slugNb: '/sandbox/hentediktat',

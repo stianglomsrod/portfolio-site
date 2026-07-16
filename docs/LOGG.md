@@ -6,6 +6,31 @@
 
 ## Changelog
 
+### 2026-07-17 — Sporing v2: ekte skriftforming med bokstavhus og skriveretning
+- **Stians funn**: v1 var langt unna ekte sporingsark. Research gjort
+  (8 skjermbilder fra Stian + egne dumper i `docs/innsikt/sporing/` av
+  Kaleido skriftforming-utdraget, Teaching Funtastic m.fl.);
+  designgrunnlaget er dokumentert i `docs/innsikt/SPORING-DESIGN.md`:
+  bokstavhuset (loft gul/stue rosa/kjeller blå + hus-ikon med tak),
+  vokal rød/konsonant blå, grønt startpunkt + strøknummer +
+  retningspiler, modellrad → tom øverad (Kaleido-mønsteret),
+  skriveretningsregler (start øverst, rundinger mot klokka fra kl. 1–2,
+  b/p stav først, prikker til slutt).
+- **Nytt banebibliotek** `src/lib/bokstavbaner.ts`: skjelettbaner for
+  a–å OG A–Å (58 tegn) der path-retningen ER penneføringen — strøk i
+  riktig rekkefølge. Verktøyet leser startpunkt, pilposisjon og -vinkel
+  rett ut av banene med getTotalLength/getPointAtLength, så dekoren
+  følger automatisk hvis en bane justeres.
+- **SporingVerktoy skrevet helt om**: bokstavhus-rader i SVG med
+  valgfrie sonefarger, modellbokstav i vokal/konsonant-farge (eller
+  sort) med grønn startprikk per strøk, nummer ved flere strøk og
+  pilspiss ved 55 % av strøket; deretter stiplede sporebokstaver og
+  valgfri tom øvelinje. Én bokstav per rad = full skriftforming; ord =
+  sporing av hele ordet med startprikker. Ukjente tegn navngis.
+- QA: røyk-seksjonen omskrevet (soner, strøkfarger, numre 1-2-3 på k,
+  ukjent tegn-feil), visuelt verifisert for både små og store bokstaver,
+  PDF 1 side, bygg grønt, axe 0/56, kant 0/56.
+
 ### 2026-07-16 — Lærerrommet + bølge 1 fra idébanken (7 nye verktøy)
 - **Lærerrommet** (/laerer, EN /en/teacher): kuratert samleside for alle
   utskriftsverktøyene i tre kategorier (Norsk, Matematikk, Lek og

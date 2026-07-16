@@ -1,9 +1,14 @@
 ---
-/* Sporing-verktøyet: skriveark der eleven sporer stiplede bokstaver og
-   ord på skrivelinjer. Hver rad er SVG: linjesystem (topp/x-høyde
-   stiplet, grunnlinje heltrukket) og teksten gjentatt med stiplet
-   kontur (fill: none + stroke-dasharray) — første forekomst mørkere,
-   resten lysere. textLength gjør gjentakelsene forutsigbare. */
+/* Sporing-verktøyet v2: ekte norsk skriftforming (se
+   docs/innsikt/SPORING-DESIGN.md). Hver rad er et BOKSTAVHUS: fire
+   linjer med loft/stue/kjeller (valgfrie sonefarger gul/rosa/blå) og
+   hus-ikon med tak til venstre. Modellbokstaven tegnes med solid strek
+   (vokal rød / konsonant blå, valgfritt sort), grønn startprikk per
+   strøk, strøknummer når det er flere, og pilspiss langs strøket —
+   posisjon og vinkel leses ut av skjelettbanene i
+   src/lib/bokstavbaner.ts med getPointAtLength. Deretter følger
+   stiplede sporebokstaver, og valgfri tom øvelinje under (mønsteret fra
+   Kaleido skriftforming: modellrad → tom rad). */
 
 interface Props {
   lang?: 'nb' | 'en';
@@ -17,32 +22,42 @@ const t =
         tittelFelt: 'Tittel på arket',
         tittelEks: 'Skriv tittelen her',
         radNavn: 'Bokstaver eller ord (én per rad)',
-        radEks: 'skriv en bokstav eller et ord',
+        radEks: 'f.eks. a eller sol',
         leggTil: '+ Legg til rad',
+        hint: 'Én bokstav per rad gir full skriftforming med startpunkt, tall og piler. Et ord gir sporing av hele ordet.',
         storrelse: 'Størrelse',
         storrelseStor: 'stor (1.–2. trinn)',
         storrelseMiddels: 'middels',
-        tomLinje: 'Tom skrivelinje under hver rad',
+        husfarger: 'Farger i bokstavhuset (loft, stue, kjeller)',
+        bokstavfarge: 'Farge på modellbokstaven',
+        fargeVokal: 'vokaler røde, konsonanter blå',
+        fargeSort: 'sort',
+        tomLinje: 'Tom øvelinje under hver rad',
         lag: 'Lag sporingsark',
         skrivUt: 'Skriv ut',
         navnLinje: 'Navn: ____________________   Dato: ____________',
-        instruks: 'Spor bokstavene så pent du kan.',
+        instruks: 'Start på den grønne prikken og følg pilene. Spor bokstavene så pent du kan.',
         standardTittel: 'Sporing',
       }
     : {
         tittelFelt: 'Sheet title',
         tittelEks: 'Type the title here',
         radNavn: 'Letters or words (one per row)',
-        radEks: 'type a letter or a word',
+        radEks: 'e.g. a or sun',
         leggTil: '+ Add row',
+        hint: 'A single letter per row gives full letter formation with starting point, numbers and arrows. A word gives tracing of the whole word.',
         storrelse: 'Size',
         storrelseStor: 'large (early years)',
         storrelseMiddels: 'medium',
-        tomLinje: 'Empty writing line under each row',
+        husfarger: 'Colours in the letter house (attic, living room, basement)',
+        bokstavfarge: 'Model letter colour',
+        fargeVokal: 'vowels red, consonants blue',
+        fargeSort: 'black',
+        tomLinje: 'Empty practice line under each row',
         lag: 'Create tracing sheet',
         skrivUt: 'Print',
         navnLinje: 'Name: ____________________   Date: ____________',
-        instruks: 'Trace the letters as neatly as you can.',
+        instruks: 'Start at the green dot and follow the arrows. Trace the letters as neatly as you can.',
         standardTittel: 'Tracing',
       };
 ---
@@ -61,6 +76,7 @@ const t =
         <span class="sp-felt-navn" id="sp-rad-navn">{t.radNavn}</span>
         <ul id="sp-liste" aria-labelledby="sp-rad-navn"></ul>
         <button type="button" id="sp-legg-til" class="sp-sekundaer">{t.leggTil}</button>
+        <p class="sp-hint">{t.hint}</p>
       </div>
 
       <label class="sp-felt">
@@ -69,6 +85,19 @@ const t =
           <option value="stor" selected>{t.storrelseStor}</option>
           <option value="middels">{t.storrelseMiddels}</option>
         </select>
+      </label>
+
+      <label class="sp-felt">
+        <span class="sp-felt-navn">{t.bokstavfarge}</span>
+        <select id="sp-farge">
+          <option value="vokal" selected>{t.fargeVokal}</option>
+          <option value="sort">{t.fargeSort}</option>
+        </select>
+      </label>
+
+      <label class="sp-valg">
+        <input type="checkbox" id="sp-husfarger" checked />
+        {t.husfarger}
       </label>
 
       <label class="sp-valg">
@@ -179,6 +208,12 @@ const t =
     .sp-valg {
       min-height: 44px;
     }
+  }
+
+  .sp-hint {
+    margin: 2px 0 0;
+    font-size: 13.5px;
+    color: var(--dempet);
   }
 
   #sp-liste {
@@ -333,17 +368,17 @@ const t =
   .sp-rader {
     display: flex;
     flex-direction: column;
-    gap: 14px;
-  }
-
-  .sp-rader[data-storrelse='middels'] {
-    gap: 10px;
+    gap: 16px;
   }
 
   .sp-rad svg {
     display: block;
     width: 100%;
     height: auto;
+  }
+
+  .sp-rader[data-storrelse='middels'] .sp-rad svg {
+    width: 82%;
   }
 
   @media print {
@@ -389,21 +424,23 @@ const t =
     }
 
     .sp-rader {
-      gap: 7mm;
-    }
-
-    .sp-rader[data-storrelse='middels'] {
-      gap: 5mm;
+      gap: 6mm;
     }
 
     .sp-rad {
       break-inside: avoid;
+    }
+
+    .sp-rad svg {
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
     }
   }
 </style>
 
 <script>
   import { ordErUpassende } from '../lib/ordkryss-kjerne';
+  import { LINJER, VOKALER, bane } from '../lib/bokstavbaner';
 
   const rot = document.querySelector<HTMLElement>('.sp-verktoy');
   if (rot) {
@@ -413,25 +450,45 @@ const t =
     const MAKS = 8;
     const NS = 'http://www.w3.org/2000/svg';
 
+    // fargene fra designgrunnlaget
+    const SONE_LOFT = '#FFF3C6';
+    const SONE_STUE = '#FBE3EF';
+    const SONE_KJELLER = '#DDEFF8';
+    const ROD = '#c23a2f';
+    const BLAA = '#1f5f8b';
+    const SORT = '#222';
+    const GRONN = '#1a8a3a';
+    const SPOR = '#b8b8b8';
+    const PIL = '#8d8d8d';
+
+    const VB_BREDDE = 330;
+    const VB_HOYDE = 44;
+    const START_X = 24; // etter hus-ikonet
+    const GAP = 7;
+
     const M =
       lang === 'nb'
         ? {
             minstEn: 'Skriv inn minst én bokstav eller ett ord.',
             upassende: (o: string) =>
               `«${o}» passer ikke på et skoleark. Bytt det ut, så lager vi arket.`,
+            ukjentTegn: (tegn: string, rad: string) =>
+              `«${tegn}» i «${rad}» har ingen sporingsbane ennå — bruk bokstavene a–å og A–Å.`,
             klart: (n: number) => `Arket er klart: ${n} rader.`,
             radAria: (i: number) => `Rad ${i}`,
             fjern: (i: number) => `Fjern rad ${i}`,
-            radEks: 'skriv en bokstav eller et ord',
+            radEks: 'f.eks. a eller sol',
           }
         : {
             minstEn: 'Type at least one letter or word.',
             upassende: (o: string) =>
               `“${o}” does not belong on a school sheet. Swap it and we will make the sheet.`,
+            ukjentTegn: (tegn: string, rad: string) =>
+              `“${tegn}” in “${rad}” has no tracing path yet — use the letters a–å and A–Å.`,
             klart: (n: number) => `The sheet is ready: ${n} rows.`,
             radAria: (i: number) => `Row ${i}`,
             fjern: (i: number) => `Remove row ${i}`,
-            radEks: 'type a letter or a word',
+            radEks: 'e.g. a or sun',
           };
 
     interface Rad {
@@ -452,6 +509,8 @@ const t =
           JSON.stringify({
             tittel: el<HTMLInputElement>('sp-tittel').value,
             storrelse: el<HTMLSelectElement>('sp-storrelse').value,
+            farge: el<HTMLSelectElement>('sp-farge').value,
+            husfarger: el<HTMLInputElement>('sp-husfarger').checked,
             tomLinje: el<HTMLInputElement>('sp-tom-linje').checked,
             rader: rader.map((r) => r.tekst),
           })
@@ -465,8 +524,11 @@ const t =
         if (!raa) return false;
         const u = JSON.parse(raa);
         el<HTMLInputElement>('sp-tittel').value = u.tittel ?? '';
-        const felt = el<HTMLSelectElement>('sp-storrelse');
-        if ([...felt.options].some((o) => o.value === u.storrelse)) felt.value = u.storrelse;
+        (['storrelse', 'farge'] as const).forEach((navn) => {
+          const felt = el<HTMLSelectElement>(`sp-${navn}`);
+          if ([...felt.options].some((o) => o.value === u[navn])) felt.value = u[navn];
+        });
+        el<HTMLInputElement>('sp-husfarger').checked = u.husfarger !== false;
         el<HTMLInputElement>('sp-tom-linje').checked = u.tomLinje !== false;
         (u.rader ?? []).forEach((r: unknown) => {
           if (typeof r === 'string') rader.push({ id: nesteId++, tekst: r });
@@ -526,41 +588,128 @@ const t =
       return e;
     }
 
-    /* Én sporingsrad: linjesystem + teksten gjentatt med stiplet kontur.
-       Skala: font 13, grunnlinje y=15, x-høyde ≈ 6.5 over, topp ≈ 10. */
-    function lagRadSvg(tekst: string, medTekst: boolean) {
-      const svg = svgEl('svg', { viewBox: '0 0 200 21', 'aria-hidden': 'true' });
-      const grunn = 15;
-      svg.appendChild(svgEl('line', { x1: '0', y1: '4.5', x2: '200', y2: '4.5', stroke: '#c9c9c9', 'stroke-width': '0.35', 'stroke-dasharray': '2 2' }));
-      svg.appendChild(svgEl('line', { x1: '0', y1: '9.5', x2: '200', y2: '9.5', stroke: '#c9c9c9', 'stroke-width': '0.35', 'stroke-dasharray': '2 2' }));
-      svg.appendChild(svgEl('line', { x1: '0', y1: String(grunn), x2: '200', y2: String(grunn), stroke: '#777', 'stroke-width': '0.45' }));
+    function tegnFor(tegn: string, fargevalg: string): string {
+      if (fargevalg === 'sort') return SORT;
+      return VOKALER.has(tegn) ? ROD : BLAA;
+    }
 
-      if (medTekst) {
-        // textLength gir forutsigbar bredde per gjentakelse
-        const lengde = Math.max(2, tekst.length) * 7.2;
-        const antall = Math.max(1, Math.floor(202 / (lengde + 9)));
-        for (let i = 0; i < antall; i++) {
-          svg.appendChild(
-            svgEl(
-              'text',
-              {
-                x: String(3 + i * (lengde + 9)),
-                y: String(grunn),
-                'font-size': '13',
-                'font-weight': '600',
-                fill: 'none',
-                stroke: i === 0 ? '#444' : '#b9b9b9',
-                'stroke-width': '0.42',
-                'stroke-dasharray': '1.1 0.75',
-                textLength: String(lengde),
-                lengthAdjust: 'spacingAndGlyphs',
-              },
-              tekst
-            )
+    /* Selve bokstavhuset: soner, fire linjer og hus-ikon med tak */
+    function lagHus(svg: SVGElement, medFarger: boolean) {
+      const { topp, xtopp, grunn, bunn } = LINJER;
+      if (medFarger) {
+        svg.appendChild(svgEl('rect', { x: String(START_X - 4), y: String(topp), width: String(VB_BREDDE - START_X + 2), height: String(xtopp - topp), fill: SONE_LOFT }));
+        svg.appendChild(svgEl('rect', { x: String(START_X - 4), y: String(xtopp), width: String(VB_BREDDE - START_X + 2), height: String(grunn - xtopp), fill: SONE_STUE }));
+        svg.appendChild(svgEl('rect', { x: String(START_X - 4), y: String(grunn), width: String(VB_BREDDE - START_X + 2), height: String(bunn - grunn), fill: SONE_KJELLER }));
+      }
+      const linje = (y: number, farge: string, stiplet: boolean, tykkelse = 0.55) =>
+        svg.appendChild(
+          svgEl('line', {
+            x1: String(START_X - 4), y1: String(y), x2: String(VB_BREDDE - 2), y2: String(y),
+            stroke: farge, 'stroke-width': String(tykkelse),
+            ...(stiplet ? { 'stroke-dasharray': '3 2.4' } : {}),
+          })
+        );
+      linje(topp, '#b9b9b9', true);
+      linje(xtopp, '#b9b9b9', true);
+      linje(grunn, '#555', false, 0.8);
+      linje(bunn, '#cfcfcf', false, 0.45);
+
+      // hus-ikonet: vegg over stua + tak over loftet (jf. bokstavhus-arkene)
+      svg.appendChild(svgEl('path', { d: `M 2 ${topp} L 10 ${topp - 2.6} L 18 ${topp}`, fill: 'none', stroke: '#777', 'stroke-width': '0.9' }));
+      svg.appendChild(svgEl('rect', { x: '4', y: String(topp), width: '12', height: String(bunn - topp), fill: 'none', stroke: '#999', 'stroke-width': '0.6' }));
+      svg.appendChild(svgEl('line', { x1: '4', y1: String(xtopp), x2: '16', y2: String(xtopp), stroke: '#bbb', 'stroke-width': '0.5' }));
+      svg.appendChild(svgEl('line', { x1: '4', y1: String(grunn), x2: '16', y2: String(grunn), stroke: '#bbb', 'stroke-width': '0.5' }));
+    }
+
+    /* Én instans av teksten (modell eller spore). Returnerer paths som
+       skal dekoreres (kun modell). */
+    function leggTekst(
+      svg: SVGElement,
+      tekst: string,
+      x0: number,
+      modell: boolean,
+      fargevalg: string
+    ): { bredde: number; dekor: { path: SVGPathElement; farge: string; nummer: number | null }[] } {
+      let x = x0;
+      const dekor: { path: SVGPathElement; farge: string; nummer: number | null }[] = [];
+      for (const tegn of tekst) {
+        const b = bane(tegn);
+        if (!b) continue;
+        const farge = modell ? tegnFor(tegn, fargevalg) : SPOR;
+        const synligeStrok = b.strok.filter((s) => !s.prikk);
+        const flereStrok = synligeStrok.length > 1;
+        let strokNr = 0;
+        b.strok.forEach((strok) => {
+          const g = svgEl('g', { transform: `translate(${x} 0)` });
+          if (strok.prikk) {
+            // i/j-prikken: fylt punkt (stiplet-grå på sporeversjonen)
+            const m = strok.d.match(/M\s*([\d.]+)\s+([\d.]+)/);
+            if (m) {
+              g.appendChild(
+                svgEl('circle', {
+                  cx: m[1], cy: m[2], r: '1.7',
+                  fill: modell ? farge : SPOR,
+                })
+              );
+            }
+            svg.appendChild(g);
+            return;
+          }
+          strokNr++;
+          const path = svgEl('path', {
+            d: strok.d,
+            fill: 'none',
+            stroke: farge,
+            'stroke-width': modell ? '2.3' : '2.1',
+            'stroke-linecap': 'round',
+            'stroke-linejoin': 'round',
+            ...(modell ? {} : { 'stroke-dasharray': '3 2.6' }),
+          }) as SVGPathElement;
+          if (modell) {
+            path.setAttribute('class', 'sp-modell-strok');
+            dekor.push({ path, farge, nummer: flereStrok ? strokNr : null });
+          } else {
+            path.setAttribute('class', 'sp-spor-strok');
+          }
+          g.appendChild(path);
+          svg.appendChild(g);
+        });
+        x += b.bredde;
+      }
+      return { bredde: x - x0, dekor };
+    }
+
+    /* Startprikk, strøknummer og pilspiss — leses ut av banen selv */
+    function dekorer(svg: SVGElement, dekor: { path: SVGPathElement; farge: string; nummer: number | null }[]) {
+      dekor.forEach(({ path, farge, nummer }) => {
+        const g = path.parentElement as unknown as SVGGElement;
+        const lengde = path.getTotalLength();
+        const start = path.getPointAtLength(0);
+        g.appendChild(svgEl('circle', { cx: String(start.x), cy: String(start.y), r: '1.8', fill: GRONN }));
+        if (nummer !== null) {
+          g.appendChild(
+            svgEl('text', {
+              x: String(start.x + 3), y: String(start.y - 2.2),
+              'font-size': '4.6', 'font-weight': '700', fill: GRONN,
+            }, String(nummer))
           );
         }
-      }
-      return svg;
+        // pilspiss ved ~57 % av strøket, rotert etter tangenten
+        if (lengde > 9) {
+          const a = path.getPointAtLength(lengde * 0.55);
+          const b = path.getPointAtLength(Math.min(lengde, lengde * 0.55 + 1.4));
+          const vinkel = (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI;
+          g.appendChild(
+            svgEl('path', {
+              d: 'M 0 0 L -3.4 -1.9 L -3.4 1.9 Z',
+              fill: PIL,
+              transform: `translate(${b.x} ${b.y}) rotate(${vinkel})`,
+              class: 'sp-pil',
+            })
+          );
+        }
+        void farge;
+      });
     }
 
     function siStatus(tekst: string, erFeil = false) {
@@ -580,7 +729,17 @@ const t =
           siStatus(M.upassende(tekst), true);
           return;
         }
+        for (const tegn of tekst) {
+          if (!bane(tegn)) {
+            siStatus(M.ukjentTegn(tegn, tekst), true);
+            return;
+          }
+        }
       }
+
+      const fargevalg = el<HTMLSelectElement>('sp-farge').value;
+      const medFarger = el<HTMLInputElement>('sp-husfarger').checked;
+      const tomLinje = el<HTMLInputElement>('sp-tom-linje').checked;
 
       el('sp-overskrift').textContent =
         el<HTMLInputElement>('sp-tittel').value.trim() || standardTittel;
@@ -588,29 +747,50 @@ const t =
       const beholder = el('sp-rader');
       beholder.setAttribute('data-storrelse', el<HTMLSelectElement>('sp-storrelse').value);
       beholder.replaceChildren();
-      const tomLinje = el<HTMLInputElement>('sp-tom-linje').checked;
+
+      const alleDekor: { svg: SVGElement; dekor: { path: SVGPathElement; farge: string; nummer: number | null }[] }[] = [];
+
       rene.forEach((tekst) => {
         const rad = document.createElement('div');
         rad.className = 'sp-rad';
-        rad.appendChild(lagRadSvg(tekst, true));
+        rad.setAttribute('aria-label', tekst);
+        const svg = svgEl('svg', { viewBox: `-1 -3 ${VB_BREDDE + 2} ${VB_HOYDE + 3}`, 'aria-hidden': 'true' });
+        lagHus(svg, medFarger);
+
+        const instansBredde = [...tekst].reduce((sum, tegn) => sum + (bane(tegn)?.bredde ?? 0), 0);
+        const { dekor } = leggTekst(svg, tekst, START_X, true, fargevalg);
+        let x = START_X + instansBredde + GAP + 3;
+        while (x + instansBredde <= VB_BREDDE - 4) {
+          leggTekst(svg, tekst, x, false, fargevalg);
+          x += instansBredde + GAP;
+        }
+
+        rad.appendChild(svg);
         beholder.appendChild(rad);
+        alleDekor.push({ svg, dekor });
+
         if (tomLinje) {
           const tom = document.createElement('div');
           tom.className = 'sp-rad';
-          tom.appendChild(lagRadSvg('', false));
+          const tomSvg = svgEl('svg', { viewBox: `-1 -3 ${VB_BREDDE + 2} ${VB_HOYDE + 3}`, 'aria-hidden': 'true' });
+          lagHus(tomSvg, medFarger);
+          tom.appendChild(tomSvg);
           beholder.appendChild(tom);
         }
       });
 
       el('sp-ark-seksjon').removeAttribute('hidden');
+      // dekoreringen måler pathene — gjøres etter at de står i DOM
+      alleDekor.forEach(({ svg, dekor }) => dekorer(svg, dekor));
+
       siStatus(M.klart(rene.length));
       lagreUtkast();
     }
 
     if (!lastUtkast()) {
-      leggTil();
-      leggTil();
-      leggTil();
+      leggTil('a');
+      leggTil('s');
+      leggTil('sol');
     }
     tegnListe();
 
@@ -625,7 +805,7 @@ const t =
     el('sp-skriv-ut').addEventListener('click', skrivUt);
     el('sp-skriv-ut-sticky').addEventListener('click', skrivUt);
 
-    ['sp-tittel', 'sp-storrelse', 'sp-tom-linje'].forEach((id) =>
+    ['sp-tittel', 'sp-storrelse', 'sp-farge', 'sp-husfarger', 'sp-tom-linje'].forEach((id) =>
       el(id).addEventListener('change', lagreUtkast)
     );
   }

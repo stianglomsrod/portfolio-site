@@ -29,9 +29,6 @@ const t =
         storrelseStor: 'stor (1.–2. trinn)',
         storrelseMiddels: 'middels',
         husfarger: 'Farger i bokstavhuset (loft, stue, kjeller)',
-        bokstavfarge: 'Farge på modellbokstaven',
-        fargeVokal: 'vokaler røde, konsonanter blå',
-        fargeSort: 'sort',
         tomLinje: 'Tom øvelinje under hver rad',
         lag: 'Lag sporingsark',
         skrivUt: 'Skriv ut',
@@ -50,9 +47,6 @@ const t =
         storrelseStor: 'large (early years)',
         storrelseMiddels: 'medium',
         husfarger: 'Colours in the letter house (attic, living room, basement)',
-        bokstavfarge: 'Model letter colour',
-        fargeVokal: 'vowels red, consonants blue',
-        fargeSort: 'black',
         tomLinje: 'Empty practice line under each row',
         lag: 'Create tracing sheet',
         skrivUt: 'Print',
@@ -84,14 +78,6 @@ const t =
         <select id="sp-storrelse">
           <option value="stor" selected>{t.storrelseStor}</option>
           <option value="middels">{t.storrelseMiddels}</option>
-        </select>
-      </label>
-
-      <label class="sp-felt">
-        <span class="sp-felt-navn">{t.bokstavfarge}</span>
-        <select id="sp-farge">
-          <option value="vokal" selected>{t.fargeVokal}</option>
-          <option value="sort">{t.fargeSort}</option>
         </select>
       </label>
 
@@ -440,7 +426,7 @@ const t =
 
 <script>
   import { ordErUpassende } from '../lib/ordkryss-kjerne';
-  import { LINJER, VOKALER, bane } from '../lib/bokstavbaner';
+  import { LINJER, bane } from '../lib/bokstavbaner';
 
   const rot = document.querySelector<HTMLElement>('.sp-verktoy');
   if (rot) {
@@ -450,20 +436,20 @@ const t =
     const MAKS = 8;
     const NS = 'http://www.w3.org/2000/svg';
 
-    // fargene fra designgrunnlaget
+    // fargene fra designgrunnlaget: bokstavstrekene er nøytrale —
+    // fargen bor i veiledningen (grønt startpunkt, mørke piler/tall)
     const SONE_LOFT = '#FFF3C6';
     const SONE_STUE = '#FBE3EF';
     const SONE_KJELLER = '#DDEFF8';
-    const ROD = '#c23a2f';
-    const BLAA = '#1f5f8b';
     const SORT = '#222';
     const GRONN = '#1a8a3a';
     const SPOR = '#b8b8b8';
-    const PIL = '#8d8d8d';
+    const PIL = '#444';
+    const PIL_LETT = '#8f8f8f';
 
-    const VB_BREDDE = 330;
+    const VB_BREDDE = 340;
     const VB_HOYDE = 44;
-    const START_X = 24; // etter hus-ikonet
+    const START_X = 40; // etter hus-ikonet
     const GAP = 7;
 
     const M =
@@ -509,7 +495,6 @@ const t =
           JSON.stringify({
             tittel: el<HTMLInputElement>('sp-tittel').value,
             storrelse: el<HTMLSelectElement>('sp-storrelse').value,
-            farge: el<HTMLSelectElement>('sp-farge').value,
             husfarger: el<HTMLInputElement>('sp-husfarger').checked,
             tomLinje: el<HTMLInputElement>('sp-tom-linje').checked,
             rader: rader.map((r) => r.tekst),
@@ -524,10 +509,8 @@ const t =
         if (!raa) return false;
         const u = JSON.parse(raa);
         el<HTMLInputElement>('sp-tittel').value = u.tittel ?? '';
-        (['storrelse', 'farge'] as const).forEach((navn) => {
-          const felt = el<HTMLSelectElement>(`sp-${navn}`);
-          if ([...felt.options].some((o) => o.value === u[navn])) felt.value = u[navn];
-        });
+        const storrelse = el<HTMLSelectElement>('sp-storrelse');
+        if ([...storrelse.options].some((o) => o.value === u.storrelse)) storrelse.value = u.storrelse;
         el<HTMLInputElement>('sp-husfarger').checked = u.husfarger !== false;
         el<HTMLInputElement>('sp-tom-linje').checked = u.tomLinje !== false;
         (u.rader ?? []).forEach((r: unknown) => {
@@ -588,11 +571,6 @@ const t =
       return e;
     }
 
-    function tegnFor(tegn: string, fargevalg: string): string {
-      if (fargevalg === 'sort') return SORT;
-      return VOKALER.has(tegn) ? ROD : BLAA;
-    }
-
     /* Selve bokstavhuset: soner, fire linjer og hus-ikon med tak */
     function lagHus(svg: SVGElement, medFarger: boolean) {
       const { topp, xtopp, grunn, bunn } = LINJER;
@@ -614,43 +592,40 @@ const t =
       linje(grunn, '#555', false, 0.8);
       linje(bunn, '#cfcfcf', false, 0.45);
 
-      // hus-ikonet: vegg over stua + tak over loftet (jf. bokstavhus-arkene)
-      svg.appendChild(svgEl('path', { d: `M 2 ${topp} L 10 ${topp - 2.6} L 18 ${topp}`, fill: 'none', stroke: '#777', 'stroke-width': '0.9' }));
-      svg.appendChild(svgEl('rect', { x: '4', y: String(topp), width: '12', height: String(bunn - topp), fill: 'none', stroke: '#999', 'stroke-width': '0.6' }));
-      svg.appendChild(svgEl('line', { x1: '4', y1: String(xtopp), x2: '16', y2: String(xtopp), stroke: '#bbb', 'stroke-width': '0.5' }));
-      svg.appendChild(svgEl('line', { x1: '4', y1: String(grunn), x2: '16', y2: String(grunn), stroke: '#bbb', 'stroke-width': '0.5' }));
+      // hus-ikonet: bred vegg med tak over loftet (jf. bokstavhus-arkene)
+      svg.appendChild(svgEl('path', { d: `M 0.5 ${topp} L 16.5 ${topp - 3.8} L 32.5 ${topp}`, fill: 'none', stroke: '#777', 'stroke-width': '1' }));
+      svg.appendChild(svgEl('rect', { x: '3', y: String(topp), width: '27', height: String(bunn - topp), fill: 'none', stroke: '#999', 'stroke-width': '0.6' }));
+      svg.appendChild(svgEl('line', { x1: '3', y1: String(xtopp), x2: '30', y2: String(xtopp), stroke: '#bbb', 'stroke-width': '0.5' }));
+      svg.appendChild(svgEl('line', { x1: '3', y1: String(grunn), x2: '30', y2: String(grunn), stroke: '#bbb', 'stroke-width': '0.5' }));
     }
 
-    /* Én instans av teksten (modell eller spore). Returnerer paths som
-       skal dekoreres (kun modell). */
+    type Nivaa = 'modell' | 'lett' | 'ren';
+
+    /* Én instans av teksten. «modell» = solid m/ full veiledning,
+       «lett» = stiplet m/ startprikk og pil (Salto-mønsteret: de første
+       øvingene har veiledning), «ren» = bare stiplet. */
     function leggTekst(
       svg: SVGElement,
       tekst: string,
       x0: number,
-      modell: boolean,
-      fargevalg: string
-    ): { bredde: number; dekor: { path: SVGPathElement; farge: string; nummer: number | null }[] } {
+      nivaa: Nivaa
+    ): { bredde: number; dekor: { path: SVGPathElement; nummer: number | null; nivaa: Nivaa }[] } {
       let x = x0;
-      const dekor: { path: SVGPathElement; farge: string; nummer: number | null }[] = [];
+      const modell = nivaa === 'modell';
+      const dekor: { path: SVGPathElement; nummer: number | null; nivaa: Nivaa }[] = [];
       for (const tegn of tekst) {
         const b = bane(tegn);
         if (!b) continue;
-        const farge = modell ? tegnFor(tegn, fargevalg) : SPOR;
+        const farge = modell ? SORT : SPOR;
         const synligeStrok = b.strok.filter((s) => !s.prikk);
         const flereStrok = synligeStrok.length > 1;
         let strokNr = 0;
         b.strok.forEach((strok) => {
           const g = svgEl('g', { transform: `translate(${x} 0)` });
           if (strok.prikk) {
-            // i/j-prikken: fylt punkt (stiplet-grå på sporeversjonen)
             const m = strok.d.match(/M\s*([\d.]+)\s+([\d.]+)/);
             if (m) {
-              g.appendChild(
-                svgEl('circle', {
-                  cx: m[1], cy: m[2], r: '1.7',
-                  fill: modell ? farge : SPOR,
-                })
-              );
+              g.appendChild(svgEl('circle', { cx: m[1], cy: m[2], r: '1.7', fill: farge }));
             }
             svg.appendChild(g);
             return;
@@ -665,11 +640,9 @@ const t =
             'stroke-linejoin': 'round',
             ...(modell ? {} : { 'stroke-dasharray': '3 2.6' }),
           }) as SVGPathElement;
-          if (modell) {
-            path.setAttribute('class', 'sp-modell-strok');
-            dekor.push({ path, farge, nummer: flereStrok ? strokNr : null });
-          } else {
-            path.setAttribute('class', 'sp-spor-strok');
+          path.setAttribute('class', modell ? 'sp-modell-strok' : 'sp-spor-strok');
+          if (nivaa !== 'ren') {
+            dekor.push({ path, nummer: modell && flereStrok ? strokNr : null, nivaa });
           }
           g.appendChild(path);
           svg.appendChild(g);
@@ -680,21 +653,27 @@ const t =
     }
 
     /* Startprikk, strøknummer og pilspiss — leses ut av banen selv */
-    function dekorer(svg: SVGElement, dekor: { path: SVGPathElement; farge: string; nummer: number | null }[]) {
-      dekor.forEach(({ path, farge, nummer }) => {
+    function dekorer(dekor: { path: SVGPathElement; nummer: number | null; nivaa: Nivaa }[]) {
+      dekor.forEach(({ path, nummer, nivaa }) => {
         const g = path.parentElement as unknown as SVGGElement;
         const lengde = path.getTotalLength();
         const start = path.getPointAtLength(0);
-        g.appendChild(svgEl('circle', { cx: String(start.x), cy: String(start.y), r: '1.8', fill: GRONN }));
+        g.appendChild(
+          svgEl('circle', {
+            cx: String(start.x), cy: String(start.y),
+            r: nivaa === 'modell' ? '1.8' : '1.5',
+            fill: GRONN,
+          })
+        );
         if (nummer !== null) {
           g.appendChild(
             svgEl('text', {
               x: String(start.x + 3), y: String(start.y - 2.2),
-              'font-size': '4.6', 'font-weight': '700', fill: GRONN,
+              'font-size': '4.6', 'font-weight': '700', fill: PIL,
             }, String(nummer))
           );
         }
-        // pilspiss ved ~57 % av strøket, rotert etter tangenten
+        // pilspiss ved ~55 % av strøket, rotert etter tangenten
         if (lengde > 9) {
           const a = path.getPointAtLength(lengde * 0.55);
           const b = path.getPointAtLength(Math.min(lengde, lengde * 0.55 + 1.4));
@@ -702,13 +681,12 @@ const t =
           g.appendChild(
             svgEl('path', {
               d: 'M 0 0 L -3.4 -1.9 L -3.4 1.9 Z',
-              fill: PIL,
+              fill: nivaa === 'modell' ? PIL : PIL_LETT,
               transform: `translate(${b.x} ${b.y}) rotate(${vinkel})`,
               class: 'sp-pil',
             })
           );
         }
-        void farge;
       });
     }
 
@@ -737,7 +715,6 @@ const t =
         }
       }
 
-      const fargevalg = el<HTMLSelectElement>('sp-farge').value;
       const medFarger = el<HTMLInputElement>('sp-husfarger').checked;
       const tomLinje = el<HTMLInputElement>('sp-tom-linje').checked;
 
@@ -748,7 +725,7 @@ const t =
       beholder.setAttribute('data-storrelse', el<HTMLSelectElement>('sp-storrelse').value);
       beholder.replaceChildren();
 
-      const alleDekor: { svg: SVGElement; dekor: { path: SVGPathElement; farge: string; nummer: number | null }[] }[] = [];
+      const alleDekor: { path: SVGPathElement; nummer: number | null; nivaa: 'modell' | 'lett' | 'ren' }[][] = [];
 
       rene.forEach((tekst) => {
         const rad = document.createElement('div');
@@ -758,16 +735,22 @@ const t =
         lagHus(svg, medFarger);
 
         const instansBredde = [...tekst].reduce((sum, tegn) => sum + (bane(tegn)?.bredde ?? 0), 0);
-        const { dekor } = leggTekst(svg, tekst, START_X, true, fargevalg);
+        const dekorListe = [...leggTekst(svg, tekst, START_X, 'modell').dekor];
+        // de to første øvingene får veiledning (Salto-mønsteret), resten
+        // er rene — og slutten av rada står tom til egenskriving
+        const reserver = Math.max(instansBredde * 1.2, 24);
         let x = START_X + instansBredde + GAP + 3;
-        while (x + instansBredde <= VB_BREDDE - 4) {
-          leggTekst(svg, tekst, x, false, fargevalg);
+        let nr = 0;
+        while (x + instansBredde <= VB_BREDDE - 4 - reserver) {
+          const nivaa = nr < 2 ? 'lett' : 'ren';
+          dekorListe.push(...leggTekst(svg, tekst, x, nivaa).dekor);
           x += instansBredde + GAP;
+          nr++;
         }
 
         rad.appendChild(svg);
         beholder.appendChild(rad);
-        alleDekor.push({ svg, dekor });
+        alleDekor.push(dekorListe);
 
         if (tomLinje) {
           const tom = document.createElement('div');
@@ -781,7 +764,7 @@ const t =
 
       el('sp-ark-seksjon').removeAttribute('hidden');
       // dekoreringen måler pathene — gjøres etter at de står i DOM
-      alleDekor.forEach(({ svg, dekor }) => dekorer(svg, dekor));
+      alleDekor.forEach((dekor) => dekorer(dekor));
 
       siStatus(M.klart(rene.length));
       lagreUtkast();
@@ -805,7 +788,7 @@ const t =
     el('sp-skriv-ut').addEventListener('click', skrivUt);
     el('sp-skriv-ut-sticky').addEventListener('click', skrivUt);
 
-    ['sp-tittel', 'sp-storrelse', 'sp-farge', 'sp-husfarger', 'sp-tom-linje'].forEach((id) =>
+    ['sp-tittel', 'sp-storrelse', 'sp-husfarger', 'sp-tom-linje'].forEach((id) =>
       el(id).addEventListener('change', lagreUtkast)
     );
   }

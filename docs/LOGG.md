@@ -6,6 +6,18 @@
 
 ## Changelog
 
+### 2026-07-17 (del 2) — Sporing finpuss etter Stians gjennomgang
+- **Modellbokstavene er nøytrale** (sort strek): fargen bor kun i
+  veiledningen — grønt startpunkt, mørke piler og strøknumre.
+  Vokal/konsonant-fargevalget er fjernet fra panelet (det hører til
+  plakater/remser, ikke sporingsark).
+- **Salto-mønsteret for gradvis mestring**: de to første øvingene etter
+  modellen får også startprikk + pil (dusere), resten er rene stiplede
+  — og slutten av hver rad står tom så eleven skriver på egenhånd.
+- **Hus-ikonet gjort bredere** (så det ser ut som et hus, ikke en pipe);
+  linjesystemet beholdt som før — Stians presisering: husene skal passe
+  linjene, bare ikke være så smale.
+
 ### 2026-07-17 — Sporing v2: ekte skriftforming med bokstavhus og skriveretning
 - **Stians funn**: v1 var langt unna ekte sporingsark. Research gjort
   (8 skjermbilder fra Stian + egne dumper i `docs/innsikt/sporing/` av

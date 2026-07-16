@@ -29,6 +29,7 @@ export const RUTEKART: Record<string, string> = {
   '/laerer': '/en/teacher',
   '/sandbox/ordkjeder': '/en/sandbox/word-chains',
   '/sandbox/hundrekart': '/en/sandbox/hundred-chart',
+  '/sandbox/hentediktat': '/en/sandbox/running-dictation',
   '/slik-jobber-jeg': '/en/how-i-work',
   '/om': '/en/about',
   '/kolofon': '/en/colophon',

@@ -1,0 +1,708 @@
+---
+/* Hentediktat-verktøyet: signatursjangeren i norsk stasjons- og
+   uteskole. Læreren henger nummererte kort rundt i rommet (eller ute);
+   eleven går/løper til kortet, husker ordet/setningen, og skriver det
+   på riktig linje på elevarket. To utskrifter fra samme oppsett:
+   «Skriv ut kortene» og «Skriv ut elevarket» — samme klassemekanikk
+   som fasit-utskriften (print-kort/print-elevark + afterprint).
+   Fasit-visningen legger ordene på elevarkets linjer. */
+
+interface Props {
+  lang?: 'nb' | 'en';
+}
+
+const { lang = 'nb' } = Astro.props;
+
+const t =
+  lang === 'nb'
+    ? {
+        tittelFelt: 'Tittel på arket',
+        tittelEks: 'Skriv tittelen her',
+        ordNavn: 'Ord eller setninger (ett kort per rad)',
+        ordEks: 'skriv et ord eller en setning',
+        leggTil: '+ Legg til kort',
+        hint: 'Kortene henges rundt i rommet eller ute. Eleven går til kortet, husker det som står der, og skriver det på riktig linje på elevarket.',
+        bokstaver: 'Bokstaver på kortene',
+        valgStore: 'STORE (ABC)',
+        valgSmaa: 'små (abc)',
+        lag: 'Lag hentediktat',
+        skrivUtKort: 'Skriv ut kortene',
+        skrivUtElevark: 'Skriv ut elevarket',
+        visFasit: 'Vis fasit her',
+        navnLinje: 'Navn: ____________________   Dato: ____________',
+        kortTittel: 'Kort til å henge opp — klipp langs de stiplede linjene',
+        instruks: 'Finn kortene, husk det som står der, og skriv det på riktig linje.',
+        fasit: 'FASIT',
+        standardTittel: 'Hentediktat',
+      }
+    : {
+        tittelFelt: 'Sheet title',
+        tittelEks: 'Type the title here',
+        ordNavn: 'Words or sentences (one card per row)',
+        ordEks: 'type a word or a sentence',
+        leggTil: '+ Add card',
+        hint: 'The cards are hung around the room or outside. The pupil walks to a card, memorises it, and writes it on the right line on the answer sheet.',
+        bokstaver: 'Letters on the cards',
+        valgStore: 'UPPERCASE (ABC)',
+        valgSmaa: 'lowercase (abc)',
+        lag: 'Create running dictation',
+        skrivUtKort: 'Print the cards',
+        skrivUtElevark: 'Print the pupil sheet',
+        visFasit: 'Show answers here',
+        navnLinje: 'Name: ____________________   Date: ____________',
+        kortTittel: 'Cards to hang up — cut along the dashed lines',
+        instruks: 'Find the cards, memorise what they say, and write it on the right line.',
+        fasit: 'KEY',
+        standardTittel: 'Running dictation',
+      };
+---
+
+<div class="he-verktoy" data-lang={lang} data-standardtittel={t.standardTittel}>
+  <div class="he-oppsett">
+    <section class="he-panel" aria-labelledby="he-panel-tittel">
+      <h2 id="he-panel-tittel" class="sr-only">{lang === 'nb' ? 'Oppsett' : 'Setup'}</h2>
+
+      <label class="he-felt">
+        <span class="he-felt-navn">{t.tittelFelt}</span>
+        <input type="text" id="he-tittel" placeholder={t.tittelEks} maxlength="60" />
+      </label>
+
+      <div class="he-felt">
+        <span class="he-felt-navn" id="he-ord-navn">{t.ordNavn}</span>
+        <ul id="he-liste" aria-labelledby="he-ord-navn"></ul>
+        <button type="button" id="he-legg-til" class="he-sekundaer">{t.leggTil}</button>
+        <p class="he-hint">{t.hint}</p>
+      </div>
+
+      <label class="he-felt">
+        <span class="he-felt-navn">{t.bokstaver}</span>
+        <select id="he-bokstaver">
+          <option value="som-skrevet" selected>{lang === 'nb' ? 'som skrevet' : 'as typed'}</option>
+          <option value="store">{t.valgStore}</option>
+          <option value="smaa">{t.valgSmaa}</option>
+        </select>
+      </label>
+
+      <button type="button" id="he-lag" class="knapp he-primaer">{t.lag}</button>
+      <p id="he-status" class="he-status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="he-visning" id="he-ark-seksjon" hidden aria-labelledby="he-visning-tittel">
+      <h2 id="he-visning-tittel" class="sr-only">
+        {lang === 'nb' ? 'Forhåndsvisning' : 'Preview'}
+      </h2>
+      <div class="he-handlinger">
+        <button type="button" id="he-skriv-ut-kort" class="knapp he-primaer">{t.skrivUtKort}</button>
+        <button type="button" id="he-skriv-ut-elevark" class="knapp he-primaer">{t.skrivUtElevark}</button>
+        <button type="button" id="he-fasit-toggle" class="he-sekundaer" aria-pressed="false">
+          {t.visFasit}
+        </button>
+      </div>
+
+      <div class="he-ark" id="he-ark">
+        <section class="he-kortdel" aria-label={t.kortTittel}>
+          <p class="he-del-tittel">{t.kortTittel}</p>
+          <div id="he-kort" class="he-kortgrid"></div>
+        </section>
+
+        <section class="he-elevdel">
+          <div class="he-ark-hode">
+            <h3 id="he-overskrift">{t.standardTittel}</h3>
+            <span class="he-fasit-merke" aria-hidden="true">{t.fasit}</span>
+          </div>
+          <p class="he-instruks">{t.instruks}</p>
+          <p class="he-navn-linje">{t.navnLinje}</p>
+          <ol id="he-linjer" class="he-linjer"></ol>
+        </section>
+      </div>
+    </section>
+  </div>
+</div>
+
+<style is:global>
+  .he-oppsett {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: var(--s-5);
+    align-items: start;
+    margin-top: var(--s-4);
+  }
+
+  @media (max-width: 900px) {
+    .he-oppsett {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .he-panel {
+    background: var(--flate);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: var(--s-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .he-felt {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .he-felt-navn {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--tekst);
+  }
+
+  .he-panel input[type='text'],
+  .he-panel select {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    padding: 9px 10px;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--tekst);
+    min-height: 44px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .he-hint {
+    margin: 2px 0 0;
+    font-size: 13.5px;
+    color: var(--dempet);
+  }
+
+  #he-liste {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .he-rad {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .he-rad input[type='text'] {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .he-rad.upassende input[type='text'] {
+    border-color: var(--feil);
+  }
+
+  .he-ikonknapp {
+    font: inherit;
+    min-width: 44px;
+    min-height: 44px;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--tekst);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .he-ikonknapp:hover {
+    border-color: var(--salvie);
+  }
+
+  .he-primaer {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 700;
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    border: none;
+    border-radius: 9px;
+    padding: 11px 20px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .he-primaer:hover {
+    filter: brightness(1.06);
+  }
+
+  .he-sekundaer {
+    font-family: var(--font-sans);
+    font-size: 14.5px;
+    font-weight: 600;
+    background: var(--bg);
+    color: var(--tekst);
+    border: 1px solid var(--linje);
+    border-radius: 9px;
+    padding: 10px 16px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .he-sekundaer:hover {
+    border-color: var(--salvie);
+  }
+
+  .he-sekundaer:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  .he-status {
+    margin: 0;
+    font-size: 14.5px;
+    color: var(--dempet);
+    min-height: 1.4em;
+  }
+
+  .he-status.feil {
+    color: var(--feil);
+  }
+
+  .he-handlinger {
+    display: flex;
+    gap: var(--s-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--s-3);
+  }
+
+  .he-ark {
+    background: #fff;
+    color: #111;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: 28px 32px;
+    max-width: 660px;
+  }
+
+  .he-del-tittel {
+    margin: 0 0 12px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #333;
+  }
+
+  .he-kortgrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    margin-bottom: 28px;
+  }
+
+  .he-kort {
+    border: 1.6px dashed #666;
+    margin: -0.8px;
+    min-height: 96px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px;
+    text-align: center;
+  }
+
+  .he-kort-nr {
+    font-family: var(--font-hd);
+    font-weight: 800;
+    font-size: 15px;
+    color: #fff;
+    background: #333;
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+    display: grid;
+    place-items: center;
+  }
+
+  .he-kort-tekst {
+    font-size: 21px;
+    font-weight: 600;
+    color: #111;
+    overflow-wrap: break-word;
+    max-width: 100%;
+  }
+
+  .he-ark-hode {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  #he-overskrift {
+    margin: 0 0 4px;
+    font-size: 24px;
+    color: #111;
+  }
+
+  .he-fasit-merke {
+    display: none;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    color: #b3261e;
+    border: 2px solid #b3261e;
+    border-radius: 6px;
+    padding: 2px 8px;
+  }
+
+  .he-verktoy.fasit-paa .he-fasit-merke {
+    display: inline-block;
+  }
+
+  .he-instruks {
+    margin: 0 0 6px;
+    font-size: 14.5px;
+    color: #333;
+  }
+
+  .he-navn-linje {
+    margin: 0 0 18px;
+    font-size: 13.5px;
+    color: #333;
+  }
+
+  .he-linjer {
+    margin: 0;
+    padding: 0 0 0 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 17px;
+    font-size: 17px;
+    color: #111;
+  }
+
+  .he-strek {
+    letter-spacing: 2px;
+    color: #333;
+  }
+
+  .he-svar {
+    display: none;
+    font-weight: 700;
+    color: #1a6a3a;
+  }
+
+  .he-verktoy.fasit-paa .he-svar {
+    display: inline;
+  }
+
+  .he-verktoy.fasit-paa .he-strek {
+    display: none;
+  }
+
+  @media print {
+    @page {
+      margin: 14mm;
+    }
+
+    html,
+    body {
+      color-scheme: light;
+      background: #fff !important;
+      color: #000;
+    }
+
+    .topp,
+    .bunn,
+    .hopp,
+    .he-panel,
+    .he-handlinger,
+    .he-side-hode {
+      display: none !important;
+    }
+
+    .ramme {
+      padding: 0;
+      max-width: none;
+      min-height: 0;
+      background: #fff;
+    }
+
+    .he-oppsett {
+      display: block;
+      margin: 0;
+    }
+
+    .he-ark {
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 0;
+      max-width: none;
+    }
+
+    .he-kort {
+      min-height: 45mm;
+      break-inside: avoid;
+    }
+
+    .he-kort-tekst {
+      font-size: 20pt;
+    }
+
+    .he-linjer {
+      gap: 9mm;
+    }
+
+    .he-linjer li {
+      break-inside: avoid;
+    }
+
+    /* De to utskriftene: kortene eller elevarket — aldri begge */
+    .he-verktoy.print-kort .he-elevdel {
+      display: none !important;
+    }
+
+    .he-verktoy.print-elevark .he-kortdel {
+      display: none !important;
+    }
+
+    .he-verktoy:not(.print-fasit) .he-svar {
+      display: none !important;
+    }
+
+    .he-verktoy:not(.print-fasit) .he-fasit-merke {
+      display: none !important;
+    }
+  }
+</style>
+
+<script>
+  import { ordErUpassende } from '../lib/ordkryss-kjerne';
+
+  const rot = document.querySelector<HTMLElement>('.he-verktoy');
+  if (rot) {
+    const lang = (rot.dataset.lang ?? 'nb') as 'nb' | 'en';
+    const standardTittel = rot.dataset.standardtittel ?? 'Hentediktat';
+    const LAGRINGSNOKKEL = `hentediktat-${lang}`;
+    const MAKS = 16;
+
+    const M =
+      lang === 'nb'
+        ? {
+            minstTo: 'Skriv inn minst to kort.',
+            upassende: (o: string) =>
+              `«${o}» passer ikke på et skoleark. Bytt det ut, så lager vi arket.`,
+            klart: (n: number) =>
+              `Klart: ${n} kort å henge opp og et elevark med ${n} linjer. Skriv ut hver del for seg.`,
+            radAria: (i: number) => `Kort ${i}`,
+            fjern: (i: number) => `Fjern kort ${i}`,
+            radEks: 'skriv et ord eller en setning',
+          }
+        : {
+            minstTo: 'Type at least two cards.',
+            upassende: (o: string) =>
+              `“${o}” does not belong on a school sheet. Swap it and we will make the sheet.`,
+            klart: (n: number) =>
+              `Ready: ${n} cards to hang up and a pupil sheet with ${n} lines. Print each part separately.`,
+            radAria: (i: number) => `Card ${i}`,
+            fjern: (i: number) => `Remove card ${i}`,
+            radEks: 'type a word or a sentence',
+          };
+
+    interface Rad {
+      id: number;
+      tekst: string;
+    }
+
+    let rader: Rad[] = [];
+    let nesteId = 1;
+    let fasitSynlig = false;
+
+    const el = <T extends HTMLElement = HTMLElement>(id: string): T =>
+      document.getElementById(id) as T;
+
+    function lagreUtkast() {
+      try {
+        localStorage.setItem(
+          LAGRINGSNOKKEL,
+          JSON.stringify({
+            tittel: el<HTMLInputElement>('he-tittel').value,
+            bokstaver: el<HTMLSelectElement>('he-bokstaver').value,
+            kort: rader.map((r) => r.tekst),
+          })
+        );
+      } catch {}
+    }
+
+    function lastUtkast(): boolean {
+      try {
+        const raa = localStorage.getItem(LAGRINGSNOKKEL);
+        if (!raa) return false;
+        const u = JSON.parse(raa);
+        el<HTMLInputElement>('he-tittel').value = u.tittel ?? '';
+        const felt = el<HTMLSelectElement>('he-bokstaver');
+        if ([...felt.options].some((o) => o.value === u.bokstaver)) felt.value = u.bokstaver;
+        (u.kort ?? []).forEach((k: unknown) => {
+          if (typeof k === 'string') rader.push({ id: nesteId++, tekst: k });
+        });
+        return rader.length > 0;
+      } catch {
+        return false;
+      }
+    }
+
+    function leggTil(tekst = '') {
+      if (rader.length >= MAKS) return;
+      rader.push({ id: nesteId++, tekst });
+      tegnListe();
+    }
+
+    function tegnListe() {
+      const liste = el('he-liste');
+      liste.replaceChildren();
+      rader.forEach((rad, indeks) => {
+        const li = document.createElement('li');
+        li.className = 'he-rad';
+        const felt = document.createElement('input');
+        felt.type = 'text';
+        felt.value = rad.tekst.slice(0, 60);
+        felt.maxLength = 60;
+        felt.placeholder = M.radEks;
+        felt.setAttribute('aria-label', M.radAria(indeks + 1));
+        felt.addEventListener('input', () => {
+          rad.tekst = felt.value;
+          const stygt = felt.value.split(/\s+/).some((o) => ordErUpassende(o));
+          li.classList.toggle('upassende', stygt);
+          felt.setAttribute('aria-invalid', stygt ? 'true' : 'false');
+          lagreUtkast();
+        });
+        const fjern = document.createElement('button');
+        fjern.type = 'button';
+        fjern.className = 'he-ikonknapp';
+        fjern.textContent = '✕';
+        fjern.setAttribute('aria-label', M.fjern(indeks + 1));
+        fjern.addEventListener('click', () => {
+          rader = rader.filter((r) => r.id !== rad.id);
+          if (rader.length === 0) leggTil();
+          tegnListe();
+          lagreUtkast();
+        });
+        li.append(felt, fjern);
+        liste.appendChild(li);
+      });
+      el<HTMLButtonElement>('he-legg-til').disabled = rader.length >= MAKS;
+    }
+
+    function siStatus(tekst: string, erFeil = false) {
+      const status = el('he-status');
+      status.textContent = tekst;
+      status.classList.toggle('feil', erFeil);
+    }
+
+    function generer() {
+      const rene = rader.map((r) => r.tekst.trim().replace(/\s+/g, ' ')).filter(Boolean);
+      if (rene.length < 2) {
+        siStatus(M.minstTo, true);
+        return;
+      }
+      for (const tekst of rene) {
+        for (const ord of tekst.split(' ')) {
+          if (ordErUpassende(ord)) {
+            siStatus(M.upassende(ord), true);
+            return;
+          }
+        }
+      }
+
+      const stil = el<HTMLSelectElement>('he-bokstaver').value;
+      const vis = (s: string) =>
+        stil === 'store' ? s.toUpperCase() : stil === 'smaa' ? s.toLowerCase() : s;
+
+      el('he-overskrift').textContent =
+        el<HTMLInputElement>('he-tittel').value.trim() || standardTittel;
+
+      const kort = el('he-kort');
+      kort.replaceChildren();
+      rene.forEach((tekst, i) => {
+        const boks = document.createElement('div');
+        boks.className = 'he-kort';
+        const nr = document.createElement('span');
+        nr.className = 'he-kort-nr';
+        nr.textContent = String(i + 1);
+        const innhold = document.createElement('span');
+        innhold.className = 'he-kort-tekst';
+        innhold.textContent = vis(tekst);
+        boks.append(nr, innhold);
+        kort.appendChild(boks);
+      });
+
+      const linjer = el('he-linjer');
+      linjer.replaceChildren();
+      rene.forEach((tekst) => {
+        const li = document.createElement('li');
+        const strek = document.createElement('span');
+        strek.className = 'he-strek';
+        strek.textContent = '_'.repeat(Math.min(52, Math.max(24, tekst.length + 10)));
+        const svar = document.createElement('span');
+        svar.className = 'he-svar';
+        svar.textContent = vis(tekst);
+        li.append(strek, svar);
+        linjer.appendChild(li);
+      });
+
+      fasitSynlig = false;
+      el('he-fasit-toggle').setAttribute('aria-pressed', 'false');
+      rot.classList.remove('fasit-paa');
+
+      el('he-ark-seksjon').removeAttribute('hidden');
+      siStatus(M.klart(rene.length));
+      lagreUtkast();
+    }
+
+    if (!lastUtkast()) {
+      leggTil();
+      leggTil();
+      leggTil();
+      leggTil();
+    }
+    tegnListe();
+
+    el('he-legg-til').addEventListener('click', () => {
+      leggTil();
+      lagreUtkast();
+    });
+
+    el('he-lag').addEventListener('click', generer);
+
+    el('he-fasit-toggle').addEventListener('click', () => {
+      fasitSynlig = !fasitSynlig;
+      el('he-fasit-toggle').setAttribute('aria-pressed', String(fasitSynlig));
+      rot.classList.toggle('fasit-paa', fasitSynlig);
+    });
+
+    el('he-skriv-ut-kort').addEventListener('click', () => {
+      rot.classList.remove('print-elevark', 'print-fasit');
+      rot.classList.add('print-kort');
+      window.print();
+    });
+    el('he-skriv-ut-elevark').addEventListener('click', () => {
+      rot.classList.remove('print-kort', 'print-fasit');
+      rot.classList.add('print-elevark');
+      window.print();
+    });
+    window.addEventListener('afterprint', () => {
+      rot.classList.remove('print-kort', 'print-elevark', 'print-fasit');
+    });
+
+    ['he-tittel', 'he-bokstaver'].forEach((id) =>
+      el(id).addEventListener('change', lagreUtkast)
+    );
+  }
+</script>

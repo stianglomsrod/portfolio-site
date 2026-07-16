@@ -1,0 +1,47 @@
+---
+import Side from '../../layouts/Side.astro';
+import HentediktatVerktoy from '../../components/HentediktatVerktoy.astro';
+
+/* Hentediktat i Lærerrommet. ENGELSK TVILLING:
+   src/pages/en/sandbox/running-dictation.astro — endre begge. */
+---
+
+<Side
+  title="Hentediktat — lag kort og elevark til utskrift"
+  description="Skriv inn ord eller setninger, og få nummererte kort til å henge opp pluss et elevark med skrivelinjer. To utskrifter fra samme oppsett."
+>
+  <div class="he-side-hode">
+    <p class="kicker">/lærer · norsk</p>
+    <h1>Hentediktat</h1>
+    <p class="dempet">
+      Lag hentediktat: skriv inn ordene eller setningene, og verktøyet lager
+      nummererte kort du henger rundt i rommet eller ute — pluss elevarket
+      der ordene skrives på riktig linje. Kortene og elevarket skrives ut
+      hver for seg.
+    </p>
+  </div>
+  <HentediktatVerktoy lang="nb" />
+</Side>
+
+<style>
+  .kicker {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: var(--tekst-label);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--hue-aksent);
+    margin: var(--s-7) 0 var(--s-2);
+  }
+
+  h1 {
+    font-size: var(--tekst-tittel);
+    margin: 0 0 var(--s-3);
+  }
+
+  .dempet {
+    color: var(--dempet);
+    max-width: 68ch;
+    margin: 0;
+  }
+</style>

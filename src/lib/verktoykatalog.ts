@@ -234,6 +234,21 @@ export const VERKTOY: Verktoykort[] = [
   },
   // ---- Lek og aktivitet ----
   {
+    slugNb: '/sandbox/hentediktat',
+    slugEn: '/en/sandbox/running-dictation',
+    kategori: 'lek',
+    nb: {
+      tittel: 'Hentediktat',
+      tekst: 'Nummererte kort å henge rundt i rommet + elevark med skrivelinjer. To utskrifter fra samme oppsett.',
+      cta: 'lag kort og ark',
+    },
+    en: {
+      tittel: 'Running dictation',
+      tekst: 'Numbered cards to hang around the room + a pupil sheet with writing lines. Two printouts from one setup.',
+      cta: 'make cards and sheet',
+    },
+  },
+  {
     slugNb: '/sandbox/ordbingo',
     slugEn: '/en/sandbox/word-bingo',
     kategori: 'lek',

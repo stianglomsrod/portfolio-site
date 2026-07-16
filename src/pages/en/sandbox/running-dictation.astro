@@ -1,0 +1,48 @@
+---
+import Side from '../../../layouts/Side.astro';
+import HentediktatVerktoy from '../../../components/HentediktatVerktoy.astro';
+
+/* Running dictation in the teacher's room. NORSK TVILLING:
+   src/pages/sandbox/hentediktat.astro — endre begge. */
+---
+
+<Side
+  lang="en"
+  title="Running dictation — make printable cards and pupil sheets"
+  description="Type words or sentences and get numbered cards to hang up plus a pupil sheet with writing lines. Two printouts from one setup."
+>
+  <div class="he-side-hode">
+    <p class="kicker">/teacher · language</p>
+    <h1>Running dictation</h1>
+    <p class="dempet">
+      Make a running dictation: type the words or sentences, and the tool
+      creates numbered cards to hang around the room or outside — plus the
+      pupil sheet where the words are written on the right line. The cards
+      and the pupil sheet print separately.
+    </p>
+  </div>
+  <HentediktatVerktoy lang="en" />
+</Side>
+
+<style>
+  .kicker {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: var(--tekst-label);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--hue-aksent);
+    margin: var(--s-7) 0 var(--s-2);
+  }
+
+  h1 {
+    font-size: var(--tekst-tittel);
+    margin: 0 0 var(--s-3);
+  }
+
+  .dempet {
+    color: var(--dempet);
+    max-width: 68ch;
+    margin: 0;
+  }
+</style>

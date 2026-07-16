@@ -1,0 +1,785 @@
+---
+/* Ordkjeder-verktøyet: 2–4 av lærerens ord kjedes sammen uten mellomrom
+   («solbilhus»), og eleven setter strek mellom ordene. Klassisk
+   avkodingssjanger fra Ordkjedetesten og Udirs kartleggingstradisjon.
+   Samme lest som søsknene; bannordfilteret kjøres OGSÅ på selve
+   kjedestrengen — sammensetninger kan danne ord ordlista ikke har. */
+
+interface Props {
+  lang?: 'nb' | 'en';
+}
+
+const { lang = 'nb' } = Astro.props;
+
+const t =
+  lang === 'nb'
+    ? {
+        tittelFelt: 'Tittel på arket',
+        tittelEks: 'Skriv tittelen her',
+        ordNavn: 'Ordene det kjedes med',
+        ordEks: 'skriv et ord',
+        leggTil: '+ Legg til ord',
+        hint: 'Bruk gjerne 8–15 kjente ord. Verktøyet blander dem til kjeder, og ord kan brukes i flere kjeder.',
+        perKjede: 'Ord per kjede',
+        antall: 'Antall kjeder',
+        bokstaver: 'Bokstaver på arket',
+        valgStore: 'STORE (ABC)',
+        valgSmaa: 'små (abc)',
+        skrivelinje: 'Skrivelinje under hver kjede (eleven skriver ordene)',
+        lag: 'Lag ordkjeder',
+        skrivUt: 'Skriv ut',
+        skrivUtFasit: 'Skriv ut fasit',
+        visFasit: 'Vis fasit her',
+        navnLinje: 'Navn: ____________________   Dato: ____________',
+        instruks: 'Sett strek mellom ordene som gjemmer seg i kjeden.',
+        fasit: 'FASIT',
+        standardTittel: 'Ordkjeder',
+      }
+    : {
+        tittelFelt: 'Sheet title',
+        tittelEks: 'Type the title here',
+        ordNavn: 'Words to chain together',
+        ordEks: 'type a word',
+        leggTil: '+ Add word',
+        hint: 'Use 8–15 familiar words. The tool mixes them into chains, and words may appear in several chains.',
+        perKjede: 'Words per chain',
+        antall: 'Number of chains',
+        bokstaver: 'Letters on the sheet',
+        valgStore: 'UPPERCASE (ABC)',
+        valgSmaa: 'lowercase (abc)',
+        skrivelinje: 'Writing line under each chain (the pupil writes the words)',
+        lag: 'Create word chains',
+        skrivUt: 'Print',
+        skrivUtFasit: 'Print answer key',
+        visFasit: 'Show answers here',
+        navnLinje: 'Name: ____________________   Date: ____________',
+        instruks: 'Draw a line between the words hiding in the chain.',
+        fasit: 'KEY',
+        standardTittel: 'Word chains',
+      };
+---
+
+<div class="kj-verktoy" data-lang={lang} data-standardtittel={t.standardTittel}>
+  <div class="kj-oppsett">
+    <section class="kj-panel" aria-labelledby="kj-panel-tittel">
+      <h2 id="kj-panel-tittel" class="sr-only">{lang === 'nb' ? 'Oppsett' : 'Setup'}</h2>
+
+      <label class="kj-felt">
+        <span class="kj-felt-navn">{t.tittelFelt}</span>
+        <input type="text" id="kj-tittel" placeholder={t.tittelEks} maxlength="60" />
+      </label>
+
+      <div class="kj-felt">
+        <span class="kj-felt-navn" id="kj-ord-navn">{t.ordNavn}</span>
+        <ul id="kj-ord-liste" aria-labelledby="kj-ord-navn"></ul>
+        <button type="button" id="kj-legg-til" class="kj-sekundaer">{t.leggTil}</button>
+        <p class="kj-hint">{t.hint}</p>
+      </div>
+
+      <label class="kj-felt">
+        <span class="kj-felt-navn">{t.perKjede}</span>
+        <select id="kj-per-kjede">
+          <option value="2">2</option>
+          <option value="3" selected>3</option>
+          <option value="4">4</option>
+        </select>
+      </label>
+
+      <label class="kj-felt">
+        <span class="kj-felt-navn">{t.antall}</span>
+        <select id="kj-antall">
+          <option value="6">6</option>
+          <option value="8" selected>8</option>
+          <option value="10">10</option>
+          <option value="12">12</option>
+        </select>
+      </label>
+
+      <label class="kj-felt">
+        <span class="kj-felt-navn">{t.bokstaver}</span>
+        <select id="kj-bokstaver">
+          <option value="smaa" selected>{t.valgSmaa}</option>
+          <option value="store">{t.valgStore}</option>
+        </select>
+      </label>
+
+      <label class="kj-valg">
+        <input type="checkbox" id="kj-skrivelinje" checked />
+        {t.skrivelinje}
+      </label>
+
+      <button type="button" id="kj-lag" class="knapp kj-primaer">{t.lag}</button>
+      <p id="kj-status" class="kj-status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="kj-visning" id="kj-ark-seksjon" hidden aria-labelledby="kj-visning-tittel">
+      <h2 id="kj-visning-tittel" class="sr-only">
+        {lang === 'nb' ? 'Forhåndsvisning' : 'Preview'}
+      </h2>
+      <div class="kj-handlinger">
+        <button type="button" id="kj-skriv-ut" class="knapp kj-primaer">{t.skrivUt}</button>
+        <button type="button" id="kj-skriv-ut-fasit" class="kj-sekundaer">{t.skrivUtFasit}</button>
+        <button type="button" id="kj-fasit-toggle" class="kj-sekundaer" aria-pressed="false">
+          {t.visFasit}
+        </button>
+      </div>
+
+      <div class="kj-sticky-print">
+        <button type="button" id="kj-skriv-ut-sticky" class="kj-sticky-knapp" title="Skriv ut arket (Ctrl+P)" aria-label={t.skrivUt}>
+          🖨
+        </button>
+      </div>
+
+      <div class="kj-ark" id="kj-ark">
+        <div class="kj-ark-hode">
+          <h3 id="kj-overskrift">{t.standardTittel}</h3>
+          <span class="kj-fasit-merke" aria-hidden="true">{t.fasit}</span>
+        </div>
+        <p class="kj-instruks">{t.instruks}</p>
+        <p class="kj-navn-linje">{t.navnLinje}</p>
+        <ul id="kj-kjeder" class="kj-kjeder"></ul>
+      </div>
+    </section>
+  </div>
+</div>
+
+<style is:global>
+  .kj-oppsett {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: var(--s-5);
+    align-items: start;
+    margin-top: var(--s-4);
+  }
+
+  @media (max-width: 900px) {
+    .kj-oppsett {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .kj-panel {
+    background: var(--flate);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: var(--s-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .kj-felt {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .kj-felt-navn {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--tekst);
+  }
+
+  .kj-panel input[type='text'],
+  .kj-panel select {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    padding: 9px 10px;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--tekst);
+    min-height: 44px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .kj-valg {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    min-height: 32px;
+    color: var(--tekst);
+  }
+
+  .kj-valg input {
+    width: 19px;
+    height: 19px;
+    accent-color: var(--salvie);
+    flex-shrink: 0;
+  }
+
+  @media (pointer: coarse) {
+    .kj-valg {
+      min-height: 44px;
+    }
+  }
+
+  .kj-hint {
+    margin: 2px 0 0;
+    font-size: 13.5px;
+    color: var(--dempet);
+  }
+
+  #kj-ord-liste {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .kj-rad {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .kj-rad input[type='text'] {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .kj-rad.upassende input[type='text'] {
+    border-color: var(--feil);
+  }
+
+  .kj-ikonknapp {
+    font: inherit;
+    min-width: 44px;
+    min-height: 44px;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--tekst);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .kj-ikonknapp:hover {
+    border-color: var(--salvie);
+  }
+
+  .kj-primaer {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 700;
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    border: none;
+    border-radius: 9px;
+    padding: 11px 20px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .kj-primaer:hover {
+    filter: brightness(1.06);
+  }
+
+  .kj-sekundaer {
+    font-family: var(--font-sans);
+    font-size: 14.5px;
+    font-weight: 600;
+    background: var(--bg);
+    color: var(--tekst);
+    border: 1px solid var(--linje);
+    border-radius: 9px;
+    padding: 10px 16px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .kj-sekundaer:hover {
+    border-color: var(--salvie);
+  }
+
+  .kj-sekundaer:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  .kj-status {
+    margin: 0;
+    font-size: 14.5px;
+    color: var(--dempet);
+    min-height: 1.4em;
+  }
+
+  .kj-status.feil {
+    color: var(--feil);
+  }
+
+  .kj-handlinger {
+    display: flex;
+    gap: var(--s-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--s-3);
+  }
+
+  .kj-sticky-print {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 15;
+  }
+
+  .kj-sticky-knapp {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 1px solid var(--linje);
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: var(--kort-skygge);
+    display: grid;
+    place-items: center;
+  }
+
+  .kj-ark {
+    background: #fff;
+    color: #111;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: 28px 32px;
+    max-width: 660px;
+  }
+
+  .kj-ark-hode {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  #kj-overskrift {
+    margin: 0 0 4px;
+    font-size: 24px;
+    color: #111;
+  }
+
+  .kj-fasit-merke {
+    display: none;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    color: #b3261e;
+    border: 2px solid #b3261e;
+    border-radius: 6px;
+    padding: 2px 8px;
+  }
+
+  .kj-verktoy.fasit-paa .kj-fasit-merke {
+    display: inline-block;
+  }
+
+  .kj-instruks {
+    margin: 0 0 6px;
+    font-size: 14.5px;
+    color: #333;
+  }
+
+  .kj-navn-linje {
+    margin: 0 0 18px;
+    font-size: 13.5px;
+    color: #333;
+  }
+
+  .kj-kjeder {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .kj-kjede {
+    font-size: 26px;
+    letter-spacing: 0.14em;
+    color: #111;
+  }
+
+  .kj-kjede-fasit {
+    display: none;
+    font-size: 17px;
+    font-weight: 700;
+    color: #1a6a3a;
+    margin-top: 2px;
+  }
+
+  .kj-verktoy.fasit-paa .kj-kjede-fasit {
+    display: block;
+  }
+
+  .kj-skrivelinje {
+    display: block;
+    letter-spacing: 2px;
+    color: #333;
+    font-size: 16px;
+    margin-top: 8px;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  @media print {
+    @page {
+      margin: 14mm;
+    }
+
+    html,
+    body {
+      color-scheme: light;
+      background: #fff !important;
+      color: #000;
+    }
+
+    .topp,
+    .bunn,
+    .hopp,
+    .kj-panel,
+    .kj-handlinger,
+    .kj-side-hode,
+    .kj-sticky-print {
+      display: none !important;
+    }
+
+    .ramme {
+      padding: 0;
+      max-width: none;
+      min-height: 0;
+      background: #fff;
+    }
+
+    .kj-oppsett {
+      display: block;
+      margin: 0;
+    }
+
+    .kj-ark {
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 0;
+      max-width: none;
+    }
+
+    .kj-kjeder {
+      gap: 11mm;
+    }
+
+    .kj-kjeder li {
+      break-inside: avoid;
+    }
+
+    .kj-verktoy:not(.print-fasit) .kj-kjede-fasit {
+      display: none !important;
+    }
+
+    .kj-verktoy:not(.print-fasit) .kj-fasit-merke {
+      display: none !important;
+    }
+
+    .kj-verktoy.print-fasit .kj-kjede-fasit {
+      display: block !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+
+    .kj-verktoy.print-fasit .kj-fasit-merke {
+      display: inline-block !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+  }
+</style>
+
+<script>
+  import { normaliserOrd, ordErUpassende } from '../lib/ordkryss-kjerne';
+
+  const rot = document.querySelector<HTMLElement>('.kj-verktoy');
+  if (rot) {
+    const lang = (rot.dataset.lang ?? 'nb') as 'nb' | 'en';
+    const standardTittel = rot.dataset.standardtittel ?? 'Ordkjeder';
+    const LAGRINGSNOKKEL = `ordkjeder-${lang}`;
+    const MAKS_ORD = 24;
+
+    const M =
+      lang === 'nb'
+        ? {
+            forFaa: (trengs: number) =>
+              `Skriv inn minst ${trengs} ulike ord (helst flere) for kjeder med så mange ord.`,
+            upassende: (o: string) =>
+              `«${o}» passer ikke på et skoleark. Bytt ut ordet, så lager vi arket.`,
+            forKort: (o: string) => `«${o}» må ha minst to bokstaver.`,
+            fikkIkke: 'Fikk ikke laget nok ulike kjeder — legg til flere ord eller senk antallet.',
+            klart: (antall: number, per: number) =>
+              `Arket er klart: ${antall} kjeder med ${per} ord i hver.`,
+            ordAria: (i: number) => `Ord ${i}`,
+            fjern: (i: number) => `Fjern ord ${i}`,
+            ordEks: 'skriv et ord',
+          }
+        : {
+            forFaa: (trengs: number) =>
+              `Type at least ${trengs} different words (preferably more) for chains of that length.`,
+            upassende: (o: string) =>
+              `“${o}” does not belong on a school sheet. Swap the word and we will make the sheet.`,
+            forKort: (o: string) => `“${o}” needs at least two letters.`,
+            fikkIkke: 'Could not make enough different chains — add more words or lower the count.',
+            klart: (antall: number, per: number) =>
+              `The sheet is ready: ${antall} chains with ${per} words each.`,
+            ordAria: (i: number) => `Word ${i}`,
+            fjern: (i: number) => `Remove word ${i}`,
+            ordEks: 'type a word',
+          };
+
+    interface Rad {
+      id: number;
+      tekst: string;
+    }
+
+    let ordListe: Rad[] = [];
+    let nesteId = 1;
+    let fasitSynlig = false;
+
+    const el = <T extends HTMLElement = HTMLElement>(id: string): T =>
+      document.getElementById(id) as T;
+
+    function lagreUtkast() {
+      try {
+        localStorage.setItem(
+          LAGRINGSNOKKEL,
+          JSON.stringify({
+            tittel: el<HTMLInputElement>('kj-tittel').value,
+            perKjede: el<HTMLSelectElement>('kj-per-kjede').value,
+            antall: el<HTMLSelectElement>('kj-antall').value,
+            bokstaver: el<HTMLSelectElement>('kj-bokstaver').value,
+            skrivelinje: el<HTMLInputElement>('kj-skrivelinje').checked,
+            ord: ordListe.map((o) => o.tekst),
+          })
+        );
+      } catch {}
+    }
+
+    function lastUtkast(): boolean {
+      try {
+        const raa = localStorage.getItem(LAGRINGSNOKKEL);
+        if (!raa) return false;
+        const u = JSON.parse(raa);
+        el<HTMLInputElement>('kj-tittel').value = u.tittel ?? '';
+        (['per-kjede', 'antall', 'bokstaver'] as const).forEach((navn) => {
+          const felt = el<HTMLSelectElement>(`kj-${navn}`);
+          const verdi = navn === 'per-kjede' ? u.perKjede : u[navn];
+          if ([...felt.options].some((o) => o.value === verdi)) felt.value = verdi;
+        });
+        el<HTMLInputElement>('kj-skrivelinje').checked = u.skrivelinje !== false;
+        (u.ord ?? []).forEach((o: unknown) => {
+          if (typeof o === 'string') ordListe.push({ id: nesteId++, tekst: o });
+        });
+        return ordListe.length > 0;
+      } catch {
+        return false;
+      }
+    }
+
+    function leggTil(tekst = '') {
+      if (ordListe.length >= MAKS_ORD) return;
+      ordListe.push({ id: nesteId++, tekst });
+      tegnListe();
+    }
+
+    function tegnListe() {
+      const liste = el('kj-ord-liste');
+      liste.replaceChildren();
+      ordListe.forEach((ord, indeks) => {
+        const rad = document.createElement('li');
+        rad.className = 'kj-rad';
+        const felt = document.createElement('input');
+        felt.type = 'text';
+        felt.value = ord.tekst.slice(0, 15);
+        felt.maxLength = 15;
+        felt.placeholder = M.ordEks;
+        felt.setAttribute('aria-label', M.ordAria(indeks + 1));
+        felt.addEventListener('input', () => {
+          ord.tekst = felt.value;
+          const stygt = ordErUpassende(felt.value);
+          rad.classList.toggle('upassende', stygt);
+          felt.setAttribute('aria-invalid', stygt ? 'true' : 'false');
+          lagreUtkast();
+        });
+        if (ordErUpassende(ord.tekst)) rad.classList.add('upassende');
+        const fjern = document.createElement('button');
+        fjern.type = 'button';
+        fjern.className = 'kj-ikonknapp';
+        fjern.textContent = '✕';
+        fjern.setAttribute('aria-label', M.fjern(indeks + 1));
+        fjern.addEventListener('click', () => {
+          ordListe = ordListe.filter((o) => o.id !== ord.id);
+          if (ordListe.length === 0) leggTil();
+          tegnListe();
+          lagreUtkast();
+        });
+        rad.append(felt, fjern);
+        liste.appendChild(rad);
+      });
+      el<HTMLButtonElement>('kj-legg-til').disabled = ordListe.length >= MAKS_ORD;
+    }
+
+    function stokk<T>(liste: T[]): T[] {
+      const kopi = [...liste];
+      for (let i = kopi.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [kopi[i], kopi[j]] = [kopi[j], kopi[i]];
+      }
+      return kopi;
+    }
+
+    function siStatus(tekst: string, erFeil = false) {
+      const status = el('kj-status');
+      status.textContent = tekst;
+      status.classList.toggle('feil', erFeil);
+    }
+
+    function generer() {
+      // vask + dedup (kjedene bygges av normaliserte små bokstaver)
+      const sett = new Set<string>();
+      const rene: string[] = [];
+      for (const o of ordListe) {
+        const raa = o.tekst.trim();
+        if (!raa) continue;
+        if (ordErUpassende(raa)) {
+          siStatus(M.upassende(raa), true);
+          return;
+        }
+        const norm = normaliserOrd(raa).toLowerCase();
+        if (norm.length < 2) {
+          siStatus(M.forKort(raa), true);
+          return;
+        }
+        if (sett.has(norm)) continue;
+        sett.add(norm);
+        rene.push(norm);
+      }
+
+      const perKjede = parseInt(el<HTMLSelectElement>('kj-per-kjede').value, 10);
+      const antall = parseInt(el<HTMLSelectElement>('kj-antall').value, 10);
+      if (rene.length < Math.max(perKjede, 4)) {
+        siStatus(M.forFaa(Math.max(perKjede, 4)), true);
+        return;
+      }
+
+      // Round-robin fra stokket liste gir jevn dekning; kjedene må være
+      // ulike, uten ordgjentakelse internt, og selve kjedestrengen må
+      // gjennom bannordfilteret (sammensetninger kan danne nye ord)
+      const kjeder: string[][] = [];
+      const brukte = new Set<string>();
+      let kilde = stokk(rene);
+      let peker = 0;
+      let vakt = 0;
+      while (kjeder.length < antall && vakt < 600) {
+        vakt++;
+        const kjede: string[] = [];
+        while (kjede.length < perKjede) {
+          if (peker >= kilde.length) {
+            kilde = stokk(rene);
+            peker = 0;
+          }
+          const kandidat = kilde[peker++];
+          if (!kjede.includes(kandidat)) kjede.push(kandidat);
+        }
+        const streng = kjede.join('');
+        if (brukte.has(kjede.join('|')) || ordErUpassende(streng)) continue;
+        brukte.add(kjede.join('|'));
+        kjeder.push(kjede);
+      }
+      if (kjeder.length < antall) {
+        siStatus(M.fikkIkke, true);
+        return;
+      }
+
+      el('kj-overskrift').textContent =
+        el<HTMLInputElement>('kj-tittel').value.trim() || standardTittel;
+
+      const store = el<HTMLSelectElement>('kj-bokstaver').value === 'store';
+      const medLinje = el<HTMLInputElement>('kj-skrivelinje').checked;
+      const vis = (s: string) => (store ? s.toUpperCase() : s);
+
+      const liste = el('kj-kjeder');
+      liste.replaceChildren();
+      kjeder.forEach((kjede) => {
+        const li = document.createElement('li');
+        const streng = document.createElement('span');
+        streng.className = 'kj-kjede';
+        streng.textContent = vis(kjede.join(''));
+        li.appendChild(streng);
+        const fasit = document.createElement('span');
+        fasit.className = 'kj-kjede-fasit';
+        fasit.textContent = kjede.map(vis).join(' | ');
+        li.appendChild(fasit);
+        if (medLinje) {
+          const linje = document.createElement('span');
+          linje.className = 'kj-skrivelinje';
+          linje.textContent = '_'.repeat(58);
+          li.appendChild(linje);
+        }
+        liste.appendChild(li);
+      });
+
+      fasitSynlig = false;
+      el('kj-fasit-toggle').setAttribute('aria-pressed', 'false');
+      rot.classList.remove('fasit-paa');
+
+      el('kj-ark-seksjon').removeAttribute('hidden');
+      siStatus(M.klart(kjeder.length, perKjede));
+      lagreUtkast();
+    }
+
+    if (!lastUtkast()) {
+      leggTil();
+      leggTil();
+      leggTil();
+      leggTil();
+    }
+    tegnListe();
+
+    el('kj-legg-til').addEventListener('click', () => {
+      leggTil();
+      lagreUtkast();
+    });
+
+    el('kj-lag').addEventListener('click', generer);
+
+    el('kj-fasit-toggle').addEventListener('click', () => {
+      fasitSynlig = !fasitSynlig;
+      el('kj-fasit-toggle').setAttribute('aria-pressed', String(fasitSynlig));
+      rot.classList.toggle('fasit-paa', fasitSynlig);
+    });
+
+    const skrivUt = () => {
+      rot.classList.remove('print-fasit');
+      window.print();
+    };
+    el('kj-skriv-ut').addEventListener('click', skrivUt);
+    el('kj-skriv-ut-sticky').addEventListener('click', skrivUt);
+    el('kj-skriv-ut-fasit').addEventListener('click', () => {
+      rot.classList.add('print-fasit');
+      window.print();
+    });
+    window.addEventListener('afterprint', () => rot.classList.remove('print-fasit'));
+
+    ['kj-tittel', 'kj-per-kjede', 'kj-antall', 'kj-bokstaver', 'kj-skrivelinje'].forEach((id) =>
+      el(id).addEventListener('change', lagreUtkast)
+    );
+  }
+</script>

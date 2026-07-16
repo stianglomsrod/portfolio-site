@@ -1,0 +1,48 @@
+---
+import Side from '../../../layouts/Side.astro';
+import OrdkjederVerktoy from '../../../components/OrdkjederVerktoy.astro';
+
+/* Word chains in the sandbox/teacher's room. NORSK TVILLING:
+   src/pages/sandbox/ordkjeder.astro — endre begge. */
+---
+
+<Side
+  lang="en"
+  title="Word chains — make printable decoding sheets"
+  description="Type your words and the tool chains them together without spaces — pupils draw lines between the words. Answer key included."
+>
+  <div class="kj-side-hode">
+    <p class="kicker">/teacher · language</p>
+    <h1>Word chains</h1>
+    <p class="dempet">
+      Make word chain sheets: your words are chained together without spaces
+      («sunbushouse»), and the pupil draws a line where the words split.
+      Classic decoding practice — with an optional writing line and a
+      separate answer key.
+    </p>
+  </div>
+  <OrdkjederVerktoy lang="en" />
+</Side>
+
+<style>
+  .kicker {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: var(--tekst-label);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--hue-aksent);
+    margin: var(--s-7) 0 var(--s-2);
+  }
+
+  h1 {
+    font-size: var(--tekst-tittel);
+    margin: 0 0 var(--s-3);
+  }
+
+  .dempet {
+    color: var(--dempet);
+    max-width: 68ch;
+    margin: 0;
+  }
+</style>

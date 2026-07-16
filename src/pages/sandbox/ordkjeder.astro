@@ -1,0 +1,47 @@
+---
+import Side from '../../layouts/Side.astro';
+import OrdkjederVerktoy from '../../components/OrdkjederVerktoy.astro';
+
+/* Ordkjeder i sandbox/Lærerrommet. ENGELSK TVILLING:
+   src/pages/en/sandbox/word-chains.astro — endre begge. */
+---
+
+<Side
+  title="Ordkjeder — lag avkodingsark til utskrift"
+  description="Skriv inn ordene, og verktøyet kjeder dem sammen uten mellomrom — elevene setter strek mellom ordene. Med fasit."
+>
+  <div class="kj-side-hode">
+    <p class="kicker">/lærer · norsk</p>
+    <h1>Ordkjeder</h1>
+    <p class="dempet">
+      Lag ordkjede-ark: ordene dine kjedes sammen uten mellomrom
+      («solbilhus»), og eleven setter strek der ordene skilles. Klassisk
+      avkodingstrening kjent fra kartleggingsprøvene — med valgfri
+      skrivelinje og egen fasit-utskrift.
+    </p>
+  </div>
+  <OrdkjederVerktoy lang="nb" />
+</Side>
+
+<style>
+  .kicker {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: var(--tekst-label);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--hue-aksent);
+    margin: var(--s-7) 0 var(--s-2);
+  }
+
+  h1 {
+    font-size: var(--tekst-tittel);
+    margin: 0 0 var(--s-3);
+  }
+
+  .dempet {
+    color: var(--dempet);
+    max-width: 68ch;
+    margin: 0;
+  }
+</style>

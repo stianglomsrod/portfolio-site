@@ -141,6 +141,21 @@ export const VERKTOY: Verktoykort[] = [
       cta: 'make a sheet',
     },
   },
+  {
+    slugNb: '/sandbox/ordkjeder',
+    slugEn: '/en/sandbox/word-chains',
+    kategori: 'norsk',
+    nb: {
+      tittel: 'Ordkjeder',
+      tekst: 'Ordene kjedes sammen uten mellomrom — eleven setter strek der de skilles. Avkodingstrening med fasit.',
+      cta: 'lag et ark',
+    },
+    en: {
+      tittel: 'Word chains',
+      tekst: 'Words are chained together without spaces — the pupil draws lines where they split. Decoding practice with a key.',
+      cta: 'make a sheet',
+    },
+  },
   // ---- Matematikk ----
   {
     slugNb: '/sandbox/regneark',

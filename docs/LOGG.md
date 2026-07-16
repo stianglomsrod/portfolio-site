@@ -6,6 +6,26 @@
 
 ## Changelog
 
+### 2026-07-16 — Research: 20 verifiserte kandidater til nye verktøy
+- **Multi-agent research** (49 agenter: 8 kildesveip → 198 funn → syntese
+  → adversariell verifisering med teknisk + pedagogisk linse per
+  kandidat) over Malimo, undervisningsmetoder.com, Kittys oppgaver,
+  Spireserien, forlagene (Skolestudio/Salaby/Aunivers/Skolen CD/Multi/
+  Ordriket/DragonBox), offentlige kilder (Udir-kartlegging, Statped,
+  Lesesenteret, Skrivesenteret, Matematikksenteret, matematikk.org) og
+  internasjonale generatorer (WorksheetWorks, Puzzlemaker, SuperTeacher,
+  toolsforeducators, Twinkl m.fl.). Manuell nettleser-runde i tillegg.
+- **Alt dokumentert varig i `docs/innsikt/VERKTOY-RESEARCH-2026-07.md`**:
+  sjangerkart (7 familier), validering av de 13 eksisterende verktøyene
+  mot markedet, prioritert topp-20 med panel/ark-spesifikasjon og
+  verifiseringsbegrunnelser, anbefalt byggerekkefølge i tre bølger,
+  forkastede sjangre med hvorfor, og hele funnkatalogen (198 funn).
+- Toppkandidater: Tallforståelses-ark «dagens tall» og Øveord/«ukens
+  ord»-ark (begge 5/5/5/5), deretter ordkjeder, hundrekart, hentediktat,
+  tallvenner, plassverdi, brøk, sortering, skriverammer. Største
+  strukturelle hull mot markedet: tallforståelses-familien og klippbare
+  kort-/spillformater (stasjonsundervisning).
+
 ### 2026-07-11 (natt) — GREN nye-verktoy: ni nye lærerverktøy til testing
 - **Ni nye verktøy på gren `nye-verktoy`** (IKKE pushet — Stian tester
   lokalt på :4322 først). Norsk: Luketekst (/sandbox/luketekst, klikk

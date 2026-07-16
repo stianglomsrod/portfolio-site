@@ -217,6 +217,21 @@ export const VERKTOY: Verktoykort[] = [
       cta: 'make a sheet',
     },
   },
+  {
+    slugNb: '/sandbox/hundrekart',
+    slugEn: '/en/sandbox/hundred-chart',
+    kategori: 'matte',
+    nb: {
+      tittel: 'Hundrekartet',
+      tekst: 'Kartet 1–100 med tomme ruter elevene fyller inn — eller helt tomt. Fasit følger med.',
+      cta: 'lag et ark',
+    },
+    en: {
+      tittel: 'Hundred chart',
+      tekst: 'The 1–100 chart with empty squares to fill in — or completely empty. Answer key included.',
+      cta: 'make a sheet',
+    },
+  },
   // ---- Lek og aktivitet ----
   {
     slugNb: '/sandbox/ordbingo',

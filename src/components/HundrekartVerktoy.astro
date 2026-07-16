@@ -1,0 +1,526 @@
+---
+/* Hundrekart-verktøyet: 10×10-kartet som utfyllingsark. Tre moduser:
+   noen ruter tomme, bare tierkolonnen står, eller helt tomt kart.
+   Hele kartet er SVG (samme motor-idé som Gangetabellen — tomme
+   CSS-kantbokser culles i print i enkelte Chrome-versjoner). */
+
+interface Props {
+  lang?: 'nb' | 'en';
+}
+
+const { lang = 'nb' } = Astro.props;
+
+const t =
+  lang === 'nb'
+    ? {
+        tittelFelt: 'Tittel på arket',
+        tittelEks: 'Skriv tittelen her',
+        start: 'Tallene',
+        start1: '1–100',
+        start0: '0–99',
+        modus: 'Hvor mye skal stå ferdig?',
+        modusHull: 'noen ruter er tomme',
+        modusTiere: 'bare tierne står (10, 20, 30 …)',
+        modusTom: 'helt tomt kart',
+        hull: 'Antall tomme ruter',
+        lag: 'Lag hundrekart',
+        skrivUt: 'Skriv ut',
+        skrivUtFasit: 'Skriv ut fasit',
+        visFasit: 'Vis fasit her',
+        navnLinje: 'Navn: ____________________   Dato: ____________',
+        instruks: 'Fyll inn tallene som mangler i hundrekartet.',
+        fasit: 'FASIT',
+        standardTittel: 'Hundrekartet',
+      }
+    : {
+        tittelFelt: 'Sheet title',
+        tittelEks: 'Type the title here',
+        start: 'The numbers',
+        start1: '1–100',
+        start0: '0–99',
+        modus: 'How much is filled in?',
+        modusHull: 'some squares are empty',
+        modusTiere: 'only the tens remain (10, 20, 30 …)',
+        modusTom: 'completely empty chart',
+        hull: 'Number of empty squares',
+        lag: 'Create hundred chart',
+        skrivUt: 'Print',
+        skrivUtFasit: 'Print answer key',
+        visFasit: 'Show answers here',
+        navnLinje: 'Name: ____________________   Date: ____________',
+        instruks: 'Fill in the missing numbers in the hundred chart.',
+        fasit: 'KEY',
+        standardTittel: 'Hundred chart',
+      };
+---
+
+<div class="hu-verktoy" data-lang={lang} data-standardtittel={t.standardTittel}>
+  <div class="hu-oppsett">
+    <section class="hu-panel" aria-labelledby="hu-panel-tittel">
+      <h2 id="hu-panel-tittel" class="sr-only">{lang === 'nb' ? 'Oppsett' : 'Setup'}</h2>
+
+      <label class="hu-felt">
+        <span class="hu-felt-navn">{t.tittelFelt}</span>
+        <input type="text" id="hu-tittel" placeholder={t.tittelEks} maxlength="60" />
+      </label>
+
+      <label class="hu-felt">
+        <span class="hu-felt-navn">{t.start}</span>
+        <select id="hu-start">
+          <option value="1" selected>{t.start1}</option>
+          <option value="0">{t.start0}</option>
+        </select>
+      </label>
+
+      <label class="hu-felt">
+        <span class="hu-felt-navn">{t.modus}</span>
+        <select id="hu-modus">
+          <option value="hull" selected>{t.modusHull}</option>
+          <option value="tiere">{t.modusTiere}</option>
+          <option value="tom">{t.modusTom}</option>
+        </select>
+      </label>
+
+      <label class="hu-felt" id="hu-hull-felt">
+        <span class="hu-felt-navn">{t.hull}</span>
+        <select id="hu-hull">
+          <option value="10">10</option>
+          <option value="20" selected>20</option>
+          <option value="30">30</option>
+          <option value="50">50</option>
+        </select>
+      </label>
+
+      <button type="button" id="hu-lag" class="knapp hu-primaer">{t.lag}</button>
+      <p id="hu-status" class="hu-status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="hu-visning" id="hu-ark-seksjon" hidden aria-labelledby="hu-visning-tittel">
+      <h2 id="hu-visning-tittel" class="sr-only">
+        {lang === 'nb' ? 'Forhåndsvisning' : 'Preview'}
+      </h2>
+      <div class="hu-handlinger">
+        <button type="button" id="hu-skriv-ut" class="knapp hu-primaer">{t.skrivUt}</button>
+        <button type="button" id="hu-skriv-ut-fasit" class="hu-sekundaer">{t.skrivUtFasit}</button>
+        <button type="button" id="hu-fasit-toggle" class="hu-sekundaer" aria-pressed="false">
+          {t.visFasit}
+        </button>
+      </div>
+
+      <div class="hu-sticky-print">
+        <button type="button" id="hu-skriv-ut-sticky" class="hu-sticky-knapp" title="Skriv ut arket (Ctrl+P)" aria-label={t.skrivUt}>
+          🖨
+        </button>
+      </div>
+
+      <div class="hu-ark" id="hu-ark">
+        <div class="hu-ark-hode">
+          <h3 id="hu-overskrift">{t.standardTittel}</h3>
+          <span class="hu-fasit-merke" aria-hidden="true">{t.fasit}</span>
+        </div>
+        <p class="hu-instruks">{t.instruks}</p>
+        <p class="hu-navn-linje">{t.navnLinje}</p>
+        <div id="hu-kart" class="hu-kart"></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<style is:global>
+  .hu-oppsett {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: var(--s-5);
+    align-items: start;
+    margin-top: var(--s-4);
+  }
+
+  @media (max-width: 900px) {
+    .hu-oppsett {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .hu-panel {
+    background: var(--flate);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: var(--s-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .hu-felt {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .hu-felt-navn {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--tekst);
+  }
+
+  .hu-panel input[type='text'],
+  .hu-panel select {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    padding: 9px 10px;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--tekst);
+    min-height: 44px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .hu-primaer {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 700;
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    border: none;
+    border-radius: 9px;
+    padding: 11px 20px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .hu-primaer:hover {
+    filter: brightness(1.06);
+  }
+
+  .hu-sekundaer {
+    font-family: var(--font-sans);
+    font-size: 14.5px;
+    font-weight: 600;
+    background: var(--bg);
+    color: var(--tekst);
+    border: 1px solid var(--linje);
+    border-radius: 9px;
+    padding: 10px 16px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .hu-sekundaer:hover {
+    border-color: var(--salvie);
+  }
+
+  .hu-status {
+    margin: 0;
+    font-size: 14.5px;
+    color: var(--dempet);
+    min-height: 1.4em;
+  }
+
+  .hu-handlinger {
+    display: flex;
+    gap: var(--s-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--s-3);
+  }
+
+  .hu-sticky-print {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 15;
+  }
+
+  .hu-sticky-knapp {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 1px solid var(--linje);
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: var(--kort-skygge);
+    display: grid;
+    place-items: center;
+  }
+
+  .hu-ark {
+    background: #fff;
+    color: #111;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: 28px 32px;
+    max-width: 660px;
+  }
+
+  .hu-ark-hode {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  #hu-overskrift {
+    margin: 0 0 4px;
+    font-size: 24px;
+    color: #111;
+  }
+
+  .hu-fasit-merke {
+    display: none;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    color: #b3261e;
+    border: 2px solid #b3261e;
+    border-radius: 6px;
+    padding: 2px 8px;
+  }
+
+  .hu-verktoy.fasit-paa .hu-fasit-merke {
+    display: inline-block;
+  }
+
+  .hu-instruks {
+    margin: 0 0 6px;
+    font-size: 14.5px;
+    color: #333;
+  }
+
+  .hu-navn-linje {
+    margin: 0 0 18px;
+    font-size: 13.5px;
+    color: #333;
+  }
+
+  .hu-kart svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .hu-fasit-del {
+    display: none;
+  }
+
+  .hu-verktoy.fasit-paa .hu-fasit-del {
+    display: inline;
+  }
+
+  @media print {
+    @page {
+      margin: 14mm;
+    }
+
+    html,
+    body {
+      color-scheme: light;
+      background: #fff !important;
+      color: #000;
+    }
+
+    .topp,
+    .bunn,
+    .hopp,
+    .hu-panel,
+    .hu-handlinger,
+    .hu-side-hode,
+    .hu-sticky-print {
+      display: none !important;
+    }
+
+    .ramme {
+      padding: 0;
+      max-width: none;
+      min-height: 0;
+      background: #fff;
+    }
+
+    .hu-oppsett {
+      display: block;
+      margin: 0;
+    }
+
+    .hu-ark {
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 0;
+      max-width: none;
+    }
+
+    .hu-kart {
+      break-inside: avoid;
+    }
+
+    .hu-verktoy:not(.print-fasit) .hu-fasit-del {
+      display: none !important;
+    }
+
+    .hu-verktoy:not(.print-fasit) .hu-fasit-merke {
+      display: none !important;
+    }
+
+    .hu-verktoy.print-fasit .hu-fasit-del {
+      display: inline !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+
+    .hu-verktoy.print-fasit .hu-fasit-merke {
+      display: inline-block !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+  }
+</style>
+
+<script>
+  const rot = document.querySelector<HTMLElement>('.hu-verktoy');
+  if (rot) {
+    const lang = (rot.dataset.lang ?? 'nb') as 'nb' | 'en';
+    const standardTittel = rot.dataset.standardtittel ?? 'Hundrekartet';
+    const LAGRINGSNOKKEL = `hundrekart-${lang}`;
+    const NS = 'http://www.w3.org/2000/svg';
+
+    const M =
+      lang === 'nb'
+        ? {
+            klartHull: (n: number) => `Kartet er klart: ${n} tomme ruter å fylle inn.`,
+            klartAlt: 'Kartet er klart.',
+          }
+        : {
+            klartHull: (n: number) => `The chart is ready: ${n} empty squares to fill in.`,
+            klartAlt: 'The chart is ready.',
+          };
+
+    let fasitSynlig = false;
+
+    const el = <T extends HTMLElement = HTMLElement>(id: string): T =>
+      document.getElementById(id) as T;
+
+    function svgEl(navn: string, attrs: Record<string, string>, tekst?: string) {
+      const e = document.createElementNS(NS, navn);
+      for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+      if (tekst !== undefined) e.textContent = tekst;
+      return e;
+    }
+
+    function generer() {
+      const start = parseInt(el<HTMLSelectElement>('hu-start').value, 10);
+      const modus = el<HTMLSelectElement>('hu-modus').value as 'hull' | 'tiere' | 'tom';
+      const antallHull = parseInt(el<HTMLSelectElement>('hu-hull').value, 10);
+
+      el('hu-overskrift').textContent =
+        el<HTMLInputElement>('hu-tittel').value.trim() || standardTittel;
+
+      // hvilke posisjoner (0–99) er tomme?
+      const tomme = new Set<number>();
+      if (modus === 'tom') {
+        for (let i = 0; i < 100; i++) tomme.add(i);
+      } else if (modus === 'tiere') {
+        for (let i = 0; i < 100; i++) {
+          const verdi = start + i;
+          if (verdi % 10 !== 0) tomme.add(i);
+        }
+      } else {
+        const posisjoner = Array.from({ length: 100 }, (_, i) => i);
+        for (let i = posisjoner.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [posisjoner[i], posisjoner[j]] = [posisjoner[j], posisjoner[i]];
+        }
+        posisjoner.slice(0, antallHull).forEach((p) => tomme.add(p));
+      }
+
+      const C = 10;
+      const svg = svgEl('svg', {
+        viewBox: `-0.5 -0.5 ${10 * C + 1} ${10 * C + 1}`,
+        'aria-hidden': 'true',
+      });
+      for (let i = 0; i < 100; i++) {
+        const rad = Math.floor(i / 10);
+        const kol = i % 10;
+        const x = kol * C;
+        const y = rad * C;
+        const verdi = start + i;
+        svg.appendChild(
+          svgEl('rect', {
+            x: String(x), y: String(y), width: String(C), height: String(C),
+            fill: '#fff', stroke: '#333', 'stroke-width': '0.5',
+          })
+        );
+        const attrs: Record<string, string> = {
+          x: String(x + C / 2),
+          y: String(y + C / 2 + 1.6),
+          'text-anchor': 'middle',
+          'font-size': '4.2',
+          fill: '#111',
+        };
+        if (tomme.has(i)) {
+          attrs.fill = '#1a6a3a';
+          attrs['font-weight'] = '700';
+          attrs.class = 'hu-fasit-del';
+        }
+        svg.appendChild(svgEl('text', attrs, String(verdi)));
+      }
+
+      el('hu-kart').replaceChildren(svg);
+
+      fasitSynlig = false;
+      el('hu-fasit-toggle').setAttribute('aria-pressed', 'false');
+      rot.classList.remove('fasit-paa');
+
+      el('hu-ark-seksjon').removeAttribute('hidden');
+      el('hu-status').textContent =
+        modus === 'hull' ? M.klartHull(antallHull) : M.klartHull(tomme.size);
+      try {
+        localStorage.setItem(
+          LAGRINGSNOKKEL,
+          JSON.stringify({
+            tittel: el<HTMLInputElement>('hu-tittel').value,
+            start: el<HTMLSelectElement>('hu-start').value,
+            modus,
+            hull: el<HTMLSelectElement>('hu-hull').value,
+          })
+        );
+      } catch {}
+    }
+
+    try {
+      const u = JSON.parse(localStorage.getItem(LAGRINGSNOKKEL) ?? 'null');
+      if (u) {
+        el<HTMLInputElement>('hu-tittel').value = u.tittel ?? '';
+        (['start', 'modus', 'hull'] as const).forEach((navn) => {
+          const felt = el<HTMLSelectElement>(`hu-${navn}`);
+          if ([...felt.options].some((o) => o.value === u[navn])) felt.value = u[navn];
+        });
+      }
+    } catch {}
+
+    el('hu-lag').addEventListener('click', generer);
+
+    el('hu-fasit-toggle').addEventListener('click', () => {
+      fasitSynlig = !fasitSynlig;
+      el('hu-fasit-toggle').setAttribute('aria-pressed', String(fasitSynlig));
+      rot.classList.toggle('fasit-paa', fasitSynlig);
+    });
+
+    const skrivUt = () => {
+      rot.classList.remove('print-fasit');
+      window.print();
+    };
+    el('hu-skriv-ut').addEventListener('click', skrivUt);
+    el('hu-skriv-ut-sticky').addEventListener('click', skrivUt);
+    el('hu-skriv-ut-fasit').addEventListener('click', () => {
+      rot.classList.add('print-fasit');
+      window.print();
+    });
+    window.addEventListener('afterprint', () => rot.classList.remove('print-fasit'));
+  }
+</script>

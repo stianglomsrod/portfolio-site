@@ -1,0 +1,46 @@
+---
+import Side from '../../layouts/Side.astro';
+import HundrekartVerktoy from '../../components/HundrekartVerktoy.astro';
+
+/* Hundrekart i Lærerrommet. ENGELSK TVILLING:
+   src/pages/en/sandbox/hundred-chart.astro — endre begge. */
+---
+
+<Side
+  title="Hundrekartet — lag utfyllingsark til utskrift"
+  description="Hundrekartet med tomme ruter elevene fyller inn — velg 1–100 eller 0–99 og hvor mye som skal stå ferdig. Med fasit."
+>
+  <div class="hu-side-hode">
+    <p class="kicker">/lærer · matematikk</p>
+    <h1>Hundrekartet</h1>
+    <p class="dempet">
+      Lag hundrekart-ark: velg 1–100 eller 0–99, og hvor mye som skal stå
+      ferdig — noen tomme ruter, bare tierne, eller et helt tomt kart.
+      Fasiten fyller alt.
+    </p>
+  </div>
+  <HundrekartVerktoy lang="nb" />
+</Side>
+
+<style>
+  .kicker {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: var(--tekst-label);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--hue-aksent);
+    margin: var(--s-7) 0 var(--s-2);
+  }
+
+  h1 {
+    font-size: var(--tekst-tittel);
+    margin: 0 0 var(--s-3);
+  }
+
+  .dempet {
+    color: var(--dempet);
+    max-width: 68ch;
+    margin: 0;
+  }
+</style>

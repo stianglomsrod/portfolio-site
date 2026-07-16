@@ -1,0 +1,47 @@
+---
+import Side from '../../layouts/Side.astro';
+import HemmeligKodeVerktoy from '../../components/HemmeligKodeVerktoy.astro';
+
+/* Hemmelig kode i Lærerrommet. ENGELSK TVILLING:
+   src/pages/en/sandbox/secret-code.astro — endre begge. */
+---
+
+<Side
+  title="Hemmelig kode — lag kodeark til utskrift"
+  description="Ordene dine kodes med tall eller hemmelige symboler — elevene bruker nøkkelen til å dekode. Med fasit."
+>
+  <div class="ko-side-hode">
+    <p class="kicker">/lærer · norsk</p>
+    <h1>Hemmelig kode</h1>
+    <p class="dempet">
+      Lag kodeark: ordene eller setningene dine kodes tegn for tegn, og
+      elevene bruker nøkkelen øverst på arket til å knekke koden. Velg
+      tallkode (fast eller hemmelig) eller symboler — fasiten skrives ut
+      for seg.
+    </p>
+  </div>
+  <HemmeligKodeVerktoy lang="nb" />
+</Side>
+
+<style>
+  .kicker {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: var(--tekst-label);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--hue-aksent);
+    margin: var(--s-7) 0 var(--s-2);
+  }
+
+  h1 {
+    font-size: var(--tekst-tittel);
+    margin: 0 0 var(--s-3);
+  }
+
+  .dempet {
+    color: var(--dempet);
+    max-width: 68ch;
+    margin: 0;
+  }
+</style>

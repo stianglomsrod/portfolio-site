@@ -218,6 +218,21 @@ export const VERKTOY: Verktoykort[] = [
     },
   },
   {
+    slugNb: '/sandbox/hemmelig-kode',
+    slugEn: '/en/sandbox/secret-code',
+    kategori: 'norsk',
+    nb: {
+      tittel: 'Hemmelig kode',
+      tekst: 'Ordene kodes med tall eller symboler — elevene knekker koden med nøkkelen. Fasit følger med.',
+      cta: 'lag et ark',
+    },
+    en: {
+      tittel: 'Secret code',
+      tekst: 'Words are encoded with numbers or symbols — pupils crack the code with the key. Answer key included.',
+      cta: 'make a sheet',
+    },
+  },
+  {
     slugNb: '/sandbox/hundrekart',
     slugEn: '/en/sandbox/hundred-chart',
     kategori: 'matte',

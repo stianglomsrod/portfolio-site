@@ -1,0 +1,861 @@
+---
+/* Hemmelig kode-verktøyet (kryptogram): lærerens ord/setninger kodes
+   tegn for tegn, og eleven bruker nøkkelen øverst til å dekode og
+   skrive bokstavene under. To nøkkeltyper: tall (fast a=1…å=29 eller
+   stokket) og symboler (29 egne SVG-glyfer, alltid stokket). Alt er
+   ren algoritme på lærerens egen tekst — fasit er klarteksten. */
+
+interface Props {
+  lang?: 'nb' | 'en';
+}
+
+const { lang = 'nb' } = Astro.props;
+
+const t =
+  lang === 'nb'
+    ? {
+        tittelFelt: 'Tittel på arket',
+        tittelEks: 'Skriv tittelen her',
+        ordNavn: 'Ord eller setninger som skal kodes',
+        ordEks: 'skriv et ord eller en setning',
+        leggTil: '+ Legg til rad',
+        noekkel: 'Kodenøkkel',
+        noekkelTallFast: 'tall — fast (a=1, b=2 …)',
+        noekkelTallStokket: 'tall — hemmelig (stokket)',
+        noekkelSymbol: 'symboler (hemmelig)',
+        omfang: 'Nøkkelen viser',
+        omfangBrukte: 'bare bokstavene som brukes',
+        omfangAlle: 'hele alfabetet',
+        lag: 'Lag kodeark',
+        skrivUt: 'Skriv ut',
+        skrivUtFasit: 'Skriv ut fasit',
+        visFasit: 'Vis fasit her',
+        navnLinje: 'Navn: ____________________   Dato: ____________',
+        noekkelTittel: 'Nøkkel',
+        instruks: 'Bruk nøkkelen til å finne bokstavene, og skriv dem under tegnene.',
+        fasit: 'FASIT',
+        standardTittel: 'Hemmelig kode',
+      }
+    : {
+        tittelFelt: 'Sheet title',
+        tittelEks: 'Type the title here',
+        ordNavn: 'Words or sentences to encode',
+        ordEks: 'type a word or a sentence',
+        leggTil: '+ Add row',
+        noekkel: 'Code key',
+        noekkelTallFast: 'numbers — fixed (a=1, b=2 …)',
+        noekkelTallStokket: 'numbers — secret (shuffled)',
+        noekkelSymbol: 'symbols (secret)',
+        omfang: 'The key shows',
+        omfangBrukte: 'only the letters that are used',
+        omfangAlle: 'the whole alphabet',
+        lag: 'Create code sheet',
+        skrivUt: 'Print',
+        skrivUtFasit: 'Print answer key',
+        visFasit: 'Show answers here',
+        navnLinje: 'Name: ____________________   Date: ____________',
+        noekkelTittel: 'Key',
+        instruks: 'Use the key to find the letters and write them under the signs.',
+        fasit: 'KEY',
+        standardTittel: 'Secret code',
+      };
+---
+
+<div class="ko-verktoy" data-lang={lang} data-standardtittel={t.standardTittel}>
+  <div class="ko-oppsett">
+    <section class="ko-panel" aria-labelledby="ko-panel-tittel">
+      <h2 id="ko-panel-tittel" class="sr-only">{lang === 'nb' ? 'Oppsett' : 'Setup'}</h2>
+
+      <label class="ko-felt">
+        <span class="ko-felt-navn">{t.tittelFelt}</span>
+        <input type="text" id="ko-tittel" placeholder={t.tittelEks} maxlength="60" />
+      </label>
+
+      <div class="ko-felt">
+        <span class="ko-felt-navn" id="ko-ord-navn">{t.ordNavn}</span>
+        <ul id="ko-liste" aria-labelledby="ko-ord-navn"></ul>
+        <button type="button" id="ko-legg-til" class="ko-sekundaer">{t.leggTil}</button>
+      </div>
+
+      <label class="ko-felt">
+        <span class="ko-felt-navn">{t.noekkel}</span>
+        <select id="ko-noekkel">
+          <option value="tall-fast" selected>{t.noekkelTallFast}</option>
+          <option value="tall-stokket">{t.noekkelTallStokket}</option>
+          <option value="symbol">{t.noekkelSymbol}</option>
+        </select>
+      </label>
+
+      <label class="ko-felt">
+        <span class="ko-felt-navn">{t.omfang}</span>
+        <select id="ko-omfang">
+          <option value="brukte" selected>{t.omfangBrukte}</option>
+          <option value="alle">{t.omfangAlle}</option>
+        </select>
+      </label>
+
+      <button type="button" id="ko-lag" class="knapp ko-primaer">{t.lag}</button>
+      <p id="ko-status" class="ko-status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="ko-visning" id="ko-ark-seksjon" hidden aria-labelledby="ko-visning-tittel">
+      <h2 id="ko-visning-tittel" class="sr-only">
+        {lang === 'nb' ? 'Forhåndsvisning' : 'Preview'}
+      </h2>
+      <div class="ko-handlinger">
+        <button type="button" id="ko-skriv-ut" class="knapp ko-primaer">{t.skrivUt}</button>
+        <button type="button" id="ko-skriv-ut-fasit" class="ko-sekundaer">{t.skrivUtFasit}</button>
+        <button type="button" id="ko-fasit-toggle" class="ko-sekundaer" aria-pressed="false">
+          {t.visFasit}
+        </button>
+      </div>
+
+      <div class="ko-sticky-print">
+        <button type="button" id="ko-skriv-ut-sticky" class="ko-sticky-knapp" title="Skriv ut arket (Ctrl+P)" aria-label={t.skrivUt}>
+          🖨
+        </button>
+      </div>
+
+      <div class="ko-ark" id="ko-ark">
+        <div class="ko-ark-hode">
+          <h3 id="ko-overskrift">{t.standardTittel}</h3>
+          <span class="ko-fasit-merke" aria-hidden="true">{t.fasit}</span>
+        </div>
+        <p class="ko-instruks">{t.instruks}</p>
+        <p class="ko-navn-linje">{t.navnLinje}</p>
+        <div class="ko-noekkelboks">
+          <p class="ko-noekkel-tittel">{t.noekkelTittel}</p>
+          <div id="ko-noekkel-grid" class="ko-noekkel-grid"></div>
+        </div>
+        <ol id="ko-meldinger" class="ko-meldinger"></ol>
+      </div>
+    </section>
+  </div>
+</div>
+
+<style is:global>
+  .ko-oppsett {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: var(--s-5);
+    align-items: start;
+    margin-top: var(--s-4);
+  }
+
+  @media (max-width: 900px) {
+    .ko-oppsett {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .ko-panel {
+    background: var(--flate);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: var(--s-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .ko-felt {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .ko-felt-navn {
+    font-family: var(--font-hd);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--tekst);
+  }
+
+  .ko-panel input[type='text'],
+  .ko-panel select {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    padding: 9px 10px;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--tekst);
+    min-height: 44px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  #ko-liste {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .ko-rad {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .ko-rad input[type='text'] {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .ko-rad.upassende input[type='text'] {
+    border-color: var(--feil);
+  }
+
+  .ko-ikonknapp {
+    font: inherit;
+    min-width: 44px;
+    min-height: 44px;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--tekst);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .ko-ikonknapp:hover {
+    border-color: var(--salvie);
+  }
+
+  .ko-primaer {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 700;
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    border: none;
+    border-radius: 9px;
+    padding: 11px 20px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .ko-primaer:hover {
+    filter: brightness(1.06);
+  }
+
+  .ko-sekundaer {
+    font-family: var(--font-sans);
+    font-size: 14.5px;
+    font-weight: 600;
+    background: var(--bg);
+    color: var(--tekst);
+    border: 1px solid var(--linje);
+    border-radius: 9px;
+    padding: 10px 16px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .ko-sekundaer:hover {
+    border-color: var(--salvie);
+  }
+
+  .ko-sekundaer:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  .ko-status {
+    margin: 0;
+    font-size: 14.5px;
+    color: var(--dempet);
+    min-height: 1.4em;
+  }
+
+  .ko-status.feil {
+    color: var(--feil);
+  }
+
+  .ko-handlinger {
+    display: flex;
+    gap: var(--s-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--s-3);
+  }
+
+  .ko-sticky-print {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 15;
+  }
+
+  .ko-sticky-knapp {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 1px solid var(--linje);
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: var(--kort-skygge);
+    display: grid;
+    place-items: center;
+  }
+
+  .ko-ark {
+    background: #fff;
+    color: #111;
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: 28px 32px;
+    max-width: 660px;
+  }
+
+  .ko-ark-hode {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  #ko-overskrift {
+    margin: 0 0 4px;
+    font-size: 24px;
+    color: #111;
+  }
+
+  .ko-fasit-merke {
+    display: none;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    color: #b3261e;
+    border: 2px solid #b3261e;
+    border-radius: 6px;
+    padding: 2px 8px;
+  }
+
+  .ko-verktoy.fasit-paa .ko-fasit-merke {
+    display: inline-block;
+  }
+
+  .ko-instruks {
+    margin: 0 0 6px;
+    font-size: 14.5px;
+    color: #333;
+  }
+
+  .ko-navn-linje {
+    margin: 0 0 16px;
+    font-size: 13.5px;
+    color: #333;
+  }
+
+  .ko-noekkelboks {
+    border: 2px solid #333;
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-bottom: 20px;
+  }
+
+  .ko-noekkel-tittel {
+    margin: 0 0 8px;
+    font-weight: 700;
+    font-size: 14.5px;
+    text-decoration: underline;
+    color: #111;
+  }
+
+  .ko-noekkel-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 14px;
+  }
+
+  .ko-noekkel-par {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    min-width: 26px;
+  }
+
+  .ko-noekkel-bokstav {
+    font-size: 15px;
+    font-weight: 700;
+    color: #111;
+  }
+
+  .ko-tegn {
+    font-size: 15px;
+    font-weight: 600;
+    color: #111;
+    line-height: 1;
+  }
+
+  .ko-tegn svg {
+    width: 16px;
+    height: 16px;
+    display: block;
+  }
+
+  .ko-meldinger {
+    margin: 0;
+    padding: 0 0 0 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+  }
+
+  .ko-melding {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 22px;
+  }
+
+  .ko-ord {
+    display: flex;
+    gap: 6px;
+  }
+
+  .ko-celle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 22px;
+  }
+
+  .ko-celle .ko-tegn {
+    font-size: 16px;
+  }
+
+  .ko-celle .ko-tegn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .ko-strek {
+    font-size: 15px;
+    color: #333;
+    letter-spacing: 1px;
+  }
+
+  .ko-svar {
+    display: none;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a6a3a;
+  }
+
+  .ko-verktoy.fasit-paa .ko-svar {
+    display: inline;
+  }
+
+  .ko-verktoy.fasit-paa .ko-strek {
+    display: none;
+  }
+
+  @media print {
+    @page {
+      margin: 14mm;
+    }
+
+    html,
+    body {
+      color-scheme: light;
+      background: #fff !important;
+      color: #000;
+    }
+
+    .topp,
+    .bunn,
+    .hopp,
+    .ko-panel,
+    .ko-handlinger,
+    .ko-side-hode,
+    .ko-sticky-print {
+      display: none !important;
+    }
+
+    .ramme {
+      padding: 0;
+      max-width: none;
+      min-height: 0;
+      background: #fff;
+    }
+
+    .ko-oppsett {
+      display: block;
+      margin: 0;
+    }
+
+    .ko-ark {
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 0;
+      max-width: none;
+    }
+
+    .ko-noekkelboks {
+      margin-bottom: 9mm;
+      break-inside: avoid;
+    }
+
+    .ko-meldinger {
+      gap: 12mm;
+    }
+
+    .ko-meldinger li {
+      break-inside: avoid;
+    }
+
+    .ko-verktoy:not(.print-fasit) .ko-svar {
+      display: none !important;
+    }
+
+    .ko-verktoy:not(.print-fasit) .ko-fasit-merke {
+      display: none !important;
+    }
+
+    .ko-verktoy.print-fasit .ko-svar {
+      display: inline !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+
+    .ko-verktoy.print-fasit .ko-strek {
+      display: none !important;
+    }
+
+    .ko-verktoy.print-fasit .ko-fasit-merke {
+      display: inline-block !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+  }
+</style>
+
+<script>
+  import { ALFABET, normaliserOrd, ordErUpassende } from '../lib/ordkryss-kjerne';
+
+  const rot = document.querySelector<HTMLElement>('.ko-verktoy');
+  if (rot) {
+    const lang = (rot.dataset.lang ?? 'nb') as 'nb' | 'en';
+    const standardTittel = rot.dataset.standardtittel ?? 'Hemmelig kode';
+    const LAGRINGSNOKKEL = `hemmelig-kode-${lang}`;
+    const MAKS = 10;
+    const NS = 'http://www.w3.org/2000/svg';
+    const BOKSTAVER = ALFABET.toLowerCase().split(''); // a–å (29)
+
+    const M =
+      lang === 'nb'
+        ? {
+            minstEn: 'Skriv inn minst ett ord eller én setning.',
+            upassende: (o: string) =>
+              `«${o}» passer ikke på et skoleark. Bytt det ut, så lager vi arket.`,
+            klart: (n: number, tegn: number) =>
+              `Arket er klart: ${n} kodede ${n === 1 ? 'melding' : 'meldinger'} med ${tegn} tegn totalt.`,
+            radAria: (i: number) => `Rad ${i}`,
+            fjern: (i: number) => `Fjern rad ${i}`,
+            radEks: 'skriv et ord eller en setning',
+          }
+        : {
+            minstEn: 'Type at least one word or sentence.',
+            upassende: (o: string) =>
+              `“${o}” does not belong on a school sheet. Swap it and we will make the sheet.`,
+            klart: (n: number, tegn: number) =>
+              `The sheet is ready: ${n} coded ${n === 1 ? 'message' : 'messages'} with ${tegn} signs in total.`,
+            radAria: (i: number) => `Row ${i}`,
+            fjern: (i: number) => `Remove row ${i}`,
+            radEks: 'type a word or a sentence',
+          };
+
+    interface Rad {
+      id: number;
+      tekst: string;
+    }
+
+    let rader: Rad[] = [];
+    let nesteId = 1;
+    let fasitSynlig = false;
+
+    const el = <T extends HTMLElement = HTMLElement>(id: string): T =>
+      document.getElementById(id) as T;
+
+    /* 29 symbolglyfer: 6 grunnformer × 5 varianter, tegnet som små SVG-er.
+       Rekkefølgen stokkes per generering, så nøkkelen er hemmelig. */
+    const FORMER = ['sirkel', 'kvadrat', 'trekant', 'diamant', 'kors', 'bue'] as const;
+    const VARIANTER = ['tom', 'fylt', 'prikk', 'strek', 'dobbel'] as const;
+
+    function lagSymbol(indeks: number): SVGElement {
+      const form = FORMER[indeks % FORMER.length];
+      const variant = VARIANTER[Math.floor(indeks / FORMER.length) % VARIANTER.length];
+      const svg = document.createElementNS(NS, 'svg');
+      svg.setAttribute('viewBox', '0 0 12 12');
+      svg.setAttribute('aria-hidden', 'true');
+      const fylt = variant === 'fylt';
+      const strekAttrs = { fill: fylt ? '#111' : 'none', stroke: '#111', 'stroke-width': '1.1' };
+      const legg = (navn: string, attrs: Record<string, string>) => {
+        const e = document.createElementNS(NS, navn);
+        for (const [k, v] of Object.entries({ ...strekAttrs, ...attrs })) e.setAttribute(k, v);
+        svg.appendChild(e);
+        return e;
+      };
+      if (form === 'sirkel') legg('circle', { cx: '6', cy: '5.4', r: '3.6' });
+      else if (form === 'kvadrat') legg('rect', { x: '2.6', y: '2', width: '6.8', height: '6.8' });
+      else if (form === 'trekant') legg('path', { d: 'M6 1.8 L9.8 8.8 L2.2 8.8 Z' });
+      else if (form === 'diamant') legg('path', { d: 'M6 1.6 L9.6 5.4 L6 9.2 L2.4 5.4 Z' });
+      else if (form === 'kors') legg('path', { d: 'M6 1.8 V9 M2.4 5.4 H9.6', fill: 'none' });
+      else legg('path', { d: 'M2.2 8 A3.9 3.9 0 0 1 9.8 8', fill: 'none' });
+      if (variant === 'prikk') legg('circle', { cx: '6', cy: form === 'bue' ? '7' : '5.4', r: '0.9', fill: '#111', stroke: 'none' });
+      if (variant === 'strek') legg('path', { d: 'M2.6 11.2 H9.4', fill: 'none' });
+      if (variant === 'dobbel') legg('path', { d: 'M2.6 11.2 H9.4 M2.6 9.9 H9.4', fill: 'none', 'stroke-width': '0.85' });
+      return svg;
+    }
+
+    function lagreUtkast() {
+      try {
+        localStorage.setItem(
+          LAGRINGSNOKKEL,
+          JSON.stringify({
+            tittel: el<HTMLInputElement>('ko-tittel').value,
+            noekkel: el<HTMLSelectElement>('ko-noekkel').value,
+            omfang: el<HTMLSelectElement>('ko-omfang').value,
+            rader: rader.map((r) => r.tekst),
+          })
+        );
+      } catch {}
+    }
+
+    function lastUtkast(): boolean {
+      try {
+        const raa = localStorage.getItem(LAGRINGSNOKKEL);
+        if (!raa) return false;
+        const u = JSON.parse(raa);
+        el<HTMLInputElement>('ko-tittel').value = u.tittel ?? '';
+        (['noekkel', 'omfang'] as const).forEach((navn) => {
+          const felt = el<HTMLSelectElement>(`ko-${navn}`);
+          if ([...felt.options].some((o) => o.value === u[navn])) felt.value = u[navn];
+        });
+        (u.rader ?? []).forEach((r: unknown) => {
+          if (typeof r === 'string') rader.push({ id: nesteId++, tekst: r });
+        });
+        return rader.length > 0;
+      } catch {
+        return false;
+      }
+    }
+
+    function leggTil(tekst = '') {
+      if (rader.length >= MAKS) return;
+      rader.push({ id: nesteId++, tekst });
+      tegnListe();
+    }
+
+    function tegnListe() {
+      const liste = el('ko-liste');
+      liste.replaceChildren();
+      rader.forEach((rad, indeks) => {
+        const li = document.createElement('li');
+        li.className = 'ko-rad';
+        const felt = document.createElement('input');
+        felt.type = 'text';
+        felt.value = rad.tekst.slice(0, 40);
+        felt.maxLength = 40;
+        felt.placeholder = M.radEks;
+        felt.setAttribute('aria-label', M.radAria(indeks + 1));
+        felt.addEventListener('input', () => {
+          rad.tekst = felt.value;
+          const stygt = felt.value.split(/\s+/).some((o) => ordErUpassende(o));
+          li.classList.toggle('upassende', stygt);
+          felt.setAttribute('aria-invalid', stygt ? 'true' : 'false');
+          lagreUtkast();
+        });
+        const fjern = document.createElement('button');
+        fjern.type = 'button';
+        fjern.className = 'ko-ikonknapp';
+        fjern.textContent = '✕';
+        fjern.setAttribute('aria-label', M.fjern(indeks + 1));
+        fjern.addEventListener('click', () => {
+          rader = rader.filter((r) => r.id !== rad.id);
+          if (rader.length === 0) leggTil();
+          tegnListe();
+          lagreUtkast();
+        });
+        li.append(felt, fjern);
+        liste.appendChild(li);
+      });
+      el<HTMLButtonElement>('ko-legg-til').disabled = rader.length >= MAKS;
+    }
+
+    function siStatus(tekst: string, erFeil = false) {
+      const status = el('ko-status');
+      status.textContent = tekst;
+      status.classList.toggle('feil', erFeil);
+    }
+
+    /* Tegnet for en bokstav, som DOM-element */
+    function lagTegn(
+      bokstav: string,
+      noekkelType: string,
+      tallkode: Map<string, number>,
+      symbolkode: Map<string, number>
+    ): HTMLElement {
+      const holder = document.createElement('span');
+      holder.className = 'ko-tegn';
+      if (noekkelType === 'symbol') {
+        holder.appendChild(lagSymbol(symbolkode.get(bokstav) ?? 0));
+      } else {
+        holder.textContent = String(tallkode.get(bokstav) ?? '?');
+      }
+      return holder;
+    }
+
+    function generer() {
+      const rene = rader.map((r) => r.tekst.trim().replace(/\s+/g, ' ')).filter(Boolean);
+      if (rene.length === 0) {
+        siStatus(M.minstEn, true);
+        return;
+      }
+      for (const tekst of rene) {
+        for (const ord of tekst.split(' ')) {
+          if (ordErUpassende(ord)) {
+            siStatus(M.upassende(ord), true);
+            return;
+          }
+        }
+      }
+
+      const noekkelType = el<HTMLSelectElement>('ko-noekkel').value;
+      const omfang = el<HTMLSelectElement>('ko-omfang').value;
+
+      // kodene: tall 1–29 (fast eller stokket) og symbolindeks (stokket)
+      const tall = BOKSTAVER.map((_, i) => i + 1);
+      const symboler = BOKSTAVER.map((_, i) => i);
+      const stokk = (a: number[]) => {
+        for (let i = a.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [a[i], a[j]] = [a[j], a[i]];
+        }
+      };
+      if (noekkelType === 'tall-stokket') stokk(tall);
+      stokk(symboler);
+      const tallkode = new Map(BOKSTAVER.map((b, i) => [b, tall[i]]));
+      const symbolkode = new Map(BOKSTAVER.map((b, i) => [b, symboler[i]]));
+
+      el('ko-overskrift').textContent =
+        el<HTMLInputElement>('ko-tittel').value.trim() || standardTittel;
+
+      // meldingene: normaliser hvert ord til a–å (annet strippes)
+      const meldinger = rene
+        .map((tekst) =>
+          tekst
+            .split(' ')
+            .map((ord) => normaliserOrd(ord).toLowerCase())
+            .filter(Boolean)
+        )
+        .filter((ord) => ord.length > 0);
+
+      const brukte = new Set<string>();
+      meldinger.forEach((ord) => ord.forEach((o) => o.split('').forEach((b) => brukte.add(b))));
+
+      // nøkkelen
+      const grid = el('ko-noekkel-grid');
+      grid.replaceChildren();
+      BOKSTAVER.filter((b) => omfang === 'alle' || brukte.has(b)).forEach((bokstav) => {
+        const par = document.createElement('span');
+        par.className = 'ko-noekkel-par';
+        const bok = document.createElement('span');
+        bok.className = 'ko-noekkel-bokstav';
+        bok.textContent = bokstav;
+        par.appendChild(bok);
+        par.appendChild(lagTegn(bokstav, noekkelType, tallkode, symbolkode));
+        grid.appendChild(par);
+      });
+
+      // meldingene som celler
+      const liste = el('ko-meldinger');
+      liste.replaceChildren();
+      let antallTegn = 0;
+      meldinger.forEach((ordListe) => {
+        const li = document.createElement('li');
+        const melding = document.createElement('span');
+        melding.className = 'ko-melding';
+        ordListe.forEach((ord) => {
+          const ordEl = document.createElement('span');
+          ordEl.className = 'ko-ord';
+          ord.split('').forEach((bokstav) => {
+            antallTegn++;
+            const celle = document.createElement('span');
+            celle.className = 'ko-celle';
+            celle.appendChild(lagTegn(bokstav, noekkelType, tallkode, symbolkode));
+            const strek = document.createElement('span');
+            strek.className = 'ko-strek';
+            strek.textContent = '__';
+            const svar = document.createElement('span');
+            svar.className = 'ko-svar';
+            svar.textContent = bokstav;
+            celle.append(strek, svar);
+            ordEl.appendChild(celle);
+          });
+          melding.appendChild(ordEl);
+        });
+        li.appendChild(melding);
+        liste.appendChild(li);
+      });
+
+      fasitSynlig = false;
+      el('ko-fasit-toggle').setAttribute('aria-pressed', 'false');
+      rot.classList.remove('fasit-paa');
+
+      el('ko-ark-seksjon').removeAttribute('hidden');
+      siStatus(M.klart(meldinger.length, antallTegn));
+      lagreUtkast();
+    }
+
+    if (!lastUtkast()) {
+      leggTil();
+      leggTil();
+      leggTil();
+    }
+    tegnListe();
+
+    el('ko-legg-til').addEventListener('click', () => {
+      leggTil();
+      lagreUtkast();
+    });
+
+    el('ko-lag').addEventListener('click', generer);
+
+    el('ko-fasit-toggle').addEventListener('click', () => {
+      fasitSynlig = !fasitSynlig;
+      el('ko-fasit-toggle').setAttribute('aria-pressed', String(fasitSynlig));
+      rot.classList.toggle('fasit-paa', fasitSynlig);
+    });
+
+    const skrivUt = () => {
+      rot.classList.remove('print-fasit');
+      window.print();
+    };
+    el('ko-skriv-ut').addEventListener('click', skrivUt);
+    el('ko-skriv-ut-sticky').addEventListener('click', skrivUt);
+    el('ko-skriv-ut-fasit').addEventListener('click', () => {
+      rot.classList.add('print-fasit');
+      window.print();
+    });
+    window.addEventListener('afterprint', () => rot.classList.remove('print-fasit'));
+
+    ['ko-tittel', 'ko-noekkel', 'ko-omfang'].forEach((id) =>
+      el(id).addEventListener('change', lagreUtkast)
+    );
+  }
+</script>

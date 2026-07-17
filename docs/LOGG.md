@@ -6,6 +6,44 @@
 
 ## Changelog
 
+### 2026-07-17 (del 4) — Sporing v3: veiledningen UT av bokstaven (piler utenfor)
+- **Stians funn etter v2**: piler/tall oppå bokstavene ble «veldig busy og
+  krangler om plass, og gir ikke eleven trygghet». Mål: piler på UTSIDEN som
+  viser skriveretning, buet der strøket buer, rolig og trygt for småskolen.
+- **Ny researchrunde** (multi-agent + inline, med små puljer etter at en
+  16-agents-workflow traff Fable 5-preview-grensen — se note nederst): 4
+  bildeanalyser + forlagsscan (Gyldendal/Salto+Salaby, Cappelen Damm/Kaleido,
+  Aschehoug/Zeppelin) + didaktikk (Lesesenteret, Skrivesenteret, kognitiv
+  belastning, faded guidance) + stavskrift/løkkeskrift-utredning. Alt bevart i
+  `docs/innsikt/sporing/*.md`; full spesifikasjon i `DESIGNBRIEF-V3.md`.
+  Kjernefunn: forlagene lar ALDRI pil og bokstavstrek dele blekk; Salto
+  nummererer bare ved reell tvetydighet (roligere enn Kaleidos «tall på alt»).
+- **Ny veiledningsmotor i `SporingVerktoy.astro`**: piltypen følger strøktypen
+  (lest av første tegnekommando) — rundt strøk → buet pil over toppen mot
+  klokka; loddrett/skrå/vannrett → rett pil ved strøkstart rotert etter
+  starttangenten. Alt i det hvite utenfor bokstaven. Tall KUN ved 3+ strøk;
+  grønt startpunkt kun på strøk 1. Veiledningsfarge mørk skifer (#3b4a59,
+  Stians valg — roligst). Graduering: modell → 2 dus bro (kun startprikk) →
+  rene stiplede → tomrom. Fikset klassifiseringsbug (t/u/j fikk buepil på
+  loddrett stav) og dobbeltprikk på 2-strøks-bokstaver.
+- **`bokstavbaner.ts`**: A/Å starter i toppspissen (to diagonaler ovenfra + ev.
+  ring/tverr), M starter øverst til venstre — ikke lenger «1 nede i kjelleren».
+  viewBox fikk luft over loftet (y −7) så piler/tall ikke klippes.
+- **Sideingress oppdatert** begge språk (bokstavhus + veiledning utenfor).
+- QA grønt: bygg, verktøy-smoke (sporing-seksjonen skrevet om til v3: grønt
+  startpunkt modell+2 broer = 3, pilhoder = 2, k=1-2-3), axe 0/56, kant flukter,
+  print 1 side (3-rad m/ tom OG tung 7-rad), ingen klipping over loftet.
+- Skriftvarianter: stavskrift = realistisk neste iterasjon (inn-/utstrøk +
+  skew, ~58 baneendringer); løkkeskrift dokumentert som vei videre (felles
+  ankerpunkt ved x-topp). Se DESIGNBRIEF-V3 §9.
+- **Åpne finpuss** (ikke blokkerende): «1 2» klumper litt der to strøk deler
+  startpunkt (A/Å/M/N); Æ er fortsatt travel (5 strøk, sjelden); i/j-prikk kan
+  stables tett med nedpilen; s-kurve/f-krok kan mykes.
+- NOTE om forbruk: en innledende 16-agents research-workflow feilet på «Usage
+  credits required» — burst mot Fable 5 (preview-modell m/ egen ramme), ikke
+  plan-taket. Løsning: små puljer (2–3 agenter, sonnet) + inline. Lærdom: ikke
+  fyr av store parallelle fan-outs på preview-modellen.
+
 ### 2026-07-17 (del 3) — Grenen nye-verktoy merget til main og deployet
 - Hele grenen (Lærerrommet, 9 verktøy fra første batch, 7 fra bølge 1,
   Sporing v2, research-dokumentene og bannordfilter-fiksen) er

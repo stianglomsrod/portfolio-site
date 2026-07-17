@@ -84,7 +84,7 @@ export const BANER: Record<string, Bane> = {
   å: { bredde: 17, strok: [{ d: sirkel(8, CY, R) }, { d: 'M 14 15 L 14 27' }, { d: sirkel(9, 9.8, 2.5) }] },
 
   /* ---------- store bokstaver ---------- */
-  A: { bredde: 18, strok: [{ d: 'M 2 27 L 9 3 L 16 27' }, { d: 'M 4.8 18.6 L 13.2 18.6' }] },
+  A: { bredde: 18, strok: [{ d: 'M 9 3 L 2 27' }, { d: 'M 9 3 L 16 27' }, { d: 'M 4.8 18.6 L 13.2 18.6' }] },
   B: { bredde: 16, strok: [{ d: 'M 4 3 L 4 27' }, { d: 'M 4 3 L 8.4 3 A 5.7 5.7 0 1 1 8.4 14.6 L 4 14.6 L 8.8 14.6 A 6.1 6.1 0 1 1 8.8 27 L 4 27' }] },
   C: { bredde: 17, strok: [{ d: 'M 14.8 6.8 A 10.4 12 0 1 0 14.8 23.2' }] },
   D: { bredde: 17, strok: [{ d: 'M 4 3 L 4 27' }, { d: 'M 4 3 L 6.6 3 C 15.8 3 15.8 27 6.6 27 L 4 27' }] },
@@ -96,7 +96,7 @@ export const BANER: Record<string, Bane> = {
   J: { bredde: 15, strok: [{ d: 'M 11.6 3 L 11.6 21.6 A 5.2 5.2 0 0 1 2.4 23.8' }] },
   K: { bredde: 17, strok: [{ d: 'M 4 3 L 4 27' }, { d: 'M 14.6 3 L 4.5 16' }, { d: 'M 7.8 11.9 L 15.2 27' }] },
   L: { bredde: 14, strok: [{ d: 'M 4 3 L 4 27 L 13.2 27' }] },
-  M: { bredde: 20, strok: [{ d: 'M 3 27 L 3 3' }, { d: 'M 3 3 L 10 17.4 L 17 3' }, { d: 'M 17 3 L 17 27' }] },
+  M: { bredde: 20, strok: [{ d: 'M 3 3 L 3 27' }, { d: 'M 3 3 L 10 17.4 L 17 3' }, { d: 'M 17 3 L 17 27' }] },
   N: { bredde: 19, strok: [{ d: 'M 4 3 L 4 27' }, { d: 'M 4 3 L 15.4 27' }, { d: 'M 15.4 3 L 15.4 27' }] },
   O: { bredde: 19, strok: [{ d: 'M 14.2 5.6 A 7.2 12 0 0 0 4.8 24.4 A 7.2 12 0 0 0 14.2 5.6' }] },
   P: { bredde: 16, strok: [{ d: 'M 4 3 L 4 27' }, { d: 'M 4 3 L 8.6 3 A 6.3 6.3 0 1 1 8.6 15.8 L 4 15.8' }] },
@@ -121,7 +121,7 @@ export const BANER: Record<string, Bane> = {
     ],
   },
   Ø: { bredde: 19, strok: [{ d: 'M 14.2 5.6 A 7.2 12 0 0 0 4.8 24.4 A 7.2 12 0 0 0 14.2 5.6' }, { d: 'M 15.8 4 L 3.2 26' }] },
-  Å: { bredde: 18, strok: [{ d: 'M 2.6 27 L 9 8.4 L 15.4 27' }, { d: 'M 5.2 20.4 L 12.8 20.4' }, { d: sirkel(9.4, 4, 2.3) }] },
+  Å: { bredde: 18, strok: [{ d: 'M 9 8.4 L 2.6 27' }, { d: 'M 9 8.4 L 15.4 27' }, { d: 'M 5.2 20.4 L 12.8 20.4' }, { d: sirkel(9.4, 4, 2.3) }] },
 };
 
 export const VOKALER = new Set([...'aeiouyæøå', ...'AEIOUYÆØÅ']);

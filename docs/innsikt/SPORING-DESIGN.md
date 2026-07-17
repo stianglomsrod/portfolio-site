@@ -1,9 +1,40 @@
-# Sporing v2 — designgrunnlag fra norsk skriftforming-didaktikk
+# Sporing — designgrunnlag fra norsk skriftforming-didaktikk
 
 > Research 17.07.2026 for ombygging av Sporing-verktøyet. Grunnlag: 8 skjermbilder
 > fra Stian (alfabetplakater m/ piler, bokstavhus-ark, Teaching Funtastic-remser,
 > H-sporingsark), egne skjermdumper i `docs/innsikt/sporing/` (Kaleido skriftforming
 > Stavskrift A-utdrag, Teaching Funtastic-produkt), og tekstkilder.
+
+## v3 (17.07.2026, del 4) — veiledningen UT av bokstaven
+
+Stians funn etter v2: piler/tall oppå bokstavene ble «veldig busy og krangler
+om plass, og gir ikke eleven trygghet». v3 flytter ALL retningsveiledning ut i
+det hvite utenfor bokstavformen (Salto-konvensjonen), forankret i en ny
+researchrunde mot Gyldendal (Salto/Salaby), Cappelen Damm (Kaleido stavskrift/
+løkkeskrift), Aschehoug/Zeppelin og forskning (Lesesenteret, Skrivesenteret,
+kognitiv belastning, faded guidance). Kjernefunn og full spesifikasjon i
+`docs/innsikt/sporing/DESIGNBRIEF-V3.md`. Hovedpunkter, som er implementert:
+
+- **Piltypen følger strøktypen** (lest av første tegnekommando i banen): rundt
+  strøk → kort BUET pil over toppen (mot klokka); loddrett/skrå → kort RETT pil
+  ved strøkstart, rotert etter starttangenten; vannrett → rett pil. Alt i det
+  hvite utenfor bokstaven, aldri oppå streken.
+- **Tall kun ved 3+ strøk** (Salto-ro: nummerer bare når det er reell
+  tvetydighet). 2-strøks-bokstaver (a, b, d, g, p, q …) klarer seg med grønt
+  startpunkt + piler. Løse tall, aldri i sirkel, i skiferfarge.
+- **Grønt startpunkt kun på strøk 1** (ikke hvert strøk → ingen dobbeltprikker).
+- **Veiledningsfarge = mørk skifer #3b4a59** (roligst; Stians valg). Modellen er
+  fortsatt nøytralt sort; grønt startpunkt er eneste sterke farge.
+- **Graduering**: modell (full veiledning) → 2 øvinger med KUN grønn startprikk
+  (dus bro) → rene stiplede → tomrom til egenskriving.
+- **Baneretting**: A/Å starter i toppspissen (to diagonaler ovenfra), M starter
+  øverst til venstre — ikke lenger «1 nede i kjelleren».
+- **viewBox** har fått luft over loftet (y ned til −7) så piler/tall ikke klippes.
+- Skriftvarianter (stavskrift/løkkeskrift): utredet, se DESIGNBRIEF-V3 §9.
+  Stavskrift er neste iterasjon; løkkeskrift dokumentert som vei videre.
+
+Avsnittene under er v2-grunnlaget og gjelder fortsatt for bokstavhus, farger og
+metodikk; v3 endrer kun veiledningslaget slik det er beskrevet over.
 
 ## Bokstavhuset (linjesystemet)
 

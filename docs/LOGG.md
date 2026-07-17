@@ -6,6 +6,15 @@
 
 ## Changelog
 
+### 2026-07-17 (del 3) — Grenen nye-verktoy merget til main og deployet
+- Hele grenen (Lærerrommet, 9 verktøy fra første batch, 7 fra bølge 1,
+  Sporing v2, research-dokumentene og bannordfilter-fiksen) er
+  fast-forward-merget til main og pushet — 16 verktøy i Lærerrommet er
+  nå i produksjon. Verifisert live: /laerer + nye ruter svarer 200, og
+  prod-røyk av Sporing (SVG-dekor) og Tallpyramider (kjerne) er grønn
+  med ren konsoll. Grenen nye-verktoy beholdes som historikk inntil
+  videre; alt videre arbeid skjer på main igjen.
+
 ### 2026-07-17 (del 2) — Sporing finpuss etter Stians gjennomgang
 - **Modellbokstavene er nøytrale** (sort strek): fargen bor kun i
   veiledningen — grønt startpunkt, mørke piler og strøknumre.

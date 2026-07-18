@@ -6,6 +6,67 @@
 
 ## Changelog
 
+### 2026-07-18 (del 2) — Bildebank for Lærerrommet (gren feat/bildebank)
+- **Bildebank i fem verktøy** (Ord og bilde, Ordbingo, Silhuetter, Ordkryss,
+  Kryssord): læreren skriver et ord og får bildeforslag som beholdes
+  implisitt, byttes (⟳, kun ved flere alternativer) eller fjernes (✕ —
+  huskes til teksten endres). Lærerens innlimte bilde vinner ALLTID.
+  Ord og bilde: forslaget teller som radens bilde (Ctrl+V er fallback,
+  mangler-markering aktiveres ved genereringsforsøk). Kryssord: forslaget
+  teller som ledetråd. Norsk standard; engelsk via avhuking (en-sidene
+  speiler med «Norwegian words»). Skill-pipeline kjørt: compliance-porten
+  🟢 (register rad 19) → PRD (`docs/PRD-bildebank.md`) → secure-dev
+  proaktivt. Alt klientside — 0 eksterne kall verifisert.
+- **Kjernen** i `src/lib/bildebank.ts` (DOM-fri, testbar): NFC-normalisering,
+  bøyningsfallback (ene/en/et/er/a/n/t + base+e; el/er-synkope FØR base+e —
+  «sykler» skal gi sykkel-substantivet, ikke sykle-verbet), sammensatt-
+  analyse kun nb ≥6 tegn (kun hodet foreslås, lengste vinner, fuge-s/e,
+  2-tegns hode krever kjent forledd, 3+ krever kjent ELLER ≥5-tegns forledd,
+  synlig «siste ledd i ordet»-merking), lagvis `utvid` (emoji først, m:
+  bakerst), kodevalidering før URL (aldri brukertekst i URL-er).
+  UI i `src/lib/bildebank-brikke.ts`: debounce 250 ms, tre stiler (OpenMoji
+  farge standard/strek/systememoji — Mulberry alltid bilde), 404 →
+  neste alternativ → glyf (emoji) eller stille tilbaketrekking, ønskeliste
+  (ord uten treff, samles ved blur, frivillig mailto — null backend),
+  aria-merkede ekte knapper, reduced motion, aldri innerHTML.
+- **Indeksene** i `public/bildebank/indeks/`: kuratert basis nb (~330 ord)
+  + en (~300), CLDR-generert lag (nb 3606 / en 4054 ord fra 1785 emojier,
+  `scripts/bildebank-cldr.mjs`, CLDR 48.2.0 — NB: bokmål heter «no» der)
+  med REDIGERBART skolefilter (`scripts/bildebank/skolefilter.json`:
+  alkohol/tobakk/våpen/sprøyte/blod/langfinger/pengespill/18+; hudtoner og
+  ♀/♂-varianter droppes; terning bevisst beholdt) + kuratering
+  (`cldr-kuratering.json`: viskelær/bringebær fra prototypen + «ett» —
+  klokkeemojien traff «sigarett» via sammensatt-analysen). Mulberry-demolag
+  (31 verifiserte verb/ord) til Stians pipeline-kjøring erstatter det.
+- **Selvhosting** (`scripts/bildebank-hent-svg.mjs`): nøyaktig de kodene
+  indeksene bruker — 1494 emojier × farge+strek + 36 Mulberry = 3024 SVG-er
+  (14 MB) fra PINNEDE versjoner (OpenMoji 15.1.0, Mulberry v3.6.0) i
+  `public/bildebank/`; koder valideres mot openmoji.json (0 avvik).
+  Kreditering i kolofonen begge språk (CC BY-SA-krav): OpenMoji · Mulberry
+  Symbols · Unicode CLDR.
+- **Mulberry-pipelinen** (Stian kjører): hent (git trees + filnavn→etikett/
+  verbflagg etter `_,_to`-konvensjonen; symbol-info.csv finnes ikke i
+  v3.6.0-assets — kategorier tomme) → oversett (`ANTHROPIC_API_KEY`,
+  claude-sonnet-4-6 eller --modell=haiku, batcher à 80, streng JSON-
+  kontrakt m/ ett nytt forsøk, gjenopptakbar TSV-gjennomgangsfil,
+  skolefilter-treff merkes «sjekk», --maks for testrunde) → kompiler
+  (TSV → mulberry-nb.json; «nei»/tomt hoppes; ALT med norsk tekst
+  kompileres — gjennomgangen skjer FØR). Røyk-testet med mini-TSV.
+- **AVVIK fra oppdraget (dokumentert i PRD-en):** «hoste» kan ikke treffe —
+  «cough» finnes ikke noe sted i Mulberry v3.6.0 (verifisert mot hele
+  git-treet). Done-testen bruker «nyse» (`sneeze_cold`) for samme mekanisme;
+  kuratering («ingen forslag er bedre enn feil forslag») vant over å koble
+  hoste→nyse-bildet. Siste release er dessuten v3.6.0, ikke v3.5.2 som i
+  bestillingen — pinnet til den faktiske.
+- **Tester**: `tests/bildebank.test.mjs` (node --test, TS-import med
+  Node 24 type-stripping) — 15 tester/alle Done-oppslag grønne, inkl. at
+  HVER kode i alle indekser har selvhostet SVG på disk. Røyksuiten
+  utvidet med 12 bildebank-sjekker (UX-kontrakten ende-til-ende + print).
+- QA grønt: bygg, enhetstester 15/15, verktøy-røyksuite ALT GRØNT,
+  axe 0/56, kant-sjekk 0/56, 0 eksterne hoster i nettverket, brikken
+  borte i print mens arkbildet består, reduced motion verifisert.
+  Grenen er IKKE merget til main — Stians beslutning.
+
 ### 2026-07-18 — Sporing v4: forlagskvalitet — baner og veiledning opp med røttene
 - **Stians PDF-gjennomgang av v3** (med skjermutsnitt): versaler «skviste»
   (unaturlig høye/tynne), q med meningsløs venstrehank, bokstavene krysser

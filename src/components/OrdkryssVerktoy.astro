@@ -2,13 +2,18 @@
 /* Ordkryss-verktøyet: ordletingsark til utskrift, for lærere. Skjermsiden
    følger sidens tokens; selve arket er alltid hvitt (det ER utskriften).
    Kjernen bor i src/lib/ordkryss-kjerne.ts; en frittstående kopi med
-   Node-tester ligger i «cs50x final project»-mappa. */
+   Node-tester ligger i «cs50x final project»-mappa. Bildebanken
+   foreslår bilde fra ordet (docs/PRD-bildebank.md); lærerens eget
+   vinner. */
+
+import profil from '../data/profil.json';
 
 interface Props {
   lang?: 'nb' | 'en';
 }
 
 const { lang = 'nb' } = Astro.props;
+const epost = profil.kontakt.epost;
 
 const t =
   lang === 'nb'
@@ -68,7 +73,7 @@ const t =
       };
 ---
 
-<div class="ok-verktoy" data-lang={lang} data-standardtittel={t.standardTittel}>
+<div class="ok-verktoy" data-lang={lang} data-standardtittel={t.standardTittel} data-epost={epost}>
   <div class="ok-oppsett">
     <section class="ok-panel" aria-labelledby="ok-panel-tittel">
       <h2 id="ok-panel-tittel" class="sr-only">{lang === 'nb' ? 'Oppsett' : 'Setup'}</h2>
@@ -261,6 +266,7 @@ const t =
     display: flex;
     gap: 6px;
     align-items: center;
+    flex-wrap: wrap; /* bildebank-brikken legger seg på egen linje */
   }
 
   .ok-ord-rad input[type='text'] {
@@ -543,6 +549,13 @@ const t =
     border: 1px solid #d8d4c8;
   }
 
+  /* Systememoji-forslag fra bildebanken rendres som glyf */
+  #ok-ordbank .bb-ark-glyf {
+    width: 44px;
+    font-size: 34px;
+    line-height: 44px;
+  }
+
   /* Utskrift: bare arket. Sidens nav/footer og panelet skjules. */
   @media print {
     @page {
@@ -636,6 +649,7 @@ const t =
     ordErUpassende,
     lagOrdkryss,
   } from '../lib/ordkryss-kjerne';
+  import { opprettBildebank } from '../lib/bildebank-brikke';
 
   const rot = document.querySelector<HTMLElement>('.ok-verktoy');
 
@@ -643,6 +657,12 @@ const t =
     const MAKS_ORD = 16;
     const lang = rot.dataset.lang === 'en' ? 'en' : 'nb';
     const LAGRINGSNOKKEL = `ordkryss-${lang}`;
+
+    const bildebank = opprettBildebank({
+      lang,
+      epost: rot.dataset.epost,
+      erUpassende: ordErUpassende,
+    });
 
     const M =
       lang === 'nb'
@@ -876,12 +896,14 @@ const t =
         fjern.setAttribute('aria-label', M.fjernOrd(indeks + 1));
         fjern.addEventListener('click', () => {
           ordListe = ordListe.filter((o) => o.id !== ord.id);
+          bildebank.nullstill(ord.id);
           if (ordListe.length === 0) leggTilOrd();
           tegnOrdListe();
           lagreUtkast();
         });
 
         rad.append(felt, bildeHolder, filFelt, fjern);
+        bildebank.monter(ord.id, felt, rad);
         liste.appendChild(rad);
       });
 
@@ -996,13 +1018,18 @@ const t =
         .filter((o) => o.tekst.trim())
         .forEach((o) => {
           const punkt = document.createElement('li');
+          // Lærerens eget bilde vinner; ellers bildebankens forslag.
+          let bilde: HTMLElement | null = null;
           if (o.bilde) {
-            const bilde = document.createElement('img');
-            bilde.src = o.bilde;
-            bilde.alt = '';
-            punkt.appendChild(bilde);
+            const img = document.createElement('img');
+            img.src = o.bilde;
+            img.alt = '';
+            bilde = img;
+          } else {
+            bilde = bildebank.lagArkElement(o.id);
           }
-          if (!bildemodus || !o.bilde) {
+          if (bilde) punkt.appendChild(bilde);
+          if (!bildemodus || !bilde) {
             const tekst = document.createElement('span');
             tekst.textContent = visTekst(normaliserOrd(o.tekst));
             punkt.appendChild(tekst);
@@ -1075,5 +1102,6 @@ const t =
       leggTilOrd();
     }
     tegnOrdListe();
+    el('ok-legg-til').parentElement?.appendChild(bildebank.innstillinger());
   }
 </script>

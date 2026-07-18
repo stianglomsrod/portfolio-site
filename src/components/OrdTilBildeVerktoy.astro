@@ -1,14 +1,18 @@
 ---
 /* Ord-til-bilde-verktøyet: eleven trekker strek fra ordet til riktig
-   bilde. Hvert ord MÅ ha bilde (opplasting eller Ctrl+V, som søsknene).
-   Fast radhøyde gjør at fasit-strekene kan tegnes som SVG-linjer i
-   sonen mellom kolonnene. Fasit-mekanikken er Ordkryss sin. */
+   bilde. Hvert ord MÅ ha bilde — bildebanken foreslår ett fra ordet
+   (docs/PRD-bildebank.md), og lærerens eget (opplasting/Ctrl+V) vinner
+   alltid. Fast radhøyde gjør at fasit-strekene kan tegnes som SVG-linjer
+   i sonen mellom kolonnene. Fasit-mekanikken er Ordkryss sin. */
+
+import profil from '../data/profil.json';
 
 interface Props {
   lang?: 'nb' | 'en';
 }
 
 const { lang = 'nb' } = Astro.props;
+const epost = profil.kontakt.epost;
 
 const t =
   lang === 'nb'
@@ -18,7 +22,7 @@ const t =
         ordNavn: 'Ordene (med bilde)',
         ordEks: 'skriv et ord',
         leggTil: '+ Legg til ord',
-        bildeHint: 'Hvert ord trenger et bilde. Tips: kopier et bilde (høyreklikk → «Kopier bilde») og lim det inn i ordfeltet med Ctrl + V.',
+        bildeHint: 'Hvert ord trenger et bilde. Verktøyet foreslår der det kan — bytt med ⟳, fjern med ✕, eller lim inn ditt eget med Ctrl + V. Ditt eget bilde vinner alltid.',
         lag: 'Lag ark',
         skrivUt: 'Skriv ut',
         skrivUtFasit: 'Skriv ut fasit',
@@ -34,7 +38,7 @@ const t =
         ordNavn: 'The words (with pictures)',
         ordEks: 'type a word',
         leggTil: '+ Add word',
-        bildeHint: 'Each word needs a picture. Tip: copy a picture (right-click → “Copy image”) and paste it into the word field with Ctrl + V.',
+        bildeHint: 'Each word needs a picture. The tool suggests one when it can — change it with ⟳, remove it with ✕, or paste your own with Ctrl + V. Your own picture always wins.',
         lag: 'Create sheet',
         skrivUt: 'Print',
         skrivUtFasit: 'Print answer key',
@@ -46,7 +50,7 @@ const t =
       };
 ---
 
-<div class="ob-verktoy" data-lang={lang} data-standardtittel={t.standardTittel}>
+<div class="ob-verktoy" data-lang={lang} data-standardtittel={t.standardTittel} data-epost={epost}>
   <div class="ob-oppsett">
     <section class="ob-panel" aria-labelledby="ob-panel-tittel">
       <h2 id="ob-panel-tittel" class="sr-only">{lang === 'nb' ? 'Oppsett' : 'Setup'}</h2>
@@ -175,6 +179,7 @@ const t =
     display: flex;
     gap: 6px;
     align-items: center;
+    flex-wrap: wrap; /* bildebank-brikken legger seg på egen linje */
   }
 
   .ob-ord-rad input[type='text'] {
@@ -413,6 +418,17 @@ const t =
     border-radius: 4px;
   }
 
+  /* Forslag fra bildebanken: SVG-ene bruker img-regelen over; system-
+     emoji rendres som glyf og skalerer med radhøyden (også i print). */
+  .ob-rad img.bb-ark-bilde {
+    border: none;
+  }
+
+  .ob-rad .bb-ark-glyf {
+    font-size: calc(var(--ob-rad) - 34px);
+    line-height: calc(var(--ob-rad) - 16px);
+  }
+
   .ob-mellom {
     position: relative;
     height: 100%;
@@ -506,6 +522,7 @@ const t =
 
 <script>
   import { ordErUpassende } from '../lib/ordkryss-kjerne';
+  import { opprettBildebank } from '../lib/bildebank-brikke';
 
   const rot = document.querySelector<HTMLElement>('.ob-verktoy');
   if (rot) {
@@ -514,6 +531,27 @@ const t =
     const LAGRINGSNOKKEL = `ord-til-bilde-${lang}`;
     const MAKS_ORD = 8;
     const NS = 'http://www.w3.org/2000/svg';
+
+    // Manglende bilde markeres først etter et genereringsforsøk — ikke
+    // mens læreren fortsatt skriver.
+    let visManglerMarkering = false;
+    const bildebank = opprettBildebank({
+      lang,
+      epost: rot.dataset.epost,
+      erUpassende: ordErUpassende,
+      paaEndring: () => oppdaterManglerMarkering(),
+    });
+
+    function oppdaterManglerMarkering() {
+      const rader = document.querySelectorAll<HTMLElement>('#ob-ord-liste .ob-ord-rad');
+      for (const li of rader) {
+        const id = Number(li.dataset.ordid);
+        const ord = ordListe.find((o) => o.id === id);
+        const mangler =
+          !!ord && ord.tekst.trim().length > 0 && !ord.bilde && !bildebank.forslagFor(id);
+        li.classList.toggle('mangler-bilde', visManglerMarkering && mangler);
+      }
+    }
 
     const M =
       lang === 'nb'
@@ -597,6 +635,7 @@ const t =
       ordListe.forEach((ord, indeks) => {
         const rad = document.createElement('li');
         rad.className = 'ob-ord-rad';
+        rad.dataset.ordid = String(ord.id);
 
         const felt = document.createElement('input');
         felt.type = 'text';
@@ -689,16 +728,19 @@ const t =
         fjern.setAttribute('aria-label', M.fjernOrd(indeks + 1));
         fjern.addEventListener('click', () => {
           ordListe = ordListe.filter((o) => o.id !== ord.id);
+          bildebank.nullstill(ord.id);
           if (ordListe.length === 0) leggTilOrd();
           tegnOrdListe();
           lagreUtkast();
         });
 
         rad.append(felt, bildeHolder, filFelt, fjern);
+        bildebank.monter(ord.id, felt, rad);
         liste.appendChild(rad);
       });
 
       el<HTMLButtonElement>('ob-legg-til').disabled = ordListe.length >= MAKS_ORD;
+      oppdaterManglerMarkering();
     }
 
     function siStatus(tekst: string, erFeil = false) {
@@ -720,11 +762,18 @@ const t =
           siStatus(M.upassende(o.tekst), true);
           return;
         }
-        if (!o.bilde) {
-          siStatus(M.manglerBilde(o.tekst), true);
-          return;
-        }
       }
+
+      // Bilde påkrevd: lærerens eget ELLER bildebank-forslaget teller.
+      const utenBilde = rene.filter((o) => !o.bilde && !bildebank.forslagFor(o.id));
+      if (utenBilde.length > 0) {
+        visManglerMarkering = true;
+        oppdaterManglerMarkering();
+        siStatus(M.manglerBilde(utenBilde[0].tekst), true);
+        return;
+      }
+      visManglerMarkering = false;
+      oppdaterManglerMarkering();
 
       el('ob-overskrift').textContent =
         el<HTMLInputElement>('ob-tittel').value.trim() || standardTittel;
@@ -769,10 +818,17 @@ const t =
         const punkt = document.createElement('span');
         punkt.className = 'ob-punkt';
         punkt.textContent = `● ${BOKSTAVER[plass]}`;
-        const img = document.createElement('img');
-        img.src = o.bilde as string;
-        img.alt = '';
-        rad.append(punkt, img);
+        let bilde: HTMLElement;
+        if (o.bilde) {
+          const img = document.createElement('img');
+          img.src = o.bilde;
+          img.alt = '';
+          bilde = img;
+        } else {
+          // Validert over: uten eget bilde finnes det et forslag.
+          bilde = bildebank.lagArkElement(o.id) ?? document.createElement('span');
+        }
+        rad.append(punkt, bilde);
         hoyre.appendChild(rad);
       });
 
@@ -811,6 +867,7 @@ const t =
       leggTilOrd();
     }
     tegnOrdListe();
+    el('ob-legg-til').parentElement?.appendChild(bildebank.innstillinger());
 
     el('ob-legg-til').addEventListener('click', () => {
       leggTilOrd();

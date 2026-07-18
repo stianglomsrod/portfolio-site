@@ -7,13 +7,18 @@
    bor i src/lib/kryssord.ts (DOM-fri, stresstestet); bannordfilter og
    normalisering deles med Ordkryss (src/lib/ordkryss-kjerne.ts).
    Fasit-mekanikken er Ordkryss sin: «Vis fasit her» (klasse fasit-paa),
-   «Skriv ut fasit» (klasse print-fasit + afterprint-opprydding). */
+   «Skriv ut fasit» (klasse print-fasit + afterprint-opprydding).
+   Bildebanken foreslår bilde fra ordet (docs/PRD-bildebank.md) og
+   teller som ledetråd; lærerens eget bilde vinner. */
+
+import profil from '../data/profil.json';
 
 interface Props {
   lang?: 'nb' | 'en';
 }
 
 const { lang = 'nb' } = Astro.props;
+const epost = profil.kontakt.epost;
 
 const t =
   lang === 'nb'
@@ -67,7 +72,7 @@ const t =
       };
 ---
 
-<div class="kv-verktoy" data-lang={lang} data-standardtittel={t.standardTittel}>
+<div class="kv-verktoy" data-lang={lang} data-standardtittel={t.standardTittel} data-epost={epost}>
   <div class="kv-oppsett">
     <section class="kv-panel" aria-labelledby="kv-panel-tittel">
       <h2 id="kv-panel-tittel" class="sr-only">{lang === 'nb' ? 'Oppsett' : 'Setup'}</h2>
@@ -250,6 +255,7 @@ const t =
     display: flex;
     gap: 6px;
     align-items: center;
+    flex-wrap: wrap; /* bildebank-brikken legger seg på egen linje */
   }
 
   .kv-ord-linje input[type='text'] {
@@ -553,6 +559,13 @@ const t =
     flex-shrink: 0;
   }
 
+  /* Systememoji-forslag fra bildebanken rendres som glyf */
+  span.kv-ledetraad-bilde.bb-ark-glyf {
+    height: auto;
+    font-size: 24px;
+    line-height: 30px;
+  }
+
   .kv-ledetraad-bilde {
     height: 30px;
     width: auto;
@@ -659,6 +672,7 @@ const t =
   import { lagKryssord } from '../lib/kryssord';
   import type { KryssordPlassering } from '../lib/kryssord';
   import { normaliserOrd, ordErUpassende } from '../lib/ordkryss-kjerne';
+  import { opprettBildebank } from '../lib/bildebank-brikke';
 
   const rot = document.querySelector<HTMLElement>('.kv-verktoy');
   if (rot) {
@@ -730,6 +744,12 @@ const t =
 
     const el = <T extends HTMLElement = HTMLElement>(id: string): T =>
       document.getElementById(id) as T;
+
+    const bildebank = opprettBildebank({
+      lang,
+      epost: rot.dataset.epost,
+      erUpassende: ordErUpassende,
+    });
 
     function lagreUtkast() {
       try {
@@ -882,12 +902,14 @@ const t =
         fjern.setAttribute('aria-label', M.fjernOrd(indeks + 1));
         fjern.addEventListener('click', () => {
           ordListe = ordListe.filter((o) => o.id !== ord.id);
+          bildebank.nullstill(ord.id);
           if (ordListe.length === 0) leggTilOrd();
           tegnOrdListe();
           lagreUtkast();
         });
 
         linje.append(felt, bildeHolder, filFelt, fjern);
+        bildebank.monter(ord.id, felt, linje);
 
         const ledetraadFelt = document.createElement('input');
         ledetraadFelt.type = 'text';
@@ -1042,13 +1064,19 @@ const t =
             nr.className = 'kv-ledetraad-nr';
             nr.textContent = `${p.nummer}.`;
             li.appendChild(nr);
+            // Lærerens eget bilde vinner; ellers bildebankens forslag.
+            let bilde: HTMLElement | null = null;
             if (rad.bilde) {
               const img = document.createElement('img');
               img.src = rad.bilde;
               img.alt = '';
               img.className = 'kv-ledetraad-bilde';
-              li.appendChild(img);
+              bilde = img;
+            } else {
+              bilde = bildebank.lagArkElement(rad.id);
+              bilde?.classList.add('kv-ledetraad-bilde');
             }
+            if (bilde) li.appendChild(bilde);
             const tekst = rad.ledetraad.trim();
             if (tekst) {
               const t = document.createElement('span');
@@ -1076,7 +1104,7 @@ const t =
           siStatus(M.forKort(o.tekst), true);
           return;
         }
-        if (!o.ledetraad && !o.bilde) {
+        if (!o.ledetraad && !o.bilde && !bildebank.forslagFor(o.id)) {
           siStatus(M.utenLedetraad(o.tekst), true);
           return;
         }
@@ -1130,6 +1158,7 @@ const t =
       leggTilOrd();
     }
     tegnOrdListe();
+    el('kv-legg-til').parentElement?.appendChild(bildebank.innstillinger());
 
     el('kv-legg-til').addEventListener('click', () => {
       leggTilOrd();

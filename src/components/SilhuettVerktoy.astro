@@ -3,13 +3,18 @@
    ordets silhuett (høye, lave og dype bokser), med valgfritt bilde per
    ord. Samme lest som Ordkryss: oppsett i venstremargen, hvitt ark til
    høyre — arket ER utskriften. Bokstavlogikken bor i src/lib/silhuett.ts;
-   bannordfilteret deles med Ordkryss (src/lib/ordkryss-kjerne.ts). */
+   bannordfilteret deles med Ordkryss (src/lib/ordkryss-kjerne.ts).
+   Bildebanken foreslår bilde fra ordet (docs/PRD-bildebank.md);
+   lærerens eget vinner. */
+
+import profil from '../data/profil.json';
 
 interface Props {
   lang?: 'nb' | 'en';
 }
 
 const { lang = 'nb' } = Astro.props;
+const epost = profil.kontakt.epost;
 
 const t =
   lang === 'nb'
@@ -45,7 +50,7 @@ const t =
       };
 ---
 
-<div class="si-verktoy" data-lang={lang} data-standardtittel={t.standardTittel}>
+<div class="si-verktoy" data-lang={lang} data-standardtittel={t.standardTittel} data-epost={epost}>
   <div class="si-oppsett">
     <section class="si-panel" aria-labelledby="si-panel-tittel">
       <h2 id="si-panel-tittel" class="sr-only">{lang === 'nb' ? 'Oppsett' : 'Setup'}</h2>
@@ -196,6 +201,7 @@ const t =
     display: flex;
     gap: 6px;
     align-items: center;
+    flex-wrap: wrap; /* bildebank-brikken legger seg på egen linje */
   }
 
   .si-ord-rad input[type='text'] {
@@ -434,6 +440,14 @@ const t =
     gap: 18px;
   }
 
+  /* Systememoji-forslag fra bildebanken rendres som glyf */
+  span.si-rad-bilde.bb-ark-glyf {
+    height: auto;
+    border: none;
+    font-size: calc(50px * var(--si-skala));
+    line-height: calc(64px * var(--si-skala));
+  }
+
   .si-rad-bilde {
     width: calc(64px * var(--si-skala));
     height: calc(64px * var(--si-skala));
@@ -552,6 +566,12 @@ const t =
       -webkit-print-color-adjust: exact;
     }
 
+    span.si-rad-bilde.bb-ark-glyf {
+      height: auto;
+      font-size: calc(15mm * var(--si-skala));
+      line-height: calc(20mm * var(--si-skala));
+    }
+
     .si-bank {
       margin-bottom: 8mm;
     }
@@ -561,6 +581,7 @@ const t =
 <script>
   import { bokstavBokser } from '../lib/silhuett';
   import { normaliserOrd, ordErUpassende } from '../lib/ordkryss-kjerne';
+  import { opprettBildebank } from '../lib/bildebank-brikke';
 
   const rot = document.querySelector<HTMLElement>('.si-verktoy');
   if (rot) {
@@ -609,6 +630,26 @@ const t =
 
     const el = <T extends HTMLElement = HTMLElement>(id: string): T =>
       document.getElementById(id) as T;
+
+    const bildebank = opprettBildebank({
+      lang,
+      epost: rot.dataset.epost,
+      erUpassende: ordErUpassende,
+    });
+
+    /** Lærerens eget bilde vinner; ellers bildebankens forslag (kan være null). */
+    function bildeElementFor(o: OrdRad, klasse: string): HTMLElement | null {
+      if (o.bilde) {
+        const img = document.createElement('img');
+        img.src = o.bilde;
+        img.alt = '';
+        img.className = klasse;
+        return img;
+      }
+      const forslag = bildebank.lagArkElement(o.id);
+      if (forslag) forslag.classList.add(klasse);
+      return forslag;
+    }
 
     function lagreUtkast() {
       try {
@@ -756,12 +797,14 @@ const t =
         fjern.setAttribute('aria-label', M.fjernOrd(indeks + 1));
         fjern.addEventListener('click', () => {
           ordListe = ordListe.filter((o) => o.id !== ord.id);
+          bildebank.nullstill(ord.id);
           if (ordListe.length === 0) leggTilOrd();
           tegnOrdListe();
           lagreUtkast();
         });
 
         rad.append(felt, bildeHolder, filFelt, fjern);
+        bildebank.monter(ord.id, felt, rad);
         liste.appendChild(rad);
       });
 
@@ -879,7 +922,7 @@ const t =
       // Dynamisk layout ut fra antall og lengste ord
       const bokserPerOrd = rene.map((o) => bokstavBokser(o.tekst).length);
       const maxLen = Math.max(1, ...bokserPerOrd);
-      const harBilde = rene.some((o) => o.bilde);
+      const harBilde = rene.some((o) => o.bilde || bildebank.forslagFor(o.id));
       const layout = velgLayout(rene.length, maxLen, harBilde, visBank);
       const ark = el('si-ark');
       ark.style.setProperty('--si-skala', String(layout.skala));
@@ -897,13 +940,8 @@ const t =
         const rad = document.createElement('li');
         rad.className = 'si-rad';
 
-        if (o.bilde) {
-          const bilde = document.createElement('img');
-          bilde.src = o.bilde;
-          bilde.alt = '';
-          bilde.className = 'si-rad-bilde';
-          rad.appendChild(bilde);
-        }
+        const bilde = bildeElementFor(o, 'si-rad-bilde');
+        if (bilde) rad.appendChild(bilde);
 
         const ordEl = document.createElement('span');
         ordEl.className = 'si-ord';
@@ -929,6 +967,7 @@ const t =
       leggTilOrd();
     }
     tegnOrdListe();
+    el('si-legg-til').parentElement?.appendChild(bildebank.innstillinger());
 
     ['si-tittel', 'si-vis-ordbank'].forEach((id) =>
       el(id).addEventListener('change', lagreUtkast)

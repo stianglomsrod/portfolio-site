@@ -3,7 +3,7 @@
 > Register over regulatoriske vurderinger for prosjektet. Oppdateres ved hver
 > vesentlig ny feature. Ikke juridisk rådgivning.
 
-**Prosjekt:** stianglomsrod.no v2  **Samlet trafikklys:** 🟢 GRØNT  **Sist oppdatert:** 2026-07-11
+**Prosjekt:** stianglomsrod.no v2  **Samlet trafikklys:** 🟢 GRØNT  **Sist oppdatert:** 2026-07-18
 
 | # | Område | Relevant? | Farge | Vurdering / status | Nødvendig tiltak/dokument | Ansvarlig |
 |---|---|---|---|---|---|---|
@@ -25,6 +25,8 @@
 | 16 | IP / opphavsrett / lisens | Ja | 🟢 | Fonter: SIL OFL 1.1 ×3 (dokumenteres, Done 17). Spillmotor Phaser: MIT. Portrett: egeneid. Lori Frisør: navn/skjermbilder krever arkivert skriftlig godkjenning (Done 19), ellers plassholderkort. | Lisensdokumentasjon i kolofon; Lori-sjekk før deploy | Stian (Lori-OK) |
 | 17 | Offentlig anskaffelse | Nei | 🟢 | Privat prosjekt. | — | — |
 | 18 | Sandbox-lærerverktøy (Ordkryss, Silhuetter, Ordbingo, Kryssord; batch vurdert 2026-07-11: Luketekst, Setningsstokking, Ord-til-bilde, Sporing, Alfabetisering, Regneark, Klokkeark, Tallinje, Gangetabell) | Ja | 🟢 | Rene klientside-verktøy uten server, konto eller innsending: læreren skriver ordliste lokalt, arket genereres i nettleseren og skrives ut. Utkast i localStorage er funksjonelt/brukerinitiert (kun tekst, aldri bilder — jf. rad 5). Innlimte bilder blir som data-URL i minnet og forlater aldri nettleseren; ansvaret for bildenes opphavsrett ligger hos læreren (kun lokal utskrift). Ingen elevdata behandles av siden (jf. rad 14). Bannordfilter beskytter klasserommet. | WCAG-kravet (rad 6) dekker de nye rutene: axe + kant-sjekk utvides per verktøy (nb + en) | Claude Code |
+
+| 19 | Bildebank for lærerverktøyene (vurdert 2026-07-18) | Ja | 🟢 | Klientside ordbok-oppslag (ord → emoji/symbol) i lærerverktøyene. Ingen konto, ingen opplasting, ingen cookies; oppslaget skjer i nettleseren mot statiske JSON-indekser og selvhostede SVG-er (`public/bildebank/`) — ingen eksterne kall i produksjon (holder rad 5). Ingen elevdata (jf. rad 14/18); læreren skriver enkeltord, aldri persondata etter formålet. Skolefilter i byggskriptet (redigerbar blokkeringsliste). Ønskeliste over ord uten treff samles kun i minnet i økta og sendes bare hvis læreren selv klikker en mailto-lenke (frivillig, egen e-postklient, null backend/sporing). KI brukes kun i produksjonslinja (oversettelse av Mulberrys engelske etiketter via Claude API — åpne symbolnavn, ingen persondata) med menneskelig gjennomgang før publisering; ingen KI-funksjon i produktet (jf. rad 9). Lisenser: OpenMoji CC BY-SA 4.0 og Mulberry Symbols CC BY-SA — uendrede symboler, kommersiell bruk OK med kreditering; CLDR-ordkoblinger under permissiv Unicode-lisens. ARASAAC/Sclera (CC BY-NC) er eksplisitt forkastet og skal ikke bygges inn. | Kreditering av OpenMoji, Mulberry Symbols og Unicode CLDR i kolofonen (hardt Done-krav); selvhosting verifiseres i QA (0 tredjeparts-requests); versjoner pinnes; symboler brukes uendret (share-alike utløses ikke) | Claude Code |
 
 **Konklusjon:** Ingen gule/røde områder. Release-gate (Done 20) kjøres før
 prod-deploy; avvik dokumenteres i `docs/BESLUTNINGER.md`.

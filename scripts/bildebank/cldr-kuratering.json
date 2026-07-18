@@ -1,0 +1,13 @@
+{
+  "_om": [
+    "Kuratering av den CLDR-genererte indeksen: ingen forslag er bedre enn",
+    "feil forslag. fjernOrd fjerner et oppslagsord helt (validert i",
+    "prototypen: «viskelær» ga svamp, «bringebær» ga jordbær). fjernKobling",
+    "fjerner én kode fra ett ord uten å røre resten. «ett» (klokka ett,",
+    "🕐) er fjernet fordi -ett er et vanlig norsk suffiks: «sigarett» fikk",
+    "klokkeforslag via sammensatt-analysen, og tallordet «ett» med",
+    "klokkebilde er uansett et dårlig forslag."
+  ],
+  "fjernOrd": ["viskelær", "bringebær", "ett"],
+  "fjernKobling": {}
+}

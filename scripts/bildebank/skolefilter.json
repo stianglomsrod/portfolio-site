@@ -1,0 +1,32 @@
+{
+  "_om": [
+    "Skolefilter for CLDR-indeksen (bildebank). REDIGERBAR LISTE, ikke",
+    "hardkodet moralisme: blokkerteKoder fjerner emojier helt (hex som i",
+    "indeksene), ordMonstre fjerner enkeltord fra oppslaget (regex, testes",
+    "mot hele ordet, uavhengig av emoji). Hudtone-varianter droppes via",
+    "OpenMoji-metadataene når droppHudtoner er true. droppKjonnsvarianter",
+    "fjerner ♀/♂-ZWJ-variantene (støyreduksjon: den nøytrale varianten",
+    "beholdes — tre nesten like syklister på ⟳ hjelper ingen). Terning",
+    "(1F3B2) er bevisst IKKE blokkert — brettspill hører hjemme i",
+    "klasserommet."
+  ],
+  "droppHudtoner": true,
+  "droppKjonnsvarianter": true,
+  "blokkerteKoder": [
+    "1F37A", "1F37B", "1F942", "1F377", "1F943", "1F378", "1F379",
+    "1F376", "1F37E",
+    "1F6AC",
+    "1F52B", "1F5E1", "2694", "1F4A3", "1F9E8", "1F3F9", "1F52A",
+    "1F489", "1FA78", "1FA7A",
+    "1F595",
+    "1F3B0",
+    "1F51E",
+    "1F6BE",
+    "1F921-200D-2640-FE0F", "1F921-200D-2642-FE0F"
+  ],
+  "ordMonstre": {
+    "nb": "^(øl|pils|vin|rødvin|hvitvin|champagne|brennevin|vodka|whisky|likør|cocktail|drink|alkohol|fyll|sigarett|sigar|røyking|tobakk|snus|pistol|revolver|gevær|rifle|våpen|bombe|granat|dolk|sverd|kniv|blod|blodig|sprøyte|narkotika|dop|kasino|gambling|pengespill|tipping|sexy|naken)$",
+    "en": "^(beer|lager|wine|champagne|liquor|vodka|whisky|whiskey|cocktail|booze|alcohol|drunk|cigarette|cigar|smoking|tobacco|gun|pistol|revolver|rifle|weapon|bomb|grenade|dagger|sword|knife|blood|bloody|syringe|drugs|casino|gambling|betting|sexy|naked)$",
+    "nn": "^(øl|pils|vin|raudvin|kvitvin|champagne|brennevin|vodka|whisky|likør|cocktail|drink|alkohol|sigarett|sigar|røyking|tobakk|snus|pistol|revolver|gevær|rifle|våpen|bombe|granat|dolk|sverd|kniv|blod|blodig|sprøyte|narkotika|dop|kasino|gambling|pengespel|tipping|sexy|naken)$"
+  }
+}

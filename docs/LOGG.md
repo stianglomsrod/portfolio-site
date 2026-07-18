@@ -6,6 +6,64 @@
 
 ## Changelog
 
+### 2026-07-18 — Sporing v4: forlagskvalitet — baner og veiledning opp med røttene
+- **Stians PDF-gjennomgang av v3** (med skjermutsnitt): versaler «skviste»
+  (unaturlig høye/tynne), q med meningsløs venstrehank, bokstavene krysser
+  grunnlinja i stedet for å hvile på den, piler «helt ute og kjøre» (konveks/
+  konkav speilvendt, for kraftige, for nære). Mandat: dra verktøyet opp med
+  røttene, mål = Salto 1A/1B-kvalitet; færre rader for større bokstaver OK.
+- **Ny fasit-research**: direktelesing av forlagsdumper fra forrige økt
+  (Salto Håndskrift Stavskrift 1 s. 50–51 + pil-zoomer, Kaleido b-modell) +
+  2 sonnet-agenter: (1) proporsjonstabell målt på Andika/infant-fonter +
+  Zeppelin-sider; (2) Zeppelin Arbeidsbok Trykkskrift-sidene (I/L/O/V/U/F)
+  via issuu-dumping. Fasit: pil = TYNN offset-parallell av strøket (~1/5 av
+  bokstavstreken, én strekbredde utenfor), tall ved pilens HALE m/ liten
+  prikk, bokstavblekket HVILER på linjene, O ≈ 0,8 av versalhøyden.
+  Alt i `docs/innsikt/sporing/FORMPROFIL-V4.md` + nett-proporsjoner.md +
+  nett-salto-trykk.md.
+- **`bokstavbaner.ts` skrevet helt om (v4)**: blekkant-terminaler (baner felt
+  inn med halv strekbredde: topp 4,1 · x-topp 16,1 · grunnhvile 25,9 ·
+  bunnhvile 37,9) så blekket hviler PÅ linjene; runde kropper r 4,9 fyller
+  stua eksakt; BREDE versaler (O/Q/Ø oval rx 8, A 21, M 22, W 23); q rett
+  hale uten kick; æ = a-bolle + delt stem + ekte e-del; myknet s/f/t/r;
+  eksportert STREK-konstant.
+- **Veiledningsmotor v4** i SporingVerktoy: pilen SAMPLES langs strøkets
+  første del og offsettes 3,4 enheter ut langs normalen → pilens krumning
+  følger strøkets automatisk (b/p-boller med klokka får riktig speilet bue).
+  Side velges med LUFT-regelen (score = avstand til bokstavens blekk-punktsky,
+  tak 6; egen strek ekskludert); er begge sider trange → INNLEDNINGSPIL i
+  lufta før strøkstart (Salto-mønsteret for tverrstreker/e/ø-strek).
+  Hjørnekutt stopper pilen ved skarpe knekk (z/e). Pil 0,55 tykk, lite hode,
+  tall 3,6 + haleprikk ved pilens hale. SIDE_HINT-kart for overstyring
+  (tomt — luftregelen traff alle 58).
+- **Større bokstaver**: «stor» = viewBox-bredde 250 (x-høyde ≈ 8,7 mm på A4,
+  Salto-klassen; ~7 repetisjoner per rad), «middels» = 340; MAKS rader 8→6
+  (Stians tillatelse: færre linjer, større bokstaver); 82 %-CSS-en fjernet.
+  Print strammet (viewBox-luft, radgap 3,5 mm, mindre topptekst) → 1 side
+  for 3 rader m/ tom øvelinje OG 6 rader uten.
+- Dev-serveren på 4322 serverte stale moduler etter omskrivingen (kjent
+  regel) — restartet (verifisert at PID-en var repoets astro dev først).
+- **Adversariell galleri-review** (sonnet-agent, alle 58 tegn + prod-ark mot
+  kravlista og Salto-fasit) fant 5 systematiske KRITISK-funn som ble fikset:
+  (1) buepiler kunne havne i telehull (d/å/h) — løst med KRUMNINGSREGEL
+  (buet strøk → pil alltid på konveks side) + trimming mot annet blekk;
+  (2) e-pil på tverrdraget/inn i løkka — løst ved at egen strek NEDSTRØMS
+  for pilen teller som hinder (kun pilens eget spenn ekskluderes) →
+  innledningspil, nøyaktig Salto-e; (3) tallstabling ved delt startpunkt
+  (E/F/R/Æ/Å/m) — løst med parvis frastøtnings-nudge av tallene; (4) O/Q/Ø
+  for ovale — utvidet til rx 8,6 (0,80 av høyden), C/G til 8,2; (5) J
+  hvilte ikke på grunnlinja — halvsirkelkrok med bunn i 25,9. I ord deles
+  blekk-punktskyen på tvers av bokstavene (Ole-e-kollisjonen borte), og
+  innledningspiler krymper ved trange naboer. Grønn startprikk fikk hvit
+  halo (lesbar der streker krysser, jf. ø). Full rapport:
+  `scratchpad/research/review-v4-visuell.md` (funnliste også i denne logg-
+  oppføringen som fasit). Rest-kosmetikk (Æ er tett — 5 strøk, sjelden;
+  Y-«3» nær krysset) er bevisst akseptert.
+- QA grønt etter fiksene: bygg, verktøy-smoke 79 OK (alle sporing-sjekker),
+  print 1 side begge cases (3 rader m/tom + 6 uten), axe 0/56, kant flukter,
+  visuell verifisering av alle review-funn (d/e/h/å/m/Ole + E/F/R/Æ/Å/O +
+  J/Q/Ø/ø/q/sol).
+
 ### 2026-07-17 (del 4) — Sporing v3: veiledningen UT av bokstaven (piler utenfor)
 - **Stians funn etter v2**: piler/tall oppå bokstavene ble «veldig busy og
   krangler om plass, og gir ikke eleven trygghet». Mål: piler på UTSIDEN som

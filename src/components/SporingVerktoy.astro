@@ -363,10 +363,6 @@ const t =
     height: auto;
   }
 
-  .sp-rader[data-storrelse='middels'] .sp-rad svg {
-    width: 82%;
-  }
-
   @media print {
     @page {
       margin: 14mm;
@@ -410,11 +406,25 @@ const t =
     }
 
     .sp-rader {
-      gap: 6mm;
+      gap: 3.5mm;
     }
 
     .sp-rad {
       break-inside: avoid;
+    }
+
+    #sp-overskrift {
+      font-size: 19px;
+      margin: 0 0 2px;
+    }
+
+    .sp-instruks {
+      font-size: 13px;
+      margin: 0 0 3px;
+    }
+
+    .sp-navn-linje {
+      margin: 0 0 10px;
     }
 
     .sp-rad svg {
@@ -433,7 +443,7 @@ const t =
     const lang = (rot.dataset.lang ?? 'nb') as 'nb' | 'en';
     const standardTittel = rot.dataset.standardtittel ?? 'Sporing';
     const LAGRINGSNOKKEL = `sporing-${lang}`;
-    const MAKS = 8;
+    const MAKS = 6; // færre rader = større bokstaver (Salto-størrelse på A4)
     const NS = 'http://www.w3.org/2000/svg';
 
     // fargene fra designgrunnlaget (v3, docs/innsikt/SPORING-DESIGN.md):
@@ -448,7 +458,10 @@ const t =
     const SPOR = '#b8b8b8';
     const PIL = '#3b4a59';
 
-    const VB_BREDDE = 340;
+    /* smalere viewBox → fysisk større bokstaver på arket. «stor» gir
+       x-høyde ≈ 8,7 mm på A4 (Salto-klassen); «middels» som før. */
+    const VB_STOR = 250;
+    const VB_MIDDELS = 340;
     const VB_HOYDE = 44;
     const START_X = 40; // etter hus-ikonet
     const GAP = 7;
@@ -573,25 +586,25 @@ const t =
     }
 
     /* Selve bokstavhuset: soner, fire linjer og hus-ikon med tak */
-    function lagHus(svg: SVGElement, medFarger: boolean) {
+    function lagHus(svg: SVGElement, medFarger: boolean, vbBredde: number) {
       const { topp, xtopp, grunn, bunn } = LINJER;
       if (medFarger) {
-        svg.appendChild(svgEl('rect', { x: String(START_X - 4), y: String(topp), width: String(VB_BREDDE - START_X + 2), height: String(xtopp - topp), fill: SONE_LOFT }));
-        svg.appendChild(svgEl('rect', { x: String(START_X - 4), y: String(xtopp), width: String(VB_BREDDE - START_X + 2), height: String(grunn - xtopp), fill: SONE_STUE }));
-        svg.appendChild(svgEl('rect', { x: String(START_X - 4), y: String(grunn), width: String(VB_BREDDE - START_X + 2), height: String(bunn - grunn), fill: SONE_KJELLER }));
+        svg.appendChild(svgEl('rect', { x: String(START_X - 4), y: String(topp), width: String(vbBredde - START_X + 2), height: String(xtopp - topp), fill: SONE_LOFT }));
+        svg.appendChild(svgEl('rect', { x: String(START_X - 4), y: String(xtopp), width: String(vbBredde - START_X + 2), height: String(grunn - xtopp), fill: SONE_STUE }));
+        svg.appendChild(svgEl('rect', { x: String(START_X - 4), y: String(grunn), width: String(vbBredde - START_X + 2), height: String(bunn - grunn), fill: SONE_KJELLER }));
       }
       const linje = (y: number, farge: string, stiplet: boolean, tykkelse = 0.55) =>
         svg.appendChild(
           svgEl('line', {
-            x1: String(START_X - 4), y1: String(y), x2: String(VB_BREDDE - 2), y2: String(y),
+            x1: String(START_X - 4), y1: String(y), x2: String(vbBredde - 2), y2: String(y),
             stroke: farge, 'stroke-width': String(tykkelse),
             ...(stiplet ? { 'stroke-dasharray': '3 2.4' } : {}),
           })
         );
-      linje(topp, '#b9b9b9', true);
-      linje(xtopp, '#b9b9b9', true);
-      linje(grunn, '#555', false, 0.8);
-      linje(bunn, '#cfcfcf', false, 0.45);
+      linje(topp, '#c4c4c4', true);
+      linje(xtopp, '#c4c4c4', true);
+      linje(grunn, '#666', false, 0.8);
+      linje(bunn, '#d2d2d2', false, 0.45);
 
       // hus-ikonet: bred vegg med tak over loftet (jf. bokstavhus-arkene)
       svg.appendChild(svgEl('path', { d: `M 0.5 ${topp} L 16.5 ${topp - 3.8} L 32.5 ${topp}`, fill: 'none', stroke: '#777', 'stroke-width': '1' }));
@@ -602,129 +615,243 @@ const t =
 
     type Nivaa = 'modell' | 'lett' | 'ren';
 
+    interface Punkt { x: number; y: number }
+
     interface Jobb {
       g: SVGGElement;
       path: SVGPathElement;
-      strokD: string;
+      tegn: string;
+      strokIdx: number;
+      /** unik per bokstavinstans — luft-regelen måler mot hele bokstaven */
+      gruppeId: number;
       /** strøknummer når bokstaven har 3+ strøk (Salto-ro), ellers null */
       nummer: number | null;
       /** strøk 1 (får grønn startprikk) */
       forste: boolean;
       nivaa: Nivaa;
+      /** bokstavinstansens x-forskyvning — blekk-skyen deles på tvers av
+          ordet og maales i rad-koordinater */
+      offX: number;
+      egneIdx?: Set<number>;
+      /** sample-t (banelengde) per egen indeks — brukes til å telle egen
+          strek NEDSTRØMS for pilen som hinder (e-løkka skal stoppe pilen) */
+      egneT?: Map<number, number>;
     }
 
-    /* Hvilken tegnekommando kommer FØRST etter start-M? Avgjør buet vs rett
-       veiledningspil — leses av strøkets BEGYNNELSE, ikke om banen inneholder
-       en bue et sted (ellers får t/u/j feil buepil på en loddrett stav). */
-    function forsteKommando(d: string): string {
-      const utenM = d.replace(/^\s*M\s*-?[\d.]+\s+-?[\d.]+\s*/, '');
-      return (utenM.trim()[0] || 'L').toUpperCase();
+    /* v4-veiledningsmotor (se docs/innsikt/sporing/FORMPROFIL-V4.md):
+       pilen er en TYNN OFFSET-PARALLELL av strøkets første del — samplet
+       langs banen og forskjøvet ut langs normalen — slik at pilens krumning
+       alltid følger strøkets (Kaleido/Salto-fasit). Siden velges med
+       LUFT-regelen; er begge sider trange, brukes en INNLEDNINGSPIL i lufta
+       før strøkstart (Salto-mønsteret for tverrstreker). Tall + liten prikk
+       ved pilens hale. */
+
+    /** Per-strøk overstyring: 'tegn:strokIdx' → 1/-1 (side) eller 0 (lead-in) */
+    const SIDE_HINT: Record<string, number> = {};
+
+    /* Hvor langt langs strøket kan pilen følge før første skarpe hjørne? */
+    function hjornekutt(path: SVGPathElement, L: number, maks: number): number {
+      const steg = 0.9;
+      let prev: Punkt | null = null;
+      for (let t = 0.4; t <= maks; t += steg) {
+        const p = path.getPointAtLength(t);
+        const p2 = path.getPointAtLength(Math.min(L, t + 0.7));
+        let tx = p2.x - p.x, ty = p2.y - p.y;
+        const tl = Math.hypot(tx, ty) || 1;
+        tx /= tl; ty /= tl;
+        if (prev) {
+          if (tx * prev.x + ty * prev.y < 0.64) return Math.max(3.4, t - steg);
+        }
+        prev = { x: tx, y: ty };
+      }
+      return maks;
     }
 
-    /* Kort RETT pil, hodet i (hx,hy), pekende i 'vinkel' (radianer). */
-    function tegnRettPil(g: SVGGElement, hx: number, hy: number, vinkel: number) {
-      const len = 4.2;
-      const tx = hx - Math.cos(vinkel) * len;
-      const ty = hy - Math.sin(vinkel) * len;
-      g.appendChild(
-        svgEl('line', {
-          x1: String(+tx.toFixed(2)), y1: String(+ty.toFixed(2)),
-          x2: String(+hx.toFixed(2)), y2: String(+hy.toFixed(2)),
-          stroke: PIL, 'stroke-width': '0.9', 'stroke-linecap': 'round',
-        })
-      );
-      g.appendChild(
-        svgEl('path', {
-          d: 'M 0 0 L -2.9 -1.7 L -2.9 1.7 Z', fill: PIL,
-          transform: `translate(${+hx.toFixed(2)} ${+hy.toFixed(2)}) rotate(${((vinkel * 180) / Math.PI).toFixed(1)})`,
-        })
-      );
+    function offsetPilBane(path: SVGPathElement, L: number, side: number): Punkt[] {
+      const frac = hjornekutt(path, L, Math.max(4, Math.min(0.32 * L, 10)));
+      const gap = 3.4;
+      const n = 9;
+      const pts: Punkt[] = [];
+      for (let i = 0; i <= n; i++) {
+        const t = (frac * i) / n;
+        const p = path.getPointAtLength(t);
+        const p2 = path.getPointAtLength(Math.min(L, t + 0.7));
+        let tx = p2.x - p.x, ty = p2.y - p.y;
+        const tl = Math.hypot(tx, ty) || 1;
+        tx /= tl; ty /= tl;
+        pts.push({ x: p.x + -ty * gap * side, y: p.y + tx * gap * side });
+      }
+      return pts;
     }
 
-    /* Kort BUET pil over toppen av et rundt strøk, buer mot klokka. */
-    function tegnBuePil(g: SVGGElement, cx: number, cy: number, r: number) {
-      const a0 = (-35 * Math.PI) / 180;
-      const a1 = (-145 * Math.PI) / 180;
-      const x0 = cx + r * Math.cos(a0), y0 = cy + r * Math.sin(a0);
-      const x1 = cx + r * Math.cos(a1), y1 = cy + r * Math.sin(a1);
-      g.appendChild(
-        svgEl('path', {
-          d: `M ${x0.toFixed(2)} ${y0.toFixed(2)} A ${r} ${r} 0 0 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`,
-          fill: 'none', stroke: PIL, 'stroke-width': '0.9', 'stroke-linecap': 'round',
-        })
-      );
-      const vg = ((a1 + Math.PI / 2) * 180) / Math.PI;
-      g.appendChild(
-        svgEl('path', {
-          d: 'M 0 0 L -2.9 -1.5 L -2.9 1.5 Z', fill: PIL,
-          transform: `translate(${x1.toFixed(2)} ${y1.toFixed(2)}) rotate(${vg.toFixed(1)})`,
-        })
-      );
-    }
-
-    function tegnTall(g: SVGGElement, x: number, y: number, n: number) {
-      g.appendChild(
-        svgEl('text', {
-          x: String(+x.toFixed(2)), y: String(+y.toFixed(2)),
-          'font-size': '4.4', 'font-weight': '700', fill: PIL, 'text-anchor': 'middle',
-        }, String(n))
-      );
-    }
-
-    /* Plasser veiledning (pil, evt. tall, evt. grønn startprikk) i det HVITE
-       utenfor strøket. Piltypen følger strøktypen (Salto-fasit):
-       rundt strøk → buet pil over toppen; loddrett/skrå/vannrett → rett pil
-       ved strøkstart, rotert etter starttangenten. */
-    function veiledStrok(job: Jobb) {
-      const { g, path, strokD, nummer, forste } = job;
-      const L = path.getTotalLength();
-      if (L < 0.5) return;
+    /* Innledningspil: i lufta FØR strøkstart, hodet peker inn mot starten.
+       Lengden krymper hvis halen ellers treffer annet blekk (ord-modus). */
+    function leadInBane(path: SVGPathElement, L: number, minDistAnnen: (p: Punkt) => number): Punkt[] {
       const p0 = path.getPointAtLength(0);
-      const early = path.getPointAtLength(Math.min(L * 0.14, 3.2));
-      let topX = p0.x, topY = p0.y;
-      const N = 26;
-      for (let i = 0; i <= N; i++) {
-        const p = path.getPointAtLength((L * i) / N);
-        if (p.y < topY) { topY = p.y; topX = p.x; }
-      }
-      const fc = forsteKommando(strokD);
-      const erBue = fc === 'A' || fc === 'C';
-      const dx = early.x - p0.x, dy = early.y - p0.y;
-      const GAPU = 3.0;
-      const { xtopp } = LINJER;
+      const p2 = path.getPointAtLength(Math.min(L, 1.2));
+      let tx = p2.x - p0.x, ty = p2.y - p0.y;
+      const tl = Math.hypot(tx, ty) || 1;
+      tx /= tl; ty /= tl;
+      let lengde = 6.6;
+      const prov = { x: p0.x - tx * lengde, y: p0.y - ty * lengde };
+      if (minDistAnnen(prov) < 2) lengde = 4.4;
+      const hode = { x: p0.x - tx * 2.1, y: p0.y - ty * 2.1 };
+      const hale = { x: p0.x - tx * lengde, y: p0.y - ty * lengde };
+      return [hale, { x: (hale.x + hode.x) / 2, y: (hale.y + hode.y) / 2 }, hode];
+    }
 
-      if (erBue) {
-        const r = 2.4;
-        const cy = topY - GAPU + 0.7 * r;
-        tegnBuePil(g, topX, cy, r);
-        if (nummer) tegnTall(g, topX - r - 2.2, cy - r - 0.4, nummer);
-      } else {
-        const vin = Math.atan2(dy, dx);
-        const dypStart = p0.y > xtopp + 3.5; // strøket begynner nede i bokstaven
-        let hx: number, hy: number;
-        if (dypStart) {
-          const utX = dx >= 0 ? -1 : 1;
-          hx = p0.x + utX * 3.0 - Math.cos(vin) * 1.0;
-          hy = p0.y - 1.2 - Math.sin(vin) * 1.0;
-        } else {
-          hx = p0.x - Math.cos(vin) * GAPU;
-          hy = p0.y - Math.sin(vin) * GAPU;
+    /* Samlet sving (radianer, fortegn) over pilens spenn — avgjør om strøket
+       er buet, og hvilken side som er konveks. */
+    function samletSving(path: SVGPathElement, L: number, frac: number): number {
+      let sum = 0;
+      let prev: Punkt | null = null;
+      const n = 6;
+      for (let i = 0; i <= n; i++) {
+        const t = (frac * i) / n;
+        const p = path.getPointAtLength(t);
+        const p2 = path.getPointAtLength(Math.min(L, t + 0.7));
+        let tx = p2.x - p.x, ty = p2.y - p.y;
+        const tl = Math.hypot(tx, ty) || 1;
+        tx /= tl; ty /= tl;
+        if (prev) sum += Math.asin(Math.max(-1, Math.min(1, prev.x * ty - prev.y * tx)));
+        prev = { x: tx, y: ty };
+      }
+      return sum;
+    }
+
+    function velgPolylinje(
+      path: SVGPathElement,
+      L: number,
+      inkSamples: Punkt[],
+      egneIdx: Set<number>,
+      egneT: Map<number, number>,
+      offX: number,
+      hintKey: string
+    ): Punkt[] {
+      const fracEks = hjornekutt(path, L, Math.max(4, Math.min(0.32 * L, 10))) + 3;
+      const minDistAnnen = (p: Punkt) => {
+        let m = 99;
+        for (let i = 0; i < inkSamples.length; i++) {
+          // egen strek INNENFOR pilens spenn gir konstant gap og ignoreres;
+          // egen strek NEDSTRØMS (f.eks. e-løkka) er et reelt hinder
+          if (egneIdx.has(i) && (egneT.get(i) ?? 0) <= fracEks) continue;
+          const q = inkSamples[i];
+          const d = Math.hypot(p.x + offX - q.x, p.y - q.y);
+          if (d < m) m = d;
         }
-        tegnRettPil(g, hx, hy, vin);
-        if (nummer) {
-          const tx = hx - Math.cos(vin) * 5.2 - Math.sin(vin) * 3.0;
-          const ty = hy - Math.sin(vin) * 5.2 + Math.cos(vin) * 3.0 + 1.4;
-          tegnTall(g, tx, ty, nummer);
+        return m;
+      };
+      const luft = (pts: Punkt[]) => {
+        let sum = 0;
+        for (const p of pts) sum += Math.min(6, minDistAnnen(p));
+        return sum / pts.length;
+      };
+      /* trim haleenden av pilen der den nærmer seg annet blekk (f.eks.
+         d-bollens bue som ellers ville truffet staven) */
+      const trim = (pts: Punkt[]) => {
+        let n = pts.length;
+        while (n > 4 && minDistAnnen(pts[n - 1]) < 2) n--;
+        return pts.slice(0, n);
+      };
+      const hint = SIDE_HINT[hintKey];
+      if (hint !== undefined) {
+        return hint === 0 ? leadInBane(path, L, minDistAnnen) : trim(offsetPilBane(path, L, hint));
+      }
+      const frac = hjornekutt(path, L, Math.max(4, Math.min(0.32 * L, 10)));
+      const sving = samletSving(path, L, frac);
+      if (Math.abs(sving) > 0.45) {
+        // buet strøk: pilen ligger ALLTID på konveks side (utsiden av kurven) —
+        // aldri inne i telehullet, uansett hvor «luftig» hullet er
+        const side = sving > 0 ? -1 : 1;
+        const pts = trim(offsetPilBane(path, L, side));
+        if (luft(pts) < 2.2) return leadInBane(path, L, minDistAnnen);
+        return pts;
+      }
+      const kand = [offsetPilBane(path, L, 1), offsetPilBane(path, L, -1)];
+      const l0 = luft(kand[0]), l1 = luft(kand[1]);
+      if (Math.max(l0, l1) < 3.1) return leadInBane(path, L, minDistAnnen);
+      if (Math.abs(l0 - l1) < 0.3) {
+        // like mye luft (frittstående stav/tverrstrek): foretrekk venstre/over
+        const gj = (pts: Punkt[]) => pts.reduce((s, p) => s + p.x + p.y * 0.4, 0);
+        return trim(gj(kand[0]) < gj(kand[1]) ? kand[0] : kand[1]);
+      }
+      return trim(l0 > l1 ? kand[0] : kand[1]);
+    }
+
+    interface TallPlan { g: SVGGElement; x: number; y: number; ux: number; uy: number; nummer: number }
+
+    /* Tegner pil + haleprikk; tallet planlegges (returneres) slik at
+       kolliderende tall kan nudges fra hverandre før de tegnes. */
+    function tegnPil(job: Jobb, inkSamples: Punkt[]): TallPlan | null {
+      const { g, path } = job;
+      const L = path.getTotalLength();
+      if (L < 3) return null;
+      const pts = velgPolylinje(path, L, inkSamples, job.egneIdx!, job.egneT!, job.offX, `${job.tegn}:${job.strokIdx}`);
+      const d = 'M ' + pts.map((p) => `${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(' L ');
+      g.appendChild(
+        svgEl('path', {
+          d, fill: 'none', stroke: PIL, 'stroke-width': '0.55',
+          'stroke-linecap': 'round', 'stroke-linejoin': 'round', class: 'sp-pil',
+        })
+      );
+      const sist = pts[pts.length - 1], nest = pts[pts.length - 2];
+      const vin = (Math.atan2(sist.y - nest.y, sist.x - nest.x) * 180) / Math.PI;
+      g.appendChild(
+        svgEl('path', {
+          d: 'M 0 0 L -2.4 -1.25 L -2.4 1.25 Z', fill: PIL, class: 'sp-pil',
+          transform: `translate(${sist.x.toFixed(2)} ${sist.y.toFixed(2)}) rotate(${vin.toFixed(1)})`,
+        })
+      );
+      // hale: liten prikk + ev. tall (Kaleido: tallet står ved pilens hale)
+      const hale = pts[0];
+      g.appendChild(svgEl('circle', { cx: hale.x.toFixed(2), cy: hale.y.toFixed(2), r: '0.55', fill: PIL }));
+      if (!job.nummer) return null;
+      const dx = pts[1].x - hale.x, dy = pts[1].y - hale.y;
+      const dl = Math.hypot(dx, dy) || 1;
+      return {
+        g,
+        x: hale.x - (dx / dl) * 2.6,
+        y: hale.y - (dy / dl) * 2.6,
+        ux: -(dx / dl), uy: -(dy / dl),
+        nummer: job.nummer,
+      };
+    }
+
+    /* Tall som havner oppå hverandre (strøk med delt startpunkt: E, Å, m …)
+       skyves parvis FRA hverandre før de tegnes (to runder tar kjedene). */
+    function tegnTall(planer: TallPlan[]) {
+      for (let runde = 0; runde < 2; runde++) {
+        for (let i = 0; i < planer.length; i++) {
+          for (let j = 0; j < i; j++) {
+            const a = planer[i], b = planer[j];
+            // gruppene deler koordinatsystem kun innen samme bokstav
+            if (a.g.getAttribute('transform') !== b.g.getAttribute('transform')) continue;
+            const dx = a.x - b.x, dy = a.y - b.y;
+            const d = Math.hypot(dx, dy);
+            if (d < 3.4) {
+              const ux = d > 0.1 ? dx / d : a.ux;
+              const uy = d > 0.1 ? dy / d : a.uy;
+              const skyv = (3.4 - d) / 2 + 0.3;
+              a.x += ux * skyv; a.y += uy * skyv;
+              b.x -= ux * skyv; b.y -= uy * skyv;
+            }
+          }
         }
       }
-      if (forste) {
-        g.appendChild(svgEl('circle', { cx: String(p0.x), cy: String(p0.y), r: '1.5', fill: GRONN }));
-      }
+      planer.forEach((p) => {
+        p.g.appendChild(
+          svgEl('text', {
+            x: p.x.toFixed(2), y: (p.y + 1.2).toFixed(2),
+            'font-size': '3.6', 'font-weight': '600', fill: PIL, 'text-anchor': 'middle',
+          }, String(p.nummer))
+        );
+      });
     }
 
     /* Én instans av teksten. «modell» = solid m/ full veiledning utenfor,
        «lett» = stiplet m/ kun grønn startprikk (dus bro, de første øvingene),
        «ren» = bare stiplet. */
+    let nesteGruppeId = 1;
     function leggTekst(
       svg: SVGElement,
       tekst: string,
@@ -737,16 +864,18 @@ const t =
       for (const tegn of tekst) {
         const b = bane(tegn);
         if (!b) continue;
+        const gruppeId = nesteGruppeId++;
+        const offX = x;
         const farge = modell ? SORT : SPOR;
         const synlige = b.strok.filter((s) => !s.prikk);
         const nummererer = synlige.length >= 3; // tall kun ved 3+ strøk
         let nr = 0;
-        b.strok.forEach((strok) => {
+        b.strok.forEach((strok, strokIdx) => {
           const g = svgEl('g', { transform: `translate(${x} 0)` }) as SVGGElement;
           if (strok.prikk) {
             const m = strok.d.match(/M\s*([\d.]+)\s+([\d.]+)/);
             if (m) {
-              g.appendChild(svgEl('circle', { cx: m[1], cy: m[2], r: '1.7', fill: farge }));
+              g.appendChild(svgEl('circle', { cx: m[1], cy: m[2], r: '1.35', fill: farge }));
             }
             svg.appendChild(g);
             return;
@@ -756,16 +885,16 @@ const t =
             d: strok.d,
             fill: 'none',
             stroke: farge,
-            'stroke-width': modell ? '2.3' : '2.1',
+            'stroke-width': modell ? '2.2' : '2',
             'stroke-linecap': 'round',
             'stroke-linejoin': 'round',
-            ...(modell ? {} : { 'stroke-dasharray': '3 2.6' }),
+            ...(modell ? {} : { 'stroke-dasharray': '2.8 2.7' }),
           }) as SVGPathElement;
           path.setAttribute('class', modell ? 'sp-modell-strok' : 'sp-spor-strok');
           g.appendChild(path);
           svg.appendChild(g);
           jobber.push({
-            g, path, strokD: strok.d,
+            g, path, tegn, strokIdx, gruppeId, offX,
             nummer: nummererer ? nr : null,
             forste: nr === 1,
             nivaa,
@@ -778,17 +907,45 @@ const t =
 
     /* Tegner veiledningen etter at pathene står i DOM (getPointAtLength). */
     function dekorer(jobber: Jobb[]) {
-      jobber.forEach((job) => {
-        if (job.nivaa === 'ren') return;
-        if (job.nivaa === 'modell') {
-          veiledStrok(job);
-        } else if (job.nivaa === 'lett' && job.forste) {
-          const p0 = job.path.getPointAtLength(0);
-          job.g.appendChild(
-            svgEl('circle', { cx: String(p0.x), cy: String(p0.y), r: '1.4', fill: GRONN })
-          );
+      // blekk-punktsky i RAD-koordinater over hele modellsettet (hele ordet),
+      // så veiledningen også unngår nabobokstavens blekk i ord-modus
+      const inkSamples: Punkt[] = [];
+      const modell = jobber.filter((j) => j.nivaa === 'modell');
+      modell.forEach((j) => {
+        const L = j.path.getTotalLength();
+        const n = Math.max(6, Math.min(16, Math.round(L / 2.5)));
+        const fra = inkSamples.length;
+        j.egneT = new Map();
+        for (let i = 0; i <= n; i++) {
+          const t = (L * i) / n;
+          const p = j.path.getPointAtLength(t);
+          inkSamples.push({ x: p.x + j.offX, y: p.y });
+          j.egneT.set(fra + i, t);
+        }
+        j.egneIdx = new Set(Array.from({ length: n + 1 }, (_, i) => fra + i));
+      });
+      // grønn startprikk med hvit halo (leselig også der streker krysser)
+      const prikk = (j: Jobb, r: number) => {
+        const p0 = j.path.getPointAtLength(0);
+        j.g.appendChild(
+          svgEl('circle', {
+            cx: String(p0.x), cy: String(p0.y), r: String(r),
+            fill: GRONN, stroke: '#fff', 'stroke-width': '0.4',
+          })
+        );
+      };
+      const tallPlaner: TallPlan[] = [];
+      jobber.forEach((j) => {
+        if (j.nivaa === 'ren') return;
+        if (j.nivaa === 'modell') {
+          const plan = tegnPil(j, inkSamples);
+          if (plan) tallPlaner.push(plan);
+          if (j.forste) prikk(j, 1.15);
+        } else if (j.nivaa === 'lett' && j.forste) {
+          prikk(j, 1.05);
         }
       });
+      tegnTall(tallPlaner);
     }
 
     function siStatus(tekst: string, erFeil = false) {
@@ -827,16 +984,18 @@ const t =
       beholder.replaceChildren();
 
       const alleDekor: Jobb[][] = [];
-      // viewBox-en får luft over loftet (y ned til -7) så piler og tall som
-      // ligger UTENFOR bokstavene ikke klippes bort øverst.
-      const VIEWBOX = `-1 -7 ${VB_BREDDE + 2} ${VB_HOYDE + 7}`;
+      const vbBredde = el<HTMLSelectElement>('sp-storrelse').value === 'stor' ? VB_STOR : VB_MIDDELS;
+      // viewBox-en får luft over loftet (y ned til -7,5) så piler og tall som
+      // ligger UTENFOR bokstavene ikke klippes — og strammes i bunnen slik at
+      // radene ikke sprenger A4-siden.
+      const VIEWBOX = `-1 -7.5 ${vbBredde + 2} 49`;
 
       rene.forEach((tekst) => {
         const rad = document.createElement('div');
         rad.className = 'sp-rad';
         rad.setAttribute('aria-label', tekst);
         const svg = svgEl('svg', { viewBox: VIEWBOX, 'aria-hidden': 'true' });
-        lagHus(svg, medFarger);
+        lagHus(svg, medFarger, vbBredde);
 
         const instansBredde = [...tekst].reduce((sum, tegn) => sum + (bane(tegn)?.bredde ?? 0), 0);
         const jobbListe = [...leggTekst(svg, tekst, START_X, 'modell').jobber];
@@ -845,7 +1004,7 @@ const t =
         const reserver = Math.max(instansBredde * 1.2, 24);
         let x = START_X + instansBredde + GAP + 3;
         let nr = 0;
-        while (x + instansBredde <= VB_BREDDE - 4 - reserver) {
+        while (x + instansBredde <= vbBredde - 4 - reserver) {
           const nivaa = nr < 2 ? 'lett' : 'ren';
           jobbListe.push(...leggTekst(svg, tekst, x, nivaa).jobber);
           x += instansBredde + GAP;
@@ -860,7 +1019,7 @@ const t =
           const tom = document.createElement('div');
           tom.className = 'sp-rad';
           const tomSvg = svgEl('svg', { viewBox: VIEWBOX, 'aria-hidden': 'true' });
-          lagHus(tomSvg, medFarger);
+          lagHus(tomSvg, medFarger, vbBredde);
           tom.appendChild(tomSvg);
           beholder.appendChild(tom);
         }

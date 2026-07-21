@@ -1,5 +1,6 @@
 ---
 import Side from '../layouts/Side.astro';
+import VippsDonasjon from '../components/VippsDonasjon.astro';
 import { VERKTOY, KATEGORINAVN } from '../lib/verktoykatalog';
 import type { Kategori } from '../lib/verktoykatalog';
 
@@ -38,6 +39,8 @@ const kategorier: Kategori[] = ['norsk', 'matte', 'lek'];
       </div>
     </section>
   ))}
+
+  <VippsDonasjon />
 
   <p class="lr-fot dempet">
     Verktøyene er laget av en lærer, for lærere — og listen vokser. Savner du

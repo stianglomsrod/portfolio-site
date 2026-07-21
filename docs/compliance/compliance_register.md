@@ -3,7 +3,7 @@
 > Register over regulatoriske vurderinger for prosjektet. Oppdateres ved hver
 > vesentlig ny feature. Ikke juridisk rådgivning.
 
-**Prosjekt:** stianglomsrod.no v2  **Samlet trafikklys:** 🟢 GRØNT  **Sist oppdatert:** 2026-07-11
+**Prosjekt:** stianglomsrod.no v2  **Samlet trafikklys:** 🟢 GRØNT  **Sist oppdatert:** 2026-07-21
 
 | # | Område | Relevant? | Farge | Vurdering / status | Nødvendig tiltak/dokument | Ansvarlig |
 |---|---|---|---|---|---|---|
@@ -17,7 +17,7 @@
 | 8 | Digitalsikkerhetsloven | Nei | 🟢 | Ikke samfunnskritisk tjeneste. | — | — |
 | 9 | KI-forordningen | Nei | 🟢 | KI brukes som utviklingsverktøy, ikke som funksjon i produktet. Ingen KI-beslutninger mot brukere. | Kolofonen beskriver arbeidsflyten (transparens, frivillig) | — |
 | 10 | Helse / medisinsk utstyr | Nei | 🟢 | Ikke relevant. Klar omtales kun som case. | — | — |
-| 11 | Betaling/finans | Nei | 🟢 | Ingen salgslogikk (brief §3). | — | — |
+| 11 | Betaling/finans | Ja | 🟢 | Ingen salgslogikk på siden. Vipps-donasjon (rad 20) er kun statisk QR/lenke inn i Vipps MobilePay (konsesjonsbelagt betalingsforetak) — siden mottar, behandler eller formidler aldri betalingsdata. | Se rad 20 | — |
 | 12 | DSA / plattform / UGC | Nei | 🟢 | Ingen brukergenerert innhold. | — | — |
 | 13 | Forbruker/markedsføring | Nei | 🟢 | Ingen e-handel, intet nyhetsbrev. | — | — |
 | 14 | Barn / skole / elevdata | Nei | 🟢 | Ingen elevdata på siden. Klar-casen omtales uten persondata (jf. profilregler). | — | — |
@@ -25,6 +25,10 @@
 | 16 | IP / opphavsrett / lisens | Ja | 🟢 | Fonter: SIL OFL 1.1 ×3 (dokumenteres, Done 17). Spillmotor Phaser: MIT. Portrett: egeneid. Lori Frisør: navn/skjermbilder krever arkivert skriftlig godkjenning (Done 19), ellers plassholderkort. | Lisensdokumentasjon i kolofon; Lori-sjekk før deploy | Stian (Lori-OK) |
 | 17 | Offentlig anskaffelse | Nei | 🟢 | Privat prosjekt. | — | — |
 | 18 | Sandbox-lærerverktøy (Ordkryss, Silhuetter, Ordbingo, Kryssord; batch vurdert 2026-07-11: Luketekst, Setningsstokking, Ord-til-bilde, Sporing, Alfabetisering, Regneark, Klokkeark, Tallinje, Gangetabell) | Ja | 🟢 | Rene klientside-verktøy uten server, konto eller innsending: læreren skriver ordliste lokalt, arket genereres i nettleseren og skrives ut. Utkast i localStorage er funksjonelt/brukerinitiert (kun tekst, aldri bilder — jf. rad 5). Innlimte bilder blir som data-URL i minnet og forlater aldri nettleseren; ansvaret for bildenes opphavsrett ligger hos læreren (kun lokal utskrift). Ingen elevdata behandles av siden (jf. rad 14). Bannordfilter beskytter klasserommet. | WCAG-kravet (rad 6) dekker de nye rutene: axe + kant-sjekk utvides per verktøy (nb + en) | Claude Code |
+
+<!-- Rad 19 er tatt i bruk av bildebanken på grenen feat/bildebank (ikke
+     merget); denne grenen hopper derfor til rad 20 for å unngå kollisjon. -->
+| 20 | Vipps-donasjon («spandér en kaffe», /laerer + nb-verktøysider) | Ja | 🟢 | Frivillig gave uten motytelse — ingen salgslogikk, ingen betalingsdata på siden. Statisk offisiell QR-PNG + offisielle merkefiler sjekket inn i repoet; mobilknappens href er qr.vipps.no-URL dekodet fra QR-en i byggetid (domenevalidert, fail-closed). Beløp skrives av giver i appen (kan ikke forhåndsutfylles). 0 nye eksterne kall, 0 cookies, 0 sporing (jf. rad 5). Barnevern: donasjonsblokka print-skjules på SAMTLIGE verktøysider (ark deles ut til barn) — verifiseres i QA, ikke antas. Merkevare: Vipps-retningslinjene følges (offisielle filer, aldri omtegnet/omfarget). Skatt/regnskap for mottatte gaver til ENK org.nr 838 126 782 er Stians ansvar utenfor siden. | Print-skjuling + 0-eksterne-kall som Done-kriterier i `docs/PRD-vipps.md`; org.nr-transparens i kolofonen | Claude Code (bygg/QA) · Stian (regnskap) |
 
 **Konklusjon:** Ingen gule/røde områder. Release-gate (Done 20) kjøres før
 prod-deploy; avvik dokumenteres i `docs/BESLUTNINGER.md`.

@@ -1,7 +1,9 @@
 ---
 import profil from '../data/profil.json';
+import vipps from '../data/vipps.json';
 import Merke from './Merke.astro';
 import { UI, type Spraak } from '../lib/i18n';
+import { VERKTOY } from '../lib/verktoykatalog';
 
 interface Props {
   lang?: Spraak;
@@ -10,6 +12,11 @@ interface Props {
 const { lang = 'nb' } = Astro.props;
 const t = UI[lang];
 const kolofonSti = lang === 'nb' ? '/kolofon' : '/en/colophon';
+
+/* Kaffelinja vises KUN på norske verktøysider (oppslag i katalogen — nye
+   verktøy arver den automatisk). Aldri på /en/-sider, aldri på utskrift. */
+const sti = Astro.url.pathname.replace(/\/$/, '') || '/';
+const visVipps = lang === 'nb' && VERKTOY.some((v) => v.slugNb === sti);
 ---
 
 <footer class="bunn">
@@ -23,6 +30,12 @@ const kolofonSti = lang === 'nb' ? '/kolofon' : '/en/colophon';
       <a href={profil.kontakt.github} rel="me">GitHub</a> ·
       <a href={profil.kontakt.linkedin} rel="me">LinkedIn</a>
     </p>
+    {visVipps && (
+      <p class="linje vipps-linje" data-vipps>
+        Gratis — men en kaffe via <a href={vipps.url}>Vipps</a> ({vipps.nummer})
+        varmer alltid.
+      </p>
+    )}
   </div>
 </footer>
 
@@ -46,6 +59,19 @@ const kolofonSti = lang === 'nb' ? '/kolofon' : '/en/colophon';
     margin: 0;
     font-size: 15px;
     color: var(--dempet);
+  }
+
+  .vipps-linje {
+    flex-basis: 100%;
+    font-size: 14px;
+  }
+
+  /* Kaffelinja skal ALDRI på utskrift (arkene deles ut til barn) — i
+     tillegg til at verktøyene skjuler hele .bunn i print. */
+  @media print {
+    .vipps-linje {
+      display: none !important;
+    }
   }
 
   /* Berøringsskjerm: footer-lenkene var 18px høye — utvid trykkflaten

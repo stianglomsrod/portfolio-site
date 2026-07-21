@@ -6,6 +6,42 @@
 
 ## Changelog
 
+### 2026-07-21 — Vipps-donasjon for Lærerrommet (gren feat/vipps, fra main)
+- **«Spandér en kaffe»** på /laerer (blokk nederst, etter at verdien er vist)
+  + diskré kaffelinje i footeren på alle nb-verktøysider (oppslag i
+  verktøykatalogen — nye verktøy arver linja automatisk). Engelske sider har
+  ingenting (verifisert i DOM). Skill-pipeline kjørt: compliance-porten 🟢
+  (register rad 20; rad 19 er bildebankens på sin gren) → PRD
+  (`docs/PRD-vipps.md`) → secure-dev proaktivt.
+- **Offisielle filer, aldri gjettet:** QR fra bedriftsportalen + Pay Mark
+  Small RGB sjekket inn byte-identisk (fc /b) i `public/vipps/`. Mobilknappens
+  href er URL-en dekodet fra QR-en i BYGGETID
+  (`scripts/vipps-dekod-qr.mjs`, jsqr 1.4.0 + pngjs 7.0.0 eksakt-pinnet,
+  fail-closed: kun `https://qr.vipps.no` godtas — en byttet/forgiftet QR-fil
+  stopper bygget). Dekodet: `https://qr.vipps.no/vp/nPU6JDdcM` →
+  `src/data/vipps.json` (sjekket inn; prebuild-kjeden regenererer).
+  Beløp kan ikke forhåndsutfylles — teksten foreslår, lenken gjør ikke.
+- **Print-regelen (viktigst):** blokka/linja skal ALDRI på utskrift (ark
+  deles ut til barn) — egen print-skjuling i komponenten OG footeren, i
+  tillegg til verktøyenes eksisterende `.bunn`-skjuling. Verifisert, ikke
+  antatt: `_baseline/qa/vipps-print-sjekk.mjs` (69/69 grønt) print-emulerer
+  alle 20 nb-verktøysider + /laerer og krever null synlige vipps-spor
+  (egne tekstnoder + bilder), sjekker en-sidene for DOM-fravær, 0 eksterne
+  requests, 0 cookies, href === dekodet URL, QR-alt-tekst, kolofon.
+- **Kolofon:** «Siden drives av Stian Glomsrød (enkeltpersonforetak), org.nr
+  838 126 782» + gave-uten-motytelse-presisering der krediteringene bor
+  (nb + en-tvilling; SIL-krediteringen intakt). Regnskap/skatt for gaver til
+  ENK er Stians ansvar utenfor siden (registerrad 20).
+- **Design:** tokens hele veien (flate/linje/salvie — hue-robust), knapp i
+  verktøyenes primær-idiom, Vipps-merket i offisiell oransje som eneste
+  dekor, QR på hvit flate (kravet for skanning). Begge temaer + mobil
+  sjekket i nettleser. Ingen animasjon, ingen klient-JS.
+- QA grønt: bygg, vipps-suite 69/69, axe 0/56, kant-sjekk 0/56 (`.vipps-kort`
+  lagt til i kandidatlista), verktøy-røyksuite 81 OK — de 2 FEIL er
+  bildebank-sjekker som tester feat/bildebank-featuren (finnes ikke på denne
+  grenen; ikke regresjon). GJENSTÅR hos Stian: fysisk telefontest av at
+  knappen/QR-en åpner Vipps-appen med riktig mottaker.
+
 ### 2026-07-18 — Sporing v4: forlagskvalitet — baner og veiledning opp med røttene
 - **Stians PDF-gjennomgang av v3** (med skjermutsnitt): versaler «skviste»
   (unaturlig høye/tynne), q med meningsløs venstrehank, bokstavene krysser

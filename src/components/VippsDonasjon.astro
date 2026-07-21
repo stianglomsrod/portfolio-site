@@ -1,0 +1,153 @@
+---
+import vipps from '../data/vipps.json';
+
+/* Donasjonsblokka for Lærerrommet («spandér en kaffe»). Kun norsk — den
+   engelske tvillingen (/en/teacher) har ingen donasjon. Ingen klient-JS.
+
+   - QR-bildet og Vipps-merket er OFFISIELLE filer i public/vipps/ (QR fra
+     bedriftsportalen, merket fra Vipps' retningslinjer) — aldri omtegnet,
+     aldri omfarget, aldri generert selv.
+   - Mobilknappens href er den eksakte URL-en dekodet fra QR-en i byggetid
+     (scripts/vipps-dekod-qr.mjs, fail-closed mot qr.vipps.no).
+   - Beløp kan ikke forhåndsutfylles («valgfritt beløp»); teksten foreslår.
+   - PRINT-REGELEN: blokka skal ALDRI kunne havne på utskrift — arkene deles
+     ut til barn. Print-skjulingen ligger her i komponenten i tillegg til
+     verktøyenes egne print-regler (belte og bukseseler). */
+---
+
+<section class="vipps-blokk" id="kaffe" aria-labelledby="vipps-tittel" data-vipps>
+  <div class="vipps-kort">
+    <div class="vipps-tekst">
+      <h2 id="vipps-tittel">Nyttig? Spandér en kaffe ☕</h2>
+      <p class="vipps-broed">
+        Verktøyene her er gratis. Har et ark spart deg for en søndagskveld,
+        kan du spandere en kaffe hvis du vil. En 20-kroning via Vipps holder
+        i massevis. Helt frivillig!
+      </p>
+      <a class="vipps-knapp" href={vipps.url}>Åpne Vipps</a>
+      <p class="vipps-nummer">
+        <img
+          class="vipps-merke"
+          src="/vipps/vipps-merke.svg"
+          alt=""
+          width="139"
+          height="104"
+          loading="lazy"
+          decoding="async"
+        />
+        Vipps til <strong>{vipps.nummer}</strong>
+      </p>
+    </div>
+    <img
+      class="vipps-qr"
+      src="/vipps/vipps-qr-59882.png"
+      alt={`QR-kode for Vipps: skann med mobilkameraet for å åpne Vipps med mottakeren stianglomsrod.no (Vippsnummer ${vipps.nummer}).`}
+      width="150"
+      height="150"
+      loading="lazy"
+      decoding="async"
+    />
+  </div>
+</section>
+
+<style>
+  .vipps-blokk {
+    margin-top: var(--s-6);
+  }
+
+  .vipps-kort {
+    display: flex;
+    align-items: center;
+    gap: var(--s-5);
+    background: var(--flate);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius-md);
+    box-shadow: var(--kort-skygge);
+    padding: var(--s-4) var(--s-5);
+  }
+
+  .vipps-tekst {
+    flex: 1;
+    min-width: 0;
+  }
+
+  h2 {
+    font-size: 21px;
+    margin: 0 0 var(--s-2);
+  }
+
+  .vipps-broed {
+    margin: 0;
+    font-size: 15.5px;
+    line-height: 1.55;
+    color: var(--dempet);
+    max-width: 58ch;
+  }
+
+  /* Mobil: knapp med den dekodede QR-URL-en. Skjult på desktop, der QR-en
+     gjør jobben. Samme idiom som verktøyenes primærknapper. */
+  .vipps-knapp {
+    display: none;
+    width: fit-content;
+    margin-top: var(--s-3);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 700;
+    background: var(--salvie);
+    color: var(--salvie-kontrast);
+    text-decoration: none;
+    border-radius: 9px;
+    padding: 11px 20px;
+    min-height: 44px;
+    align-items: center;
+  }
+
+  .vipps-knapp:hover {
+    filter: brightness(1.06);
+  }
+
+  .vipps-nummer {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    margin: var(--s-3) 0 0;
+    font-size: 15px;
+    color: var(--tekst);
+  }
+
+  .vipps-merke {
+    height: 26px;
+    width: auto;
+    border-radius: 4px;
+  }
+
+  .vipps-qr {
+    flex-shrink: 0;
+    border-radius: var(--radius-sm);
+    background: #fff;
+  }
+
+  @media (max-width: 680px) {
+    .vipps-kort {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--s-3);
+    }
+
+    .vipps-qr {
+      display: none;
+    }
+
+    .vipps-knapp {
+      display: inline-flex;
+    }
+  }
+
+  /* ALDRI på utskrift — arkene deles ut til barn. Gjelder i tillegg til
+     verktøyenes egne print-regler. */
+  @media print {
+    .vipps-blokk {
+      display: none !important;
+    }
+  }
+</style>

@@ -1,0 +1,3 @@
+# Vipps-merkefilene skal forbli byte-identiske med originalene fra
+# retningslinjene (Done 7 i docs/PRD-vipps.md) — ingen EOL-normalisering.
+public/vipps/* -text

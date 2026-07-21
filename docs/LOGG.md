@@ -41,6 +41,11 @@
   bildebank-sjekker som tester feat/bildebank-featuren (finnes ikke på denne
   grenen; ikke regresjon). GJENSTÅR hos Stian: fysisk telefontest av at
   knappen/QR-en åpner Vipps-appen med riktig mottaker.
+- **Merget til main (ff, 79eeab6) og deployet 2026-07-21 på Stians ordre.**
+  Prod-smoke mot stianglomsrod.no ALT GRØNT (9/9): blokk + dekodet href på
+  /laerer, QR-PNG 200 med riktig bytestørrelse (14316), merke-SVG 200,
+  kaffelinje på verktøyside, en-sidene uten vipps-spor, kolofon med org.nr
+  og SIL-kreditering intakt, ingen Set-Cookie.
 
 ### 2026-07-18 — Sporing v4: forlagskvalitet — baner og veiledning opp med røttene
 - **Stians PDF-gjennomgang av v3** (med skjermutsnitt): versaler «skviste»
